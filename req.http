@@ -1,4 +1,4 @@
+method(GET)
 url("https://google.com") 
 query('url', 'haha')
-method(GET)
 header('content-type','application/json')

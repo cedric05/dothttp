@@ -1,0 +1,8 @@
+method(POST)
+url("https://httpbin.org/post")
+query("querykey1", "queryvalue1")
+header('myhederkey','myheadervalue')
+query("querykey2", "queryvalue2")
+header('myhederkey2','myheadervalue2')
+data('{}')
+output('output')
