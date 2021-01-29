@@ -1,0 +1,8 @@
+HTTP: http=URL (querylist=QUERYS)? (method=METHOD)? (headerlist=HEADERLIST)?;
+URL: 'url' '(' url=STRING ')';
+HEADER: 'header' '(' key=STRING ',' value=STRING ')';
+METHOD: 'method' '(' type=METHODTYPE ')';
+METHODTYPE: "GET" | "POST" | "OPTIONS" | "DELETE" | "CONNECT" | "PUT" | "HEAD" | "TRACE" ;
+QUERY: 'query' '(' key=STRING ',' value=STRING ')';
+QUERYS: querys *= QUERY;
+HEADERLIST: headers *= HEADER;
