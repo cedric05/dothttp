@@ -1,5 +1,4 @@
-method(POST)
-url("https://httpbin.org/post")
+POST "https://dothttp.azurewebsites.net"
 query("querykey1", "queryvalue1")
 header('myhederkey','myheadervalue')
 query("querykey2", "queryvalue2")
