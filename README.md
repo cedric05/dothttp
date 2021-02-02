@@ -7,4 +7,15 @@ dothttp will provide simple, cleaner architecture for making http requests. It u
 
 
 
-checkout [examples]('./examples/httpbinorg.http')
+checkout [examples]('./examples/dothttpazure.http')
+
+
+- [ ] variable substitution
+- [ ] properties file
+- [ ] tests 
+- [ ] file uploads
+- [ ] multi form upload
+- [ ] basic auth
+- [ ] aws auth
+- [ ] command line arguments to curl and to make http request
+- [ ] add a lot of examples to refer

@@ -28,6 +28,7 @@ class BaseModelProcessor:
         for line in self.model.lines:
             if header := line.header:
                 headers[header.key] = header.value
+        return headers
 
     def get_url(self):
         return self.model.http.url
@@ -81,7 +82,7 @@ class RequestCompiler(BaseModelProcessor):
         session = Session()
         resp: Response = session.send(self.get_request())
         output = self.get_output()
-        for data in resp.iter_content():
+        for data in resp.iter_content(1024):
             if 'b' in output.mode:
                 output.write(data)
             else:
