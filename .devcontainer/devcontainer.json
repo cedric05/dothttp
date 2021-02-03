@@ -27,6 +27,6 @@
 	"extensions": [
 		"ms-python.python"
 	],
-
+	"postCreateCommand": "pipenv install --system --deploy",
 	"remoteUser": "vscode"
 }

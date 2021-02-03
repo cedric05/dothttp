@@ -1,17 +1,19 @@
-from . import RequestCompiler, CurlCompiler, dothttp_model
-import sys
+import argparse
+
+from . import RequestCompiler, CurlCompiler
 
 
-def apply(mm, filename):
-    with open(filename, 'r') as f:
-        httpData = f.read()
-    model = mm.model_from_str(httpData)
-    RequestCompiler(model).run()
+def apply(args):
+    comp_clss = CurlCompiler if args.curl else RequestCompiler
+    comp_clss(args).run()
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        print(apply(dothttp_model, sys.argv[1]))
-    else:
-        print(apply(dothttp_model, "..\examples\dothttpazure.http"))
-        print('run with python test.py filename.http')
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--curl', help='generates curl script', action='store_const', const=True)
+    parser.add_argument('--property-file', '-p', help='property file')
+    parser.add_argument('--env', '-e', help='environment to select in property file')
+    parser.add_argument('file', help='http file')
+
+    args = parser.parse_args()
+    apply(args)

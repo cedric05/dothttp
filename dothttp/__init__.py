@@ -1,21 +1,71 @@
+import json
 import os
 import re
 import sys
 
 from curlify import to_curl
 from requests import PreparedRequest, Session, Response
-from textx import metamodel_from_file, model as Model
+from textx import metamodel_from_file
+
+from dothttp.exceptions import PropertyNotFound
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 dothttp_model = metamodel_from_file(os.path.join(dir_path, 'http.tx'))
-var_regex = re.compile(r'{(?P<varible>\w*)}')
 
 
 class BaseModelProcessor:
-    def __init__(self, model: Model):
+    var_regex = re.compile(r'{(?P<varible>\w*)}')
+
+    def load_properties(self):
+        # TODO handle exceptions like file not found, non json file
+        if self.property_file:
+            with open(self.property_file, 'r') as f:
+                props = json.load(f)
+        else:
+            props = {}
+        self.properties.update(props.get("*", {}))
+        if self.env:
+            self.properties.update(props.get(self.env, {}))
+        return self.properties
+
+    def __init__(self, args):
+        self.args = args
+        self.file = args.file
+        self.properties = {}
+        self.property_file = args.property_file
+        self.env = args.env
+        self.content = ''
+        self.model = None
+        self.load()
+
+    def load(self):
+        self.load_content()
+        self.load_properties()
+        self.update_content_with_prop()
+        self.load_model()
+
+    def load_model(self):
+        # TODO for a very big file, it could be a problem
+        # textx has provided utitlity to load model, but we had variable options
+        # dothttp_model.model_from_file(args.file)
+        model = dothttp_model.model_from_str(self.content)
         self.model = model
 
+    def load_content(self):
+        with open(self.file, 'r') as f:
+            self.content = f.read()
+
+    def update_content_with_prop(self):
+        out = BaseModelProcessor.var_regex.findall(self.content)
+        for var in filter(lambda x: x, out):
+            if var in self.properties:
+                self.content = re.sub(r'{%s}' % var, self.properties.get(var), self.content)
+            else:
+                raise PropertyNotFound(var, self.args)
+
+
+class RequestBase(BaseModelProcessor):
     def get_query(self):
         params = {}
         for line in self.model.lines:
@@ -63,7 +113,7 @@ class BaseModelProcessor:
         raise NotImplementedError()
 
 
-class CurlCompiler(BaseModelProcessor):
+class CurlCompiler(RequestBase):
 
     def run(self):
         prep = self.get_request()
@@ -76,7 +126,7 @@ class CurlCompiler(BaseModelProcessor):
             output.close()
 
 
-class RequestCompiler(BaseModelProcessor):
+class RequestCompiler(RequestBase):
 
     def run(self):
         session = Session()
