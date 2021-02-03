@@ -8,7 +8,7 @@ from textx import metamodel_from_file, model as Model
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
-mm = metamodel_from_file(os.path.join(dir_path, 'http.tx'))
+dothttp_model = metamodel_from_file(os.path.join(dir_path, 'http.tx'))
 var_regex = re.compile(r'{(?P<varible>\w*)}')
 
 
@@ -89,18 +89,3 @@ class RequestCompiler(BaseModelProcessor):
                 output.write(data.decode())
         if output.fileno() != 1:
             output.close()
-
-
-def apply(mm, filename):
-    with open(filename, 'r') as f:
-        httpData = f.read()
-    model = mm.model_from_str(httpData)
-    RequestCompiler(model).run()
-
-
-if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        print(apply(mm, sys.argv[1]))
-    else:
-        print(apply(mm, "..\examples\dothttpazure.http"))
-        print('run with python test.py filename.http')
