@@ -49,8 +49,8 @@ checkout [examples]('./examples/dothttpazure.http')
 
 - [x] variable substitution
 - [x] properties file
-- [ ] support various data types like json, text (headers should be added autometically)
-- [ ] update README.md to explain syntax
+- [x] support various data types like json, text (headers should be added autometically)
+- [ ] update README.md to explain syntax and examples to refer
 - [ ] tests
 - [ ] file uploads
 - [x] should handle exceptions, only message should be shown.
@@ -59,4 +59,5 @@ checkout [examples]('./examples/dothttpazure.http')
 - [ ] basic auth
 - [ ] aws auth
 - [X] command line arguments to curl and to make http request
-- [ ] add a lot of examples to refer
+- [ ] easy installation package using pyinstaller, docker, brew
+- [ ] language server?, formatting

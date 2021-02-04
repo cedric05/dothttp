@@ -1,8 +1,58 @@
-HTTP: http=URL (lines *= LINE)? (payload=PAYLOAD)? (output=TOFILE)?;
-URL: (method=METHODTYPE)? url=STRING;
-LINE: (query=QUERY) | (header=HEADER);
-HEADER: 'header' '(' key=STRING ',' value=STRING ')' | key=STRING ':' value=STRING;
-METHODTYPE: "GET" | "POST" | "OPTIONS" | "DELETE" | "CONNECT" | "PUT" | "HEAD" | "TRACE" ;
-QUERY: 'query' '(' key=STRING ',' value=STRING ')' | '?' '(' key=STRING ',' value=STRING ')' | '?' key=STRING ',' value=STRING;
-PAYLOAD: 'data' '(' data=STRING ')' | 'fileinput' '(' file=STRING ')';
+HTTP: 
+    http=URL 
+    (lines *= LINE)? 
+    (payload=PAYLOAD)? 
+    (output=TOFILE)?;
+
+URL: 
+    (method=METHODTYPE)? url=STRING
+;
+
+LINE: 
+    (query=QUERY) | (header=HEADER)
+;
+
+HEADER: 
+    'header' '(' key=STRING ',' value=STRING ')' 
+    | key=STRING ':' value=STRING
+;
+
+METHODTYPE: 
+    "GET" | "POST" | "OPTIONS"
+    | "DELETE" | "CONNECT" | "PUT"
+    | "HEAD" | "TRACE"
+;
+
+QUERY: 
+    'query' '(' key=STRING ',' value=STRING ')'
+    | '?' '(' key=STRING ',' value=STRING ')'
+    | '?' key=STRING ',' value=STRING
+;
+
+PAYLOAD: 
+    'data' '(' data=STRING ')' 
+    | 'fileinput' '(' file=STRING ')' 
+    | ('json' '(' json=JSON  ')' )
+;
+
 TOFILE: 'output' '('output=STRING ')';
+
+JSON:
+    Array | Object
+;
+
+Array:
+    "[" values*=Value[','] "]"
+;
+
+Value:
+    STRING | FLOAT | BOOL | Object | Array | "null"
+;
+
+Object:
+    "{" members*=Member[','] "}"
+;
+
+Member:
+    key=STRING ':' value=Value
+;

@@ -61,7 +61,7 @@ class BaseModelProcessor:
         self.property_file = args.property_file
         self.env = args.env
         self.content = ''
-        self.model = None
+        self.original_content = self.content = ''
         self.load()
 
     def load(self):
@@ -84,7 +84,7 @@ class BaseModelProcessor:
         if not os.path.exists(self.file):
             raise HttpFileNotFoundException(file=self.file)
         with open(self.file, 'r') as f:
-            self.content = f.read()
+            self.original_content = self.content = f.read()
 
     def update_content_with_prop(self):
         out = BaseModelProcessor.var_regex.findall(self.content)
@@ -147,6 +147,8 @@ class RequestBase(BaseModelProcessor):
                 raise DataFileNotFoundException(datafile=filename)
             with open(filename, 'r') as f:
                 return f.read()
+        else:
+            print(self.model.payload.json)
 
     def get_output(self):
         if output := self.model.output:
