@@ -9,7 +9,7 @@ def apply(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser = argparse.ArgumentParser(description='Make http requests', prog="dothttp")
     parser.add_argument('--curl', help='generates curl script', action='store_const', const=True)
     parser.add_argument('--property-file', '-p', help='property file')
     parser.add_argument('--env', '-e', help='environment to select in property file')
