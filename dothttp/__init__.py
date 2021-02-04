@@ -1,3 +1,4 @@
+from dothttp.exceptions import *
 import json
 import os
 import re
@@ -6,8 +7,12 @@ import sys
 from curlify import to_curl
 from requests import PreparedRequest, Session, Response
 from textx import metamodel_from_file
+import logging
 
-from dothttp.exceptions import PropertyNotFound
+from .exceptions import PropertyNotFoundException
+
+logger = logging.getLogger("dothttp")
+
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -18,15 +23,26 @@ class BaseModelProcessor:
     var_regex = re.compile(r'{(?P<varible>\w*)}')
 
     def load_properties(self):
-        # TODO handle exceptions like file not found, non json file
+        if not self.property_file:
+            default = os.path.join(os.path.dirname(self.file), ".dothttp.json")
+            if os.path.exists(default):
+                self.property_file = default
         if self.property_file:
+            if not os.path.exists(default):
+                raise PropertyFileNotFoundException(
+                    propertyfile=self.property_file)
             with open(self.property_file, 'r') as f:
-                props = json.load(f)
+                try:
+                    props = json.load(f)
+                except:
+                    raise PropertyFileNotJsonException(
+                        propertyfile=self.property_file)
         else:
             props = {}
         self.properties.update(props.get("*", {}))
         if self.env:
-            self.properties.update(props.get(self.env, {}))
+            for env_name in self.env:
+                self.properties.update(props.get(env_name, {}))
         return self.properties
 
     def __init__(self, args):
@@ -49,10 +65,15 @@ class BaseModelProcessor:
         # TODO for a very big file, it could be a problem
         # textx has provided utitlity to load model, but we had variable options
         # dothttp_model.model_from_file(args.file)
-        model = dothttp_model.model_from_str(self.content)
+        try:
+            model = dothttp_model.model_from_str(self.content)
+        except:
+            raise HttpFileSyntaxException(file=self.file, position=None)
         self.model = model
 
     def load_content(self):
+        if not os.path.exists(self.file):
+            raise HttpFileNotFoundException(file=self.file)
         with open(self.file, 'r') as f:
             self.content = f.read()
 
@@ -60,9 +81,11 @@ class BaseModelProcessor:
         out = BaseModelProcessor.var_regex.findall(self.content)
         for var in filter(lambda x: x, out):
             if var in self.properties:
-                self.content = re.sub(r'{%s}' % var, self.properties.get(var), self.content)
+                self.content = re.sub(
+                    r'{%s}' % var, self.properties.get(var), self.content)
             else:
-                raise PropertyNotFound(var, self.args)
+                raise PropertyNotFoundException(
+                    var=var, propertyfile=self.property_file)
 
 
 class RequestBase(BaseModelProcessor):
@@ -92,6 +115,8 @@ class RequestBase(BaseModelProcessor):
         if self.model.payload.data:
             return self.model.payload.data
         elif filename := self.model.payload.file:
+            if not os.path.exists(filename):
+                raise DataFileNotFoundException(datafile=filename)
             with open(filename, 'r') as f:
                 return f.read()
 

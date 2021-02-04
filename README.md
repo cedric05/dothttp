@@ -32,6 +32,13 @@ docker run -it --rm dothttp
 
 ### whalebrew
 
+## Features
+1. easy http syntax
+1. variable substition with property file
+1. generates curl from http for easy sharing
+
+
+
 ```
 docker build -t dothttp .
 whalebrew install dothttp
@@ -46,6 +53,8 @@ checkout [examples]('./examples/dothttpazure.http')
 - [ ] update README.md to explain syntax
 - [ ] tests
 - [ ] file uploads
+- [x] should handle exceptions, only message should be shown.
+- [x] debug mode to show logs
 - [ ] multi form upload
 - [ ] basic auth
 - [ ] aws auth

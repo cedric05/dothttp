@@ -4,5 +4,5 @@ query("querykey1", "queryvalue1 {ram}")
 query("querykey2", "queryvalue2")
 ? ('haha', '{ram}')
 ? 'haha3', 'haha2'
-header('myhederkey2','myheadervalue2')
+header('myhederkey2','myheadervalue2 {ranga}')
 data('{}')
