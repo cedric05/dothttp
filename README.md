@@ -33,7 +33,7 @@ docker run -it --rm dothttp
 ### whalebrew
 
 ## Features
-1. easy http syntax
+1. easy and cleaner http syntax
 1. variable substition with property file
 1. generates curl from http for easy sharing
 

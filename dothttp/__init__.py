@@ -11,7 +11,9 @@ import logging
 
 from .exceptions import PropertyNotFoundException
 
-logger = logging.getLogger("dothttp")
+base_logger = logging.getLogger("dothttp")
+request_logger = logging.getLogger("request")
+curl_logger = logging.getLogger("curl")
 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -24,16 +26,23 @@ class BaseModelProcessor:
 
     def load_properties(self):
         if not self.property_file:
+            base_logger.debug('properfile not specified')
             default = os.path.join(os.path.dirname(self.file), ".dothttp.json")
             if os.path.exists(default):
+                base_logger.debug(
+                    f'file: {default} exists. it will be used for property reference')
                 self.property_file = default
+        elif not os.path.exists(self.property_file):
+            base_logger.debug(
+                f'file: {self.property_file} not found')
+            raise PropertyFileNotFoundException(
+                propertyfile=self.property_file)
         if self.property_file:
-            if not os.path.exists(default):
-                raise PropertyFileNotFoundException(
-                    propertyfile=self.property_file)
             with open(self.property_file, 'r') as f:
                 try:
                     props = json.load(f)
+                    base_logger.debug(
+                        f'file: {self.property_file} loaded successfully')
                 except:
                     raise PropertyFileNotJsonException(
                         propertyfile=self.property_file)
@@ -79,8 +88,11 @@ class BaseModelProcessor:
 
     def update_content_with_prop(self):
         out = BaseModelProcessor.var_regex.findall(self.content)
-        for var in filter(lambda x: x, out):
+        base_logger.debug(f'propertys used in `{self.file}` are `{out}`')
+        for var in set(filter(lambda x: x, out)):
             if var in self.properties:
+                base_logger.debug(
+                    f'using `{self.properties.get(var)}` for property {var} ')
                 self.content = re.sub(
                     r'{%s}' % var, self.properties.get(var), self.content)
             else:
@@ -94,6 +106,8 @@ class RequestBase(BaseModelProcessor):
         for line in self.model.lines:
             if query := line.query:
                 params[query.key] = query.value
+        request_logger.debug(
+            f'computed query params from `{self.file}` are `{params}`')
         return params
 
     def get_headers(self):
@@ -101,28 +115,49 @@ class RequestBase(BaseModelProcessor):
         for line in self.model.lines:
             if header := line.header:
                 headers[header.key] = header.value
+        request_logger.debug(
+            f'computed query params from `{self.file}` are `{headers}`')
         return headers
 
     def get_url(self):
+        request_logger.debug(
+            f'url is {self.model.http.url}')
         return self.model.http.url
 
     def get_method(self):
-        if model := self.model.http.method:
-            return model
+        if method := self.model.http.method:
+            request_logger.debug(
+                f'method defined in `{self.file}` is {method}')
+            return method
+        request_logger.debug(
+            f'method not defined in `{self.file}`. defaults to `GET`')
         return "GET"
 
     def get_payload(self):
-        if self.model.payload.data:
-            return self.model.payload.data
+        if data := self.model.payload.data:
+            request_logger.debug(
+                f'payload for request is `{data}`')
+            return data
         elif filename := self.model.payload.file:
+            request_logger.debug(
+                f'payload will be loaded from `{filename}`')
             if not os.path.exists(filename):
+                request_logger.debug(
+                    f'payload file `{filename}` Not found. ')
                 raise DataFileNotFoundException(datafile=filename)
             with open(filename, 'r') as f:
                 return f.read()
 
     def get_output(self):
         if output := self.model.output:
-            return open(output.output, 'wb')
+            request_logger.debug(
+                f'output will be written into `{self.file}` is `{output}`')
+            try:
+                return open(output.output, 'wb')
+            except:
+                request_logger.debug(
+                    f'not able to open `{output}`. output will be written to stdout')
+                return sys.stdout
         else:
             return sys.stdout
 
@@ -132,6 +167,7 @@ class RequestBase(BaseModelProcessor):
         prep.prepare_method(self.get_method())
         prep.prepare_headers(self.get_headers())
         prep.prepare_body(self.get_payload(), None)
+        request_logger.debug(f'request prepared completely')
         return prep
 
     def run(self):
@@ -149,6 +185,7 @@ class CurlCompiler(RequestBase):
         output.write(curlreq)
         if output.fileno() != 1:
             output.close()
+        curl_logger.debug(f'curl request generation completed successfully')
 
 
 class RequestCompiler(RequestBase):
@@ -164,3 +201,4 @@ class RequestCompiler(RequestBase):
                 output.write(data.decode())
         if output.fileno() != 1:
             output.close()
+        request_logger.debug(f'request executed completely')
