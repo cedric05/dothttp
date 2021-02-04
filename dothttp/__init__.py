@@ -137,7 +137,7 @@ class RequestBase(BaseModelProcessor):
         if data := self.model.payload.data:
             request_logger.debug(
                 f'payload for request is `{data}`')
-            return data
+            return data, {}, 'data'
         elif filename := self.model.payload.file:
             request_logger.debug(
                 f'payload will be loaded from `{filename}`')
@@ -146,9 +146,12 @@ class RequestBase(BaseModelProcessor):
                     f'payload file `{filename}` Not found. ')
                 raise DataFileNotFoundException(datafile=filename)
             with open(filename, 'r') as f:
-                return f.read()
+                return f.read(), {}, 'data'
         else:
-            print(self.model.payload.json)
+            # TODO returning multiple is wrong
+            # wrapping in a class is better. fix me please
+            d = json_or_array_to_json(self.model.payload.json)
+            return json.dumps(d), {"content-type": "application/json"}, 'json'
 
     def get_output(self):
         if output := self.model.output:
@@ -168,12 +171,37 @@ class RequestBase(BaseModelProcessor):
         prep.prepare_url(self.get_url(), self.get_query())
         prep.prepare_method(self.get_method())
         prep.prepare_headers(self.get_headers())
-        prep.prepare_body(self.get_payload(), None)
-        request_logger.debug(f'request prepared completely')
+        payload, headers, _ = self.get_payload()
+        prep.prepare_body(payload, None)
+        for key in headers:
+            prep.headers[key] = headers[key]
+        request_logger.debug(f'request prepared completely {prep}')
         return prep
 
     def run(self):
         raise NotImplementedError()
+
+
+def json_or_array_to_json(model):
+    if array := model.array:
+        return [jsonmodel_to_json(value) for value in array.values]
+    elif object := model.object:
+        return {member.key: jsonmodel_to_json(member.value) for member in object.members}
+
+
+def jsonmodel_to_json(model):
+    if str := model.str:
+        return str.value
+    elif flt := model.flt:
+        return flt.value
+    elif bl := model.bl:
+        return bl.value
+    elif object := model.object:
+        return {member.key: jsonmodel_to_json(member.value) for member in object.members}
+    elif array := model.array:
+        return [jsonmodel_to_json(value) for value in array.values]
+    elif model == 'null':
+        return None
 
 
 class CurlCompiler(RequestBase):

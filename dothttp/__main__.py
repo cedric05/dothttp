@@ -1,5 +1,6 @@
 import argparse
 import logging
+import traceback 
 
 from . import CurlCompiler, RequestCompiler, RequestBase
 from .exceptions import DotHttpException
@@ -22,6 +23,9 @@ def apply(args):
         logger.error(f'dothttp exception happened {dotthtppexc}')
         eprint(dotthtppexc.message)
     except Exception as exc:
+        # TODO remove below comments
+        # traceback.print_exc() 
+        # print(exc)
         logger.error(f'unknown error happened {exc}')
         eprint(f'unknown exception occurred with message {exc}')
 

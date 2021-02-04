@@ -49,7 +49,7 @@ checkout [examples]('./examples/dothttpazure.http')
 
 - [x] variable substitution
 - [x] properties file
-- [x] support various data types like json, text (headers should be added autometically)
+- [x] support various data types like json, text (headers should be added automatically)
 - [ ] update README.md to explain syntax and examples to refer
 - [ ] tests
 - [ ] file uploads

@@ -38,7 +38,7 @@ PAYLOAD:
 TOFILE: 'output' '('output=STRING ')';
 
 JSON:
-    Array | Object
+    array=Array | object=Object
 ;
 
 Array:
@@ -46,7 +46,20 @@ Array:
 ;
 
 Value:
-    STRING | FLOAT | BOOL | Object | Array | "null"
+    str=String | flt=Float | bl=Bool | object=Object | array=Array | null="null"
+;
+
+
+Bool:
+    value=BOOL
+;
+
+Float:
+    value=FLOAT
+;
+
+String: 
+    value=STRING
 ;
 
 Object:
