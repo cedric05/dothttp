@@ -53,6 +53,9 @@ checkout [examples]('./examples/dothttpazure.http')
 - [ ] update README.md to explain syntax and examples to refer
 - [ ] tests
 - [ ] file uploads
+- [ ] handle 200, 300, 400, 500 exception (user readable messages)
+- [ ] output should have rolling output format
+- [ ] multiple logging options
 - [x] should handle exceptions, only message should be shown.
 - [x] debug mode to show logs
 - [ ] multi form upload
