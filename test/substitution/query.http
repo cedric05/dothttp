@@ -1,0 +1,7 @@
+POST "https://{host}/ram"
+? '{queryname}' , 'value1'
+? 'key2' , '{valuename}'
+json({
+"{queryname}": "{valuename}"
+
+})

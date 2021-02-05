@@ -6,7 +6,7 @@ from test import TestBase
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 
-class RequestTestBase(TestBase):
+class RequestTest(TestBase):
     def test_get(self):
         req = self.get_request(f"{dir_path}/requests/pass.http")
         self.assertEqual("https://dothttp.azurewebsites.net/", req.url, "incorrect url")

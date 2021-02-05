@@ -11,7 +11,7 @@ json({
 "ranga":0.0,
     "ram2": [
         {
-            "ranga": "rangarao"
+            "ranga": "{ram}"
         }
     ]
 })

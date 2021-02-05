@@ -4,7 +4,7 @@ from test import TestBase
 from test.test_request import dir_path
 
 
-class PayLoadTestBase(TestBase):
+class PayLoadTest(TestBase):
     def test_json_payload(self):
         req = self.get_request(f"{dir_path}/payload/jsonpayload.http")
         self.assertEqual("https://dothttp.azurewebsites.net/", req.url,

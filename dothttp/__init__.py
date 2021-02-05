@@ -1,12 +1,11 @@
-from typing import Union
-
-import jstyleson as json
 import logging
 import os
 import re
 import sys
 from dataclasses import dataclass
+from typing import Union
 
+import jstyleson as json
 from curlify import to_curl
 from requests import PreparedRequest, Session, Response
 from textx import metamodel_from_file
@@ -37,7 +36,7 @@ class BaseModelProcessor:
 
     def load_properties(self):
         if not self.property_file:
-            base_logger.debug('properfile not specified')
+            base_logger.debug('property file not specified')
             default = os.path.join(os.path.dirname(self.file), ".dothttp.json")
             if os.path.exists(default):
                 base_logger.debug(
