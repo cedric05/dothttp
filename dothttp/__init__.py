@@ -1,24 +1,33 @@
-from dothttp.exceptions import *
 import json
+import logging
 import os
 import re
 import sys
+from dataclasses import dataclass
 
 from curlify import to_curl
 from requests import PreparedRequest, Session, Response
 from textx import metamodel_from_file
-import logging
 
+from dothttp.exceptions import *
 from .exceptions import PropertyNotFoundException
 
 base_logger = logging.getLogger("dothttp")
 request_logger = logging.getLogger("request")
 curl_logger = logging.getLogger("curl")
 
-
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 dothttp_model = metamodel_from_file(os.path.join(dir_path, 'http.tx'))
+
+
+@dataclass
+class Config:
+    curl: bool
+    property_file: str
+    env: list
+    debug: bool
+    file: str
 
 
 class BaseModelProcessor:
@@ -54,7 +63,7 @@ class BaseModelProcessor:
                 self.properties.update(props.get(env_name, {}))
         return self.properties
 
-    def __init__(self, args):
+    def __init__(self, args: Config):
         self.args = args
         self.file = args.file
         self.properties = {}
