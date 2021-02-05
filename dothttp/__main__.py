@@ -21,13 +21,13 @@ def apply(args: Config):
     try:
         comp_clss(args).run()
     except DotHttpException as dotthtppexc:
-        logger.error(f'dothttp exception happened {dotthtppexc}')
+        logger.error(f'dothttp exception happened {dotthtppexc}', exc_info=True)
         eprint(dotthtppexc.message)
     except Exception as exc:
         # TODO remove below comments
         # traceback.print_exc() 
         # print(exc)
-        logger.error(f'unknown error happened {exc}')
+        logger.error(f'unknown error happened {exc}', exc_info=True)
         eprint(f'unknown exception occurred with message {exc}')
 
 

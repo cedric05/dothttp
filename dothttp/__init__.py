@@ -1,4 +1,4 @@
-import json
+import jstyleson as json
 import logging
 import os
 import re
