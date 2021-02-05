@@ -1,3 +1,5 @@
+from typing import Union
+
 import jstyleson as json
 import logging
 import os
@@ -24,7 +26,7 @@ dothttp_model = metamodel_from_file(os.path.join(dir_path, 'http.tx'))
 @dataclass
 class Config:
     curl: bool
-    property_file: str
+    property_file: Union[str, None]
     env: list
     debug: bool
     file: str
@@ -143,6 +145,8 @@ class RequestBase(BaseModelProcessor):
         return "GET"
 
     def get_payload(self):
+        if not self.model.payload:
+            return None, {}, ''
         if data := self.model.payload.data:
             request_logger.debug(
                 f'payload for request is `{data}`')
