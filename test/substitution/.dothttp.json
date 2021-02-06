@@ -1,0 +1,17 @@
+{
+  "*": {
+    "host": "dothttp.azurewebsites.net",
+    "queryname": "key1",
+    "valuename": "value2"
+  },
+  "env1": {
+    "host1": "httpbing.org",
+    "queryname1": "haha",
+    "valuename1": "ahah"
+  },
+  "env2": {
+    "host1": "httpbing.org",
+    "queryname2": "qu2",
+    "valuename2": "va2"
+  }
+}

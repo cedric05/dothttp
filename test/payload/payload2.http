@@ -1,0 +1,4 @@
+POST 'https://dothttp.azurewebsites.net?key3=value3'
+? 'key1', 'value1'
+? 'key2', 'value2'
+data('{this is bad}')
