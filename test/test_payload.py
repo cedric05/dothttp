@@ -3,7 +3,7 @@ import json
 from test import TestBase
 from test.test_request import dir_path
 
-base_dir = f"{dir_path}/payload"
+base_dir = f"{dir_path}/Payload"
 
 
 class PayLoadTest(TestBase):
@@ -12,7 +12,7 @@ class PayLoadTest(TestBase):
         self.assertEqual("https://dothttp.azurewebsites.net/", req.url,
                          "incorrect url computed")
         self.assertEqual("POST", req.method, "incorrect method")
-        self.assertEqual('{"string": "simple"}', req.body, "incorrect method")
+        self.assertEqual(b'{"string": "simple"}', req.body, "incorrect method")
 
     def test_json_payload2(self):
         req = self.get_request(f"{base_dir}/jsonpayload2.http")
@@ -20,7 +20,7 @@ class PayLoadTest(TestBase):
                          "incorrect url computed")
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual(
-            '{"string": "simple", "list": ["dothttp", "azure"], "null": null, "bool": false, "bool2": true, "float": 1.121212, "float2": 1.0}',
+            b'{"string": "simple", "list": ["dothttp", "azure"], "null": null, "bool": false, "bool2": true, "float": 1.121212, "float2": 1.0}',
             req.body,
             "incorrect method")
 
@@ -55,7 +55,7 @@ class PayLoadTest(TestBase):
                 {"id": "Help"},
                 {"id": "About", "label": "About Adobe CVG Viewer..."}
             ]
-        }}, json.loads(req.body), "json payload parsed wrong")
+        }}, json.loads(req.body), "json Payload parsed wrong")
 
     def test_json_payload_complex(self):
         req = self.get_request(f"{base_dir}/jsonpayload4.http")
@@ -83,10 +83,10 @@ class PayLoadTest(TestBase):
                     }
                 }
             }
-        }, json.loads(req.body), "json payload parsed wrong")
+        }, json.loads(req.body), "json Payload parsed wrong")
 
     def test_payload(self):
-        req = self.get_request(f"{base_dir}/payload.http")
+        req = self.get_request(f"{base_dir}/Payload.http")
         self.assertEqual("https://dothttp.azurewebsites.net/", req.url,
                          "incorrect url computed")
         self.assertEqual("POST", req.method, "incorrect method")
@@ -104,4 +104,26 @@ class PayLoadTest(TestBase):
         self.assertEqual("https://dothttp.azurewebsites.net/", req.url,
                          "incorrect url computed")
         self.assertEqual("POST", req.method, "incorrect method")
-        self.assertEqual("{}", req.body, "incorrect method")
+        self.assertEqual(b"{}", req.body, "incorrect method")
+
+    def test_file_payload(self):
+        # TODO test file payload
+        pass
+
+    def test_json_header_payload(self):
+        # TODO json payload, header
+        pass
+
+    def test_multiple_payload(self):
+        # TODO mulitiple files
+        pass
+
+    def test_multipart_payload(self):
+        # TODO data + files
+        pass
+
+    def test_file_input_not_found(self):
+        pass
+
+    def test_file_input_not_found(self):
+        pass

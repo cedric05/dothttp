@@ -3,7 +3,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass
-from typing import Union
+from typing import Union, Dict
 
 import jstyleson as json
 from curlify import to_curl
@@ -13,6 +13,8 @@ from textx import metamodel_from_file
 from dothttp.exceptions import *
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import PropertyNotFoundException
+
+CONTENT_TYPE = 'content-type'
 
 base_logger = logging.getLogger("dothttp")
 request_logger = logging.getLogger("request")
@@ -36,6 +38,13 @@ class Config:
     file: str
 
 
+@dataclass
+class Payload:
+    data: Union[str, bytes, None]
+    json: Union[Dict, None]
+    header: Union[str, None]
+
+
 class BaseModelProcessor:
     var_regex = re.compile(r'{(?P<varible>\w*)}')
 
@@ -47,7 +56,7 @@ class BaseModelProcessor:
                 base_logger.debug(
                     f'file: {default} exists. it will be used for property reference')
                 self.property_file = default
-        if not os.path.exists(self.property_file):
+        if self.property_file and not os.path.exists(self.property_file):
             base_logger.debug(
                 f'file: {self.property_file} not found')
             raise PropertyFileNotFoundException(
@@ -105,18 +114,17 @@ class BaseModelProcessor:
     def update_content_with_prop(self):
         out = BaseModelProcessor.var_regex.findall(self.content)
         base_logger.debug(f'property used in `{self.file}` are `{out}`')
-        # TODO
-        # print check missing properties beforehand
-        # and list them, rather than fixing one by one
-        for var in set(filter(lambda x: x, out)):
-            if var in self.properties:
-                base_logger.debug(
-                    f'using `{self.properties.get(var)}` for property {var} ')
-                self.content = re.sub(
-                    r'{%s}' % var, self.properties.get(var), self.content)
-            else:
-                raise PropertyNotFoundException(
-                    var=var, propertyfile=self.property_file)
+        props_needed = set(filter(lambda x: x, out))
+        keys = set(self.properties.keys())
+        missing_props = props_needed - keys
+        if len(missing_props) != 0:
+            raise PropertyNotFoundException(
+                var=missing_props, propertyfile=self.property_file)
+        for var in props_needed:
+            base_logger.debug(
+                f'using `{self.properties.get(var)}` for property {var} ')
+            self.content = re.sub(
+                r'{%s}' % var, self.properties.get(var), self.content)
 
 
 class RequestBase(BaseModelProcessor):
@@ -153,12 +161,15 @@ class RequestBase(BaseModelProcessor):
         return "GET"
 
     def get_payload(self):
+        # TODO let @requests package handle, file reading, and data
+        # both data and file can be provided
+        # and files can be multiple
         if not self.model.payload:
-            return None, {}, ''
+            return Payload(data=None, json=None, header=None)
         if data := self.model.payload.data:
             request_logger.debug(
                 f'payload for request is `{data}`')
-            return data, {}, 'data'
+            return Payload(data=data, json=None, header=None)
         elif filename := self.model.payload.file:
             request_logger.debug(
                 f'payload will be loaded from `{filename}`')
@@ -167,12 +178,10 @@ class RequestBase(BaseModelProcessor):
                     f'payload file `{filename}` Not found. ')
                 raise DataFileNotFoundException(datafile=filename)
             with open(filename, 'r') as f:
-                return f.read(), {}, 'data'
+                return Payload(data=f.read(), json=None, header=None)
         else:
-            # TODO returning multiple is wrong
-            # wrapping in a class is better. fix me please
             d = json_or_array_to_json(self.model.payload.json)
-            return json.dumps(d), {"content-type": "application/json"}, 'json'
+            return Payload(data=None, json=d, header="application/json")
 
     def get_output(self):
         if output := self.model.output:
@@ -192,10 +201,12 @@ class RequestBase(BaseModelProcessor):
         prep.prepare_url(self.get_url(), self.get_query())
         prep.prepare_method(self.get_method())
         prep.prepare_headers(self.get_headers())
-        payload, headers, _ = self.get_payload()
-        prep.prepare_body(payload, None)
-        for key in headers:
-            prep.headers[key] = headers[key]
+        payload = self.get_payload()
+        prep.prepare_body(data=payload.data, json=payload.json, files=None)
+        if payload.header and CONTENT_TYPE not in prep.headers:
+            # if content-type is provided by header
+            # we will not wish to update it
+            prep.headers[CONTENT_TYPE] = payload.header
         request_logger.debug(f'request prepared completely {prep}')
         return prep
 

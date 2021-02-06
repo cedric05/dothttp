@@ -24,6 +24,13 @@ class RequestTest(TestBase):
                          "incorrect url computed")
         self.assertEqual("GET", req.method, "incorrect method")
 
+    def test_file_notfound(self):
+        pass
+
+    def test_syntax_problem(self):
+        pass
+
+
 
 if __name__ == "__main__":
     unittest.main()

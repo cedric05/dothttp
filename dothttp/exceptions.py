@@ -45,7 +45,7 @@ class PropertyFileNotJsonException(PropertyFileException):
     message = "property file is not a json file"
 
 
-@exception_wrapper('payload file `{datafile}` not found')
+@exception_wrapper('Payload file `{datafile}` not found')
 class DataFileNotFoundException(HttpFileException):
     message = "data file mentioned is not a"
 
