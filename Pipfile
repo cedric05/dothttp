@@ -8,6 +8,8 @@ textx = "*"
 requests = "*"
 curlify = "*"
 jstyleson = "*"
+python-magic = "*"
+python-magic-bin = "*"
 
 [dev-packages]
 autopep8 = "*"

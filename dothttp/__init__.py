@@ -4,6 +4,7 @@ import re
 import sys
 from dataclasses import dataclass
 from typing import Union, Dict
+import magic
 
 import jstyleson as json
 from curlify import to_curl
@@ -13,6 +14,8 @@ from textx import metamodel_from_file
 from dothttp.exceptions import *
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import PropertyNotFoundException
+
+MIME_TYPE_JSON = "application/json"
 
 CONTENT_TYPE = 'content-type'
 
@@ -40,9 +43,10 @@ class Config:
 
 @dataclass
 class Payload:
-    data: Union[str, bytes, None]
-    json: Union[Dict, None]
-    header: Union[str, None]
+    data: Union[str, bytes, None] = None
+    json: Union[Dict, None] = None
+    header: Union[str, None] = None
+    files: Union[Dict, None] = None
 
 
 class BaseModelProcessor:
@@ -161,15 +165,14 @@ class RequestBase(BaseModelProcessor):
         return "GET"
 
     def get_payload(self):
-        # TODO let @requests package handle, file reading, and data
-        # both data and file can be provided
-        # and files can be multiple
+        payload = None
         if not self.model.payload:
-            return Payload(data=None, json=None, header=None)
+            payload = Payload()
         if data := self.model.payload.data:
+            mimetype = self.model.payload.type if self.model.payload.type else magic.from_buffer(data, mime=True)
             request_logger.debug(
                 f'payload for request is `{data}`')
-            return Payload(data=data, json=None, header=None)
+            payload = Payload(data, header=mimetype)
         elif filename := self.model.payload.file:
             request_logger.debug(
                 f'payload will be loaded from `{filename}`')
@@ -177,11 +180,27 @@ class RequestBase(BaseModelProcessor):
                 request_logger.debug(
                     f'payload file `{filename}` Not found. ')
                 raise DataFileNotFoundException(datafile=filename)
+            mimetype = self.model.payload.type if self.model.payload.type else magic.from_file(filename, mime=True)
             with open(filename, 'r') as f:
-                return Payload(data=f.read(), json=None, header=None)
-        else:
-            d = json_or_array_to_json(self.model.payload.json)
-            return Payload(data=None, json=d, header="application/json")
+                payload = Payload(data=f.read(), header=mimetype)
+        elif json_data := self.model.payload.file:
+            d = json_or_array_to_json(json_data)
+            payload = Payload(json=d, header=MIME_TYPE_JSON)
+        elif files_wrap := self.model.payload.fileswrap:
+            files = {}
+            for filetype in files_wrap.files:
+                filename = filetype.name
+                content = filetype.path
+                mimetype = filetype.type
+                if os.path.exists(filetype.path):  # probably check valid path, then check for exists
+                    content = open(filetype.path, 'rb')
+                    filename = os.path.basename(filetype.path)
+                    if not mimetype: mimetype = magic.from_file(filetype.path, mime=True)
+                elif not mimetype:
+                    mimetype = magic.from_buffer(filename.path, mime=True)
+                files[filetype.name] = (filename, content, mimetype)
+            payload = Payload(files=files)
+        return payload
 
     def get_output(self):
         if output := self.model.output:
@@ -202,7 +221,7 @@ class RequestBase(BaseModelProcessor):
         prep.prepare_method(self.get_method())
         prep.prepare_headers(self.get_headers())
         payload = self.get_payload()
-        prep.prepare_body(data=payload.data, json=payload.json, files=None)
+        prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
         if payload.header and CONTENT_TYPE not in prep.headers:
             # if content-type is provided by header
             # we will not wish to update it

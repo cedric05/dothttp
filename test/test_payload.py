@@ -1,6 +1,7 @@
 import json
 
 from test import TestBase
+import tempfile
 from test.test_request import dir_path
 
 base_dir = f"{dir_path}/Payload"
@@ -107,6 +108,8 @@ class PayLoadTest(TestBase):
         self.assertEqual(b"{}", req.body, "incorrect method")
 
     def test_file_payload(self):
+        loadfile = tempfile.NamedTemporaryFile(delete=False)
+        loadfile.write("test");
         # TODO test file payload
         pass
 
@@ -120,9 +123,6 @@ class PayLoadTest(TestBase):
 
     def test_multipart_payload(self):
         # TODO data + files
-        pass
-
-    def test_file_input_not_found(self):
         pass
 
     def test_file_input_not_found(self):

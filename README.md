@@ -49,19 +49,20 @@ checkout [examples]('./examples/dothttpazure.http')
 
 - [x] variable substitution
 - [x] properties file
+- [ ] property from command line substitution  
 - [x] support various data types like json, text (headers should be added automatically)
 - [ ] update README.md to explain syntax and examples to refer
 - [x] tests
 - [ ] integration tests
-- [ ] file uploads
+- [x] file uploads
 - [x] handle 200, 300, 400, 500 exception (user readable messages)
 - [ ] output should have rolling output format
+- [ ] output coloring  
 - [ ] multiple logging options ?
 - [x] should handle exceptions, only message should be shown.
 - [x] debug mode to show logs
-- [ ] multi form upload
+- [x] multi form upload
 - [ ] basic auth
-- [ ] aws auth
 - [X] command line arguments to curl and to make http request
 - [ ] easy installation package using pyinstaller, docker, brew
-- [ ] language server?, formatting
+- [ ] language server?, formatter
