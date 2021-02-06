@@ -11,6 +11,7 @@ from requests import PreparedRequest, Session, Response
 from textx import metamodel_from_file
 
 from dothttp.exceptions import *
+from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import PropertyNotFoundException
 
 base_logger = logging.getLogger("dothttp")
@@ -20,6 +21,10 @@ curl_logger = logging.getLogger("curl")
 dir_path = os.path.dirname(os.path.realpath(__file__))
 
 dothttp_model = metamodel_from_file(os.path.join(dir_path, 'http.tx'))
+
+
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
 
 
 @dataclass
@@ -198,37 +203,15 @@ class RequestBase(BaseModelProcessor):
         raise NotImplementedError()
 
 
-def json_or_array_to_json(model):
-    if array := model.array:
-        return [jsonmodel_to_json(value) for value in array.values]
-    elif object := model.object:
-        return {member.key: jsonmodel_to_json(member.value) for member in object.members}
-
-
-def jsonmodel_to_json(model):
-    if str := model.str:
-        return str.value
-    elif flt := model.flt:
-        return flt.value
-    elif bl := model.bl:
-        return bl.value
-    elif object := model.object:
-        return {member.key: jsonmodel_to_json(member.value) for member in object.members}
-    elif array := model.array:
-        return [jsonmodel_to_json(value) for value in array.values]
-    elif model == 'null':
-        return None
-
-
 class CurlCompiler(RequestBase):
 
     def run(self):
         prep = self.get_request()
         output = self.get_output()
-        curlreq = to_curl(prep)
+        curl_req = to_curl(prep)
         if 'b' in output.mode:
-            curlreq = curlreq.encode()
-        output.write(curlreq)
+            curl_req = curl_req.encode()
+        output.write(curl_req)
         if output.fileno() != 1:
             output.close()
         curl_logger.debug(f'curl request generation completed successfully')
@@ -239,6 +222,13 @@ class RequestCompiler(RequestBase):
     def run(self):
         session = Session()
         resp: Response = session.send(self.get_request())
+        for hist_resp in resp.history:
+            request_logger.info(
+                f"server with url response {hist_resp}, status_code "
+                f"{hist_resp.status_code}, url: {hist_resp.url}")
+        if 400 <= resp.status_code:
+            request_logger.error(f"server with url response {resp.status_code}")
+            eprint(f"server responded with non 2XX code. code: {resp.status_code}")
         output = self.get_output()
         for data in resp.iter_content(1024):
             if 'b' in output.mode:

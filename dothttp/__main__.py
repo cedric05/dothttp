@@ -1,14 +1,8 @@
 import argparse
 import logging
-import sys
 
-from . import CurlCompiler, RequestCompiler, RequestBase, Config
+from . import CurlCompiler, RequestCompiler, Config
 from .exceptions import DotHttpException
-
-
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
-
 
 logger = logging.getLogger('dothttp')
 
