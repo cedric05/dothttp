@@ -42,7 +42,7 @@ class BaseModelProcessor:
                 base_logger.debug(
                     f'file: {default} exists. it will be used for property reference')
                 self.property_file = default
-        elif not os.path.exists(self.property_file):
+        if not os.path.exists(self.property_file):
             base_logger.debug(
                 f'file: {self.property_file} not found')
             raise PropertyFileNotFoundException(
@@ -53,7 +53,8 @@ class BaseModelProcessor:
                     props = json.load(f)
                     base_logger.debug(
                         f'file: {self.property_file} loaded successfully')
-                except:
+                except Exception as e:
+                    base_logger.error(f'exception loading property file ', exc_info=True)
                     raise PropertyFileNotJsonException(
                         propertyfile=self.property_file)
         else:
@@ -82,7 +83,7 @@ class BaseModelProcessor:
 
     def load_model(self):
         # TODO for a very big file, it could be a problem
-        # textx has provided utitlity to load model, but we had variable options
+        # textx has provided utility to load model, but we had variable options
         # dothttp_model.model_from_file(args.file)
         try:
             model = dothttp_model.model_from_str(self.content)
@@ -98,7 +99,10 @@ class BaseModelProcessor:
 
     def update_content_with_prop(self):
         out = BaseModelProcessor.var_regex.findall(self.content)
-        base_logger.debug(f'propertys used in `{self.file}` are `{out}`')
+        base_logger.debug(f'property used in `{self.file}` are `{out}`')
+        # TODO
+        # print check missing properties beforehand
+        # and list them, rather than fixing one by one
         for var in set(filter(lambda x: x, out)):
             if var in self.properties:
                 base_logger.debug(
