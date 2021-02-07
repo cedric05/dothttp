@@ -1,5 +1,6 @@
 HTTP: 
-    http=URL 
+    http=URL
+    (basic_auth_wrap=BASICAUTH)?
     (lines *= LINE)? 
     (payload=PAYLOAD)? 
     (output=TOFILE)?;
@@ -17,6 +18,10 @@ HEADER:
     | key=STRING ':' value=STRING
 ;
 
+BASICAUTH:
+    'basicauth' '(' username=STRING ',' password= STRING ')'
+;
+
 METHODTYPE: 
     "GET" | "POST" | "OPTIONS"
     | "DELETE" | "CONNECT" | "PUT"
@@ -27,12 +32,24 @@ QUERY:
     'query' '(' key=STRING ',' value=STRING ')'
     | '?' '(' key=STRING ',' value=STRING ')'
     | '?' key=STRING ',' value=STRING
+    | '?' key=STRING ':' value=STRING
+    | '?' key=STRING '=' value=STRING
 ;
 
 PAYLOAD: 
-    'data' '(' data=STRING ')' 
-    | 'fileinput' '(' file=STRING ')' 
-    | ('json' '(' json=JSON  ')' )
+    (   'data' '(' data=STRING (',' type=STRING)? ')'
+        | 'fileinput' '(' file=STRING   (',' type=STRING)? ')'
+        | ('json' '(' json=JSON  ')' )
+        | (fileswrap=FILES)
+    )
+;
+
+FILES:
+    "files" "(" files*=FILETYPE[','] ")"
+;
+
+FILETYPE:
+    ( '(' name=STRING ',' path=STRING (',' type=STRING)? ')')
 ;
 
 TOFILE: 'output' '('output=STRING ')';
