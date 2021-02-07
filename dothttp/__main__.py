@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from . import CurlCompiler, RequestCompiler, Config, eprint
+from . import CurlCompiler, RequestCompiler, HttpFileFormatter, Config, eprint
 from .exceptions import DotHttpException
 
 logger = logging.getLogger('dothttp')
@@ -11,9 +11,14 @@ def apply(args: Config):
     logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
     setup_logging(args)
     logger.info(f'command line arguments are {args}')
-    comp_clss: CurlCompiler | RequestCompiler = CurlCompiler if args.curl else RequestCompiler
+    if args.format:
+        comp_class = HttpFileFormatter
+    elif args.curl:
+        comp_class = CurlCompiler
+    else:
+        comp_class = RequestCompiler
     try:
-        comp_clss(args).run()
+        comp_class(args).run()
     except DotHttpException as dotthtppexc:
         logger.error(f'dothttp exception happened {dotthtppexc}', exc_info=True)
         eprint(dotthtppexc.message)
@@ -46,12 +51,14 @@ def main():
     parser.add_argument(
         '--info', '-i', help='more information', action='store_const', const=True)
     parser.add_argument(
+        '--format', '-fmt', help='formatter', action='store_const', const=True)
+    parser.add_argument(
         '--property', help='list of property\'s', nargs='+', default=[])
     parser.add_argument('file', help='http file')
 
     args = parser.parse_args()
     config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file,
-                    info=args.info, propertys=args.property, no_cookie=args.no_cookie)
+                    info=args.info, propertys=args.property, no_cookie=args.no_cookie, format=args.format)
     apply(config)
 
 

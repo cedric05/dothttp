@@ -49,6 +49,7 @@ class Config:
     file: str
     info: bool
     no_cookie: bool
+    format: bool
 
 
 @dataclass
@@ -308,6 +309,48 @@ class CurlCompiler(RequestBase):
         if output.fileno() != 1:
             output.close()
         curl_logger.debug(f'curl request generation completed successfully')
+
+
+class HttpFileFormatter(RequestBase):
+
+    def load(self):
+        self.load_content()
+        self.load_model()
+
+    @staticmethod
+    def format(model):
+        new_line = "\n"
+        output_str = f'{model.http.method} "{model.http.url}"'
+        if auth_wrap := model.basic_auth_wrap:
+            output_str += f'{new_line}basicauth("{auth_wrap.username}", "{auth_wrap.password}")'
+        if lines := model.lines:
+            headers = new_line.join(map(lambda line: f'"{line.header.key}": "{line.header.value}"',
+                                        filter(lambda line:
+                                               line.header, lines)))
+            query = new_line.join(map(lambda line: f'? ("{line.query.key}", "{line.query.value}")',
+                                      filter(lambda line:
+                                             line.query, lines)))
+            output_str += f'\n{headers}\n{query}'
+        if payload := model.payload:
+            p = ""
+            mime_type = payload.type
+            if data := payload.data:
+                p = f'data("{data}", {mime_type})'
+            elif filetype := payload.file:
+                p = f'fileinput("{filetype}", {mime_type})'
+            elif files_wrap := payload.fileswrap:
+                p2 = "\n\t".join(map(
+                    lambda file_type: f'("{file_type.name}", "{(file_type.name)}"'
+                                      f', "{file_type.type}")'
+                    , files_wrap.files))
+                p = f"files(\n\t{p2}\n)"
+            output_str += f'\n{p}'
+        return output_str
+
+    def run(self):
+        formatted = self.format(self.model)
+        with open(self.args.file, 'w') as f:
+            f.write(formatted)
 
 
 class RequestCompiler(RequestBase):

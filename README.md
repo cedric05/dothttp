@@ -66,6 +66,9 @@ checkout [examples]('./examples/dothttpazure.http')
   - [x] docker
   - [x] whalebrew
 - [ ] language server, formatter
+  - [x] HttpFileFormatter
+  - [ ] vscode plugin
+  - [ ] language server
 - [ ] 50% integration tests
 - [ ] 80% coverage unit tests
 - [x] release, packages to github
