@@ -27,3 +27,12 @@ class SubstitutionTest(TestBase):
 
     def test_substitution_property_file_comments(self):
         self.test_substitution_multiple_env(f"{base_dir}/prop2.json")
+
+    def test_file_notfound(self):
+        pass
+
+    def test_syntax_problem(self):
+        pass
+
+    def test_property_not_found(self):
+        pass

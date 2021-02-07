@@ -1,0 +1,3 @@
+ARG IMAGE_NAME=dothttp
+FROM ${IMAGE_NAME}
+RUN pyinstaller -F dothttp-cli.py --add-data "dothttp/http.tx:."
