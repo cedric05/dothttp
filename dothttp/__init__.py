@@ -165,14 +165,14 @@ class RequestBase(BaseModelProcessor):
         return "GET"
 
     def get_payload(self):
-        payload = None
+        # can be short circuted
         if not self.model.payload:
-            payload = Payload()
-        if data := self.model.payload.data:
+            return Payload()
+        elif data := self.model.payload.data:
             mimetype = self.model.payload.type if self.model.payload.type else magic.from_buffer(data, mime=True)
             request_logger.debug(
                 f'payload for request is `{data}`')
-            payload = Payload(data, header=mimetype)
+            return Payload(data, header=mimetype)
         elif filename := self.model.payload.file:
             request_logger.debug(
                 f'payload will be loaded from `{filename}`')
@@ -181,11 +181,11 @@ class RequestBase(BaseModelProcessor):
                     f'payload file `{filename}` Not found. ')
                 raise DataFileNotFoundException(datafile=filename)
             mimetype = self.model.payload.type if self.model.payload.type else magic.from_file(filename, mime=True)
-            with open(filename, 'r') as f:
-                payload = Payload(data=f.read(), header=mimetype)
-        elif json_data := self.model.payload.file:
+            with open(filename, 'rb') as f:
+                return Payload(data=f.read(), header=mimetype)
+        elif json_data := self.model.payload.json:
             d = json_or_array_to_json(json_data)
-            payload = Payload(json=d, header=MIME_TYPE_JSON)
+            return Payload(json=d, header=MIME_TYPE_JSON)
         elif files_wrap := self.model.payload.fileswrap:
             files = {}
             for filetype in files_wrap.files:
@@ -199,8 +199,8 @@ class RequestBase(BaseModelProcessor):
                 elif not mimetype:
                     mimetype = magic.from_buffer(filename.path, mime=True)
                 files[filetype.name] = (filename, content, mimetype)
-            payload = Payload(files=files)
-        return payload
+            return Payload(files=files)
+        return Payload()
 
     def get_output(self):
         if output := self.model.output:

@@ -108,8 +108,8 @@ class PayLoadTest(TestBase):
         self.assertEqual(b"{}", req.body, "incorrect method")
 
     def test_file_payload(self):
-        loadfile = tempfile.NamedTemporaryFile(delete=False)
-        loadfile.write("test");
+        # loadfile = tempfile.NamedTemporaryFile(delete=False)
+        # loadfile.write("test");
         # TODO test file payload
         pass
 

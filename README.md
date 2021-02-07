@@ -33,11 +33,10 @@ docker run -it --rm dothttp
 ### whalebrew
 
 ## Features
+
 1. easy and cleaner http syntax
 1. variable substition with property file
 1. generates curl from http for easy sharing
-
-
 
 ```
 docker build -t dothttp .
@@ -49,7 +48,7 @@ checkout [examples]('./examples/dothttpazure.http')
 
 - [x] variable substitution
 - [x] properties file
-- [ ] property from command line substitution  
+- [ ] property from command line substitution
 - [x] support various data types like json, text (headers should be added automatically)
 - [ ] update README.md to explain syntax and examples to refer
 - [x] tests
@@ -57,12 +56,15 @@ checkout [examples]('./examples/dothttpazure.http')
 - [x] file uploads
 - [x] handle 200, 300, 400, 500 exception (user readable messages)
 - [ ] output should have rolling output format
-- [ ] output coloring  
+- [ ] output coloring (according to content-type)
 - [ ] multiple logging options ?
 - [x] should handle exceptions, only message should be shown.
 - [x] debug mode to show logs
+- [ ] info logs, (just headers and response)
 - [x] multi form upload
 - [ ] basic auth
+- [ ] cookie storage and support
+- [ ] history
 - [X] command line arguments to curl and to make http request
 - [ ] easy installation package using pyinstaller, docker, brew
-- [ ] language server?, formatter
+- [ ] language server, formatter
