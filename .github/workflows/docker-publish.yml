@@ -9,7 +9,7 @@ on:
     tags:
       - v*
 env:
-  IMAGE_NAME: dothttp
+  IMAGE_NAME: cedric05/dothttp
 
 jobs:
   push:
