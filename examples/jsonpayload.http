@@ -1,14 +1,14 @@
 POST "https://dothttp.azurewebsites.net"
-query("querykey1", "queryvalue1 {ram}")
-'myhederkey' : 'myheadervalue {ram}'
-query("querykey2", "queryvalue2")
-? ('haha', '{ram}')
-? 'haha3', 'haha2'
-header('myhederkey2','myheadervalue2')
+"myhederkey": "myheadervalue {ram}"
+"myhederkey2": "myheadervalue2"
+? ("querykey1", "queryvalue1 {ram}")
+? ("querykey2", "queryvalue2")
+? ("haha", "{ram}")
+? ("haha3", "haha2")
 json({
-        "hai": "ram",
-"ram3":null,
-"ranga":0.0,
+    "hai": "ram",
+    "ram3": null,
+    "ranga": 0.0,
     "ram2": [
         {
             "ranga": "{ram}"

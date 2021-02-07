@@ -1,5 +1,8 @@
 # TODO clean up
-def json_or_array_to_json(model):
+from typing import Dict, List
+
+
+def json_or_array_to_json(model) -> Dict | List:
     if array := model.array:
         return [jsonmodel_to_json(value) for value in array.values]
     elif json_object := model.object:

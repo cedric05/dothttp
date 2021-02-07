@@ -1,15 +1,16 @@
 POST "https://dothttp.azurewebsites.net"
-"myhederkey": "myheadervalue {ram}"
-"myhederkey2": "myheadervalue2 {ranga}"
-? ("querykey1", "queryvalue1 {ram}")
+"myhederkey": "myheadervalue {{ram}}"
+"myhederkey2": "myheadervalue2 {{ranga}}"
+? ("querykey1", "queryvalue1 {{ram}}")
 ? ("querykey2", "queryvalue2")
-? ("haha", "{ram}")
-? ("haha3", "haha2")
-json({
-    "hi": true,
-    "bye": [
-        "hi",
-        "hahahah",
-        "hi"
-    ]
-})
+? ("haha", "{{ram}}")
+? ("{{raj=haha3}}", "haha2")
+data({'hi':"hi"})
+#json({
+#    "hi": "{{raj=haha3}}",
+#    "bye": [
+#        "hi",
+#        "hahahah",
+#        "hi"
+#    ]
+#})

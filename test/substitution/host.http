@@ -1,1 +1,1 @@
-GET "https://{host}/ram"
+GET "https://{{host}}/ram"

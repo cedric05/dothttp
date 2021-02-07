@@ -18,6 +18,8 @@ from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .exceptions import PropertyNotFoundException
 
+FORM_URLENCODED = "application/x-www-form-urlencoded"
+
 DOTHTTP_COOKIEJAR = os.path.expanduser('~/.dothttp.cookiejar')
 
 MIME_TYPE_JSON = "application/json"
@@ -38,6 +40,11 @@ dothttp_model = metamodel_from_file(dir_path)
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
+
+# TODO
+# better to create model structure
+# like a class,
+# it will come in handy in most scenarios
 
 @dataclass
 class Config:
@@ -61,10 +68,47 @@ class Payload:
     files: Union[Dict, None] = None
 
 
-class BaseModelProcessor:
-    var_regex = re.compile(r'{(?P<varible>\w*)}')
+@dataclass
+class Property:
+    text: str
+    key: Union[str, None] = None
+    value: Union[str, None] = None
 
-    def load_properties(self):
+
+# noinspection PyPackageRequirements
+class BaseModelProcessor:
+    var_regex = re.compile(r'{{(?P<var>.*?)}}')
+
+    def load_properties_n_headers(self):
+        """
+            1. in most scenarios, dev might want to short circut creating property file, but will wanted it as argument
+                for those scenarios, user can define property's default value in http file itself.
+                but there is a catch. if dev users same property twice, and passes different value,
+                it would complicate scenario
+            2. dev might want to separate property to a file. properties can be segregated in to multiple environments and dev
+                can enable multiple at a time.  ('*' section exists, it will be by default used)
+            3. dev can always mention which property file to load. but when he is lazy,
+                he can define a `.dothttp.json` which will be loaded if dev didn't mention property file
+            preference:
+            command line property > property from file > default property
+            property file syntax
+            {
+                "headers": {
+                    "Content-Type": "application/json",
+                },
+                "*": {
+                    "param1": "val1",
+                    "param2": "val2",
+                },
+                "env1": {
+                    "param1": "val3",
+                    "param2": "val4",
+                }
+                // ....
+            }
+            currently environment has restriction to not use "*" and "headers"
+        :return:
+        """
         if not self.property_file:
             base_logger.debug('property file not specified')
             default = os.path.join(os.path.dirname(self.file), ".dothttp.json")
@@ -89,10 +133,19 @@ class BaseModelProcessor:
                         propertyfile=self.property_file)
         else:
             props = {}
-        self.properties.update(props.get("*", {}))
-        if self.env:
-            for env_name in self.env:
-                self.properties.update(props.get(env_name, {}))
+        # TODO validate json to be of first level dict and second level string structure
+        try:
+            self.default_headers.update(props.get('headers', {}))
+            self.properties.update(props.get("*", {}))
+            if self.env:
+                for env_name in self.env:
+                    self.properties.update(props.get(env_name, {}))
+        except:
+            # mostly happens when, dev defines env with a number, string or array
+            # this is bad, cat and justify exception
+            raise PropertyFileException(
+                "property file expects all first level to be dictionary, second level values to be string")
+
         return self.properties
 
     def __init__(self, args: Config):
@@ -100,6 +153,10 @@ class BaseModelProcessor:
         self.file = args.file
         self.command_line_props = {}
         self.properties = {}
+        # dev can define default headers, which dev dont want to do it for all requests
+        # in most scenarios, headers are either computed or common across all other requests
+        # best syntax would be headers section of property file will define default headers
+        self.default_headers = {}
         self.property_file = args.property_file
         self.env = args.env
         self.content = ''
@@ -108,7 +165,7 @@ class BaseModelProcessor:
 
     def load(self):
         self.load_content()
-        self.load_properties()
+        self.load_properties_n_headers()
         self.load_command_line_props()
         self.update_content_with_prop()
         self.load_model()
@@ -138,12 +195,48 @@ class BaseModelProcessor:
         with open(self.file, 'r') as f:
             self.original_content = self.content = f.read()
 
+    @staticmethod
+    def validate_n_gen(prop, cache: Dict[str, Property]):
+        p: Union[Property, None] = None
+        if '=' in prop:
+            key_values = prop.split('=')
+            if len(key_values) != 2:
+                raise HttpFileException('default property should not have multiple `=`')
+            key, value = key_values
+            if key in cache and value != cache[key].value:
+                raise HttpFileException('defined property is defaulted with different values, panicked ')
+            p = Property(prop, key, value)
+            cache.setdefault(key, p)
+        else:
+            p = Property(prop)
+            cache.setdefault(prop, p)
+        return p
+
+    @staticmethod
+    def get_most_possible_val(a=None, b=None, c=None):
+        if a is not None:
+            return a
+        if b is not None:
+            return b
+        if c is not None:
+            return c
+
     def update_content_with_prop(self):
+        """
+            1. properties defined in file itself ({{a=10}})
+            2. properties from command line
+            3. properties from file's activated env
+            4. properties from files's '*'
+        :return:
+        """
         out = BaseModelProcessor.var_regex.findall(self.content)
         base_logger.debug(f'property used in `{self.file}` are `{out}`')
-        props_needed = set(filter(lambda x: x, out))
+        prop_cache: Dict[str, Property] = {}
+        tuple(self.validate_n_gen(x, prop_cache) for x in out if x)  # generates prop_cache, this could be done better
+        props_needed = set(prop_cache.keys())
+
         keys = set(self.properties.keys()).union(set(self.command_line_props.keys()))
-        missing_props = props_needed - keys
+        missing_props = props_needed - keys - set(key for key in prop_cache if prop_cache[key])
         if len(missing_props) != 0:
             raise PropertyNotFoundException(
                 var=missing_props, propertyfile=self.property_file)
@@ -151,9 +244,10 @@ class BaseModelProcessor:
             base_logger.debug(
                 f'using `{self.properties.get(var)}` for property {var} ')
             # command line props take preference
-            value = self.command_line_props.get(var) or self.properties.get(var)
+            value = self.get_most_possible_val(self.command_line_props.get(var), self.properties.get(var),
+                                               prop_cache[var].value)
             self.content = re.sub(
-                r'{%s}' % var, value, self.content)
+                r'{{%s}}' % prop_cache[var].text, value, self.content)
 
 
 class RequestBase(BaseModelProcessor):
@@ -171,7 +265,16 @@ class RequestBase(BaseModelProcessor):
         return params
 
     def get_headers(self):
+        """
+            entrypoints
+                1. dev defines headers in http file
+                2. dev defines headers in property file
+                3. dev defines headers via basic auth (only for Authorization)
+                4. dev can define in data/file/files's type attribute section for ('content-type')
+        :return:
+        """
         headers = {}
+        headers.update(self.default_headers)
         for line in self.model.lines:
             if header := line.header:
                 headers[header.key] = header.value
@@ -194,6 +297,16 @@ class RequestBase(BaseModelProcessor):
         return "GET"
 
     def get_payload(self):
+        """
+            1. dev can define data with string
+            2. dev can define data with json (will be sent as form)
+            3. dev can define a file upload (will be sent as file upload)
+            4. dev can define a json payload (will be sent as json string as payload)
+            5. dev can define multipart
+                5.1 dev can define file upload (header also optional)
+                5.2 dev can define data input (header also, optional)
+        :return:
+        """
         # can be short circuted
         if not self.model.payload:
             return Payload()
@@ -202,6 +315,11 @@ class RequestBase(BaseModelProcessor):
             request_logger.debug(
                 f'payload for request is `{data}`')
             return Payload(data, header=mimetype)
+        elif data_json := self.model.payload.datajson:
+            # TODO, array input for data could be problem
+            # from requests side
+            d = json_or_array_to_json(data_json)
+            return Payload(data=d, header=FORM_URLENCODED)
         elif filename := self.model.payload.file:
             request_logger.debug(
                 f'payload will be loaded from `{filename}`')
@@ -245,6 +363,11 @@ class RequestBase(BaseModelProcessor):
             return sys.stdout
 
     def get_cookie(self):
+        """
+            1. dev has option to not to save cookies
+            2. it will come in handy for most scenarios, so until user explicitly says no, we will send
+        :return:
+        """
         if self.args.no_cookie:
             cookie = None
             request_logger.debug(f'cookies set to `{self.args.no_cookie}`')
@@ -286,13 +409,6 @@ class RequestBase(BaseModelProcessor):
             prep.headers[CONTENT_TYPE] = payload.header
         request_logger.debug(f'request prepared completely {prep}')
         return prep
-
-    # remove me , i have no use
-    def save_cookie_call_back(self, *_args, **_kwargs):
-        base_logger.debug("in request cookie save phase")
-        if self._cookie is not None:
-            self._cookie.save()
-            base_logger.debug(f"cookies saved to {DOTHTTP_COOKIEJAR}")
 
     def run(self):
         raise NotImplementedError()

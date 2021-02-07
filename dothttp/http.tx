@@ -38,6 +38,7 @@ QUERY:
 
 PAYLOAD: 
     (   'data' '(' data=STRING (',' type=STRING)? ')'
+        | 'data' '(' datajson=JSON (',' type=STRING)? ')'
         | 'fileinput' '(' file=STRING   (',' type=STRING)? ')'
         | ('json' '(' json=JSON  ')' )
         | (fileswrap=FILES)
@@ -85,4 +86,7 @@ Object:
 
 Member:
     key=STRING ':' value=Value
+;
+Comment:
+    /#.*$/
 ;
