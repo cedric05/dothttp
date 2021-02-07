@@ -5,7 +5,11 @@ POST "https://dothttp.azurewebsites.net"
 ? ("querykey2", "queryvalue2")
 ? ("haha", "{ram}")
 ? ("haha3", "haha2")
-files(
-	("resume", "resume", "")
-	("resume2", "resume2", "")
-)
+json({
+    "hi": true,
+    "bye": [
+        "hi",
+        "hahahah",
+        "hi"
+    ]
+})
