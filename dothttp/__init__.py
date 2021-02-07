@@ -50,6 +50,7 @@ class Config:
     info: bool
     no_cookie: bool
     format: bool
+    stdout: bool = False
 
 
 @dataclass
@@ -352,8 +353,11 @@ class HttpFileFormatter(RequestBase):
 
     def run(self):
         formatted = self.format(self.model)
-        with open(self.args.file, 'w') as f:
-            f.write(formatted)
+        if self.args.stdout:
+            print(formatted)
+        else:
+            with open(self.args.file, 'w') as f:
+                f.write(formatted)
 
 
 class RequestCompiler(RequestBase):
