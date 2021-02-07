@@ -1,5 +1,6 @@
 HTTP: 
-    http=URL 
+    http=URL
+    (basic_auth_wrap=BASICAUTH)?
     (lines *= LINE)? 
     (payload=PAYLOAD)? 
     (output=TOFILE)?;
@@ -15,6 +16,10 @@ LINE:
 HEADER: 
     'header' '(' key=STRING ',' value=STRING ')' 
     | key=STRING ':' value=STRING
+;
+
+BASICAUTH:
+    'basicauth' '(' username=STRING ',' password= STRING ')'
 ;
 
 METHODTYPE: 

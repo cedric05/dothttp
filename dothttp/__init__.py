@@ -3,18 +3,22 @@ import os
 import re
 import sys
 from dataclasses import dataclass
+from http.cookiejar import LWPCookieJar
 from typing import Union, Dict, List
 import magic
 
 import jstyleson as json
 from curlify import to_curl
 from requests import PreparedRequest, Session, Response
+# this is bad, loading private stuff. find a better way
 from requests.status_codes import _codes as status_code
 from textx import metamodel_from_file
 
 from dothttp.exceptions import *
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import PropertyNotFoundException
+
+DOTHTTP_COOKIEJAR = os.path.expanduser('~/.dothttp.cookiejar')
 
 MIME_TYPE_JSON = "application/json"
 
@@ -42,6 +46,7 @@ class Config:
     debug: bool
     file: str
     info: bool
+    no_cookie: bool
 
 
 @dataclass
@@ -148,6 +153,10 @@ class BaseModelProcessor:
 
 
 class RequestBase(BaseModelProcessor):
+    def __init__(self, args: Config):
+        super().__init__(args)
+        self._cookie: LWPCookieJar = None
+
     def get_query(self):
         params = {}
         for line in self.model.lines:
@@ -231,19 +240,55 @@ class RequestBase(BaseModelProcessor):
         else:
             return sys.stdout
 
+    def get_cookie(self):
+        if self.args.no_cookie:
+            cookie = None
+            request_logger.debug(f'cookies set to `{self.args.no_cookie}`')
+        else:
+            cookie = LWPCookieJar(DOTHTTP_COOKIEJAR)
+            request_logger.debug(f'cookie {cookie} loaded from {DOTHTTP_COOKIEJAR}')
+            if not os.path.exists(DOTHTTP_COOKIEJAR):
+                cookie.save()
+            else:
+                cookie.load()
+        self._cookie = cookie
+        return self._cookie
+
+    def get_session(self):
+        session = Session()
+        if not self.args.no_cookie:
+            session.cookies = self.get_cookie()
+        # session.hooks['response'] = self.save_cookie_call_back
+        return session
+
+    def get_auth(self):
+        if auth_wrap := self.model.basic_auth_wrap:
+            return auth_wrap.username, auth_wrap.password
+        return None
+
     def get_request(self):
         prep = PreparedRequest()
         prep.prepare_url(self.get_url(), self.get_query())
         prep.prepare_method(self.get_method())
         prep.prepare_headers(self.get_headers())
+        prep.prepare_cookies(self.get_cookie())
+        prep.prepare_auth(self.get_auth(), prep.url)
         payload = self.get_payload()
         prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
+        # prep.prepare_hooks({"response": self.save_cookie_call_back})
         if payload.header and CONTENT_TYPE not in prep.headers:
             # if content-type is provided by header
             # we will not wish to update it
             prep.headers[CONTENT_TYPE] = payload.header
         request_logger.debug(f'request prepared completely {prep}')
         return prep
+
+    # remove me , i have no use
+    def save_cookie_call_back(self, *_args, **_kwargs):
+        base_logger.debug("in request cookie save phase")
+        if self._cookie is not None:
+            self._cookie.save()
+            base_logger.debug(f"cookies saved to {DOTHTTP_COOKIEJAR}")
 
     def run(self):
         raise NotImplementedError()
@@ -266,10 +311,12 @@ class CurlCompiler(RequestBase):
 class RequestCompiler(RequestBase):
 
     def run(self):
-        session = Session()
+        session = self.get_session()
         request = self.get_request()
         self.print_req_info(request)
         resp: Response = session.send(request)
+        # FIXME issue with hooks, cookies aren't getting save while in hooks
+        session.cookies.save()  # lwpCookie has .save method
         for hist_resp in resp.history:
             self.print_req_info(hist_resp, '<')
             request_logger.debug(
@@ -290,7 +337,7 @@ class RequestCompiler(RequestBase):
         request_logger.debug(f'request executed completely')
 
     def print_req_info(self, request: Union[PreparedRequest, Response], prefix=">"):
-        if not self.args.info:
+        if not (self.args.debug or self.args.info):
             return
         if hasattr(request, 'method'):
             print(f'{prefix} {request.method} {request.url}')

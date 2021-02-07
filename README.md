@@ -58,8 +58,8 @@ checkout [examples]('./examples/dothttpazure.http')
 - [x] info logs, (just headers and response)
 - [x] multi form upload
 - [X] command line arguments to curl and to make http request
-- [ ] basic auth
-- [ ] cookie storage and support
+- [x] basic auth
+- [x] cookie storage and support
 - [ ] update README.md to explain syntax and examples to refer
 - [ ] easy installation package using pyinstaller, docker, brew
 - [ ] integration tests

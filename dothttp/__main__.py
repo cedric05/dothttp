@@ -36,11 +36,13 @@ if __name__ == "__main__":
     parser.add_argument('--curl', help='generates curl script',
                         action='store_const', const=True)
     parser.add_argument('--property-file', '-p', help='property file')
+    parser.add_argument('--no-cookie', '-nc', help='cookie storage is disabled', action='store_const', const=True)
     parser.add_argument('--env', '-e',
                         help='environment to select in property file. properties will be enabled on FIFO',
                         nargs='+', default=['*'])
     parser.add_argument(
         '--debug', '-d', help='debug will enable logs and exceptions', action='store_const', const=True)
+    # TODO add conflits with debug for info
     parser.add_argument(
         '--info', '-i', help='more information', action='store_const', const=True)
     parser.add_argument(
@@ -48,5 +50,6 @@ if __name__ == "__main__":
     parser.add_argument('file', help='http file')
 
     args = parser.parse_args()
-    config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file, info=args.info, propertys=args.property)
+    config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file,
+                    info=args.info, propertys=args.property, no_cookie=args.no_cookie)
     apply(config)
