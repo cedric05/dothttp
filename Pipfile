@@ -10,6 +10,7 @@ curlify = "*"
 jstyleson = "*"
 python-magic = "*"
 python-magic-bin = "*"
+pyinstaller = "*"
 
 [dev-packages]
 autopep8 = "*"

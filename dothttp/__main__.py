@@ -30,7 +30,7 @@ def setup_logging(args):
     logging.getLogger('curl').setLevel(level)
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(
         description='Make http requests', prog="dothttp")
     parser.add_argument('--curl', help='generates curl script',
@@ -53,3 +53,7 @@ if __name__ == "__main__":
     config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file,
                     info=args.info, propertys=args.property, no_cookie=args.no_cookie)
     apply(config)
+
+
+if __name__ == "__main__":
+    main()
