@@ -14,19 +14,25 @@
 - [x] cookie storage and support
 - [ ] update README.md to explain syntax and examples to refer
 - [x] easy installation package using pyinstaller, docker, brew
-  - [x] pyinstaller
-  - [x] docker
-  - [x] whalebrew
+    - [x] pyinstaller
+    - [x] docker
+    - [x] whalebrew
+- [x] default headers defined in prop file
+- [x] property value in http file itself
+- [x] property syntax with double paranthesis
+- [x] comments
+- [x] payload 's data should support json - -> form input
+- [x] release, packages to github
 - [ ] language server, formatter
-  - [x] HttpFileFormatter
-  - [x] [vscode plugin](https://github.com/cedric05/dothttp-code.git)
-    - [x] code highlights
-    - [ ] suggestions
-    - [ ] run in vscode(itself)
+    - [x] HttpFileFormatter
+    - [x] [vscode plugin](https://github.com/cedric05/dothttp-code.git)
+        - [x] code highlights
+        - [ ] suggestions
+        - [ ] run in vscode(itself)
 - [ ] 50% integration tests
 - [ ] 80% coverage unit tests
-- [x] release, packages to github
 - [ ] history ?
 - [ ] multiple logging options ?
 - [ ] output coloring (according to content-type) ?
-- [ ] output should have rolling output format ? 
+- [ ] output should have rolling output format ?
+- [ ] curl import 
