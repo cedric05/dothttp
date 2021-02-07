@@ -61,13 +61,14 @@ checkout [examples]('./examples/dothttpazure.http')
 - [x] basic auth
 - [x] cookie storage and support
 - [ ] update README.md to explain syntax and examples to refer
-- [ ] easy installation package using pyinstaller, docker, brew
+- [x] easy installation package using pyinstaller, docker, brew
   - [x] pyinstaller
-  - [ ] docker
+  - [x] docker
   - [x] whalebrew
 - [ ] language server, formatter
 - [ ] 50% integration tests
 - [ ] 80% coverage unit tests
+- [x] release, packages to github
 - [ ] history ?
 - [ ] multiple logging options ?
 - [ ] output coloring (according to content-type) ?

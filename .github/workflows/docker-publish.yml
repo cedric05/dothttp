@@ -10,6 +10,7 @@ on:
       - v*
 env:
   IMAGE_NAME: cedric05/dothttp
+  IMAGE_NAME_REL: cedric05/dothttp-rel
 
 jobs:
   push:
@@ -20,7 +21,10 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
+        run: |
+          docker build . --file Dockerfile --tag $IMAGE_NAME
+          docker build --build-arg IMAGE_NAME=$IMAGE_NAME . --file Dockerfile.release --tag $IMAGE_NAME_REL
+          docker run --rm --entrypoint cat $IMAGE_NAME_REL  /app/dist/dothttp-cli > dothttp-cli
 
       - name: Log into registry
 
@@ -47,3 +51,12 @@ jobs:
 
           docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dothttp-cli
+          asset_name: dothttp-cli
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
