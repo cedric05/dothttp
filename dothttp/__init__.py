@@ -453,6 +453,9 @@ class HttpFileFormatter(RequestBase):
             mime_type = payload.type
             if data := payload.data:
                 p = f'data("{data}", {mime_type})'
+            if datajson := payload.datajson:
+                parsed_data = json_or_array_to_json(datajson)
+                p = f'data({json.dumps(parsed_data, indent=4)})'
             elif filetype := payload.file:
                 p = f'fileinput("{filetype}", {mime_type})'
             elif json_data := payload.json:
