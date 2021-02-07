@@ -43,8 +43,10 @@ if __name__ == "__main__":
         '--debug', '-d', help='debug will enable logs and exceptions', action='store_const', const=True)
     parser.add_argument(
         '--info', '-i', help='more information', action='store_const', const=True)
+    parser.add_argument(
+        '--property', help='list of property\'s', nargs='+', default=[])
     parser.add_argument('file', help='http file')
 
     args = parser.parse_args()
-    config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file, info=args.info)
+    config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file, info=args.info, propertys=args.property)
     apply(config)

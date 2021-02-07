@@ -3,7 +3,7 @@ import os
 import re
 import sys
 from dataclasses import dataclass
-from typing import Union, Dict
+from typing import Union, Dict, List
 import magic
 
 import jstyleson as json
@@ -37,6 +37,7 @@ def eprint(*args, **kwargs):
 class Config:
     curl: bool
     property_file: Union[str, None]
+    propertys: List[str]
     env: list
     debug: bool
     file: str
@@ -88,6 +89,7 @@ class BaseModelProcessor:
     def __init__(self, args: Config):
         self.args = args
         self.file = args.file
+        self.command_line_props = {}
         self.properties = {}
         self.property_file = args.property_file
         self.env = args.env
@@ -98,8 +100,18 @@ class BaseModelProcessor:
     def load(self):
         self.load_content()
         self.load_properties()
+        self.load_command_line_props()
         self.update_content_with_prop()
         self.load_model()
+
+    def load_command_line_props(self):
+        for prop in self.args.propertys:
+            try:
+                key, value = prop.split("=")
+                base_logger.debug(f"detected command line property {key} value: {value}")
+                self.command_line_props[key] = value
+            except:
+                raise CommandLinePropError(prop)
 
     def load_model(self):
         # TODO for a very big file, it could be a problem
@@ -121,7 +133,7 @@ class BaseModelProcessor:
         out = BaseModelProcessor.var_regex.findall(self.content)
         base_logger.debug(f'property used in `{self.file}` are `{out}`')
         props_needed = set(filter(lambda x: x, out))
-        keys = set(self.properties.keys())
+        keys = set(self.properties.keys()).union(set(self.command_line_props.keys()))
         missing_props = props_needed - keys
         if len(missing_props) != 0:
             raise PropertyNotFoundException(
@@ -129,8 +141,10 @@ class BaseModelProcessor:
         for var in props_needed:
             base_logger.debug(
                 f'using `{self.properties.get(var)}` for property {var} ')
+            # command line props take preference
+            value = self.command_line_props.get(var) or self.properties.get(var)
             self.content = re.sub(
-                r'{%s}' % var, self.properties.get(var), self.content)
+                r'{%s}' % var, value, self.content)
 
 
 class RequestBase(BaseModelProcessor):

@@ -53,3 +53,7 @@ class DataFileNotFoundException(HttpFileException):
 @exception_wrapper('property `{var}` not defined in `{propertyfile}`')
 class PropertyNotFoundException(PropertyFileException):
     pass
+
+@exception_wrapper("error with command line property format, property {}")
+class CommandLinePropError(DotHttpException):
+    pass
