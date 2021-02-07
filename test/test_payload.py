@@ -1,10 +1,9 @@
 import json
 
 from test import TestBase
-import tempfile
 from test.test_request import dir_path
 
-base_dir = f"{dir_path}/Payload"
+base_dir = f"{dir_path}/payload"
 
 
 class PayLoadTest(TestBase):
@@ -87,7 +86,7 @@ class PayLoadTest(TestBase):
         }, json.loads(req.body), "json Payload parsed wrong")
 
     def test_payload(self):
-        req = self.get_request(f"{base_dir}/Payload.http")
+        req = self.get_request(f"{base_dir}/payload.http")
         self.assertEqual("https://dothttp.azurewebsites.net/", req.url,
                          "incorrect url computed")
         self.assertEqual("POST", req.method, "incorrect method")
