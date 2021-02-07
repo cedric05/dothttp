@@ -9,7 +9,7 @@ requests = "*"
 curlify = "*"
 jstyleson = "*"
 python-magic = "*"
-python-magic-bin = "*"
+python-magic-bin = { version = "*", os_name = "=='nt'" }
 pyinstaller = "*"
 
 [dev-packages]

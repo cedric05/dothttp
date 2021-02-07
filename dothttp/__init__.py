@@ -5,17 +5,17 @@ import sys
 from dataclasses import dataclass
 from http.cookiejar import LWPCookieJar
 from typing import Union, Dict, List
-import magic
 
 import jstyleson as json
+import magic
 from curlify import to_curl
 from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
 from requests.status_codes import _codes as status_code
 from textx import metamodel_from_file
 
-from dothttp.exceptions import *
 from .dsl_jsonparser import json_or_array_to_json
+from .exceptions import *
 from .exceptions import PropertyNotFoundException
 
 DOTHTTP_COOKIEJAR = os.path.expanduser('~/.dothttp.cookiejar')
@@ -28,9 +28,11 @@ base_logger = logging.getLogger("dothttp")
 request_logger = logging.getLogger("request")
 curl_logger = logging.getLogger("curl")
 
-dir_path = os.path.dirname(os.path.realpath(__file__))
-
-dothttp_model = metamodel_from_file(os.path.join(dir_path, 'http.tx'))
+if os.path.exists(__file__):
+    dir_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'http.tx')
+else:
+    dir_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'http.tx')
+dothttp_model = metamodel_from_file(dir_path)
 
 
 def eprint(*args, **kwargs):
@@ -222,7 +224,7 @@ class RequestBase(BaseModelProcessor):
                     filename = os.path.basename(filetype.path)
                     if not mimetype: mimetype = magic.from_file(filetype.path, mime=True)
                 elif not mimetype:
-                    mimetype = magic.from_buffer(filename.path, mime=True)
+                    mimetype = magic.from_buffer(filetype.path, mime=True)
                 files[filetype.name] = (filename, content, mimetype)
             return Payload(files=files)
         return Payload()
