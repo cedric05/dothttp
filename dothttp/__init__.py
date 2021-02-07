@@ -9,6 +9,7 @@ import magic
 import jstyleson as json
 from curlify import to_curl
 from requests import PreparedRequest, Session, Response
+from requests.status_codes import _codes as status_code
 from textx import metamodel_from_file
 
 from dothttp.exceptions import *
@@ -39,6 +40,7 @@ class Config:
     env: list
     debug: bool
     file: str
+    info: bool
 
 
 @dataclass
@@ -251,14 +253,18 @@ class RequestCompiler(RequestBase):
 
     def run(self):
         session = Session()
-        resp: Response = session.send(self.get_request())
+        request = self.get_request()
+        self.print_req_info(request)
+        resp: Response = session.send(request)
         for hist_resp in resp.history:
-            request_logger.info(
+            self.print_req_info(hist_resp, '<')
+            request_logger.debug(
                 f"server with url response {hist_resp}, status_code "
                 f"{hist_resp.status_code}, url: {hist_resp.url}")
         if 400 <= resp.status_code:
             request_logger.error(f"server with url response {resp.status_code}")
             eprint(f"server responded with non 2XX code. code: {resp.status_code}")
+        self.print_req_info(resp, '<')
         output = self.get_output()
         for data in resp.iter_content(1024):
             if 'b' in output.mode:
@@ -268,3 +274,14 @@ class RequestCompiler(RequestBase):
         if output.fileno() != 1:
             output.close()
         request_logger.debug(f'request executed completely')
+
+    def print_req_info(self, request: Union[PreparedRequest, Response], prefix=">"):
+        if not self.args.info:
+            return
+        if hasattr(request, 'method'):
+            print(f'{prefix} {request.method} {request.url}')
+        else:
+            print(f"{prefix} {request.status_code} {status_code[request.status_code][0].capitalize()}")
+        for header in request.headers:
+            print(f'{prefix} {header}: {request.headers[header]}')
+        print('-------------------------------------------\n')

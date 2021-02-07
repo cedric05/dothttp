@@ -60,7 +60,7 @@ checkout [examples]('./examples/dothttpazure.http')
 - [ ] multiple logging options ?
 - [x] should handle exceptions, only message should be shown.
 - [x] debug mode to show logs
-- [ ] info logs, (just headers and response)
+- [x] info logs, (just headers and response)
 - [x] multi form upload
 - [ ] basic auth
 - [ ] cookie storage and support
