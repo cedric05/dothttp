@@ -35,7 +35,7 @@ docker run -it --rm dothttp
 ## Features
 
 1. easy and cleaner http syntax
-1. variable substition with property file
+1. variable substitution with property file
 1. generates curl from http for easy sharing
 
 ```
@@ -44,9 +44,7 @@ whalebrew install dothttp
 dothttp examples/dothttpazure.http
 ```
 
+
+
+
 checkout [examples]('./examples/dothttpazure.http')
-
-```
-
-
-```

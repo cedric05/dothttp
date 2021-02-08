@@ -1,3 +1,4 @@
+#!/usr/bin/env /home/prasanth/cedric05/dothttp/dist/dothttp-cli
 POST "https://dothttp.azurewebsites.net"
 "myhederkey": "myheadervalue {{ram}}"
 "myhederkey2": "myheadervalue2 {{ranga}}"

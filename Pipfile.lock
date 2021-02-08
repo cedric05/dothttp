@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8b127cf22e0b70b1e19681ace092ae976aa075ca43e9e817b5d7a30ede552c31"
+            "sha256": "f47f82d575ba97ae021fc56dd6061b2e0d1d56b0aecff47fbc2d30e70bb27d38"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,13 +16,6 @@
         ]
     },
     "default": {
-        "altgraph": {
-            "hashes": [
-                "sha256:1f05a47122542f97028caf78775a095fbe6a2699b5089de8477eb583167d69aa",
-                "sha256:c623e5f3408ca61d4016f23a681b9adb100802ca3e3da5e718915a9e4052cebe"
-            ],
-            "version": "==0.17"
-        },
         "arpeggio": {
             "hashes": [
                 "sha256:920d12cc762edb2eb56daae64a14c93e43dc181b481c88fc79314c0df6ee639e",
@@ -67,20 +60,6 @@
             "index": "pypi",
             "version": "==0.0.2"
         },
-        "pyinstaller": {
-            "hashes": [
-                "sha256:f5c0eeb2aa663cce9a5404292c0195011fa500a6501c873a466b2e8cad3c950c"
-            ],
-            "index": "pypi",
-            "version": "==4.2"
-        },
-        "pyinstaller-hooks-contrib": {
-            "hashes": [
-                "sha256:fa8280b79d8a2b267a2e43ff44f73b3e4a68fc8d205b8d34e8e06c960f7c2fcf",
-                "sha256:fc3290a2ca337d1d58c579c223201360bfe74caed6454eaf5a2550b77dbda45c"
-            ],
-            "version": "==2020.11"
-        },
         "python-magic": {
             "hashes": [
                 "sha256:356efa93c8899047d1eb7d3eb91e871ba2f5b1376edbaf4cc305e3c872207355",
@@ -119,6 +98,13 @@
         }
     },
     "develop": {
+        "altgraph": {
+            "hashes": [
+                "sha256:1f05a47122542f97028caf78775a095fbe6a2699b5089de8477eb583167d69aa",
+                "sha256:c623e5f3408ca61d4016f23a681b9adb100802ca3e3da5e718915a9e4052cebe"
+            ],
+            "version": "==0.17"
+        },
         "autopep8": {
             "hashes": [
                 "sha256:9e136c472c475f4ee4978b51a88a494bfcd4e3ed17950a44a988d9e434837bea",
@@ -217,6 +203,20 @@
             ],
             "markers": "python_version >= '3.5'",
             "version": "==2.7.4"
+        },
+        "pyinstaller": {
+            "hashes": [
+                "sha256:f5c0eeb2aa663cce9a5404292c0195011fa500a6501c873a466b2e8cad3c950c"
+            ],
+            "index": "pypi",
+            "version": "==4.2"
+        },
+        "pyinstaller-hooks-contrib": {
+            "hashes": [
+                "sha256:fa8280b79d8a2b267a2e43ff44f73b3e4a68fc8d205b8d34e8e06c960f7c2fcf",
+                "sha256:fc3290a2ca337d1d58c579c223201360bfe74caed6454eaf5a2550b77dbda45c"
+            ],
+            "version": "==2020.11"
         },
         "toml": {
             "hashes": [

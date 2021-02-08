@@ -20,7 +20,7 @@
 - [x] default headers defined in prop file
 - [x] property value in http file itself
 - [x] property syntax with double paranthesis
-- [x] comments
+- [x] comments (using #, so shebang support)
 - [x] payload 's data should support json - -> form input
 - [x] release, packages to github
 - [ ] language server, formatter

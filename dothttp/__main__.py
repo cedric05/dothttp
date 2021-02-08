@@ -62,6 +62,8 @@ def main():
         '--property', help='list of property\'s', nargs='+', default=[])
     general_group.add_argument('file', help='http file')
     args = parser.parse_args()
+    # TODO
+    # check property has `=` in its property
     config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file,
                     info=args.info, propertys=args.property, no_cookie=args.no_cookie,
                     format=args.format, stdout=args.stdout)

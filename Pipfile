@@ -10,9 +10,9 @@ curlify = "*"
 jstyleson = "*"
 python-magic = "*"
 python-magic-bin = { version = "*", os_name = "=='nt'" }
-pyinstaller = "*"
 
 [dev-packages]
+pyinstaller = "*"
 autopep8 = "*"
 ipython = "*"
 
