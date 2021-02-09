@@ -6,7 +6,7 @@ POST "https://dothttp.azurewebsites.net"
 ? ("querykey2", "queryvalue2")
 ? ("haha", "{{ram}}")
 ? ("{{raj=haha3}}", "haha2")
-data({'hi':"hi"})
+data("{{                                    raj=haha3 }}")
 #json({
 #    "hi": "{{raj=haha3}}",
 #    "bye": [

@@ -2,9 +2,9 @@ import logging
 import os
 import re
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from http.cookiejar import LWPCookieJar
-from typing import Union, Dict, List
+from typing import Union, Dict, List, Set
 
 import jstyleson as json
 import magic
@@ -67,7 +67,7 @@ class Payload:
 
 @dataclass
 class Property:
-    text: str
+    text: Set = field(default_factory=set())
     key: Union[str, None] = None
     value: Union[str, None] = None
 
@@ -205,12 +205,25 @@ class BaseModelProcessor:
             if len(key_values) != 2:
                 raise HttpFileException('default property should not have multiple `=`')
             key, value = key_values
-            if key in cache and value != cache[key].value:
-                raise HttpFileException('defined property is defaulted with different values, panicked ')
-            p = Property(prop, key, value)
+            # strip white space for keys
+            key = key.strip()
+
+            # strip white space for values
+            value = value.strip()
+            if value and value[0] == value[-1] and value[0] in {"'", '"'}:
+                # strip "'" "'" if it has any
+                # like ranga=" ramprasad" --> we should replace with " ramprasad"
+                value = value[1:-1]
+            if key in cache:
+                if value != cache[key].value:
+                    raise HttpFileException('defined property is defaulted with different values, panicked ')
+                p = cache[key]
+                p.text.add(prop)
+            else:
+                p = Property({prop}, key, value)
             cache.setdefault(key, p)
         else:
-            p = Property(prop)
+            p = Property({prop})
             cache.setdefault(prop, p)
         return p
 
@@ -226,6 +239,11 @@ class BaseModelProcessor:
     def update_content_with_prop(self):
         """
             1. properties defined in file itself ({{a=10}})
+                allowed values are
+                {{ a=ranga}} {{a=ranga }} {{ a=ranga }} {{ a="ranga" }} {{ a='ranga' }}
+                a=ranga for all above
+                {{ a="ranga "}}
+                in above case whitespace is considered
             2. properties from command line
             3. properties from file's activated env
             4. properties from files's '*'
@@ -248,8 +266,9 @@ class BaseModelProcessor:
             # command line props take preference
             value = self.get_most_possible_val(self.command_line_props.get(var), self.properties.get(var),
                                                prop_cache[var].value)
-            self.content = re.sub(
-                r'{{%s}}' % prop_cache[var].text, value, self.content)
+            for text_to_replace in prop_cache[var].text:
+                self.content = re.sub(
+                    r'{{%s}}' % text_to_replace, value, self.content)
 
 
 class RequestBase(BaseModelProcessor):
