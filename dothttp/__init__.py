@@ -137,17 +137,11 @@ class BaseModelProcessor:
 
         else:
             props = {}
-        try:
-            self.default_headers.update(props.get('headers', {}))
-            self.properties.update(props.get("*", {}))
-            if self.env:
-                for env_name in self.env:
-                    self.properties.update(props.get(env_name, {}))
-        except:
-            # mostly happens when, dev defines env with a number, string or array
-            # this is bad, cat and justify exception
-            raise PropertyFileException(
-                "property file expects all first level to be dictionary, second level values to be string")
+        self.default_headers.update(props.get('headers', {}))
+        self.properties.update(props.get("*", {}))
+        if self.env:
+            for env_name in self.env:
+                self.properties.update(props.get(env_name, {}))
 
         return self.properties
 
@@ -180,7 +174,7 @@ class BaseModelProcessor:
                 base_logger.debug(f"detected command line property {key} value: {value}")
                 self.command_line_props[key] = value
             except:
-                raise CommandLinePropError(prop)
+                raise CommandLinePropError(prop=prop)
 
     def load_model(self):
         # textx has provided utility to load model metamodel.model_from_file(args.file)

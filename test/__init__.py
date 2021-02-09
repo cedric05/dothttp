@@ -6,7 +6,9 @@ from dothttp import Config, RequestCompiler
 class TestBase(unittest.TestCase):
 
     @staticmethod
-    def get_request(file, env=None, prop=None):
+    def get_request(file, env=None, prop=None, properties=None):
+        if properties is None:
+            properties = []
         if env is None:
             env = []
         config = Config(file=file,
@@ -14,7 +16,7 @@ class TestBase(unittest.TestCase):
                         debug=False,
                         property_file=prop,
                         env=env,
-                        properties=[],
+                        properties=properties,
                         no_cookie=False,
                         format=False,
                         info=False)

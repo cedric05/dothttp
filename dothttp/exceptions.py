@@ -47,7 +47,7 @@ class PropertyFileNotJsonException(PropertyFileException):
 
 @exception_wrapper('Payload file `{datafile}` not found')
 class DataFileNotFoundException(HttpFileException):
-    message = "data file mentioned is not a"
+    message = "data file mentioned is not a valid"
 
 
 @exception_wrapper('property `{var}` not defined in propertyfile/commandline/httpfile propertyfile:`{propertyfile}`')
@@ -55,7 +55,7 @@ class PropertyNotFoundException(PropertyFileException):
     pass
 
 
-@exception_wrapper("error with command line property format, property {}")
+@exception_wrapper("error with command line property format, property `{prop}`")
 class CommandLinePropError(DotHttpException):
     pass
 

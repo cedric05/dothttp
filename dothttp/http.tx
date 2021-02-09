@@ -88,5 +88,15 @@ Member:
     key=STRING ':' value=Value
 ;
 Comment:
+    UnixComment | CommentLine | CommentBlock
+;
+UnixComment:
     /#.*$/
+;
+CommentLine:
+    /\/\/.*?$/
+;
+
+CommentBlock:
+    /\/\*(.|\n)*?\*\//
 ;

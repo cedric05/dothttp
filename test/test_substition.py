@@ -28,6 +28,16 @@ class SubstitutionTest(TestBase):
     def test_substitution_property_file_comments(self):
         self.test_substitution_multiple_env(f"{base_dir}/prop2.json")
 
+    def test_substitution_with_default_prop(self):
+        req = self.get_request(f"{base_dir}/httpfileprop.http")
+        self.assertEqual("https://google.com/", req.url)
+        self.assertEqual("GET", req.method)
+
+    def test_substitution_commandline(self):
+        req = self.get_request(f"{base_dir}/httpfileprop.http", properties=["dontsubstitute=dothttp.azurewebsites.net"])
+        self.assertEqual("https://dothttp.azurewebsites.net/", req.url)
+        self.assertEqual("GET", req.method)
+
     def test_file_notfound(self):
         pass
 

@@ -116,7 +116,7 @@ user can specify payload by mentioning below four forms (for various scenarios).
   `data("ram", "text/plain")`
 - `data({"key": "value"})` for form input.
 - `json({"key": "value"})` for json payload.
-- `file("path/to/file", "type")` uploads file as payload (type is optional).
+- `fileinput("path/to/file", "type")` uploads file as payload (type is optional).
 - `files(("photo", "path/to/file/photo.jpg", "image/jpeg"),
   ("photo details", '{"name":"prasanth"}', "application/json")   
   )`
@@ -127,6 +127,11 @@ user can specify payload by mentioning below four forms (for various scenarios).
 ### Comments
 
 **dothttp** will use `#` for commenting entire line.
+
+1. `//` line comment. follows java, javascript
+2. `#` line comment. follows python's comment style
+3. `/*
+   */` multi line comment. follows java/javascript style
 
 ### Templating
 
