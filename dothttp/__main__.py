@@ -1,5 +1,6 @@
 import argparse
 import logging
+import sys
 
 from . import CurlCompiler, RequestCompiler, HttpFileFormatter, Config, eprint
 from .exceptions import DotHttpException
@@ -29,7 +30,6 @@ def apply(args: Config):
 
 def setup_logging(args):
     level = logging.DEBUG if args.debug else logging.CRITICAL
-    # TODO need to add seperate levels. verbose ...
     logging.getLogger('dothttp').setLevel(level)
     logging.getLogger('request').setLevel(level)
     logging.getLogger('curl').setLevel(level)
@@ -50,7 +50,6 @@ def main():
                                 nargs='+', default=['*'])
     general_group.add_argument(
         '--debug', '-d', help='debug will enable logs and exceptions', action='store_const', const=True)
-    # TODO add conflits with debug for info
     general_group.add_argument(
         '--info', '-i', help='more information', action='store_const', const=True)
     fmt_group = parser.add_argument_group('format')
@@ -62,10 +61,17 @@ def main():
         '--property', help='list of property\'s', nargs='+', default=[])
     general_group.add_argument('file', help='http file')
     args = parser.parse_args()
-    # TODO
-    # check property has `=` in its property
+    if args.debug and args.info:
+        eprint("info and debug are conflicting options, use debug for more information")
+        sys.exit(1)
+    for one_prop in args.property:
+        if '=' not in one_prop:
+            # FUTURE,
+            # this can be done better by adding validation in add_argument.
+            eprint(f"command line property: `{one_prop}` is invalid, expected prop=val")
+            sys.exit(1)
     config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file,
-                    info=args.info, propertys=args.property, no_cookie=args.no_cookie,
+                    info=args.info, properties=args.property, no_cookie=args.no_cookie,
                     format=args.format, stdout=args.stdout)
     apply(config)
 

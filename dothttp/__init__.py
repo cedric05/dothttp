@@ -9,6 +9,7 @@ from typing import Union, Dict, List
 import jstyleson as json
 import magic
 from curlify import to_curl
+from jsonschema import validate
 from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
 from requests.status_codes import _codes as status_code
@@ -17,6 +18,7 @@ from textx import metamodel_from_file
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .exceptions import PropertyNotFoundException
+from .property_schema import property_schema
 
 FORM_URLENCODED = "application/x-www-form-urlencoded"
 
@@ -41,16 +43,11 @@ def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
 
 
-# TODO
-# better to create model structure
-# like a class,
-# it will come in handy in most scenarios
-
 @dataclass
 class Config:
     curl: bool
     property_file: Union[str, None]
-    propertys: List[str]
+    properties: List[str]
     env: list
     debug: bool
     file: str
@@ -62,7 +59,7 @@ class Config:
 
 @dataclass
 class Payload:
-    data: Union[str, bytes, None] = None
+    data: Union[str, bytes, None, Dict] = None
     json: Union[Dict, None] = None
     header: Union[str, None] = None
     files: Union[Dict, None] = None
@@ -131,9 +128,15 @@ class BaseModelProcessor:
                     base_logger.error(f'exception loading property file ', exc_info=True)
                     raise PropertyFileNotJsonException(
                         propertyfile=self.property_file)
+                try:
+                    validate(instance=props, schema=property_schema)
+                except Exception as e:
+                    base_logger.error(f'property json schema validation failed! ', exc_info=True)
+                    raise PropertyFileException(message="property file has invalid json schema",
+                                                file=self.property_file)
+
         else:
             props = {}
-        # TODO validate json to be of first level dict and second level string structure
         try:
             self.default_headers.update(props.get('headers', {}))
             self.properties.update(props.get("*", {}))
@@ -171,7 +174,7 @@ class BaseModelProcessor:
         self.load_model()
 
     def load_command_line_props(self):
-        for prop in self.args.propertys:
+        for prop in self.args.properties:
             try:
                 key, value = prop.split("=")
                 base_logger.debug(f"detected command line property {key} value: {value}")
@@ -180,9 +183,8 @@ class BaseModelProcessor:
                 raise CommandLinePropError(prop)
 
     def load_model(self):
-        # TODO for a very big file, it could be a problem
-        # textx has provided utility to load model, but we had variable options
-        # dothttp_model.model_from_file(args.file)
+        # textx has provided utility to load model metamodel.model_from_file(args.file)
+        # but we had variable options, and it has to be dynamically populated
         try:
             model = dothttp_model.model_from_str(self.content)
         except:
@@ -253,7 +255,7 @@ class BaseModelProcessor:
 class RequestBase(BaseModelProcessor):
     def __init__(self, args: Config):
         super().__init__(args)
-        self._cookie: LWPCookieJar = None
+        self._cookie: Union[LWPCookieJar, None] = None
 
     def get_query(self):
         params = {}
@@ -316,9 +318,9 @@ class RequestBase(BaseModelProcessor):
                 f'payload for request is `{data}`')
             return Payload(data, header=mimetype)
         elif data_json := self.model.payload.datajson:
-            # TODO, array input for data could be problem
-            # from requests side
             d = json_or_array_to_json(data_json)
+            if isinstance(d, list):
+                raise PayloadDataNotValidException(payload=f"data should be json/str, current: {d}")
             return Payload(data=d, header=FORM_URLENCODED)
         elif filename := self.model.payload.file:
             request_logger.debug(
@@ -374,17 +376,28 @@ class RequestBase(BaseModelProcessor):
         else:
             cookie = LWPCookieJar(DOTHTTP_COOKIEJAR)
             request_logger.debug(f'cookie {cookie} loaded from {DOTHTTP_COOKIEJAR}')
-            if not os.path.exists(DOTHTTP_COOKIEJAR):
-                cookie.save()
-            else:
-                cookie.load()
+            try:
+                if not os.path.exists(DOTHTTP_COOKIEJAR):
+                    cookie.save()
+                else:
+                    cookie.load()
+            except Exception as e:
+                # mostly permission exception
+                # traceback.print_exc()
+                eprint("cookie save action failed")
+                base_logger.debug("error while saving cookies", exc_info=True)
+                cookie = None
+                # FUTURE
+                # instead of saving (short curiting here, could lead to bad logic error)
+                self.args.no_cookie = True
         self._cookie = cookie
         return self._cookie
 
     def get_session(self):
         session = Session()
         if not self.args.no_cookie:
-            session.cookies = self.get_cookie()
+            if cookie := self.get_cookie():
+                session.cookies = cookie
         # session.hooks['response'] = self.save_cookie_call_back
         return session
 
@@ -486,8 +499,8 @@ class RequestCompiler(RequestBase):
         request = self.get_request()
         self.print_req_info(request)
         resp: Response = session.send(request)
-        # FIXME issue with hooks, cookies aren't getting save while in hooks
-        session.cookies.save()  # lwpCookie has .save method
+        if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
+            session.cookies.save()  # lwpCookie has .save method
         for hist_resp in resp.history:
             self.print_req_info(hist_resp, '<')
             request_logger.debug(

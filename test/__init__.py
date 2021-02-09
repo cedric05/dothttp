@@ -14,7 +14,7 @@ class TestBase(unittest.TestCase):
                         debug=False,
                         property_file=prop,
                         env=env,
-                        propertys=[],
+                        properties=[],
                         no_cookie=False,
                         format=False,
                         info=False)
