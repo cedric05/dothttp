@@ -256,10 +256,10 @@ class BaseModelProcessor:
         props_needed = set(prop_cache.keys())
 
         keys = set(self.properties.keys()).union(set(self.command_line_props.keys()))
-        missing_props = props_needed - keys - set(key for key in prop_cache if prop_cache[key])
+        missing_props = props_needed - keys - set(key for key in prop_cache if prop_cache[key].value is not None)
         if len(missing_props) != 0:
             raise PropertyNotFoundException(
-                var=missing_props, propertyfile=self.property_file)
+                var=missing_props, propertyfile=self.property_file if self.property_file else "not specified")
         for var in props_needed:
             base_logger.debug(
                 f'using `{self.properties.get(var)}` for property {var} ')

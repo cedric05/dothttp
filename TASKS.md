@@ -12,7 +12,7 @@
 - [X] command line arguments to curl and to make http request
 - [x] basic auth
 - [x] cookie storage and support
-- [ ] update README.md to explain syntax and examples to refer
+- [x] update README.md to explain syntax and examples to refer
 - [x] easy installation package using pyinstaller, docker, brew
     - [x] pyinstaller
     - [x] docker

@@ -50,7 +50,7 @@ class DataFileNotFoundException(HttpFileException):
     message = "data file mentioned is not a"
 
 
-@exception_wrapper('property `{var}` not defined in `{propertyfile}`')
+@exception_wrapper('property `{var}` not defined in propertyfile/commandline/httpfile propertyfile:`{propertyfile}`')
 class PropertyNotFoundException(PropertyFileException):
     pass
 
