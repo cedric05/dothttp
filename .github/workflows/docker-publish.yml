@@ -22,8 +22,8 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . --file Dockerfile --tag $IMAGE_NAME
-          docker build --build-arg IMAGE_NAME=$IMAGE_NAME . --file Dockerfile.release --tag $IMAGE_NAME_REL
+          docker build --target builder . --file Dockerfile --tag $IMAGE_NAME
+          docker build --file Dockerfile --tag $IMAGE_NAME_REL .
           docker run --rm --entrypoint cat $IMAGE_NAME_REL  /app/dothttp-cli.zip > dothttp-cli.zip
       - name: Log into registry
 

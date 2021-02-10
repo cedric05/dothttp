@@ -1,0 +1,13 @@
+FROM python:3.9.1-windowsservercore-1809 as builder
+LABEL maintainer="kesavarapu.siva@gmail.com"
+RUN pip install pipenv
+WORKDIR C:\\dothttp
+COPY Pipfile.lock Pipfile C:\\dothttp\\
+RUN pipenv install --system --deploy
+ADD . .
+RUN pipenv install --dev --system
+ENTRYPOINT ["python", "-m", "dothttp"]
+
+FROM builder
+RUN pyinstaller .\dothttp-cli.py --add-data 'dothttp\http.tx;.'
+RUN Compress-Archive -DestinationPath dothttp-cli-windows.zip  -Path  dist\dothttp-cli

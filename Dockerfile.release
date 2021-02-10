@@ -1,5 +1,0 @@
-ARG IMAGE_NAME=dothttp
-FROM ${IMAGE_NAME}
-RUN pipenv install --dev --system
-RUN apt update && apt install zip
-RUN pyinstaller dothttp-cli.spec && cd dist/ && zip -r ../dothttp-cli.zip dothttp-cli/ && cd .. && rm -rf dist build 

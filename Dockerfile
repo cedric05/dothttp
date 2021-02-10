@@ -1,5 +1,4 @@
-ARG VARIANT="3.9"
-FROM ghcr.io/cedric05/python3.9:main
+FROM ghcr.io/cedric05/python3.9:main as builder
 
 LABEL maintainer="kesavarapu.siva@gmail.com"
 
@@ -19,3 +18,8 @@ ADD . /app
 # entrypoint or command
 # ENTRYPOINT [ "bash" ]
 ENTRYPOINT ["python", "-m", "dothttp"]
+
+FROM builder
+RUN pipenv install --dev --system
+RUN apt update && apt install zip
+RUN pyinstaller dothttp-cli.spec && cd dist/ && zip -r ../dothttp-cli.zip dothttp-cli/ && cd .. && rm -rf dist build
