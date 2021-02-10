@@ -2,7 +2,7 @@ import os
 import tempfile
 import unittest
 
-from dothttp import HttpFileException
+from dothttp import HttpFileException, HttpFileFormatter, CurlCompiler
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -65,21 +65,28 @@ class RequestTest(TestBase):
         req.run()
 
     def test_curl_print(self):
-        ## TODO check curl output
-        req = self.get_req_comp(f"{base_dir}/redirect.http", info=True, curl=True)
-        req.run()
+        req: CurlCompiler = self.get_req_comp(f"{base_dir}/redirect.http", info=True, curl=True)
+        output = req.get_curl_output()
+        self.assertEqual("curl -X GET http://endeavour.today/", output)
 
     def test_format_print(self):
-        ## TODO check history
-        ## actually
         req = self.get_req_comp(f"{base_dir}/redirect.http", format=True, stdout=True)
-        req.run()
+        req.load()
+        output = HttpFileFormatter.format(req.model)
+        self.assertEqual('GET "http://endeavour.today/"', output)
+        print(output)
 
     def test_format2_print(self):
-        ## move to seperate folder for integration
-        ## test formatted output
         req = self.get_req_comp(f"{sub_dir}/multipleenv.http", format=True, stdout=True)
-        req.run()
+        req.load()
+        output = HttpFileFormatter.format(req.model)
+        self.assertEqual("""POST "https://{{host1}}/ram"
+? ("{{queryname1}}", "value1")
+? ("key2", "{{valuename1}}")
+json({
+    "{{queryname2}}": "{{valuename2}}"
+})
+output(test)""", output)
 
 
 if __name__ == "__main__":

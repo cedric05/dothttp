@@ -1,5 +1,7 @@
 import json
 
+from requests import PreparedRequest
+
 from test import TestBase
 from test.test_request import dir_path
 
@@ -38,11 +40,8 @@ class SubstitutionTest(TestBase):
         self.assertEqual("https://dothttp.azurewebsites.net/", req.url)
         self.assertEqual("GET", req.method)
 
-    def test_file_notfound(self):
-        pass
-
-    def test_syntax_problem(self):
-        pass
-
-    def test_property_not_found(self):
-        pass
+    def test_substitution_infile_with_quotes(self):
+        req: PreparedRequest = self.get_request(f"{base_dir}/infilepropwithquotes.http")
+        self.assertEqual("https://google.com/", req.url)
+        self.assertEqual("POST", req.method)
+        self.assertEqual(b'{"key": " space in between quotes"}', req.body)

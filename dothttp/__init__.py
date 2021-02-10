@@ -261,8 +261,7 @@ class BaseModelProcessor:
             value = self.get_most_possible_val(self.command_line_props.get(var), self.properties.get(var),
                                                prop_cache[var].value)
             for text_to_replace in prop_cache[var].text:
-                self.content = re.sub(
-                    r'{{%s}}' % text_to_replace, value, self.content)
+                self.content = self.content.replace("{{" + text_to_replace + "}}", value)
 
 
 class RequestBase(BaseModelProcessor):
@@ -443,15 +442,19 @@ class RequestBase(BaseModelProcessor):
 class CurlCompiler(RequestBase):
 
     def run(self):
-        prep = self.get_request()
+        curl_req = self.get_curl_output()
         output = self.get_output()
-        curl_req = to_curl(prep)
         if 'b' in output.mode:
             curl_req = curl_req.encode()
         output.write(curl_req)
         if output.fileno() != 1:
             output.close()
         curl_logger.debug(f'curl request generation completed successfully')
+
+    def get_curl_output(self):
+        prep = self.get_request()
+        curl_req = to_curl(prep)
+        return curl_req
 
 
 class HttpFileFormatter(RequestBase):
@@ -471,10 +474,13 @@ class HttpFileFormatter(RequestBase):
             headers = new_line.join(map(lambda line: f'"{line.header.key}": "{line.header.value}"',
                                         filter(lambda line:
                                                line.header, lines)))
+            if headers:
+                output_str += f"\n{headers}"
             query = new_line.join(map(lambda line: f'? ("{line.query.key}", "{line.query.value}")',
                                       filter(lambda line:
                                              line.query, lines)))
-            output_str += f'\n{headers}\n{query}'
+            if query:
+                output_str += f'\n{query}'
         if payload := model.payload:
             p = ""
             mime_type = payload.type
@@ -495,6 +501,8 @@ class HttpFileFormatter(RequestBase):
                     , files_wrap.files))
                 p = f"files(\n\t{p2}\n)"
             output_str += f'\n{p}'
+        if output := model.output:
+            output_str += f'\noutput({output.output})'
         return output_str
 
     def run(self):
