@@ -1,5 +1,5 @@
 ARG VARIANT="3.9"
-FROM python:${VARIANT}
+FROM ghcr.io/cedric05/python3.9:main
 
 LABEL maintainer="kesavarapu.siva@gmail.com"
 
