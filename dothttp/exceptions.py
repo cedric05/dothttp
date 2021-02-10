@@ -14,7 +14,7 @@ class DotHttpException(Exception):
     pass
 
 
-@exception_wrapper("error with httpfile")
+@exception_wrapper("error with httpfile message: `{message}`")
 class HttpFileException(DotHttpException):
     pass
 

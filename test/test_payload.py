@@ -1,4 +1,6 @@
 import json
+import os
+import tempfile
 
 from test import TestBase
 from test.test_request import dir_path
@@ -84,6 +86,7 @@ class PayLoadTest(TestBase):
                 }
             }
         }, json.loads(req.body), "json Payload parsed wrong")
+        self.assertEqual('application/json', req.headers['content-type'])
 
     def test_payload(self):
         req = self.get_request(f"{base_dir}/payload.http")
@@ -107,22 +110,31 @@ class PayLoadTest(TestBase):
         self.assertEqual(b"{}", req.body, "incorrect method")
 
     def test_file_payload(self):
-        # loadfile = tempfile.NamedTemporaryFile(delete=False)
-        # loadfile.write("test");
-        # TODO test file payload
-        pass
+        loadfile = tempfile.NamedTemporaryFile(delete=False)
+        test = b"test"
+        loadfile.write(test)
+        loadfile.flush()
+        req = self.get_request(f"{base_dir}/filepayload.http", properties=[f"filename={loadfile.name}"])
+        self.assertEqual(test, req.body)
+        loadfile.close()
+        os.unlink(loadfile.name)
 
-    def test_json_header_payload(self):
-        # TODO json payload, header
-        pass
-
-    def test_multiple_payload(self):
-        # TODO mulitiple files
-        pass
+    def test_data_json_payload(self):
+        req = self.get_request(f"{base_dir}/dataasformpayload.http")
+        self.assertEqual("hi=prasanth", req.body)
+        self.assertEqual('application/x-www-form-urlencoded', req.headers.get("content-type"))
 
     def test_multipart_payload(self):
-        # TODO data + files
-        pass
-
-    def test_file_input_not_found(self):
-        pass
+        loadfile = tempfile.NamedTemporaryFile(delete=False)
+        test = b"test"
+        loadfile.write(test)
+        loadfile.flush()
+        data = f"this is text part"
+        req = self.get_request(f"{base_dir}/multipartfiles.http", properties=
+        [f"filename={loadfile.name}",
+         f"data={data}"
+         ])
+        self.assertIn(test, req.body)
+        self.assertIn(data.encode("utf-8"), req.body)
+        loadfile.close()
+        os.unlink(loadfile.name)

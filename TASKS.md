@@ -23,6 +23,7 @@
 - [x] comments (using #, so shebang support)
 - [x] payload 's data should support json - -> form input
 - [x] release, packages to github
+- [ ] support binary output
 - [ ] language server, formatter
     - [x] HttpFileFormatter
     - [x] [vscode plugin](https://github.com/cedric05/dothttp-code.git)
@@ -30,7 +31,7 @@
         - [ ] suggestions
         - [ ] run in vscode(itself)
 - [ ] 50% integration tests
-- [ ] 80% coverage unit tests
+- [x] 80% coverage unit tests
 - [ ] history ?
 - [ ] multiple logging options ?
 - [ ] output coloring (according to content-type) ?

@@ -53,8 +53,4 @@ class NegativeScenarios(TestBase):
 
     def test_property_with_multiple_val_for_single(self):
         with self.assertRaises(HttpFileException):
-            self.get_request(f"{sub_base_path}/infileproperty2.http")
-
-    def test_property_with(self):
-        with self.assertRaises(HttpFileException):
-            self.get_request(f"{sub_base_path}/infileproperty2.http")
+            self.get_request(f"{neg_base_path}/infileproperty2.http")

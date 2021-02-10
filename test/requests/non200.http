@@ -1,0 +1,2 @@
+"https://httpbin.org/redirect-to"
+? 'url', "https://dothttp.azurewebsites.net"

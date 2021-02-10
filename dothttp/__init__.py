@@ -197,7 +197,7 @@ class BaseModelProcessor:
         if '=' in prop:
             key_values = prop.split('=')
             if len(key_values) != 2:
-                raise HttpFileException('default property should not have multiple `=`')
+                raise HttpFileException(message='default property should not have multiple `=`')
             key, value = key_values
             # strip white space for keys
             key = key.strip()
@@ -463,7 +463,8 @@ class HttpFileFormatter(RequestBase):
     @staticmethod
     def format(model):
         new_line = "\n"
-        output_str = f'{model.http.method} "{model.http.url}"'
+        method = model.http.method if model.http.method else "GET"
+        output_str = f'{method} "{model.http.url}"'
         if auth_wrap := model.basic_auth_wrap:
             output_str += f'{new_line}basicauth("{auth_wrap.username}", "{auth_wrap.password}")'
         if lines := model.lines:
@@ -524,13 +525,19 @@ class RequestCompiler(RequestBase):
             eprint(f"server responded with non 2XX code. code: {resp.status_code}")
         self.print_req_info(resp, '<')
         output = self.get_output()
+        func = None
+        if hasattr(output, 'mode') and 'b' in output.mode:
+            func = lambda data: output.write(data)
+        else:
+            func = lambda data: output.write(data.decode())
         for data in resp.iter_content(1024):
-            if 'b' in output.mode:
-                output.write(data)
-            else:
-                output.write(data.decode())
-        if output.fileno() != 1:
-            output.close()
+            func(data)
+        try:
+            if output.fileno() != 1:
+                output.close()
+        except:
+            request_logger.warning("not able to close, mostly happens while testing in pycharm")
+            eprint("output file close failed")
         request_logger.debug(f'request executed completely')
 
     def print_req_info(self, request: Union[PreparedRequest, Response], prefix=">"):

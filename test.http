@@ -1,0 +1,3 @@
+POST 'https://httpbin.org/post'
+? ("{{key}}", "{{value}}")
+data('{"{{key}}" :"{{value}}"}', 'application/json')
