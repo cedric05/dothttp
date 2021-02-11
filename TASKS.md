@@ -38,4 +38,8 @@
 - [ ] multiple logging options ?
 - [ ] output coloring (according to content-type) ?
 - [ ] output should have rolling output format ?
-- [ ] curl import 
+- [ ] curl import
+
+# BUGS
+
+- [ ] list query parameters are not working ?ram=ranga&ram=rajesh
