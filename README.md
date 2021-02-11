@@ -209,6 +209,11 @@ to print to command line
 
 `dothttp --format examples/dothttpazure.http --experimental --stdout`
 
+### Editor support
+
+syntax highlighting for visual studio code is supported
+via [dothttp-code](https://marketplace.visualstudio.com/items?itemName=ShivaPrasanth.dothttp-code)
+
 ### Command line options
 
 ```
