@@ -486,19 +486,19 @@ class HttpFileFormatter(RequestBase):
             p = ""
             mime_type = payload.type
             if data := payload.data:
-                p = f'data("{data}", {mime_type})'
+                p = f'data("{data}"{(" ," + mime_type) if mime_type else ""})'
             if datajson := payload.datajson:
                 parsed_data = json_or_array_to_json(datajson)
                 p = f'data({json.dumps(parsed_data, indent=4)})'
             elif filetype := payload.file:
-                p = f'fileinput("{filetype}", {mime_type})'
+                p = f'fileinput("{filetype}",{(" ," + mime_type) if mime_type else ""})'
             elif json_data := payload.json:
                 parsed_data = json_or_array_to_json(json_data)
                 p = f'json({json.dumps(parsed_data, indent=4)})'
             elif files_wrap := payload.fileswrap:
                 p2 = "\n\t".join(map(
                     lambda file_type: f'("{file_type.name}", "{(file_type.name)}"'
-                                      f', "{file_type.type}")'
+                                      f'\'{(" ," + file_type.type) if file_type.type else ""}\')'
                     , files_wrap.files))
                 p = f"files(\n\t{p2}\n)"
             output_str += f'\n{p}'
