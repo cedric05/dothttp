@@ -198,6 +198,17 @@ User can define headers in below three formats
 2. `headers` once a property file is activated. headers from property file will be added to request by default without
    user having to specify in `.http` file
 
+#### Formatter (experimental phase)
+
+**dothttp** can format a http file using below command
+`dothttp -fmt examples/dothttpazure.http --experimental`
+or
+`dothttp --format examples/dothttpazure.http --experimental`
+
+to print to command line
+
+`dothttp --format examples/dothttpazure.http --experimental --stdout`
+
 ### Command line options
 
 ```

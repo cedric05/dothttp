@@ -55,6 +55,7 @@ class Config:
     no_cookie: bool
     format: bool
     stdout: bool = False
+    experimental: bool = False
 
 
 @dataclass

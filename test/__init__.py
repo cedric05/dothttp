@@ -26,6 +26,7 @@ class TestBase(unittest.TestCase):
                         no_cookie=False,
                         format=format,
                         stdout=stdout,
+                        experimental=True,
                         info=info)
         if format:
             return HttpFileFormatter(config)

@@ -26,6 +26,7 @@
 - [ ] support binary output
 - [ ] language server, formatter
     - [x] HttpFileFormatter
+        - [ ] current implementation removes comments from file. add them back
     - [x] [vscode plugin](https://github.com/cedric05/dothttp-code.git)
         - [x] code highlights
         - [ ] suggestions
