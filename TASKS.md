@@ -42,4 +42,4 @@
 
 # BUGS
 
-- [ ] list query parameters are not working ?ram=ranga&ram=rajesh
+- [x] list query parameters are not working ?ram=ranga&ram=rajesh

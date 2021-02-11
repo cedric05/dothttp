@@ -2,9 +2,10 @@ import logging
 import os
 import re
 import sys
+from collections import defaultdict
 from dataclasses import dataclass, field
 from http.cookiejar import LWPCookieJar
-from typing import Union, Dict, List, Set
+from typing import Union, Dict, List, Set, DefaultDict
 
 import jstyleson as json
 import magic
@@ -271,10 +272,10 @@ class RequestBase(BaseModelProcessor):
         self._cookie: Union[LWPCookieJar, None] = None
 
     def get_query(self):
-        params = {}
+        params: DefaultDict[List] = defaultdict(list)
         for line in self.model.lines:
             if query := line.query:
-                params[query.key] = query.value
+                params[query.key].append(query.value)
         request_logger.debug(
             f'computed query params from `{self.file}` are `{params}`')
         return params
