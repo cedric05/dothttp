@@ -223,7 +223,7 @@ class BaseModelProcessor:
             if prop in cache:
                 cache[prop].text.append(prop)
             else:
-                p = Property(prop)
+                p = Property([prop])
                 cache.setdefault(prop, p)
         return p
 
