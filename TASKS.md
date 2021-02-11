@@ -33,6 +33,7 @@
         - [ ] run in vscode(itself)
 - [ ] 50% integration tests
 - [x] 80% coverage unit tests
+- [ ] standardise dependency versions
 - [ ] history ?
 - [ ] multiple logging options ?
 - [ ] output coloring (according to content-type) ?
