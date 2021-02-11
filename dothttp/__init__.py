@@ -5,7 +5,7 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from http.cookiejar import LWPCookieJar
-from typing import Union, Dict, List, Set, DefaultDict
+from typing import Union, Dict, List, DefaultDict
 
 import jstyleson as json
 import magic
@@ -69,7 +69,7 @@ class Payload:
 
 @dataclass
 class Property:
-    text: Set = field(default_factory=set())
+    text: List = field(default_factory=list())
     key: Union[str, None] = None
     value: Union[str, None] = None
 
@@ -212,15 +212,19 @@ class BaseModelProcessor:
                 value = value[1:-1]
             if key in cache:
                 if value != cache[key].value:
-                    raise HttpFileException('defined property is defaulted with different values, panicked ')
+                    raise HttpFileException(
+                        message=f'property: `{key}` is defaulted with two/more different values, panicked ')
                 p = cache[key]
-                p.text.add(prop)
+                p.text.append(prop)
             else:
-                p = Property({prop}, key, value)
+                p = Property([prop], key, value)
             cache.setdefault(key, p)
         else:
-            p = Property({prop})
-            cache.setdefault(prop, p)
+            if prop in cache:
+                cache[prop].text.append(prop)
+            else:
+                p = Property(prop)
+                cache.setdefault(prop, p)
         return p
 
     @staticmethod
