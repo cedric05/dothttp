@@ -1,0 +1,4 @@
+POST 'https://{{dontsubstitute="google.com"}}'
+json({
+    "key":"{{    value =    ' space in between quotes'  }}"
+})

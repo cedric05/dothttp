@@ -4,3 +4,4 @@ POST "https://{{host1}}/ram"
 json({
 "{{queryname2}}": "{{valuename2}}"
 })
+output('test')

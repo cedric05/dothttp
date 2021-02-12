@@ -1,4 +1,3 @@
-# TODO clean up
 from typing import Dict, List, Union
 
 

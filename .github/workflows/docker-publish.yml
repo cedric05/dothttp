@@ -22,10 +22,9 @@ jobs:
 
       - name: Build image
         run: |
-          docker build . --file Dockerfile --tag $IMAGE_NAME
-          docker build --build-arg IMAGE_NAME=$IMAGE_NAME . --file Dockerfile.release --tag $IMAGE_NAME_REL
-          docker run --rm --entrypoint cat $IMAGE_NAME_REL  /app/dist/dothttp-cli > dothttp-cli
-
+          docker build --target builder . --file Dockerfile --tag $IMAGE_NAME
+          docker build --file Dockerfile --tag $IMAGE_NAME_REL .
+          docker run --rm --entrypoint cat $IMAGE_NAME_REL  /app/dothttp-cli.zip > dothttp-cli.zip
       - name: Log into registry
 
         run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
@@ -55,8 +54,8 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: dothttp-cli
-          asset_name: dothttp-cli
+          asset_name: dothttp_0.0.2_amd64.zip
+          file: dothttp-cli.zip
           tag: ${{ github.ref }}
           overwrite: true
           file_glob: true

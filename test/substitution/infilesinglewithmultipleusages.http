@@ -1,0 +1,4 @@
+POST 'https://{{dontsubstitute="google.com"}}'
+json({
+    "{{dontsubstitute}}":"{{dontsubstitute}}"
+})
