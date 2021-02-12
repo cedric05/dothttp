@@ -264,7 +264,7 @@ class BaseModelProcessor:
             value = self.get_most_possible_val(self.command_line_props.get(var), self.properties.get(var),
                                                prop_cache[var].value)
             for text_to_replace in prop_cache[var].text:
-                self.content = re.sub("{{" + text_to_replace + "}}", value, self.content)
+                self.content = self.content.replace("{{" + text_to_replace + "}}", value)
 
 
 class RequestBase(BaseModelProcessor):
