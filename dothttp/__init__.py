@@ -368,8 +368,9 @@ class RequestBase(BaseModelProcessor):
 
     def get_output(self):
         if output := self.model.output:
+            print(f'output will be written to `{os.path.abspath(output.output)}`')
             request_logger.debug(
-                f'output will be written into `{self.file}` is `{output}`')
+                f'output will be written into `{self.file}` is `{os.path.abspath(output.output)}`')
             try:
                 return open(output.output, 'wb')
             except:
