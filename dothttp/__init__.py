@@ -228,13 +228,10 @@ class BaseModelProcessor:
         return p
 
     @staticmethod
-    def get_most_possible_val(a=None, b=None, c=None):
-        if a is not None:
-            return a
-        if b is not None:
-            return b
-        if c is not None:
-            return c
+    def get_most_possible_val(*args):
+        for arg in args:
+            if arg is not None:
+                return arg
 
     def update_content_with_prop(self):
         """
@@ -267,7 +264,7 @@ class BaseModelProcessor:
             value = self.get_most_possible_val(self.command_line_props.get(var), self.properties.get(var),
                                                prop_cache[var].value)
             for text_to_replace in prop_cache[var].text:
-                self.content = self.content.replace("{{" + text_to_replace + "}}", value)
+                self.content = re.sub("{{" + text_to_replace + "}}", value, self.content)
 
 
 class RequestBase(BaseModelProcessor):
