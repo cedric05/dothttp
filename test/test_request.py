@@ -41,10 +41,13 @@ class RequestTest(TestBase):
         req = self.get_request(f"{base_dir}/defaultget.http")
         self.assertEqual({"headerkey": "headervalue"}, req.headers)
 
-    @unittest.skip
     def test_fail(self):
         with self.assertRaises(HttpFileException):
             req = self.get_request(f"{base_dir}/fail.http")
+
+    def test_fail2(self):
+        with self.assertRaises(HttpFileException):
+            req = self.get_request(f"{base_dir}/fail2.http")
 
     def test_output(self):
         with tempfile.NamedTemporaryFile() as f:

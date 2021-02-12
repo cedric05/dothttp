@@ -25,7 +25,7 @@ class HttpFileNotFoundException(HttpFileException):
 
 
 # TODO modify this to provide more information
-@exception_wrapper("http file: `{file}` http syntax at `{position}`")
+@exception_wrapper("httpfile `{file}` syntax issue: {message}")
 class HttpFileSyntaxException(HttpFileException):
     pass
 

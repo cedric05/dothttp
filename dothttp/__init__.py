@@ -14,7 +14,7 @@ from jsonschema import validate
 from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
 from requests.status_codes import _codes as status_code
-from textx import metamodel_from_file
+from textx import metamodel_from_file, TextXSyntaxError
 
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
@@ -183,8 +183,10 @@ class BaseModelProcessor:
         # but we had variable options, and it has to be dynamically populated
         try:
             model = dothttp_model.model_from_str(self.content)
-        except:
-            raise HttpFileSyntaxException(file=self.file, position=None)
+        except TextXSyntaxError as e:
+            raise HttpFileSyntaxException(file=self.file, message=e.args)
+        except Exception as e:
+            raise HttpFileException(message=e.args)
         self.model = model
 
     def load_content(self):
