@@ -6,7 +6,7 @@ HTTP:
     (output=TOFILE)?;
 
 URL: 
-    (method=METHODTYPE)? url=DotString
+    (method=METHODTYPE)? url=URLString
 ;
 
 LINE: 
@@ -102,5 +102,12 @@ CommentBlock:
 ;
 
 DotString:
-    STRING | /[\S^,]+/
+    STRING | /\w+/
 ;
+// allow only alphanumeric or string in double/single quotes
+
+URLString:
+    STRING | /https\:\/\/(\S)+/
+    | /http\:\/\/(\S)+/
+;
+// allows http or https till space otherwise go for string
