@@ -12,25 +12,39 @@ build a custom dsl.
 
 ## KICKSTART
 
+### From pypi
+
+```shell
+pip install dothttp==0.0.4
+```
+
+### From source
+
 ```shell
 git clone git@github.com:cedric05/dothttp.git
 cd dothttp
+python3 -m pip install pipenv
+pipenv install
 ```
 
 ### python3.9
 
-```
+```shell
 python3 -m dothttp examples/dothttpazure.http
 ```
 
 ### docker
 
-```
+```shell
 docker build -t dothttp .
 docker run -it --rm dothttp
 ```
 
 ### whalebrew
+
+```shell
+docker run -it --rm dothttp
+```
 
 ## Features
 
@@ -38,7 +52,7 @@ docker run -it --rm dothttp
 1. variable substitution with property file
 1. generates curl from http for easy sharing
 
-```
+```shell
 docker build -t dothttp .
 whalebrew install dothttp
 dothttp examples/dothttpazure.http
@@ -49,6 +63,8 @@ dothttp examples/dothttpazure.http
 ```get.http
 GET "https://httpbin.org/get"
 ```
+
+`dothttp get.http`  or `python -m dothttp get.http`
 
 ## Run
 
