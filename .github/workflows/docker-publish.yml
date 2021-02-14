@@ -18,17 +18,16 @@ jobs:
     if: github.event_name == 'push'
 
     steps:
+        # using github image, so had to login before hand
       - uses: actions/checkout@v2
+      - name: Log into registry
+        run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
 
       - name: Build image
         run: |
           docker build --target builder . --file Dockerfile --tag $IMAGE_NAME
           docker build --file Dockerfile --tag $IMAGE_NAME_REL .
           docker run --rm --entrypoint cat $IMAGE_NAME_REL  /app/dothttp-cli.zip > dothttp-cli.zip
-      - name: Log into registry
-
-        run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
-
       - name: Push image
         run: |
           IMAGE_ID=ghcr.io/$IMAGE_NAME

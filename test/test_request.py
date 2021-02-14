@@ -45,6 +45,10 @@ class RequestTest(TestBase):
         with self.assertRaises(HttpFileException):
             req = self.get_request(f"{base_dir}/fail.http")
 
+    def test_fail2(self):
+        with self.assertRaises(HttpFileException):
+            req = self.get_request(f"{base_dir}/fail2.http")
+
     def test_output(self):
         with tempfile.NamedTemporaryFile() as f:
             req = self.get_req_comp(f"{base_dir}/output.http",

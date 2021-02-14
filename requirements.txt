@@ -1,12 +1,15 @@
-dothttp_req==0.0.2
-altgraph==0.17
-Arpeggio==1.10.1
-chardet==4.0.0
+arpeggio==1.10.1
+attrs==20.3.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+certifi==2020.12.5
+chardet==4.0.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'
 curlify==2.2.1
-future==0.18.2
-idna==2.10
+idna==2.10; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+jsonschema==3.2.0
 jstyleson==0.0.2
+pyrsistent==0.17.3; python_version >= '3.5'
+python-magic-bin==0.4.14; os_name == 'nt'
 python-magic==0.4.18
 requests==2.25.1
-textX==2.3.0
-urllib3==1.26.3
+six==1.15.0; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'
+textx==2.3.0
+urllib3==1.26.3; python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4' and python_version < '4'

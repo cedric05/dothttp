@@ -39,6 +39,8 @@
 - [ ] output coloring (according to content-type) ?
 - [ ] output should have rolling output format ?
 - [ ] curl import
+- [ ] swagger to http file generator
+- [ ] postman import
 
 # BUGS
 
