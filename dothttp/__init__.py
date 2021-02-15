@@ -502,7 +502,7 @@ class HttpFileFormatter(RequestBase):
                 p = f'json({json.dumps(parsed_data, indent=4)})'
             elif files_wrap := payload.fileswrap:
                 p2 = "\n\t".join(map(
-                    lambda file_type: f'("{file_type.name}", "{(file_type.name)}"'
+                    lambda file_type: f'("{file_type.method}", "{(file_type.method)}"'
                                       f'\'{(" ," + file_type.type) if file_type.type else ""}\')'
                     , files_wrap.files))
                 p = f"files(\n\t{p2}\n)"
@@ -523,12 +523,8 @@ class HttpFileFormatter(RequestBase):
 class RequestCompiler(RequestBase):
 
     def run(self):
-        session = self.get_session()
-        request = self.get_request()
-        self.print_req_info(request)
-        resp: Response = session.send(request)
-        if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
-            session.cookies.save()  # lwpCookie has .save method
+        resp = self.get_response()
+        self.print_req_info(resp.request)
         for hist_resp in resp.history:
             self.print_req_info(hist_resp, '<')
             request_logger.debug(
@@ -553,6 +549,15 @@ class RequestCompiler(RequestBase):
             request_logger.warning("not able to close, mostly happens while testing in pycharm")
             eprint("output file close failed")
         request_logger.debug(f'request executed completely')
+        return resp
+
+    def get_response(self):
+        session = self.get_session()
+        request = self.get_request()
+        resp: Response = session.send(request)
+        if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
+            session.cookies.save()  # lwpCookie has .save method
+        return resp
 
     def print_req_info(self, request: Union[PreparedRequest, Response], prefix=">"):
         if not (self.args.debug or self.args.info):

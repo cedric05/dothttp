@@ -9,8 +9,7 @@ logger = logging.getLogger('dothttp')
 
 
 def apply(args: Config):
-    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
-    setup_logging(args)
+    setup_logging(logging.DEBUG if args.debug else logging.CRITICAL)
     logger.info(f'command line arguments are {args}')
     if args.format:
         if args.experimental:
@@ -32,8 +31,8 @@ def apply(args: Config):
         eprint(f'unknown exception occurred with message {exc}')
 
 
-def setup_logging(args):
-    level = logging.DEBUG if args.debug else logging.CRITICAL
+def setup_logging(level):
+    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
     logging.getLogger('dothttp').setLevel(level)
     logging.getLogger('request').setLevel(level)
     logging.getLogger('curl').setLevel(level)
