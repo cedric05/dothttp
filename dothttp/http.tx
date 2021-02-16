@@ -1,4 +1,5 @@
-HTTP: 
+HTTP:
+    (name=NAMEWRAP)?
     http=URL
     (basic_auth_wrap=BASICAUTH)?
     (lines *= LINE)? 
@@ -7,6 +8,10 @@ HTTP:
 
 URL: 
     (method=METHODTYPE)? url=URLString
+;
+
+NAMEWRAP:
+    '@name' '(' name=DotString ')'
 ;
 
 LINE: 
