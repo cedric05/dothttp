@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 
+from dothttp.log_utils import setup_logging
 from . import CurlCompiler, RequestCompiler, HttpFileFormatter, Config, eprint
 from .exceptions import DotHttpException
 
@@ -29,13 +30,6 @@ def apply(args: Config):
     except Exception as exc:
         logger.error(f'unknown error happened {exc}', exc_info=True)
         eprint(f'unknown exception occurred with message {exc}')
-
-
-def setup_logging(level):
-    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
-    logging.getLogger('dothttp').setLevel(level)
-    logging.getLogger('request').setLevel(level)
-    logging.getLogger('curl').setLevel(level)
 
 
 def main():

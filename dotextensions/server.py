@@ -1,15 +1,92 @@
 import json
 import logging
 import sys
+from dataclasses import dataclass, field
+from datetime import datetime
 from json import JSONDecodeError
 from typing import Dict
 
 from flask import Flask
 from flask import request
 
-from . import handlers, Command, BaseHandler
+from dothttp import RequestCompiler, Config, DotHttpException
+from dothttp.log_utils import setup_logging as root_logging_setup
 
 logger = logging.getLogger('handler')
+
+
+@dataclass
+class Command:
+    method: str
+    params: Dict  # query params
+    id: int
+    initiated: datetime = field(default_factory=lambda: datetime.now())
+
+
+@dataclass
+class Result:
+    id: int
+    result: Dict = field(default_factory=lambda: {})
+
+
+class BaseHandler:
+
+    def get_method(self):
+        raise NotImplementedError
+
+    def run(self, command: Command) -> Result:
+        raise NotImplementedError
+
+
+class RunHttpFileHandler(BaseHandler):
+    name = "/file/execute"
+
+    def get_method(self):
+        return RunHttpFileHandler.name
+
+    def run(self, command: Command) -> Result:
+        filename = command.params.get("file")
+        envs = command.params.get("env", [])
+        nocookie = command.params.get("nocookie", False)
+        props = command.params.get('properties', {})
+        properties = [f"{i}={j}" for i, j in props.items()]
+        try:
+            request = RequestCompiler(Config(file=filename,
+                                             env=envs,
+                                             properties=properties,
+                                             curl=False,
+                                             property_file=None,
+                                             debug=True,
+                                             no_cookie=nocookie,
+                                             format=False,
+                                             info=False
+                                             ))
+            resp = request.get_response()
+            result = Result(id=command.id,
+                            result={
+                                "headers":
+                                    {key: value for key, value in resp.headers.items()},
+                                "body": resp.text})
+        except DotHttpException as ex:
+            result = Result(id=command.id,
+                            result={
+                                "error_message": ex.message, "error": True})
+        return result
+
+
+class FormatHttpFileHandler(BaseHandler):
+    method = "/file/format"
+
+    def get_method(self):
+        return FormatHttpFileHandler.method
+
+    def run(self, command: Command) -> Result:
+        result = Result(id=command.id, result=command.params)
+        return result
+
+
+handlers: Dict[str, BaseHandler] = {handler.get_method(): handler for handler in
+                                    (FormatHttpFileHandler(), RunHttpFileHandler())}
 
 
 def run(command: Command) -> Dict:
@@ -22,6 +99,9 @@ class Base:
 
     def run_forever(self):
         raise NotImplementedError
+
+    def get_command(self, **kwargs):
+        return Command(**kwargs)
 
 
 class HttpServer(Base):
@@ -40,7 +120,7 @@ class HttpServer(Base):
         def flask_api_handler():
             data = json.loads(request.data)
             data['method'] = handler
-            command = Command(**data)
+            command = super(HttpServer, self).get_command(**data)
             result = run(command)
             return result
 
@@ -64,4 +144,34 @@ class CmdServer(Base):
 
     def get_command(self, line):
         output = json.loads(line)
-        return Command(**output)
+        return super().get_command(output)
+
+
+def setup_logging(level):
+    root_logging_setup(level)
+    logging.getLogger("cmd-server").setLevel(level)
+    logging.getLogger('handler').setLevel(level)
+    logging.root.setLevel(level)
+
+
+def main():
+    setup_logging(logging.DEBUG)
+    if len(sys.argv) == 2:
+        type_of_server = sys.argv[1]
+    else:
+        type_of_server = "cmd"
+    if type_of_server == "cmd":
+        CmdServer().run_forever()
+    elif type_of_server == "http":
+        port = 5000
+        if len(sys.argv) == 3:
+            try:
+                port = int(sys.argv[3])
+            except ValueError:
+                pass
+        HttpServer(port).run_forever()
+    sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
