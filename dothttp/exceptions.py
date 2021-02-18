@@ -15,7 +15,7 @@ class DotHttpException(Exception):
 
 
 @exception_wrapper("incorrect paramter key: `{key}` value: `{value}` . message `{message}`")
-class ParameterException(Exception):
+class ParameterException(DotHttpException):
     pass
 
 
