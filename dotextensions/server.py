@@ -118,11 +118,14 @@ class HttpServer(Base):
 
     def get_handler(self, handler):
         def flask_api_handler():
-            data = json.loads(request.data)
-            data['method'] = handler
-            command = super(HttpServer, self).get_command(**data)
-            result = run(command)
-            return result
+            try:
+                id = int(request.args['id'])
+                command = {'method': handler, 'params': json.loads(request.data), 'id': id}
+                command = super(HttpServer, self).get_command(**command)
+                result = run(command)
+                return result
+            except JSONDecodeError:
+                return {}
 
         flask_api_handler.__name__ = handler
         return flask_api_handler
@@ -144,7 +147,7 @@ class CmdServer(Base):
 
     def get_command(self, line):
         output = json.loads(line)
-        return super().get_command(output)
+        return super().get_command(**output)
 
 
 def setup_logging(level):

@@ -1,10 +1,12 @@
-HTTP:
-    (name=NAMEWRAP)?
+//HTTP: ram=HTTP2
+MULTISET: allhttps=HTTP+;
+
+HTTP:((name=NAMEWRAP)?
     http=URL
     (basic_auth_wrap=BASICAUTH)?
-    (lines *= LINE)? 
-    (payload=PAYLOAD)? 
-    (output=TOFILE)?;
+    (lines *= LINE)?
+    (payload=PAYLOAD)?
+    (output=TOFILE)?);
 
 URL: 
     (method=METHODTYPE)? url=URLString

@@ -59,6 +59,7 @@ def main():
     property_group.add_argument(
         '--property', help='list of property\'s', nargs='+', default=[])
     general_group.add_argument('file', help='http file')
+    general_group.add_argument('--target', '-t', help='targets a particular http definition', type=str)
     args = parser.parse_args()
     if args.debug and args.info:
         eprint("info and debug are conflicting options, use debug for more information")
@@ -71,6 +72,7 @@ def main():
             sys.exit(1)
     config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file,
                     info=args.info, properties=args.property, no_cookie=args.no_cookie,
+                    target=args.target,
                     format=args.format, stdout=args.stdout, experimental=args.experimental)
     apply(config)
 

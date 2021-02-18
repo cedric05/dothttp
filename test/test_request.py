@@ -90,7 +90,8 @@ class RequestTest(TestBase):
 json({
     "{{queryname2}}": "{{valuename2}}"
 })
-output(test)""", output)
+output(test)
+""", output)
 
 
 if __name__ == "__main__":
