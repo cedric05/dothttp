@@ -67,7 +67,7 @@ JSON:
 ;
 
 Array:
-    "[" values*=Value[','] "]"
+    "[" (values*=Value[','] ) ','? "]"
 ;
 
 Value:
@@ -88,7 +88,7 @@ String:
 ;
 
 Object:
-    "{" members*=Member[','] "}"
+    "{" members*=Member[','] ","? "}"
 ;
 
 Member:
