@@ -90,9 +90,12 @@ handlers: Dict[str, BaseHandler] = {handler.get_method(): handler for handler in
 
 
 def run(command: Command) -> Dict:
-    instance: BaseHandler = handlers.get(command.method)
-    result = instance.run(command)
-    return {"id": result.id, "result": result.result}
+    try:
+        instance: BaseHandler = handlers.get(command.method)
+        result = instance.run(command)
+        return {"id": result.id, "result": result.result}
+    except Exception as e:
+        return {"id": result.id, "result": {"error": True, "message": e.args}}
 
 
 class Base:
@@ -140,6 +143,7 @@ class CmdServer(Base):
                 command = self.get_command(line)
                 result = run(command)
                 sys.stdout.write(json.dumps(result) + "\n")
+                sys.stdout.flush()
             except JSONDecodeError:
                 logger.info(f"input line `{line}` is not json decodable")
             except Exception as e:
