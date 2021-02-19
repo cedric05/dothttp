@@ -319,11 +319,11 @@ class RequestBase(BaseModelProcessor):
 
     def get_url(self):
         request_logger.debug(
-            f'url is {self.http.http.url}')
-        return self.http.http.url
+            f'url is {self.http.urlwrap.url}')
+        return self.http.urlwrap.url
 
     def get_method(self):
-        if method := self.http.http.method:
+        if method := self.http.urlwrap.method:
             request_logger.debug(
                 f'method defined in `{self.file}` is {method}')
             return method
@@ -490,8 +490,8 @@ class HttpFileFormatter(RequestBase):
         output_str = ""
         for http in model.allhttps:
             new_line = "\n"
-            method = http.http.method if http.http.method else "GET"
-            output_str += f'{method} "{http.http.url}"'
+            method = http.urlwrap.method if http.urlwrap.method else "GET"
+            output_str += f'{method} "{http.urlwrap.url}"'
             if auth_wrap := http.basic_auth_wrap:
                 output_str += f'{new_line}basicauth("{auth_wrap.username}", "{auth_wrap.password}")'
             if lines := http.lines:

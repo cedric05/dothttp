@@ -2,7 +2,7 @@
 MULTISET: allhttps=HTTP+;
 
 HTTP:((name=NAMEWRAP)?
-    http=URL
+    urlwrap=URL
     (basic_auth_wrap=BASICAUTH)?
     (lines *= LINE)?
     (payload=PAYLOAD)?
@@ -44,16 +44,16 @@ QUERY:
 ;
 
 PAYLOAD: 
-    (   'data' '(' data=STRING (',' type=STRING)? ')'
-        | 'data' '(' datajson=JSON (',' type=STRING)? ')'
-        | 'fileinput' '(' file=STRING   (',' type=STRING)? ')'
+    (   'data' '(' data=STRING (',' type=STRING)? ','?  ')'
+        | 'data' '(' datajson=JSON (',' type=STRING)? ','? ')'
+        | 'fileinput' '(' file=STRING   (',' type=STRING)? ','?  ')'
         | ('json' '(' json=JSON  ')' )
         | (fileswrap=FILES)
     )
 ;
 
 FILES:
-    "files" "(" files*=FILETYPE[','] ")"
+    "files" "(" files*=FILETYPE[','] ','? ")"
 ;
 
 FILETYPE:
