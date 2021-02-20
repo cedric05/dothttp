@@ -1,12 +1,19 @@
-HTTP: 
-    http=URL
+//HTTP: ram=HTTP2
+MULTISET: allhttps=HTTP+;
+
+HTTP:((namewrap=NAMEWRAP)?
+    urlwrap=URL
     (basic_auth_wrap=BASICAUTH)?
-    (lines *= LINE)? 
-    (payload=PAYLOAD)? 
-    (output=TOFILE)?;
+    (lines *= LINE)?
+    (payload=PAYLOAD)?
+    (output=TOFILE)?);
 
 URL: 
     (method=METHODTYPE)? url=URLString
+;
+
+NAMEWRAP:
+    '@name' '(' name=DotString ')'
 ;
 
 LINE: 
@@ -37,16 +44,16 @@ QUERY:
 ;
 
 PAYLOAD: 
-    (   'data' '(' data=STRING (',' type=STRING)? ')'
-        | 'data' '(' datajson=JSON (',' type=STRING)? ')'
-        | 'fileinput' '(' file=STRING   (',' type=STRING)? ')'
+    (   'data' '(' data=STRING (',' type=STRING)? ','?  ')'
+        | 'data' '(' datajson=JSON (',' type=STRING)? ','? ')'
+        | 'fileinput' '(' file=STRING   (',' type=STRING)? ','?  ')'
         | ('json' '(' json=JSON  ')' )
         | (fileswrap=FILES)
     )
 ;
 
 FILES:
-    "files" "(" files*=FILETYPE[','] ")"
+    "files" "(" files*=FILETYPE[','] ','? ")"
 ;
 
 FILETYPE:
@@ -60,7 +67,7 @@ JSON:
 ;
 
 Array:
-    "[" values*=Value[','] "]"
+    "[" (values*=Value[','] ) ','? "]"
 ;
 
 Value:
@@ -81,7 +88,7 @@ String:
 ;
 
 Object:
-    "{" members*=Member[','] "}"
+    "{" members*=Member[','] ","? "}"
 ;
 
 Member:

@@ -14,6 +14,11 @@ class DotHttpException(Exception):
     pass
 
 
+@exception_wrapper("incorrect paramter key: `{key}` value: `{value}` . message `{message}`")
+class ParameterException(DotHttpException):
+    pass
+
+
 @exception_wrapper("error with httpfile message: `{message}`")
 class HttpFileException(DotHttpException):
     pass

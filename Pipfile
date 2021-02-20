@@ -11,6 +11,7 @@ jstyleson = "*"
 python-magic = "*"
 python-magic-bin = { version = "*", os_name = "=='nt'" }
 jsonschema = "==3.2.0"
+flask = "*"
 
 [dev-packages]
 pyinstaller = "*"

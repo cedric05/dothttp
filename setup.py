@@ -1,6 +1,5 @@
 import os
 import sys
-
 from setuptools import setup, find_packages
 
 
@@ -9,13 +8,13 @@ def read(fname):
         return f.read()
 
 
-windows_req = "python-magic-bin==0.4.14"
+# windows_req = "python-magic-bin==0.4.14"
 
 
 def requirements():
     reqs = [req.split(';')[0] for req in read('requirements.txt').split('\n')]
-    if sys.platform == 'win32':
-        return reqs.append(windows_req)
+    # if sys.platform == 'win32':
+    #     return reqs.append(windows_req)
     return reqs
 
 

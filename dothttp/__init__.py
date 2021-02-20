@@ -57,6 +57,7 @@ class Config:
     format: bool
     stdout: bool = False
     experimental: bool = False
+    target: str = field(default_factory=lambda: '1')
 
 
 @dataclass
@@ -273,10 +274,27 @@ class RequestBase(BaseModelProcessor):
     def __init__(self, args: Config):
         super().__init__(args)
         self._cookie: Union[LWPCookieJar, None] = None
+        if target := self.args.target:
+            if target.isdecimal():
+                if 1 <= int(target) <= len(self.model.allhttps):
+                    self.http = self.model.allhttps[int(target) - 1]
+                else:
+                    raise ParameterException(message="target startswith 1", key='target',
+                                             value=target)
+            else:
+                try:
+                    # if multiple names have same value, it will create confusion
+                    # if they want to go with that. then pass id
+                    self.http = next(filter(lambda http: http.namewrap.name == target, self.model.allhttps))
+                except StopIteration:
+                    raise ParameterException(message="target is not spelled correctly", key='target',
+                                             value=target)
+        else:
+            self.http = self.model.allhttps[0]
 
     def get_query(self):
         params: DefaultDict[List] = defaultdict(list)
-        for line in self.model.lines:
+        for line in self.http.lines:
             if query := line.query:
                 params[query.key].append(query.value)
         request_logger.debug(
@@ -294,7 +312,7 @@ class RequestBase(BaseModelProcessor):
         """
         headers = {}
         headers.update(self.default_headers)
-        for line in self.model.lines:
+        for line in self.http.lines:
             if header := line.header:
                 headers[header.key] = header.value
         request_logger.debug(
@@ -303,11 +321,11 @@ class RequestBase(BaseModelProcessor):
 
     def get_url(self):
         request_logger.debug(
-            f'url is {self.model.http.url}')
-        return self.model.http.url
+            f'url is {self.http.urlwrap.url}')
+        return self.http.urlwrap.url
 
     def get_method(self):
-        if method := self.model.http.method:
+        if method := self.http.urlwrap.method:
             request_logger.debug(
                 f'method defined in `{self.file}` is {method}')
             return method
@@ -327,32 +345,32 @@ class RequestBase(BaseModelProcessor):
         :return:
         """
         # can be short circuted
-        if not self.model.payload:
+        if not self.http.payload:
             return Payload()
-        elif data := self.model.payload.data:
-            mimetype = self.model.payload.type if self.model.payload.type else magic.from_buffer(data, mime=True)
+        elif data := self.http.payload.data:
+            mimetype = self.http.payload.type if self.http.payload.type else magic.from_buffer(data, mime=True)
             request_logger.debug(
                 f'payload for request is `{data}`')
             return Payload(data, header=mimetype)
-        elif data_json := self.model.payload.datajson:
+        elif data_json := self.http.payload.datajson:
             d = json_or_array_to_json(data_json)
             if isinstance(d, list):
                 raise PayloadDataNotValidException(payload=f"data should be json/str, current: {d}")
             return Payload(data=d, header=FORM_URLENCODED)
-        elif filename := self.model.payload.file:
+        elif filename := self.http.payload.file:
             request_logger.debug(
                 f'payload will be loaded from `{filename}`')
             if not os.path.exists(filename):
                 request_logger.debug(
                     f'payload file `{filename}` Not found. ')
                 raise DataFileNotFoundException(datafile=filename)
-            mimetype = self.model.payload.type if self.model.payload.type else magic.from_file(filename, mime=True)
+            mimetype = self.http.payload.type if self.http.payload.type else magic.from_file(filename, mime=True)
             with open(filename, 'rb') as f:
                 return Payload(data=f.read(), header=mimetype)
-        elif json_data := self.model.payload.json:
+        elif json_data := self.http.payload.json:
             d = json_or_array_to_json(json_data)
             return Payload(json=d, header=MIME_TYPE_JSON)
-        elif files_wrap := self.model.payload.fileswrap:
+        elif files_wrap := self.http.payload.fileswrap:
             files = {}
             for filetype in files_wrap.files:
                 filename = filetype.name
@@ -369,7 +387,7 @@ class RequestBase(BaseModelProcessor):
         return Payload()
 
     def get_output(self):
-        if output := self.model.output:
+        if output := self.http.output:
             print(f'output will be written to `{os.path.abspath(output.output)}`')
             request_logger.debug(
                 f'output will be written into `{self.file}` is `{os.path.abspath(output.output)}`')
@@ -420,7 +438,7 @@ class RequestBase(BaseModelProcessor):
         return session
 
     def get_auth(self):
-        if auth_wrap := self.model.basic_auth_wrap:
+        if auth_wrap := self.http.basic_auth_wrap:
             return auth_wrap.username, auth_wrap.password
         return None
 
@@ -471,44 +489,46 @@ class HttpFileFormatter(RequestBase):
 
     @staticmethod
     def format(model):
-        new_line = "\n"
-        method = model.http.method if model.http.method else "GET"
-        output_str = f'{method} "{model.http.url}"'
-        if auth_wrap := model.basic_auth_wrap:
-            output_str += f'{new_line}basicauth("{auth_wrap.username}", "{auth_wrap.password}")'
-        if lines := model.lines:
-            headers = new_line.join(map(lambda line: f'"{line.header.key}": "{line.header.value}"',
-                                        filter(lambda line:
-                                               line.header, lines)))
-            if headers:
-                output_str += f"\n{headers}"
-            query = new_line.join(map(lambda line: f'? ("{line.query.key}", "{line.query.value}")',
-                                      filter(lambda line:
-                                             line.query, lines)))
-            if query:
-                output_str += f'\n{query}'
-        if payload := model.payload:
-            p = ""
-            mime_type = payload.type
-            if data := payload.data:
-                p = f'data("{data}"{(" ," + mime_type) if mime_type else ""})'
-            if datajson := payload.datajson:
-                parsed_data = json_or_array_to_json(datajson)
-                p = f'data({json.dumps(parsed_data, indent=4)})'
-            elif filetype := payload.file:
-                p = f'fileinput("{filetype}",{(" ," + mime_type) if mime_type else ""})'
-            elif json_data := payload.json:
-                parsed_data = json_or_array_to_json(json_data)
-                p = f'json({json.dumps(parsed_data, indent=4)})'
-            elif files_wrap := payload.fileswrap:
-                p2 = "\n\t".join(map(
-                    lambda file_type: f'("{file_type.name}", "{(file_type.name)}"'
-                                      f'\'{(" ," + file_type.type) if file_type.type else ""}\')'
-                    , files_wrap.files))
-                p = f"files(\n\t{p2}\n)"
-            output_str += f'\n{p}'
-        if output := model.output:
-            output_str += f'\noutput({output.output})'
+        output_str = ""
+        for http in model.allhttps:
+            new_line = "\n"
+            method = http.urlwrap.method if http.urlwrap.method else "GET"
+            output_str += f'{method} "{http.urlwrap.url}"'
+            if auth_wrap := http.basic_auth_wrap:
+                output_str += f'{new_line}basicauth("{auth_wrap.username}", "{auth_wrap.password}")'
+            if lines := http.lines:
+                headers = new_line.join(map(lambda line: f'"{line.header.key}": "{line.header.value}"',
+                                            filter(lambda line:
+                                                   line.header, lines)))
+                if headers:
+                    output_str += f"\n{headers}"
+                query = new_line.join(map(lambda line: f'? ("{line.query.key}", "{line.query.value}")',
+                                          filter(lambda line:
+                                                 line.query, lines)))
+                if query:
+                    output_str += f'\n{query}'
+            if payload := http.payload:
+                p = ""
+                mime_type = payload.type
+                if data := payload.data:
+                    p = f'data("{data}"{(" ," + mime_type) if mime_type else ""})'
+                if datajson := payload.datajson:
+                    parsed_data = json_or_array_to_json(datajson)
+                    p = f'data({json.dumps(parsed_data, indent=4)})'
+                elif filetype := payload.file:
+                    p = f'fileinput("{filetype}",{(" ," + mime_type) if mime_type else ""})'
+                elif json_data := payload.json:
+                    parsed_data = json_or_array_to_json(json_data)
+                    p = f'json({json.dumps(parsed_data, indent=4)})'
+                elif files_wrap := payload.fileswrap:
+                    p2 = "\n\t".join(map(
+                        lambda file_type: f'("{file_type.method}", "{(file_type.method)}"'
+                                          f'\'{(" ," + file_type.type) if file_type.type else ""}\')'
+                        , files_wrap.files))
+                    p = f"files(\n\t{p2}\n)"
+                output_str += f'\n{p}'
+            if output := http.output:
+                output_str += f'\noutput({output.output})\n'
         return output_str
 
     def run(self):
@@ -523,12 +543,8 @@ class HttpFileFormatter(RequestBase):
 class RequestCompiler(RequestBase):
 
     def run(self):
-        session = self.get_session()
-        request = self.get_request()
-        self.print_req_info(request)
-        resp: Response = session.send(request)
-        if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
-            session.cookies.save()  # lwpCookie has .save method
+        resp = self.get_response()
+        self.print_req_info(resp.request)
         for hist_resp in resp.history:
             self.print_req_info(hist_resp, '<')
             request_logger.debug(
@@ -553,6 +569,15 @@ class RequestCompiler(RequestBase):
             request_logger.warning("not able to close, mostly happens while testing in pycharm")
             eprint("output file close failed")
         request_logger.debug(f'request executed completely')
+        return resp
+
+    def get_response(self):
+        session = self.get_session()
+        request = self.get_request()
+        resp: Response = session.send(request)
+        if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
+            session.cookies.save()  # lwpCookie has .save method
+        return resp
 
     def print_req_info(self, request: Union[PreparedRequest, Response], prefix=">"):
         if not (self.args.debug or self.args.info):

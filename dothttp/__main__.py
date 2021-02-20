@@ -2,6 +2,7 @@ import argparse
 import logging
 import sys
 
+from dothttp.log_utils import setup_logging
 from . import CurlCompiler, RequestCompiler, HttpFileFormatter, Config, eprint
 from .exceptions import DotHttpException
 
@@ -9,8 +10,7 @@ logger = logging.getLogger('dothttp')
 
 
 def apply(args: Config):
-    logging.basicConfig(format='%(asctime)s %(levelname)s %(message)s')
-    setup_logging(args)
+    setup_logging(logging.DEBUG if args.debug else logging.CRITICAL)
     logger.info(f'command line arguments are {args}')
     if args.format:
         if args.experimental:
@@ -30,13 +30,6 @@ def apply(args: Config):
     except Exception as exc:
         logger.error(f'unknown error happened {exc}', exc_info=True)
         eprint(f'unknown exception occurred with message {exc}')
-
-
-def setup_logging(args):
-    level = logging.DEBUG if args.debug else logging.CRITICAL
-    logging.getLogger('dothttp').setLevel(level)
-    logging.getLogger('request').setLevel(level)
-    logging.getLogger('curl').setLevel(level)
 
 
 def main():
@@ -66,6 +59,7 @@ def main():
     property_group.add_argument(
         '--property', help='list of property\'s', nargs='+', default=[])
     general_group.add_argument('file', help='http file')
+    general_group.add_argument('--target', '-t', help='targets a particular http definition', type=str)
     args = parser.parse_args()
     if args.debug and args.info:
         eprint("info and debug are conflicting options, use debug for more information")
@@ -78,6 +72,7 @@ def main():
             sys.exit(1)
     config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file,
                     info=args.info, properties=args.property, no_cookie=args.no_cookie,
+                    target=args.target,
                     format=args.format, stdout=args.stdout, experimental=args.experimental)
     apply(config)
 
