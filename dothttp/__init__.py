@@ -283,7 +283,9 @@ class RequestBase(BaseModelProcessor):
                                              value=target)
             else:
                 try:
-                    self.http = next(filter(lambda http: http.name == target, self.model.allhttps))
+                    # if multiple names have same value, it will create confusion
+                    # if they want to go with that. then pass id
+                    self.http = next(filter(lambda http: http.namewrap.name == target, self.model.allhttps))
                 except StopIteration:
                     raise ParameterException(message="target is not spelled correctly", key='target',
                                              value=target)

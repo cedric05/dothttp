@@ -1,7 +1,7 @@
 //HTTP: ram=HTTP2
 MULTISET: allhttps=HTTP+;
 
-HTTP:((name=NAMEWRAP)?
+HTTP:((namewrap=NAMEWRAP)?
     urlwrap=URL
     (basic_auth_wrap=BASICAUTH)?
     (lines *= LINE)?
