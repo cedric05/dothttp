@@ -1,0 +1,22 @@
+POST https://dev.dothttp.dev/
+data ({
+"ram": "ranga", // <- trailing comma
+})
+
+POST https://dev.dothttp.dev/
+json ({
+"requestseasy": "dothttp",
+"shouldwork": [
+           "first",
+           "withtrailingcomma", // <- trailing comma
+      ], // <- trailing comma
+})
+
+POST https://dev.dothttp.dev/
+data("hi", "text/plain", // <-- trailing comma
+)
+
+POST https://dev.dothttp.dev/
+files(
+     ("hi", "text/plain"), // <-- trailing comma
+)

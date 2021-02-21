@@ -30,6 +30,7 @@ class TestTarget(TestBase):
             file=f"{base_dir}/target_with_names_for_few.http", target="first"
         )
         self.assertEqual("https://req.dothttp.dev/get", first_target.url, "first target")
+        self.assertEqual("GET", first_target.method)
 
         # target second one with name
         second_target = self.get_request(
@@ -37,6 +38,7 @@ class TestTarget(TestBase):
         )
         self.assertEqual("https://req.dothttp.dev/post", second_target.url)
         self.assertEqual("hi=hi2", second_target.body)
+        self.assertEqual("POST", second_target.method)
 
         # target third one with index
         third_target = self.get_request(
@@ -44,22 +46,26 @@ class TestTarget(TestBase):
         )
         self.assertEqual("https://req.dothttp.dev/post", third_target.url)
         self.assertEqual(b'{"hi": "hi2"}', third_target.body)
+        self.assertEqual("POST", third_target.method)
 
         # target first one with index
         first_target_with_name = self.get_request(
             file=f"{base_dir}/target_with_names_for_few.http", target=1
         )
         self.assertEqual("https://req.dothttp.dev/get", first_target_with_name.url)
+        self.assertEqual("GET", first_target_with_name.method)
 
         # target second one with index
         second_target_with_name = self.get_request(
             file=f"{base_dir}/target_with_names_for_few.http", target=2
         )
         self.assertEqual("https://req.dothttp.dev/post", second_target_with_name.url)
+        self.assertEqual("POST", second_target_with_name.method)
 
         # target fourth one with index
 
-        fourone = self.get_request(
+        fourth = self.get_request(
             file=f"{base_dir}/target_with_names_for_few.http", target=4
         )
-        self.assertEqual("https://req.dothttp.dev/post?hi=bye", fourone.url)
+        self.assertEqual("https://req.dothttp.dev/post?hi=bye", fourth.url)
+        self.assertEqual("POST", fourth.method)

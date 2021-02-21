@@ -93,6 +93,19 @@ json({
 output(test)
 """, output)
 
+    def test_trailing_commas_are_ok(self):
+        filename = f"{base_dir}/trailingcomma.http"
+        first_one = self.get_request(filename, target=1)
+        second_one = self.get_request(filename, target=2)
+        third_one = self.get_request(filename, target=3)
+        fourth_one = self.get_request(filename, target=4)
+
+        self.assertEqual("ram=ranga", first_one.body)
+        self.assertEqual(b'{"requestseasy": "dothttp", "shouldwork": ["first", "withtrailingcomma"]}', second_one.body)
+        self.assertEqual('hi', third_one.body)
+        self.assertEqual('https://dev.dothttp.dev/', fourth_one.url)
+        self.assertEqual('POST', fourth_one.method)
+
 
 if __name__ == "__main__":
     unittest.main()
