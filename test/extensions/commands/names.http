@@ -1,0 +1,24 @@
+@name('test')
+GET https://req.dothttp.dev
+? "test", "test2"
+? "test", "test3"
+
+@name(test2)
+POST https://req.dothttp.dev
+data({
+     "dothttp": "rocks",
+     "generates": "curl",
+     "makes": "requests",
+})
+
+@name(test3)
+POST https://req.dothttp.dev
+json({
+     "dothttp": "rocks",
+     "generates": "curl",
+     "makes": "requests",
+})
+
+@name('test4.test')
+POST https://req.dothttp.dev
+data('hi')

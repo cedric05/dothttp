@@ -3,7 +3,7 @@ import json
 from requests import PreparedRequest
 
 from test import TestBase
-from test.test_request import dir_path
+from test.core.test_request import dir_path
 
 base_dir = f"{dir_path}/substitution"
 

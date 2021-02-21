@@ -1,0 +1,1 @@
+GET https://{{host=httpbin.org}}/get

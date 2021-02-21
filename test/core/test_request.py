@@ -10,6 +10,7 @@ base_dir = f"{dir_path}/requests"
 sub_dir = f"{dir_path}/substitution"
 
 
+
 class RequestTest(TestBase):
     def test_get(self):
         req = self.get_request(f"{base_dir}/pass.http")

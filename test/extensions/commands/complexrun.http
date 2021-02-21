@@ -1,0 +1,9 @@
+GET https://{{host=httpbin.org}}/get
+? dothttp, rocks
+
+POST https://{{host}}/post
+? startusing, dothttp
+
+
+POST https://{{host}}/POST // status 404
+? startusing, dothttp

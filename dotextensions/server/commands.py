@@ -33,7 +33,9 @@ class RunHttpFileHandler(BaseHandler):
                             result={
                                 "headers":
                                     {key: value for key, value in resp.headers.items()},
-                                "body": resp.text})
+                                "body": resp.text,
+                                "status": resp.status_code,
+                            })
         except DotHttpException as ex:
             result = Result(id=command.id,
                             result={
@@ -85,4 +87,8 @@ class GetNameReferencesHandler(BaseHandler):
             result = Result(id=command.id,
                             result={
                                 "error_message": ex.message, "error": True})
+        except Exception as e:
+            result = Result(id=command.id,
+                            result={
+                                "error_message": str(e), "error": True})
         return result
