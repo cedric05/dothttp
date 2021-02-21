@@ -32,9 +32,9 @@
         - [ ] suggestions
         - [ ] run in vscode(itself)
 - [ ] 50% integration tests
-- [ ] add tests with target and multi hosts
+- [x] add tests with target and multi hosts
 - [x] 80% coverage unit tests
-- [ ] Better message when connection refused issues
+- [x] Better message when connection refused issues
 - [x] standardise dependency versions
 - [ ] syntax issues better error reporting
   - [ ] if it failed to parse certain text, show examples on how to fix it
