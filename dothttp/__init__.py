@@ -275,6 +275,8 @@ class RequestBase(BaseModelProcessor):
         super().__init__(args)
         self._cookie: Union[LWPCookieJar, None] = None
         if target := self.args.target:
+            if not isinstance(target, str):
+                target = str(target)
             if target.isdecimal():
                 if 1 <= int(target) <= len(self.model.allhttps):
                     self.http = self.model.allhttps[int(target) - 1]

@@ -71,12 +71,17 @@ class CmdServer(Base):
                 logger.debug(f"got request {line}")
                 command = self.get_command(line)
                 result = run(command)
-                sys.stdout.write(json.dumps(result) + "\n")
-                sys.stdout.flush()
+                self.write_result(result)
             except JSONDecodeError:
-                logger.info(f"input line `{line}` is not json decodable")
+                logger.info(f"input line `{line.strip()}` is not json decodable")
+                self.write_result({"id": 0, "result": {"error": True, "error_message": "not json decodable"}})
             except Exception as e:
                 logger.info(f"unknown exception `{e}` happened ", exc_info=True)
+                self.write_result({"id": 0, "result": {"error": True, "error_message": "not json decodable"}})
+
+    def write_result(self, result):
+        sys.stdout.write(json.dumps(result) + "\n")
+        sys.stdout.flush()
 
     def get_command(self, line):
         output = json.loads(line)
