@@ -43,6 +43,7 @@ def apply(mm, filename):
 if __name__ == "__main__":
     print(sys.argv)
     if len(sys.argv) == 2:
-        print(apply(mm, sys.argv[1]).text)
+        print(apply(mm, sys.argv[1]))
     else:
+        print(apply(mm, 'workday-upload-delete.http'))
         print('run with python test.py filename.http')
