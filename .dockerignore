@@ -1,1 +1,7 @@
 .vscode
+build
+dist
+.git
+.devcontainer
+.github
+venv

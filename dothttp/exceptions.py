@@ -1,11 +1,11 @@
-
-
 def exception_wrapper(message, ):
     def wrapper(cls):
         class exc(cls):
             def __init__(self, **kwargs):
                 self.message = message.format(**kwargs)
+
         return exc
+
     return wrapper
 
 
@@ -30,7 +30,7 @@ class HttpFileSyntaxException(HttpFileException):
     pass
 
 
-@exception_wrapper('error with propertyfile')
+@exception_wrapper('property json schema validation failed! file `{file}`')
 class PropertyFileException(DotHttpException):
     pass
 
@@ -50,10 +50,21 @@ class DataFileNotFoundException(HttpFileException):
     message = "data file mentioned is not a"
 
 
-@exception_wrapper('property `{var}` not defined in `{propertyfile}`')
+@exception_wrapper('property `{var}` not defined in propertyfile/commandline/httpfile propertyfile:`{propertyfile}`')
 class PropertyNotFoundException(PropertyFileException):
     pass
 
+
 @exception_wrapper("error with command line property format, property {}")
 class CommandLinePropError(DotHttpException):
+    pass
+
+
+@exception_wrapper("invalid payload")
+class PayloadNotValidException(HttpFileException):
+    pass
+
+
+@exception_wrapper("invalid payload data, expected str,json payload: `{payload}`")
+class PayloadDataNotValidException(PayloadNotValidException):
     pass

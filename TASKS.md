@@ -1,0 +1,38 @@
+- [x] variable substitution
+- [x] properties file
+- [x] property from command line substitution
+- [x] support various data types like json, text (headers should be added automatically)
+- [x] tests
+- [x] file uploads
+- [x] handle 200, 300, 400, 500 exception (user readable messages)
+- [x] should handle exceptions, only message should be shown.
+- [x] debug mode to show logs
+- [x] info logs, (just headers and response)
+- [x] multi form upload
+- [X] command line arguments to curl and to make http request
+- [x] basic auth
+- [x] cookie storage and support
+- [x] update README.md to explain syntax and examples to refer
+- [x] easy installation package using pyinstaller, docker, brew
+    - [x] pyinstaller
+    - [x] docker
+    - [x] whalebrew
+- [x] default headers defined in prop file
+- [x] property value in http file itself
+- [x] property syntax with double paranthesis
+- [x] comments (using #, so shebang support)
+- [x] payload 's data should support json - -> form input
+- [x] release, packages to github
+- [ ] language server, formatter
+    - [x] HttpFileFormatter
+    - [x] [vscode plugin](https://github.com/cedric05/dothttp-code.git)
+        - [x] code highlights
+        - [ ] suggestions
+        - [ ] run in vscode(itself)
+- [ ] 50% integration tests
+- [ ] 80% coverage unit tests
+- [ ] history ?
+- [ ] multiple logging options ?
+- [ ] output coloring (according to content-type) ?
+- [ ] output should have rolling output format ?
+- [ ] curl import 
