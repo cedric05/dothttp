@@ -1,4 +1,5 @@
 import os
+
 from setuptools import setup, find_packages
 
 
@@ -7,8 +8,12 @@ def read(fname):
         return f.read()
 
 
+# windows_req = "python-magic-bin==0.4.14"
+
+
 def requirements():
-    return [req.split(';')[0] for req in read('requirements.txt').split('\n')]
+    reqs = [req.split(';')[0] for req in read('requirements.txt').split('\n')]
+    return reqs
 
 
 setup(
@@ -24,6 +29,7 @@ setup(
     entry_points={
         'console_scripts': ['dothttp=dothttp.__main__:main'],
     },
+    options={"bdist_wheel": {"universal": False}},
     packages=find_packages(),
     install_requires=requirements(),
     long_description=read('README.md'),
