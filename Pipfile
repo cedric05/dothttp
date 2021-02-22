@@ -8,6 +8,9 @@ textx = "*"
 requests = "*"
 curlify = "*"
 jstyleson = "*"
+python-magic = "*"
+python-magic-bin = { version = "*", os_name = "=='nt'" }
+pyinstaller = "*"
 
 [dev-packages]
 autopep8 = "*"

@@ -1,0 +1,62 @@
+name: Docker
+
+on:
+  push:
+    branches:
+      - master
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+env:
+  IMAGE_NAME: cedric05/dothttp
+  IMAGE_NAME_REL: cedric05/dothttp-rel
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: |
+          docker build . --file Dockerfile --tag $IMAGE_NAME
+          docker build --build-arg IMAGE_NAME=$IMAGE_NAME . --file Dockerfile.release --tag $IMAGE_NAME_REL
+          docker run --rm --entrypoint cat $IMAGE_NAME_REL  /app/dist/dothttp-cli > dothttp-cli
+
+      - name: Log into registry
+
+        run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u $GITHUB_ACTOR --password-stdin
+
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/$IMAGE_NAME
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dothttp-cli
+          asset_name: dothttp-cli
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
