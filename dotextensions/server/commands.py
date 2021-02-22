@@ -75,7 +75,7 @@ class GetNameReferencesHandler(BaseHandler):
                     else:
                         start = http.urlwrap._tx_position
                         end = http.urlwrap._tx_position_end
-                        name = str(index)
+                        name = str(index+1)
                     name = {
                         'name': name,
                         'start': start,
