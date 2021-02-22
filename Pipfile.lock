@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "972c143d53be4e821fc1a3eb18988ba62dd18c386bbc67b9d4dd49b931fa1ab8"
+            "sha256": "7fa548de2ad0daa832e18d791de377f9ef7a172b83d9ea8abdd47515719a96ec"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -206,11 +206,11 @@
         },
         "prompt-toolkit": {
             "hashes": [
-                "sha256:7e966747c18ececaec785699626b771c1ba8344c8d31759a1915d6b12fad6525",
-                "sha256:c96b30925025a7635471dc083ffb6af0cc67482a00611bd81aeaeeeb7e5a5e12"
+                "sha256:1411dc3c26dfbfb55b88d8239484b2f2a9df4e69e67965711b187c8917bff872",
+                "sha256:4ccd91f540ef57732d38451889b915ab75a78e04f427e9f2811ff9da0332a174"
             ],
             "markers": "python_full_version >= '3.6.1'",
-            "version": "==3.0.14"
+            "version": "==3.0.15"
         },
         "ptyprocess": {
             "hashes": [
@@ -248,6 +248,14 @@
                 "sha256:fc3290a2ca337d1d58c579c223201360bfe74caed6454eaf5a2550b77dbda45c"
             ],
             "version": "==2020.11"
+        },
+        "pywin32-ctypes": {
+            "hashes": [
+                "sha256:24ffc3b341d457d48e8922352130cf2644024a4ff09762a2261fd34c36ee5942",
+                "sha256:9dc2d991b3479cc2df15930958b674a48a227d5361d413827a4cfd0b5876fc98"
+            ],
+            "markers": "os_name == 'nt'",
+            "version": "==0.2.0"
         },
         "toml": {
             "hashes": [

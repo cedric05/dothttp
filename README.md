@@ -116,7 +116,7 @@ user can specify payload by mentioning below four forms (for various scenarios).
   `data("ram", "text/plain")`
 - `data({"key": "value"})` for form input.
 - `json({"key": "value"})` for json payload.
-- `file("path/to/file", "type")` uploads file as payload (type is optional).
+- `fileinput("path/to/file", "type")` uploads file as payload (type is optional).
 - `files(("photo", "path/to/file/photo.jpg", "image/jpeg"),
   ("photo details", '{"name":"prasanth"}', "application/json")   
   )`
@@ -127,6 +127,11 @@ user can specify payload by mentioning below four forms (for various scenarios).
 ### Comments
 
 **dothttp** will use `#` for commenting entire line.
+
+1. `//` line comment. follows java, javascript
+2. `#` line comment. follows python's comment style
+3. `/*
+   */` multi line comment. follows java/javascript style
 
 ### Templating
 
@@ -192,6 +197,22 @@ User can define headers in below three formats
    and `.dothttp.json` exists, it will be activated
 2. `headers` once a property file is activated. headers from property file will be added to request by default without
    user having to specify in `.http` file
+
+#### Formatter (experimental phase)
+
+**dothttp** can format a http file using below command
+`dothttp -fmt examples/dothttpazure.http --experimental`
+or
+`dothttp --format examples/dothttpazure.http --experimental`
+
+to print to command line
+
+`dothttp --format examples/dothttpazure.http --experimental --stdout`
+
+### Editor support
+
+syntax highlighting for visual studio code is supported
+via [dothttp-code](https://marketplace.visualstudio.com/items?itemName=ShivaPrasanth.dothttp-code)
 
 ### Command line options
 

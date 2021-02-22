@@ -23,16 +23,23 @@
 - [x] comments (using #, so shebang support)
 - [x] payload 's data should support json - -> form input
 - [x] release, packages to github
+- [ ] support binary output
 - [ ] language server, formatter
     - [x] HttpFileFormatter
+        - [ ] current implementation removes comments from file. add them back
     - [x] [vscode plugin](https://github.com/cedric05/dothttp-code.git)
         - [x] code highlights
         - [ ] suggestions
         - [ ] run in vscode(itself)
 - [ ] 50% integration tests
-- [ ] 80% coverage unit tests
+- [x] 80% coverage unit tests
+- [ ] standardise dependency versions
 - [ ] history ?
 - [ ] multiple logging options ?
 - [ ] output coloring (according to content-type) ?
 - [ ] output should have rolling output format ?
-- [ ] curl import 
+- [ ] curl import
+
+# BUGS
+
+- [x] list query parameters are not working ?ram=ranga&ram=rajesh

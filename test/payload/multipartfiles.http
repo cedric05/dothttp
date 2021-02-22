@@ -1,0 +1,6 @@
+POST "https://dothttp.azurewebsites.net"
+files(
+("resume", "{{filename}}"),
+("content2", "{{data}}")
+
+)

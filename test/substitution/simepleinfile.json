@@ -1,0 +1,11 @@
+{
+  "env1": {
+    "host": "yahoo.com"
+  },
+  "env2": {
+    "host": "ins.com"
+  },
+  "env3": {
+    "host": "hub.com"
+  }
+}

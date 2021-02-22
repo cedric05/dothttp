@@ -13,7 +13,11 @@ def apply(args: Config):
     setup_logging(args)
     logger.info(f'command line arguments are {args}')
     if args.format:
-        comp_class = HttpFileFormatter
+        if args.experimental:
+            comp_class = HttpFileFormatter
+        else:
+            eprint("http formatter is still in experimental phase. enable experimental flag to use it (--experimental)")
+            sys.exit(1)
     elif args.curl:
         comp_class = CurlCompiler
     else:
@@ -54,7 +58,9 @@ def main():
         '--info', '-i', help='more information', action='store_const', const=True)
     fmt_group = parser.add_argument_group('format')
     fmt_group.add_argument(
-        '--format', '-fmt', help='formatter', action='store_const', const=True)
+        '--format', '-fmt', help='format http file', action='store_const', const=True)
+    property_group.add_argument(
+        '--experimental', '--b', help='enable experimental', action='store_const', const=True)
     fmt_group.add_argument(
         '--stdout', help='print to commandline', action='store_const', const=True)
     property_group.add_argument(
@@ -72,7 +78,7 @@ def main():
             sys.exit(1)
     config = Config(curl=args.curl, property_file=args.property_file, env=args.env, debug=args.debug, file=args.file,
                     info=args.info, properties=args.property, no_cookie=args.no_cookie,
-                    format=args.format, stdout=args.stdout)
+                    format=args.format, stdout=args.stdout, experimental=args.experimental)
     apply(config)
 
 

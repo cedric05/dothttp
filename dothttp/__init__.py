@@ -2,9 +2,10 @@ import logging
 import os
 import re
 import sys
+from collections import defaultdict
 from dataclasses import dataclass, field
 from http.cookiejar import LWPCookieJar
-from typing import Union, Dict, List, Set
+from typing import Union, Dict, List, DefaultDict
 
 import jstyleson as json
 import magic
@@ -55,6 +56,7 @@ class Config:
     no_cookie: bool
     format: bool
     stdout: bool = False
+    experimental: bool = False
 
 
 @dataclass
@@ -67,7 +69,7 @@ class Payload:
 
 @dataclass
 class Property:
-    text: Set = field(default_factory=set())
+    text: List = field(default_factory=list())
     key: Union[str, None] = None
     value: Union[str, None] = None
 
@@ -137,17 +139,11 @@ class BaseModelProcessor:
 
         else:
             props = {}
-        try:
-            self.default_headers.update(props.get('headers', {}))
-            self.properties.update(props.get("*", {}))
-            if self.env:
-                for env_name in self.env:
-                    self.properties.update(props.get(env_name, {}))
-        except:
-            # mostly happens when, dev defines env with a number, string or array
-            # this is bad, cat and justify exception
-            raise PropertyFileException(
-                "property file expects all first level to be dictionary, second level values to be string")
+        self.default_headers.update(props.get('headers', {}))
+        self.properties.update(props.get("*", {}))
+        if self.env:
+            for env_name in self.env:
+                self.properties.update(props.get(env_name, {}))
 
         return self.properties
 
@@ -180,7 +176,7 @@ class BaseModelProcessor:
                 base_logger.debug(f"detected command line property {key} value: {value}")
                 self.command_line_props[key] = value
             except:
-                raise CommandLinePropError(prop)
+                raise CommandLinePropError(prop=prop)
 
     def load_model(self):
         # textx has provided utility to load model metamodel.model_from_file(args.file)
@@ -203,7 +199,7 @@ class BaseModelProcessor:
         if '=' in prop:
             key_values = prop.split('=')
             if len(key_values) != 2:
-                raise HttpFileException('default property should not have multiple `=`')
+                raise HttpFileException(message='default property should not have multiple `=`')
             key, value = key_values
             # strip white space for keys
             key = key.strip()
@@ -216,15 +212,19 @@ class BaseModelProcessor:
                 value = value[1:-1]
             if key in cache:
                 if value != cache[key].value:
-                    raise HttpFileException('defined property is defaulted with different values, panicked ')
+                    raise HttpFileException(
+                        message=f'property: `{key}` is defaulted with two/more different values, panicked ')
                 p = cache[key]
-                p.text.add(prop)
+                p.text.append(prop)
             else:
-                p = Property({prop}, key, value)
+                p = Property([prop], key, value)
             cache.setdefault(key, p)
         else:
-            p = Property({prop})
-            cache.setdefault(prop, p)
+            if prop in cache:
+                cache[prop].text.append(prop)
+            else:
+                p = Property([prop])
+                cache.setdefault(prop, p)
         return p
 
     @staticmethod
@@ -267,8 +267,7 @@ class BaseModelProcessor:
             value = self.get_most_possible_val(self.command_line_props.get(var), self.properties.get(var),
                                                prop_cache[var].value)
             for text_to_replace in prop_cache[var].text:
-                self.content = re.sub(
-                    r'{{%s}}' % text_to_replace, value, self.content)
+                self.content = self.content.replace("{{" + text_to_replace + "}}", value)
 
 
 class RequestBase(BaseModelProcessor):
@@ -277,10 +276,10 @@ class RequestBase(BaseModelProcessor):
         self._cookie: Union[LWPCookieJar, None] = None
 
     def get_query(self):
-        params = {}
+        params: DefaultDict[List] = defaultdict(list)
         for line in self.model.lines:
             if query := line.query:
-                params[query.key] = query.value
+                params[query.key].append(query.value)
         request_logger.debug(
             f'computed query params from `{self.file}` are `{params}`')
         return params
@@ -449,15 +448,19 @@ class RequestBase(BaseModelProcessor):
 class CurlCompiler(RequestBase):
 
     def run(self):
-        prep = self.get_request()
+        curl_req = self.get_curl_output()
         output = self.get_output()
-        curl_req = to_curl(prep)
         if 'b' in output.mode:
             curl_req = curl_req.encode()
         output.write(curl_req)
         if output.fileno() != 1:
             output.close()
         curl_logger.debug(f'curl request generation completed successfully')
+
+    def get_curl_output(self):
+        prep = self.get_request()
+        curl_req = to_curl(prep)
+        return curl_req
 
 
 class HttpFileFormatter(RequestBase):
@@ -469,37 +472,43 @@ class HttpFileFormatter(RequestBase):
     @staticmethod
     def format(model):
         new_line = "\n"
-        output_str = f'{model.http.method} "{model.http.url}"'
+        method = model.http.method if model.http.method else "GET"
+        output_str = f'{method} "{model.http.url}"'
         if auth_wrap := model.basic_auth_wrap:
             output_str += f'{new_line}basicauth("{auth_wrap.username}", "{auth_wrap.password}")'
         if lines := model.lines:
             headers = new_line.join(map(lambda line: f'"{line.header.key}": "{line.header.value}"',
                                         filter(lambda line:
                                                line.header, lines)))
+            if headers:
+                output_str += f"\n{headers}"
             query = new_line.join(map(lambda line: f'? ("{line.query.key}", "{line.query.value}")',
                                       filter(lambda line:
                                              line.query, lines)))
-            output_str += f'\n{headers}\n{query}'
+            if query:
+                output_str += f'\n{query}'
         if payload := model.payload:
             p = ""
             mime_type = payload.type
             if data := payload.data:
-                p = f'data("{data}", {mime_type})'
+                p = f'data("{data}"{(" ," + mime_type) if mime_type else ""})'
             if datajson := payload.datajson:
                 parsed_data = json_or_array_to_json(datajson)
                 p = f'data({json.dumps(parsed_data, indent=4)})'
             elif filetype := payload.file:
-                p = f'fileinput("{filetype}", {mime_type})'
+                p = f'fileinput("{filetype}",{(" ," + mime_type) if mime_type else ""})'
             elif json_data := payload.json:
                 parsed_data = json_or_array_to_json(json_data)
                 p = f'json({json.dumps(parsed_data, indent=4)})'
             elif files_wrap := payload.fileswrap:
                 p2 = "\n\t".join(map(
                     lambda file_type: f'("{file_type.name}", "{(file_type.name)}"'
-                                      f', "{file_type.type}")'
+                                      f'\'{(" ," + file_type.type) if file_type.type else ""}\')'
                     , files_wrap.files))
                 p = f"files(\n\t{p2}\n)"
             output_str += f'\n{p}'
+        if output := model.output:
+            output_str += f'\noutput({output.output})'
         return output_str
 
     def run(self):
@@ -530,13 +539,19 @@ class RequestCompiler(RequestBase):
             eprint(f"server responded with non 2XX code. code: {resp.status_code}")
         self.print_req_info(resp, '<')
         output = self.get_output()
+        func = None
+        if hasattr(output, 'mode') and 'b' in output.mode:
+            func = lambda data: output.write(data)
+        else:
+            func = lambda data: output.write(data.decode())
         for data in resp.iter_content(1024):
-            if 'b' in output.mode:
-                output.write(data)
-            else:
-                output.write(data.decode())
-        if output.fileno() != 1:
-            output.close()
+            func(data)
+        try:
+            if output.fileno() != 1:
+                output.close()
+        except:
+            request_logger.warning("not able to close, mostly happens while testing in pycharm")
+            eprint("output file close failed")
         request_logger.debug(f'request executed completely')
 
     def print_req_info(self, request: Union[PreparedRequest, Response], prefix=">"):
