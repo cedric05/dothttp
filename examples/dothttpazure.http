@@ -1,8 +1,8 @@
 POST "https://dothttp.azurewebsites.net"
-query("querykey1", "queryvalue1")
-'myhederkey' : 'myheadervalue'
+query("querykey1", "queryvalue1 {ram}")
+'myhederkey' : 'myheadervalue {ram}'
 query("querykey2", "queryvalue2")
-? ('haha', 'haha')
+? ('haha', '{ram}')
 ? 'haha3', 'haha2'
 header('myhederkey2','myheadervalue2')
 data('{}')
