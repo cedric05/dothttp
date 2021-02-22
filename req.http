@@ -1,4 +1,0 @@
-method(GET)
-url("https://google.com") 
-query('url', 'haha')
-header('content-type','application/json')
