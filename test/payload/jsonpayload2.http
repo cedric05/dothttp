@@ -1,0 +1,10 @@
+POST 'https://dothttp.azurewebsites.net'
+json({
+"string": "simple",
+"list": ["dothttp", "azure"],
+"null": null,
+"bool": False,
+"bool2": True,
+"float":1.121212,
+"float2":1
+})

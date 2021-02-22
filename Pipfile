@@ -7,6 +7,7 @@ name = "pypi"
 textx = "*"
 requests = "*"
 curlify = "*"
+jstyleson = "*"
 
 [dev-packages]
 autopep8 = "*"
