@@ -6,7 +6,7 @@ HTTP:
     (output=TOFILE)?;
 
 URL: 
-    (method=METHODTYPE)? url=STRING
+    (method=METHODTYPE)? url=URLString
 ;
 
 LINE: 
@@ -14,12 +14,12 @@ LINE:
 ;
 
 HEADER: 
-    'header' '(' key=STRING ',' value=STRING ')' 
-    | key=STRING ':' value=STRING
+    'header' '(' key=DotString ',' value=DotString ')'
+    | key=DotString ':' value=DotString
 ;
 
 BASICAUTH:
-    'basicauth' '(' username=STRING ',' password= STRING ')'
+    'basicauth' '(' username=DotString ',' password= DotString ')'
 ;
 
 METHODTYPE: 
@@ -29,11 +29,11 @@ METHODTYPE:
 ;
 
 QUERY: 
-    'query' '(' key=STRING ',' value=STRING ')'
-    | '?' '(' key=STRING ',' value=STRING ')'
-    | '?' key=STRING ',' value=STRING
-    | '?' key=STRING ':' value=STRING
-    | '?' key=STRING '=' value=STRING
+    'query' '(' key=DotString ',' value=DotString ')'
+    | '?' '(' key=DotString ',' value=DotString ')'
+    | '?' key=DotString ',' value=DotString
+    | '?' key=DotString ':' value=DotString
+    | '?' key=DotString '=' value=DotString
 ;
 
 PAYLOAD: 
@@ -100,3 +100,14 @@ CommentLine:
 CommentBlock:
     /\/\*(.|\n)*?\*\//
 ;
+
+DotString:
+    STRING | /\w+/
+;
+// allow only alphanumeric or string in double/single quotes
+
+URLString:
+    STRING | /https\:\/\/(\S)+/
+    | /http\:\/\/(\S)+/
+;
+// allows http or https till space otherwise go for string
