@@ -45,6 +45,7 @@
 - [ ] curl import
 - [ ] swagger to http file generator
 - [ ] postman import
+- [ ] curl print multiline
 
 # BUGS
 

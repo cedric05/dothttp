@@ -1,3 +1,5 @@
+import mimetypes
+
 from dothttp import RequestCompiler, Config, DotHttpException, dothttp_model, CurlCompiler
 from . import Command, Result, BaseHandler
 
@@ -23,7 +25,10 @@ class RunHttpFileHandler(BaseHandler):
                 req = CurlCompiler(config)
                 result = req.get_curl_output()
                 result = Result(id=command.id, result={
-                    "body": result
+                    "body": result,
+                    "headers": {
+                        "Content-Type": mimetypes.types_map['.sh'],
+                    }
                 })
             else:
                 request = RequestCompiler(config)
