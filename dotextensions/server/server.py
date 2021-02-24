@@ -1,3 +1,4 @@
+import concurrent.futures
 import json
 import logging
 import sys
@@ -64,20 +65,25 @@ class HttpServer(Base):
 
 
 class CmdServer(Base):
+    def __init__(self):
+        self.pool = concurrent.futures.ThreadPoolExecutor()
 
     def run_forever(self):
         for line in sys.stdin:
             try:
                 logger.debug(f"got request {line}")
                 command = self.get_command(line)
-                result = run(command)
-                self.write_result(result)
+                self.pool.submit(self.run_respond, command)
             except JSONDecodeError:
                 logger.info(f"input line `{line.strip()}` is not json decodable")
                 self.write_result({"id": 0, "result": {"error": True, "error_message": "not json decodable"}})
             except Exception as e:
                 logger.info(f"unknown exception `{e}` happened ", exc_info=True)
                 self.write_result({"id": 0, "result": {"error": True, "error_message": "not json decodable"}})
+
+    def run_respond(self, command):
+        result = run(command)
+        self.write_result(result)
 
     def write_result(self, result):
         sys.stdout.write(json.dumps(result) + "\n")
