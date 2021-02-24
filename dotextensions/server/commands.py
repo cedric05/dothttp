@@ -1,4 +1,4 @@
-from dothttp import RequestCompiler, Config, DotHttpException, dothttp_model
+from dothttp import RequestCompiler, Config, DotHttpException, dothttp_model, CurlCompiler
 from . import Command, Result, BaseHandler
 
 
@@ -17,25 +17,24 @@ class RunHttpFileHandler(BaseHandler):
         props = command.params.get('properties', {})
         properties = [f"{i}={j}" for i, j in props.items()]
         try:
-            request = RequestCompiler(Config(file=filename,
-                                             env=envs,
-                                             properties=properties,
-                                             curl=curl,
-                                             property_file=None,
-                                             debug=True,
-                                             no_cookie=nocookie,
-                                             format=False,
-                                             info=False,
-                                             target=target
-                                             ))
-            resp = request.get_response()
-            result = Result(id=command.id,
-                            result={
-                                "headers":
-                                    {key: value for key, value in resp.headers.items()},
-                                "body": resp.text,
-                                "status": resp.status_code,
-                            })
+            config = Config(file=filename, env=envs, properties=properties, curl=curl, property_file=None, debug=True,
+                            no_cookie=nocookie, format=False, info=False, target=target)
+            if config.curl:
+                req = CurlCompiler(config)
+                result = req.get_curl_output()
+                result = Result(id=command.id, result={
+                    "body": result
+                })
+            else:
+                request = RequestCompiler(config)
+                resp = request.get_response()
+                result = Result(id=command.id,
+                                result={
+                                    "headers":
+                                        {key: value for key, value in resp.headers.items()},
+                                    "body": resp.text,
+                                    "status": resp.status_code,
+                                })
         except DotHttpException as ex:
             result = Result(id=command.id,
                             result={
@@ -75,7 +74,7 @@ class GetNameReferencesHandler(BaseHandler):
                     else:
                         start = http.urlwrap._tx_position
                         end = http.urlwrap._tx_position_end
-                        name = str(index+1)
+                        name = str(index + 1)
                     name = {
                         'name': name,
                         'start': start,
