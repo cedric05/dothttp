@@ -1,0 +1,5 @@
+GET https://{{host=httpbin.org}}/get
+
+
+POST https://{{host}}/post
+data({})
