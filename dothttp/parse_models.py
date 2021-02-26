@@ -57,7 +57,7 @@ class Payload:
     data: Optional[str]
     datajson: Optional[Dict]
     file: Optional[str]
-    json: Optional[Dict]
+    json: Optional
     fileswrap: FilesWrap
     type: str
 
@@ -69,7 +69,7 @@ class ToFile:
 
 @dataclass
 class Http:
-    namewrap: NameWrap
+    namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
     basic_auth_wrap: BasicAuth
     lines: List[Line]
