@@ -274,6 +274,7 @@ class RequestBase(BaseModelProcessor):
     def __init__(self, args: Config):
         super().__init__(args)
         self._cookie: Union[LWPCookieJar, None] = None
+        self.validate_names()
         if target := self.args.target:
             if not isinstance(target, str):
                 target = str(target)
@@ -287,12 +288,24 @@ class RequestBase(BaseModelProcessor):
                 try:
                     # if multiple names have same value, it will create confusion
                     # if they want to go with that. then pass id
-                    self.http = next(filter(lambda http: http.namewrap.name == target, self.model.allhttps))
+                    self.http = next(filter(lambda http: http.namewrap.name == target,
+                                            (http for http in self.model.allhttps if http.namewrap)))
                 except StopIteration:
                     raise ParameterException(message="target is not spelled correctly", key='target',
                                              value=target)
         else:
             self.http = self.model.allhttps[0]
+
+    def validate_names(self):
+        names = []
+        for index, http in enumerate(self.model.allhttps):
+            index = index + 1
+            if http.namewrap:
+                name = http.namewrap
+            else:
+                name = str(index)
+            if name in names:
+                raise HttpFileException(message=f"{name} appeared twice")
 
     def get_query(self):
         params: DefaultDict[List] = defaultdict(list)
@@ -484,19 +497,20 @@ class CurlCompiler(RequestBase):
     def get_curl_output(self):
         prep = self.get_request_notbody()
         parts = []
-        if self.http.payload.file:
-            parts.append(('--data', "@" + self.http.payload.file))
-        elif self.http.payload.fileswrap:
-            payload = self.get_payload()
-            if payload.files:
-                for file in payload.files:
-                    if isinstance(payload.files[file], str):
-                        parts.append(('--form', file + "=" + payload.files[file]))
-                    else:
-                        parts.append(('--form', file + "=@" + payload.files[file].name))
-        else:
-            payload = self.get_payload()
-            prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
+        if self.http.payload:
+            if self.http.payload.file:
+                parts.append(('--data', "@" + self.http.payload.file))
+            elif self.http.payload.fileswrap:
+                payload = self.get_payload()
+                if payload.files:
+                    for file in payload.files:
+                        if isinstance(payload.files[file], str):
+                            parts.append(('--form', file + "=" + payload.files[file]))
+                        else:
+                            parts.append(('--form', file + "=@" + payload.files[file].name))
+            else:
+                payload = self.get_payload()
+                prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
         curl_req = to_curl(prep, parts)
         return curl_req
 
