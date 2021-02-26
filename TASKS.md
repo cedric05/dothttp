@@ -33,6 +33,8 @@
         - [x] run in vscode(itself)
 - [ ] 50% integration tests
 - [x] add tests with target and multi hosts
+    - [ ] add tests for curl (more scenarios)
+    - [ ] target negative tests
 - [x] 80% coverage unit tests
 - [x] Better message when connection refused issues
 - [x] standardise dependency versions

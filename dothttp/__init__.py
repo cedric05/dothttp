@@ -299,13 +299,11 @@ class RequestBase(BaseModelProcessor):
     def validate_names(self):
         names = []
         for index, http in enumerate(self.model.allhttps):
-            index = index + 1
-            if http.namewrap:
-                name = http.namewrap
-            else:
-                name = str(index)
+            name = http.namewrap.name if http.namewrap else str(index + 1)
             if name in names:
-                raise HttpFileException(message=f"{name} appeared twice")
+                raise HttpFileException(message=f"target: `{name}` appeared twice or more. panicked while processing")
+            names.append(name)
+            names.append(str(index + 1))
 
     def get_query(self):
         params: DefaultDict[List] = defaultdict(list)
