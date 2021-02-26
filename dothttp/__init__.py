@@ -19,6 +19,7 @@ from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .exceptions import PropertyNotFoundException
+from .parse_models import Allhttp
 from .property_schema import property_schema
 
 FORM_URLENCODED = "application/x-www-form-urlencoded"
@@ -188,7 +189,7 @@ class BaseModelProcessor:
             raise HttpFileSyntaxException(file=self.file, message=e.args)
         except Exception as e:
             raise HttpFileException(message=e.args)
-        self.model = model
+        self.model: Allhttp = model
 
     def load_content(self):
         if not os.path.exists(self.file):
@@ -386,7 +387,6 @@ class RequestBase(BaseModelProcessor):
         elif files_wrap := self.http.payload.fileswrap:
             files = {}
             for filetype in files_wrap.files:
-                filename = filetype.name
                 content = filetype.path
                 mimetype = filetype.type
                 if os.path.exists(filetype.path):  # probably check valid path, then check for exists
