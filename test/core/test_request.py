@@ -72,7 +72,8 @@ class RequestTest(TestBase):
     def test_curl_print(self):
         req: CurlCompiler = self.get_req_comp(f"{base_dir}/redirect.http", info=True, curl=True)
         output = req.get_curl_output()
-        self.assertEqual("curl -X GET http://endeavour.today/", output)
+        self.assertEqual("""curl -X GET \\
+http://endeavour.today/""", output)
 
     def test_format_print(self):
         req = self.get_req_comp(f"{base_dir}/redirect.http", format=True, stdout=True)
