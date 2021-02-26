@@ -393,9 +393,11 @@ class RequestBase(BaseModelProcessor):
                     content = open(filetype.path, 'rb')
                     filename = os.path.basename(filetype.path)
                     if not mimetype: mimetype = magic.from_file(filetype.path, mime=True)
-                elif not mimetype:
-                    mimetype = magic.from_buffer(filetype.path, mime=True)
-                files[filetype.name] = (filename, content, mimetype)
+                    files[filetype.name] = (filename, content, mimetype)
+                else:
+                    if not mimetype:
+                        mimetype = magic.from_buffer(filetype.path, mime=True)
+                    files[filetype.name] = (None, content, mimetype)
             return Payload(files=files)
         return Payload()
 
@@ -502,10 +504,10 @@ class CurlCompiler(RequestBase):
                 payload = self.get_payload()
                 if payload.files:
                     for file in payload.files:
-                        if isinstance(payload.files[file], str):
-                            parts.append(('--form', file + "=" + payload.files[file]))
+                        if isinstance(payload.files[file][1], str):
+                            parts.append(('--form', file + "=" + payload.files[file][1]))
                         else:
-                            parts.append(('--form', file + "=@" + payload.files[file].name))
+                            parts.append(('--form', file + "=@" + payload.files[file][1].name))
             else:
                 payload = self.get_payload()
                 prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
