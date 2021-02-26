@@ -9,13 +9,13 @@ from typing import Union, Dict, List, DefaultDict
 
 import jstyleson as json
 import magic
-from curlify import to_curl
 from jsonschema import validate
 from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
 from requests.status_codes import _codes as status_code
 from textx import metamodel_from_file, TextXSyntaxError
 
+from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .exceptions import PropertyNotFoundException
@@ -445,12 +445,7 @@ class RequestBase(BaseModelProcessor):
         return None
 
     def get_request(self):
-        prep = PreparedRequest()
-        prep.prepare_url(self.get_url(), self.get_query())
-        prep.prepare_method(self.get_method())
-        prep.prepare_headers(self.get_headers())
-        prep.prepare_cookies(self.get_cookie())
-        prep.prepare_auth(self.get_auth(), prep.url)
+        prep = self.get_request_notbody()
         payload = self.get_payload()
         prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
         # prep.prepare_hooks({"response": self.save_cookie_call_back})
@@ -459,6 +454,15 @@ class RequestBase(BaseModelProcessor):
             # we will not wish to update it
             prep.headers[CONTENT_TYPE] = payload.header
         request_logger.debug(f'request prepared completely {prep}')
+        return prep
+
+    def get_request_notbody(self):
+        prep = PreparedRequest()
+        prep.prepare_url(self.get_url(), self.get_query())
+        prep.prepare_method(self.get_method())
+        prep.prepare_headers(self.get_headers())
+        prep.prepare_cookies(self.get_cookie())
+        prep.prepare_auth(self.get_auth(), prep.url)
         return prep
 
     def run(self):
@@ -478,8 +482,22 @@ class CurlCompiler(RequestBase):
         curl_logger.debug(f'curl request generation completed successfully')
 
     def get_curl_output(self):
-        prep = self.get_request()
-        curl_req = to_curl(prep)
+        prep = self.get_request_notbody()
+        parts = []
+        if self.http.payload.file:
+            parts.append(('--data', "@" + self.http.payload.file))
+        elif self.http.payload.fileswrap:
+            payload = self.get_payload()
+            if payload.files:
+                for file in payload.files:
+                    if isinstance(payload.files[file], str):
+                        parts.append(('--form', file + "=" + payload.files[file]))
+                    else:
+                        parts.append(('--form', file + "=@" + payload.files[file].name))
+        else:
+            payload = self.get_payload()
+            prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
+        curl_req = to_curl(prep, parts)
         return curl_req
 
 
