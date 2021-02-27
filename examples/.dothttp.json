@@ -1,6 +1,9 @@
 {
-  "*": {
-    "ram": "prasanth",
-    "ranga": ""
-  }
+    "*": {
+        "username": "username",
+        "password": "password"
+    },
+    "headers": {
+        "x-requested-by": "dothttp"
+    }
 }
