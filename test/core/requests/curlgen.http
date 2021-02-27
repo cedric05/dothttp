@@ -1,0 +1,18 @@
+
+POST https://httpbin.org/post
+
+files(
+    ('test', '{{filename}}'),
+    ('hi','hi2')
+)
+
+
+POST https://httpbin.org/post
+fileinput('{{filename}}')
+
+
+
+POST https://httpbin.org/post
+json({
+   'hi':'hi2'
+})

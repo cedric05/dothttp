@@ -2,10 +2,14 @@ import json
 import os
 import tempfile
 
+import requests
+
 from test import TestBase
-from test.test_request import dir_path
+from test.core.test_request import dir_path
 
 base_dir = f"{dir_path}/payload"
+
+session = requests.session()
 
 
 class PayLoadTest(TestBase):
@@ -136,5 +140,17 @@ class PayLoadTest(TestBase):
          ])
         self.assertIn(test, req.body)
         self.assertIn(data.encode("utf-8"), req.body)
+
+        # including integration test here
+
+        req2 = self.get_request(f"{base_dir}/multipartfiles2.http", properties=
+        [f"filename={loadfile.name}",
+         f"data={data}"
+         ])
+
+        resp = session.send(req2).json()
+        self.assertEqual(resp['files'], {'resume': 'test'})
+        self.assertEqual(resp['form'], {'content2': 'this is text part'})
+
         loadfile.close()
         os.unlink(loadfile.name)

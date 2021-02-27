@@ -12,3 +12,5 @@ json({
         }
     ]
 })
+
+GET https://google.com

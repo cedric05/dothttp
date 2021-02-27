@@ -9,16 +9,17 @@ from typing import Union, Dict, List, DefaultDict
 
 import jstyleson as json
 import magic
-from curlify import to_curl
 from jsonschema import validate
 from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
 from requests.status_codes import _codes as status_code
 from textx import metamodel_from_file, TextXSyntaxError
 
+from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .exceptions import PropertyNotFoundException
+from .parse_models import Allhttp
 from .property_schema import property_schema
 
 FORM_URLENCODED = "application/x-www-form-urlencoded"
@@ -188,7 +189,7 @@ class BaseModelProcessor:
             raise HttpFileSyntaxException(file=self.file, message=e.args)
         except Exception as e:
             raise HttpFileException(message=e.args)
-        self.model = model
+        self.model: Allhttp = model
 
     def load_content(self):
         if not os.path.exists(self.file):
@@ -274,7 +275,10 @@ class RequestBase(BaseModelProcessor):
     def __init__(self, args: Config):
         super().__init__(args)
         self._cookie: Union[LWPCookieJar, None] = None
+        self.validate_names()
         if target := self.args.target:
+            if not isinstance(target, str):
+                target = str(target)
             if target.isdecimal():
                 if 1 <= int(target) <= len(self.model.allhttps):
                     self.http = self.model.allhttps[int(target) - 1]
@@ -283,12 +287,24 @@ class RequestBase(BaseModelProcessor):
                                              value=target)
             else:
                 try:
-                    self.http = next(filter(lambda http: http.name == target, self.model.allhttps))
+                    # if multiple names have same value, it will create confusion
+                    # if they want to go with that. then pass id
+                    self.http = next(filter(lambda http: http.namewrap.name == target,
+                                            (http for http in self.model.allhttps if http.namewrap)))
                 except StopIteration:
                     raise ParameterException(message="target is not spelled correctly", key='target',
                                              value=target)
         else:
             self.http = self.model.allhttps[0]
+
+    def validate_names(self):
+        names = []
+        for index, http in enumerate(self.model.allhttps):
+            name = http.namewrap.name if http.namewrap else str(index + 1)
+            if name in names:
+                raise HttpFileException(message=f"target: `{name}` appeared twice or more. panicked while processing")
+            names.append(name)
+            names.append(str(index + 1))
 
     def get_query(self):
         params: DefaultDict[List] = defaultdict(list)
@@ -371,16 +387,17 @@ class RequestBase(BaseModelProcessor):
         elif files_wrap := self.http.payload.fileswrap:
             files = {}
             for filetype in files_wrap.files:
-                filename = filetype.name
                 content = filetype.path
                 mimetype = filetype.type
                 if os.path.exists(filetype.path):  # probably check valid path, then check for exists
                     content = open(filetype.path, 'rb')
                     filename = os.path.basename(filetype.path)
                     if not mimetype: mimetype = magic.from_file(filetype.path, mime=True)
-                elif not mimetype:
-                    mimetype = magic.from_buffer(filetype.path, mime=True)
-                files[filetype.name] = (filename, content, mimetype)
+                    files[filetype.name] = (filename, content, mimetype)
+                else:
+                    if not mimetype:
+                        mimetype = magic.from_buffer(filetype.path, mime=True)
+                    files[filetype.name] = (None, content, mimetype)
             return Payload(files=files)
         return Payload()
 
@@ -441,12 +458,7 @@ class RequestBase(BaseModelProcessor):
         return None
 
     def get_request(self):
-        prep = PreparedRequest()
-        prep.prepare_url(self.get_url(), self.get_query())
-        prep.prepare_method(self.get_method())
-        prep.prepare_headers(self.get_headers())
-        prep.prepare_cookies(self.get_cookie())
-        prep.prepare_auth(self.get_auth(), prep.url)
+        prep = self.get_request_notbody()
         payload = self.get_payload()
         prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
         # prep.prepare_hooks({"response": self.save_cookie_call_back})
@@ -455,6 +467,15 @@ class RequestBase(BaseModelProcessor):
             # we will not wish to update it
             prep.headers[CONTENT_TYPE] = payload.header
         request_logger.debug(f'request prepared completely {prep}')
+        return prep
+
+    def get_request_notbody(self):
+        prep = PreparedRequest()
+        prep.prepare_url(self.get_url(), self.get_query())
+        prep.prepare_method(self.get_method())
+        prep.prepare_headers(self.get_headers())
+        prep.prepare_cookies(self.get_cookie())
+        prep.prepare_auth(self.get_auth(), prep.url)
         return prep
 
     def run(self):
@@ -474,8 +495,23 @@ class CurlCompiler(RequestBase):
         curl_logger.debug(f'curl request generation completed successfully')
 
     def get_curl_output(self):
-        prep = self.get_request()
-        curl_req = to_curl(prep)
+        prep = self.get_request_notbody()
+        parts = []
+        if self.http.payload:
+            if self.http.payload.file:
+                parts.append(('--data', "@" + self.http.payload.file))
+            elif self.http.payload.fileswrap:
+                payload = self.get_payload()
+                if payload.files:
+                    for file in payload.files:
+                        if isinstance(payload.files[file][1], str):
+                            parts.append(('--form', file + "=" + payload.files[file][1]))
+                        else:
+                            parts.append(('--form', file + "=@" + payload.files[file][1].name))
+            else:
+                payload = self.get_payload()
+                prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
+        curl_req = to_curl(prep, parts)
         return curl_req
 
 

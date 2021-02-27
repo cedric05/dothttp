@@ -5,6 +5,7 @@ import sys
 from dothttp.log_utils import setup_logging
 from . import CurlCompiler, RequestCompiler, HttpFileFormatter, Config, eprint
 from .exceptions import DotHttpException
+from requests.exceptions import RequestException
 
 logger = logging.getLogger('dothttp')
 
@@ -27,6 +28,9 @@ def apply(args: Config):
     except DotHttpException as dotthtppexc:
         logger.error(f'dothttp exception happened {dotthtppexc}', exc_info=True)
         eprint(dotthtppexc.message)
+    except RequestException as exc:
+        logger.error(f'exception from requests {exc}', exc_info=True)
+        eprint(exc)
     except Exception as exc:
         logger.error(f'unknown error happened {exc}', exc_info=True)
         eprint(f'unknown exception occurred with message {exc}')
