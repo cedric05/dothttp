@@ -1,3 +1,5 @@
+from dothttp import HttpFileException
+
 from test import TestBase
 from test.core.test_request import dir_path
 
@@ -23,6 +25,10 @@ class TestTarget(TestBase):
             file=f"{base_dir}/default_target.http", target=2
         )
         self.assertEqual("https://httpbin.org/post", request.url)
+
+    def test_invalid_names(self):
+        with self.assertRaises(HttpFileException):
+            self.get_request(**{'file': f"{base_dir}/fails.http", 'target': 2})
 
     def test_target_with_names(self):
         # target with name

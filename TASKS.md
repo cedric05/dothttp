@@ -33,12 +33,14 @@
         - [x] run in vscode(itself)
 - [ ] 50% integration tests
 - [x] add tests with target and multi hosts
-    - [ ] add tests for curl (more scenarios)
-    - [ ] target negative tests
+    - [x] add tests for curl (more scenarios)
+    - [x] target negative tests
 - [x] 80% coverage unit tests
 - [x] Better message when connection refused issues
 - [x] standardise dependency versions
 - [x] curl print multiline
+- [ ] use sub commands for running server 
+   - [ ] [option](https://stackoverflow.com/a/19476216)
 - [ ] syntax issues better error reporting
     - [ ] if it failed to parse certain text, show examples on how to fix it
 - [ ] history ?

@@ -2,13 +2,12 @@ import os
 import tempfile
 import unittest
 
-from dothttp import HttpFileException, HttpFileFormatter, CurlCompiler
+from dothttp import HttpFileException, HttpFileFormatter, CurlCompiler, HttpFileNotFoundException
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 base_dir = f"{dir_path}/requests"
 sub_dir = f"{dir_path}/substitution"
-
 
 
 class RequestTest(TestBase):
@@ -27,12 +26,6 @@ class RequestTest(TestBase):
         self.assertEqual("https://dothttp.azurewebsites.net/?key3=value3&key1=value1&key2=value2", req.url,
                          "incorrect url computed")
         self.assertEqual("GET", req.method, "incorrect method")
-
-    def test_file_notfound(self):
-        pass
-
-    def test_syntax_problem(self):
-        pass
 
     def test_default_get(self):
         req = self.get_request(f"{base_dir}/defaultget.http")
@@ -94,6 +87,32 @@ json({
 })
 output(test)
 """, output)
+
+    def test_multiline_curl(self):
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            # with files
+            self.assertEqual(f'''curl -X POST \\
+--form 'test=@{f.name}' \\
+--form hi=hi2 \\
+https://httpbin.org/post''', self.get_curl_out(f))
+
+            # with file input
+            self.assertEqual(f'''curl -X POST \\
+--data '@{f.name}' \\
+https://httpbin.org/post''', self.get_curl_out(f, 2))
+
+            # with json out
+            self.assertEqual('''curl -X POST \\
+-H 'Content-Length: 13' \\
+-H 'Content-Type: application/json' \\
+-d '{"hi": "hi2"}' \\
+https://httpbin.org/post''', self.get_curl_out(f, 3))
+
+    def get_curl_out(self, f, target=1):
+        comp2 = self.get_req_comp(f'{base_dir}/curlgen.http', curl=True, properties=[f"filename={f.name}"],
+                                  target=target)
+        out2 = comp2.get_curl_output()
+        return out2
 
     def test_trailing_commas_are_ok(self):
         filename = f"{base_dir}/trailingcomma.http"
