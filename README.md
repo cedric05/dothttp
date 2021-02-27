@@ -85,7 +85,7 @@ data({
 ### From pypi
 
 ```shell
-pip install dothttp==0.0.4
+pip install dothttp==0.0.5
 ```
 
 ### From source
