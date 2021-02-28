@@ -51,6 +51,11 @@ class SubstitutionTest(TestBase):
         self.assertEquals("https://google.com/", req.url)
         self.assertEquals(b'{"google.com": "google.com"}', req.body)
 
+    def test_define_on_second_occurence(self):
+        req: PreparedRequest = self.get_request(f"{base_dir}/definevariableonsecond.http")
+        self.assertEquals("https://dothttp.dev/", req.url)
+        self.assertEquals('dothttp.dev', req.body)
+
     def test_substitution_preference(self):
         ## command line > env (last env > first env) > infile
         req: PreparedRequest = self.get_request(f"{base_dir}/simpleinfile.http", prop=f"{base_dir}/simepleinfile.json")

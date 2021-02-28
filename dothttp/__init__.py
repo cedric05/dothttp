@@ -5,7 +5,7 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from http.cookiejar import LWPCookieJar
-from typing import Union, Dict, List, DefaultDict
+from typing import Union, Dict, List, DefaultDict, Optional
 
 import jstyleson as json
 import magic
@@ -215,11 +215,12 @@ class BaseModelProcessor:
                 # like ranga=" ramprasad" --> we should replace with " ramprasad"
                 value = value[1:-1]
             if key in cache:
-                if value != cache[key].value:
+                if cache[key].value and value != cache[key].value:
                     raise HttpFileException(
                         message=f'property: `{key}` is defaulted with two/more different values, panicked ')
                 p = cache[key]
                 p.text.append(prop)
+                p.value = value
             else:
                 p = Property([prop], key, value)
             cache.setdefault(key, p)
@@ -362,7 +363,7 @@ class RequestBase(BaseModelProcessor):
         if not self.http.payload:
             return Payload()
         elif data := self.http.payload.data:
-            mimetype = self.http.payload.type if self.http.payload.type else magic.from_buffer(data, mime=True)
+            mimetype = self.get_mimetype_from_buffer(data, self.http.payload.type)
             request_logger.debug(
                 f'payload for request is `{data}`')
             return Payload(data, header=mimetype)
@@ -378,7 +379,7 @@ class RequestBase(BaseModelProcessor):
                 request_logger.debug(
                     f'payload file `{filename}` Not found. ')
                 raise DataFileNotFoundException(datafile=filename)
-            mimetype = self.http.payload.type if self.http.payload.type else magic.from_file(filename, mime=True)
+            mimetype = self.get_mimetype_from_file(filename, self.http.payload.type)
             with open(filename, 'rb') as f:
                 return Payload(data=f.read(), header=mimetype)
         elif json_data := self.http.payload.json:
@@ -392,14 +393,32 @@ class RequestBase(BaseModelProcessor):
                 if os.path.exists(filetype.path):  # probably check valid path, then check for exists
                     content = open(filetype.path, 'rb')
                     filename = os.path.basename(filetype.path)
-                    if not mimetype: mimetype = magic.from_file(filetype.path, mime=True)
+                    mimetype = self.get_mimetype_from_file(filetype.path, mimetype)
                     files[filetype.name] = (filename, content, mimetype)
                 else:
-                    if not mimetype:
-                        mimetype = magic.from_buffer(filetype.path, mime=True)
+                    mimetype = self.get_mimetype_from_buffer(content, mimetype)
                     files[filetype.name] = (None, content, mimetype)
             return Payload(files=files)
         return Payload()
+
+    @staticmethod
+    def get_mimetype_from_file(filename, mimetype: Optional[str]) -> Optional[str]:
+        if mimetype:
+            return mimetype
+        if magic:
+            return magic.from_file(filename, mime=True)
+        else:
+            return None
+
+    @staticmethod
+    def get_mimetype_from_buffer(data, mimetype: Optional[str]) -> Optional[str]:
+        if mimetype:
+            return mimetype
+        else:
+            if magic:
+                return magic.from_buffer(data, mime=True)
+            else:
+                return None
 
     def get_output(self):
         if output := self.http.output:
