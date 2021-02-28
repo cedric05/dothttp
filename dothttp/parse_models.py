@@ -59,7 +59,7 @@ class Payload:
     file: Optional[str]
     json: Optional
     fileswrap: FilesWrap
-    type: str
+    type: Optional[str]
 
 
 @dataclass
