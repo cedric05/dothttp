@@ -6,9 +6,6 @@ from datetime import datetime
 from json import JSONDecodeError
 from typing import Dict
 
-from flask import Flask
-from flask import request
-
 from dothttp import RequestCompiler, Config, DotHttpException
 from dothttp.log_utils import setup_logging as root_logging_setup
 
@@ -106,6 +103,7 @@ class Base:
 
 class HttpServer(Base):
     def __init__(self, port=5000):
+        from flask import Flask
         app = Flask("dothttp-server")
         self.app = app
         self.port = port
@@ -117,6 +115,7 @@ class HttpServer(Base):
         self.app.run("localhost", self.port)
 
     def get_handler(self, handler):
+        from flask import request
         def flask_api_handler():
             try:
                 id = int(request.args['id'])

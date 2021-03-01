@@ -1,8 +1,9 @@
 import os
+import sys
 import tempfile
 import unittest
 
-from dothttp import HttpFileException, HttpFileFormatter, CurlCompiler, HttpFileNotFoundException
+from dothttp import HttpFileException, HttpFileFormatter, CurlCompiler
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -88,6 +89,7 @@ json({
 output(test)
 """, output)
 
+    @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
     def test_multiline_curl(self):
         with tempfile.NamedTemporaryFile(delete=False) as f:
             # with files
@@ -99,6 +101,27 @@ https://httpbin.org/post''', self.get_curl_out(f))
             # with file input
             self.assertEqual(f'''curl -X POST \\
 --data '@{f.name}' \\
+https://httpbin.org/post''', self.get_curl_out(f, 2))
+
+            # with json out
+            self.assertEqual('''curl -X POST \\
+-H 'Content-Length: 13' \\
+-H 'Content-Type: application/json' \\
+-d '{"hi": "hi2"}' \\
+https://httpbin.org/post''', self.get_curl_out(f, 3))
+
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires linux")
+    def test_multiline_curl_linux(self):
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            # with files
+            self.assertEqual(f'''curl -X POST \\
+--form test=@{f.name} \\
+--form hi=hi2 \\
+https://httpbin.org/post''', self.get_curl_out(f))
+
+            # with file input
+            self.assertEqual(f'''curl -X POST \\
+--data @{f.name} \\
 https://httpbin.org/post''', self.get_curl_out(f, 2))
 
             # with json out
