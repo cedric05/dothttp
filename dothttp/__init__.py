@@ -544,7 +544,9 @@ class HttpFileFormatter(RequestBase):
     def format(model):
         output_str = ""
         for http in model.allhttps:
-            new_line = "\n"
+            new_line = os.linesep
+            if namewrap := http.namewrap:
+                output_str += f"@name(\"{namewrap.name}\"){new_line}"
             method = http.urlwrap.method if http.urlwrap.method else "GET"
             output_str += f'{method} "{http.urlwrap.url}"'
             if auth_wrap := http.basic_auth_wrap:
@@ -564,7 +566,15 @@ class HttpFileFormatter(RequestBase):
                 p = ""
                 mime_type = payload.type
                 if data := payload.data:
-                    p = f'data("{data}"{(" ," + mime_type) if mime_type else ""})'
+                    if '"' in data and "'" not in data:
+                        data = f"'{data}'"
+                    elif '"' not in data and "'" in data:
+                        data = f'"{data}"'
+                    else:
+                        # TODO not completely works
+                        # url escaping is done wrong
+                        data = "'" + data.replace("'", "\\'") + "'"
+                    p = f'data({data}{(" ," + mime_type) if mime_type else ""})'
                 if datajson := payload.datajson:
                     parsed_data = json_or_array_to_json(datajson)
                     p = f'data({json.dumps(parsed_data, indent=4)})'
@@ -578,10 +588,11 @@ class HttpFileFormatter(RequestBase):
                         lambda file_type: f'("{file_type.method}", "{(file_type.method)}"'
                                           f'\'{(" ," + file_type.type) if file_type.type else ""}\')'
                         , files_wrap.files))
-                    p = f"files(\n\t{p2}\n)"
-                output_str += f'\n{p}'
+                    p = f"files({new_line}\t{p2}{new_line})"
+                output_str += f'{new_line}{p}'
             if output := http.output:
-                output_str += f'\noutput({output.output})\n'
+                output_str += f'{new_line}output({output.output})'
+            output_str += new_line * 3
         return output_str
 
     def run(self):

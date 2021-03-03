@@ -23,12 +23,13 @@ class BasicAuth:
     username: str
     password: str
 
-
+@dataclass
 class Query:
     key: str
     value: str
 
 
+@dataclass
 class Header:
     key: str
     value: str
@@ -74,7 +75,7 @@ class Http:
     basic_auth_wrap: BasicAuth
     lines: List[Line]
     payload: Payload
-    output: ToFile
+    output: Optional[ToFile]
 
 
 @dataclass

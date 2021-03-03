@@ -9,12 +9,14 @@ from flask import Flask
 from flask import request
 
 from . import Command, BaseHandler
-from .commands import RunHttpFileHandler, FormatHttpFileHandler, GetNameReferencesHandler
+from .commands import RunHttpFileHandler, FormatHttpFileHandler, GetNameReferencesHandler, ImportPostmanCollection
 
 logger = logging.getLogger('handler')
 
 handlers: Dict[str, BaseHandler] = {handler.get_method(): handler for handler in
-                                    (FormatHttpFileHandler(), RunHttpFileHandler(), GetNameReferencesHandler())}
+                                    (FormatHttpFileHandler(), RunHttpFileHandler(), GetNameReferencesHandler(),
+                                     ImportPostmanCollection(),
+                                     )}
 
 
 def run(command: Command) -> Dict:

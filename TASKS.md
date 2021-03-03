@@ -49,8 +49,8 @@
 - [ ] output should have rolling output format ?
 - [ ] curl import
 - [ ] swagger to http file generator
-- [ ] postman import
+- [x] postman import
 
 # BUGS
 
-- [x] list query parameters are not working ?ram=ranga&ram=rajesh
+- [x] ~~list query parameters are not working ?ram=ranga&ram=rajesh~~
