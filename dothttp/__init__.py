@@ -66,7 +66,10 @@ class Payload:
     data: Union[str, bytes, None, Dict] = None
     json: Union[Dict, None] = None
     header: Union[str, None] = None
-    files: Union[Dict, None] = None
+    # [[ "key", ["filename", "content", "datatype"],
+    #  ["key",  ["filename2", "content", "datatype"]],
+    #  ["key2",  [None, "content", "datatype"]],]
+    files: Union[List, None] = None
 
 
 @dataclass
@@ -166,6 +169,7 @@ class BaseModelProcessor:
 
     def load(self):
         self.load_content()
+        self.load_model()
         self.load_properties_n_headers()
         self.load_command_line_props()
         self.update_content_with_prop()
@@ -386,7 +390,7 @@ class RequestBase(BaseModelProcessor):
             d = json_or_array_to_json(json_data)
             return Payload(json=d, header=MIME_TYPE_JSON)
         elif files_wrap := self.http.payload.fileswrap:
-            files = {}
+            files = []
             for filetype in files_wrap.files:
                 content = filetype.path
                 mimetype = filetype.type
@@ -394,10 +398,10 @@ class RequestBase(BaseModelProcessor):
                     content = open(filetype.path, 'rb')
                     filename = os.path.basename(filetype.path)
                     mimetype = self.get_mimetype_from_file(filetype.path, mimetype)
-                    files[filetype.name] = (filename, content, mimetype)
+                    files.append((filetype.name, (filename, content, mimetype)))
                 else:
                     mimetype = self.get_mimetype_from_buffer(content, mimetype)
-                    files[filetype.name] = (None, content, mimetype)
+                    files.append((filetype.name, (None, content, mimetype)))
             return Payload(files=files)
         return Payload()
 
@@ -523,10 +527,10 @@ class CurlCompiler(RequestBase):
                 payload = self.get_payload()
                 if payload.files:
                     for file in payload.files:
-                        if isinstance(payload.files[file][1], str):
-                            parts.append(('--form', file + "=" + payload.files[file][1]))
+                        if isinstance(file[1][1], str):
+                            parts.append(('--form', file[0] + "=" + file[1][1]))
                         else:
-                            parts.append(('--form', file + "=@" + payload.files[file][1].name))
+                            parts.append(('--form', file[0] + "=@" + file[1][1].name))
             else:
                 payload = self.get_payload()
                 prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)

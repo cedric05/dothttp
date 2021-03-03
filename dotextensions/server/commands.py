@@ -133,8 +133,6 @@ class ImportPostmanCollection(BaseHandler):
             with open(directory.joinpath("imported_from_collection.http"), 'w') as f:
                 f.write(f"#!/usr/bin/env dothttp{os.linesep}{os.linesep}")
                 f.write(f"# imported from {link}{os.linesep}{os.linesep}")
-                f.write(f"# dothttp expects url for all, which requires us to use{os.linesep}"
-                        f"# default value for url={DEFAULT_URL} {os.linesep}{os.linesep}")
                 f.write(data)
 
     @staticmethod
@@ -160,8 +158,8 @@ class ImportPostmanCollection(BaseHandler):
                 lines.append(Line(query=Query(query.key, query.value), header=None))
         else:
             urlwrap.url = slashed_path_to_normal_path(req.url)
-        if urlwrap.url == "":
-            urlwrap.url = DEFAULT_URL
+        # if urlwrap.url == "":
+        #     urlwrap.url = DEFAULT_URL
         if req.header:
             for header in req.header:
                 lines.append(

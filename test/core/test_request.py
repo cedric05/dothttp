@@ -73,7 +73,7 @@ http://endeavour.today/""", output)
         req = self.get_req_comp(f"{base_dir}/redirect.http", format=True, stdout=True)
         req.load()
         output = HttpFileFormatter.format(req.model)
-        self.assertEqual('GET "http://endeavour.today/"', output)
+        self.assertEqual('GET "http://endeavour.today/"\n\n\n', output)
         print(output)
 
     def test_format2_print(self):
@@ -87,6 +87,8 @@ json({
     "{{queryname2}}": "{{valuename2}}"
 })
 output(test)
+
+
 """, output)
 
     @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")

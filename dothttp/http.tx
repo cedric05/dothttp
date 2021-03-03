@@ -32,7 +32,10 @@ BASICAUTH:
 METHODTYPE: 
     "GET" | "POST" | "OPTIONS"
     | "DELETE" | "CONNECT" | "PUT"
-    | "HEAD" | "TRACE"
+    | "HEAD" | "TRACE" | "PATCH"
+    | "COPY" | "LINK" | "UNLINK"
+    | "PURGE" | "LOCK" | "UNLOCK"
+    | "PROPFIND" | "VIEW"
 ;
 
 QUERY: 
