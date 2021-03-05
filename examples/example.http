@@ -55,5 +55,6 @@ data({
     "name": "Adam A",
     "org": "dothttp",
     "location": "Hyderabad",
+    "height": {{height}},
     "interests": ["exploring", "listening to music"],
 })

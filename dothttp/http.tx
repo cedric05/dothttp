@@ -76,7 +76,7 @@ Array:
 ;
 
 Value:
-    str=String | flt=Float | bl=Bool | object=Object | array=Array | null="null"
+    str=String | VarString | flt=Float | bl=Bool | object=Object | array=Array | null="null"
 ;
 
 
@@ -111,6 +111,10 @@ CommentLine:
 
 CommentBlock:
     /\/\*(.|\n)*?\*\//
+;
+
+VarString:
+    "{{" /\w+/ "}}"
 ;
 
 DotString:

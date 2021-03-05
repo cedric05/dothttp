@@ -375,6 +375,8 @@ class RequestBase(BaseModelProcessor):
             d = json_or_array_to_json(data_json)
             if isinstance(d, list):
                 raise PayloadDataNotValidException(payload=f"data should be json/str, current: {d}")
+            # TODO convert all into string
+            # varstring hanlding
             return Payload(data=d, header=FORM_URLENCODED)
         elif filename := self.http.payload.file:
             request_logger.debug(
