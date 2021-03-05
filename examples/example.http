@@ -51,10 +51,10 @@ POST https://req.dothttp.dev/post
 # define headers in .dothttp.json with env
 basicauth("{{username}}", "{{password}}")
 
-data({
+json({
+    "height": {{height}},
     "name": "Adam A",
     "org": "dothttp",
     "location": "Hyderabad",
-    "height": {{height}},
     "interests": ["exploring", "listening to music"],
 })

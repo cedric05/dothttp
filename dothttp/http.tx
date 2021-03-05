@@ -76,7 +76,7 @@ Array:
 ;
 
 Value:
-    str=String | VarString | flt=Float | bl=Bool | object=Object | array=Array | null="null"
+    str=String | var=VarString | flt=Float | bl=Bool | object=Object | array=Array | null="null"
 ;
 
 
@@ -97,7 +97,7 @@ Object:
 ;
 
 Member:
-    key=STRING ':' value=Value
+    ((key=STRING) | (key=VarString)) ':' value=Value
 ;
 Comment:
     UnixComment | CommentLine | CommentBlock

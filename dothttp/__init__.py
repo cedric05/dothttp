@@ -5,7 +5,8 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from http.cookiejar import LWPCookieJar
-from typing import Union, Dict, List, DefaultDict, Optional
+from typing import DefaultDict, Optional
+from typing import Dict, List, Union
 
 import jstyleson as json
 import magic
@@ -16,7 +17,6 @@ from requests.status_codes import _codes as status_code
 from textx import metamodel_from_file, TextXSyntaxError
 
 from .curl_utils import to_curl
-from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .exceptions import PropertyNotFoundException
 from .parse_models import Allhttp
@@ -172,8 +172,9 @@ class BaseModelProcessor:
         self.load_model()
         self.load_properties_n_headers()
         self.load_command_line_props()
-        self.update_content_with_prop()
-        self.load_model()
+        self.validate_names()
+        self.load_props_needed_for_content()
+        self.select_target()
 
     def load_command_line_props(self):
         for prop in self.args.properties:
@@ -242,7 +243,7 @@ class BaseModelProcessor:
             if arg is not None:
                 return arg
 
-    def update_content_with_prop(self):
+    def get_updated_content(self, content):
         """
             1. properties defined in file itself ({{a=10}})
                 allowed values are
@@ -255,11 +256,10 @@ class BaseModelProcessor:
             4. properties from files's '*'
         :return:
         """
-        out = BaseModelProcessor.var_regex.findall(self.content)
-        base_logger.debug(f'property used in `{self.file}` are `{out}`')
-        prop_cache: Dict[str, Property] = {}
-        tuple(self.validate_n_gen(x, prop_cache) for x in out if x)  # generates prop_cache, this could be done better
-        props_needed = set(prop_cache.keys())
+        prop_cache = self.prop_cache
+
+        content_prop_needed = self.get_declared_props(content)
+        props_needed = set(content_prop_needed.keys())
 
         keys = set(self.properties.keys()).union(set(self.command_line_props.keys()))
         missing_props = props_needed - keys - set(key for key in prop_cache if prop_cache[key].value is not None)
@@ -267,20 +267,26 @@ class BaseModelProcessor:
             raise PropertyNotFoundException(
                 var=missing_props, propertyfile=self.property_file if self.property_file else "not specified")
         for var in props_needed:
-            base_logger.debug(
-                f'using `{self.properties.get(var)}` for property {var} ')
             # command line props take preference
             value = self.get_most_possible_val(self.command_line_props.get(var), self.properties.get(var),
                                                prop_cache[var].value)
+            base_logger.debug(
+                f'using `{value}` for property {var} ')
             for text_to_replace in prop_cache[var].text:
-                self.content = self.content.replace("{{" + text_to_replace + "}}", value)
+                content = content.replace("{{" + text_to_replace + "}}", value)
+        return content
 
+    def load_props_needed_for_content(self):
+        self.prop_cache = self.get_declared_props(self.content)
 
-class RequestBase(BaseModelProcessor):
-    def __init__(self, args: Config):
-        super().__init__(args)
-        self._cookie: Union[LWPCookieJar, None] = None
-        self.validate_names()
+    def get_declared_props(self, content):
+        out = BaseModelProcessor.var_regex.findall(content)
+        base_logger.debug(f'property used in `{self.file}` are `{out}`')
+        prop_cache: Dict[str, Property] = {}
+        tuple(self.validate_n_gen(x, prop_cache) for x in out if x)  # generates prop_cache, this could be done better
+        return prop_cache
+
+    def select_target(self):
         if target := self.args.target:
             if not isinstance(target, str):
                 target = str(target)
@@ -311,11 +317,17 @@ class RequestBase(BaseModelProcessor):
             names.append(name)
             names.append(str(index + 1))
 
+
+class RequestBase(BaseModelProcessor):
+    def __init__(self, args: Config):
+        super().__init__(args)
+        self._cookie: Union[LWPCookieJar, None] = None
+
     def get_query(self):
         params: DefaultDict[List] = defaultdict(list)
         for line in self.http.lines:
             if query := line.query:
-                params[query.key].append(query.value)
+                params[self.get_updated_content(query.key)].append(self.get_updated_content(query.value))
         request_logger.debug(
             f'computed query params from `{self.file}` are `{params}`')
         return params
@@ -341,7 +353,7 @@ class RequestBase(BaseModelProcessor):
     def get_url(self):
         request_logger.debug(
             f'url is {self.http.urlwrap.url}')
-        return self.http.urlwrap.url
+        return self.get_updated_content(self.http.urlwrap.url)
 
     def get_method(self):
         if method := self.http.urlwrap.method:
@@ -367,45 +379,77 @@ class RequestBase(BaseModelProcessor):
         if not self.http.payload:
             return Payload()
         elif data := self.http.payload.data:
-            mimetype = self.get_mimetype_from_buffer(data, self.http.payload.type)
+            content = self.get_updated_content(data)
+            mimetype = self.get_mimetype_from_buffer(content,
+                                                     self.get_updated_content(self.http.payload.type))
             request_logger.debug(
-                f'payload for request is `{data}`')
-            return Payload(data, header=mimetype)
+                f'payload for request is `{content}`')
+            return Payload(content, header=mimetype)
         elif data_json := self.http.payload.datajson:
-            d = json_or_array_to_json(data_json)
+            d = self.json_or_array_to_json(data_json)
             if isinstance(d, list):
                 raise PayloadDataNotValidException(payload=f"data should be json/str, current: {d}")
             # TODO convert all into string
             # varstring hanlding
             return Payload(data=d, header=FORM_URLENCODED)
-        elif filename := self.http.payload.file:
+        elif upload_filename := self.http.payload.file:
+            upload_filename = self.get_updated_content(upload_filename)
             request_logger.debug(
-                f'payload will be loaded from `{filename}`')
-            if not os.path.exists(filename):
+                f'payload will be loaded from `{upload_filename}`')
+            if not os.path.exists(upload_filename):
                 request_logger.debug(
-                    f'payload file `{filename}` Not found. ')
-                raise DataFileNotFoundException(datafile=filename)
-            mimetype = self.get_mimetype_from_file(filename, self.http.payload.type)
-            with open(filename, 'rb') as f:
+                    f'payload file `{upload_filename}` Not found. ')
+                raise DataFileNotFoundException(datafile=upload_filename)
+            mimetype = self.get_mimetype_from_file(upload_filename, self.http.payload.type)
+            with open(upload_filename, 'rb') as f:
                 return Payload(data=f.read(), header=mimetype)
         elif json_data := self.http.payload.json:
-            d = json_or_array_to_json(json_data)
+            d = self.json_or_array_to_json(json_data)
             return Payload(json=d, header=MIME_TYPE_JSON)
         elif files_wrap := self.http.payload.fileswrap:
             files = []
-            for filetype in files_wrap.files:
-                content = filetype.path
-                mimetype = filetype.type
-                if os.path.exists(filetype.path):  # probably check valid path, then check for exists
-                    content = open(filetype.path, 'rb')
-                    filename = os.path.basename(filetype.path)
-                    mimetype = self.get_mimetype_from_file(filetype.path, mimetype)
-                    files.append((filetype.name, (filename, content, mimetype)))
+            for multipart_file in files_wrap.files:
+                multipart_content = self.get_updated_content(multipart_file.path)
+                multipart_key = self.get_updated_content(multipart_file.name)
+                mimetype = self.get_updated_content(multipart_file.type) if multipart_file.type else None
+                if os.path.exists(multipart_content):  # probably check valid path, then check for exists
+                    mimetype = self.get_mimetype_from_file(multipart_content, mimetype)
+                    multipart_filename = os.path.basename(multipart_content)
+                    multipart_content = open(multipart_content, 'rb')
+                    files.append((multipart_key, (multipart_filename, multipart_content, mimetype)))
                 else:
-                    mimetype = self.get_mimetype_from_buffer(content, mimetype)
-                    files.append((filetype.name, (None, content, mimetype)))
+                    mimetype = self.get_mimetype_from_buffer(multipart_content, mimetype)
+                    files.append((multipart_key, (None, multipart_content, mimetype)))
             return Payload(files=files)
         return Payload()
+
+    def json_or_array_to_json(self, model) -> Union[Dict, List]:
+        if isinstance(model, Dict) or isinstance(model, List):
+            # TODO
+            # this is bad
+            # hooking here could lead to other issues
+            return model
+        if array := model.array:
+            return [self.jsonmodel_to_json(value) for value in array.values]
+        elif json_object := model.object:
+            return {self.get_updated_content(member.key): self.jsonmodel_to_json(member.value) for member in
+                    json_object.members}
+
+    def jsonmodel_to_json(self, model):
+        if str_value := model.str:
+            return self.get_updated_content(str_value.value)
+        elif var_value := model.var:
+            return self.get_updated_content(var_value)
+        elif flt := model.flt:
+            return flt.value
+        elif bl := model.bl:
+            return bl.value
+        elif json_object := model.object:
+            return {member.key: self.jsonmodel_to_json(member.value) for member in json_object.members}
+        elif array := model.array:
+            return [self.jsonmodel_to_json(value) for value in array.values]
+        elif model == 'null':
+            return None
 
     @staticmethod
     def get_mimetype_from_file(filename, mimetype: Optional[str]) -> Optional[str]:
@@ -428,11 +472,12 @@ class RequestBase(BaseModelProcessor):
 
     def get_output(self):
         if output := self.http.output:
-            print(f'output will be written to `{os.path.abspath(output.output)}`')
+            output_file = self.get_updated_content(output.output)
+            print(f'output will be written to `{os.path.abspath(output_file)}`')
             request_logger.debug(
-                f'output will be written into `{self.file}` is `{os.path.abspath(output.output)}`')
+                f'output will be written into `{self.file}` is `{os.path.abspath(output_file)}`')
             try:
-                return open(output.output, 'wb')
+                return open(output_file, 'wb')
             except:
                 request_logger.debug(
                     f'not able to open `{output}`. output will be written to stdout')
@@ -524,7 +569,7 @@ class CurlCompiler(RequestBase):
         parts = []
         if self.http.payload:
             if self.http.payload.file:
-                parts.append(('--data', "@" + self.http.payload.file))
+                parts.append(('--data', "@" + self.get_updated_content(self.http.payload.file)))
             elif self.http.payload.fileswrap:
                 payload = self.get_payload()
                 if payload.files:
@@ -542,12 +587,15 @@ class CurlCompiler(RequestBase):
 
 class HttpFileFormatter(RequestBase):
 
+    def get_updated_content(self, content):
+        return content
+
     def load(self):
         self.load_content()
         self.load_model()
+        self.prop_cache = {}
 
-    @staticmethod
-    def format(model):
+    def format(self, model):
         output_str = ""
         for http in model.allhttps:
             new_line = os.linesep
@@ -582,12 +630,12 @@ class HttpFileFormatter(RequestBase):
                         data = "'" + data.replace("'", "\\'") + "'"
                     p = f'data({data}{(" ," + mime_type) if mime_type else ""})'
                 if datajson := payload.datajson:
-                    parsed_data = json_or_array_to_json(datajson)
+                    parsed_data = self.json_or_array_to_json(datajson)
                     p = f'data({json.dumps(parsed_data, indent=4)})'
                 elif filetype := payload.file:
                     p = f'fileinput("{filetype}",{(" ," + mime_type) if mime_type else ""})'
                 elif json_data := payload.json:
-                    parsed_data = json_or_array_to_json(json_data)
+                    parsed_data = self.json_or_array_to_json(json_data)
                     p = f'json({json.dumps(parsed_data, indent=4)})'
                 elif files_wrap := payload.fileswrap:
                     p2 = "\n\t".join(map(
