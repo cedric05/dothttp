@@ -169,7 +169,9 @@ class BaseModelProcessor:
 
     def load(self):
         self.load_content()
-        self.load_model()
+        self.load_model()  # makes sure everything is syntax proof
+        self.validate_names()
+        self.select_target()
         self.load_properties_n_headers()
         self.load_command_line_props()
         self.update_content_with_prop()
@@ -275,12 +277,7 @@ class BaseModelProcessor:
             for text_to_replace in prop_cache[var].text:
                 self.content = self.content.replace("{{" + text_to_replace + "}}", value)
 
-
-class RequestBase(BaseModelProcessor):
-    def __init__(self, args: Config):
-        super().__init__(args)
-        self._cookie: Union[LWPCookieJar, None] = None
-        self.validate_names()
+    def select_target(self):
         if target := self.args.target:
             if not isinstance(target, str):
                 target = str(target)
@@ -301,6 +298,7 @@ class RequestBase(BaseModelProcessor):
                                              value=target)
         else:
             self.http = self.model.allhttps[0]
+        self.content = self.content[self.http._tx_position:self.http._tx_position_end]
 
     def validate_names(self):
         names = []
@@ -310,6 +308,12 @@ class RequestBase(BaseModelProcessor):
                 raise HttpFileException(message=f"target: `{name}` appeared twice or more. panicked while processing")
             names.append(name)
             names.append(str(index + 1))
+
+
+class RequestBase(BaseModelProcessor):
+    def __init__(self, args: Config):
+        super().__init__(args)
+        self._cookie: Union[LWPCookieJar, None] = None
 
     def get_query(self):
         params: DefaultDict[List] = defaultdict(list)
