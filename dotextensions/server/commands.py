@@ -4,6 +4,7 @@ import os
 from collections import defaultdict
 from pathlib import Path
 from typing import List, Iterator, Union
+from urllib.parse import unquote
 
 import requests
 
@@ -155,7 +156,7 @@ class ImportPostmanCollection(BaseHandler):
             url = f"{proto}://{host}/{path}"
             urlwrap.url = slashed_path_to_normal_path(url)
             for query in req.url.query:
-                lines.append(Line(query=Query(query.key, query.value), header=None))
+                lines.append(Line(query=Query(query.key, unquote(query.value)), header=None))
         else:
             urlwrap.url = slashed_path_to_normal_path(req.url)
         # if urlwrap.url == "":
@@ -238,7 +239,7 @@ class ImportPostmanCollection(BaseHandler):
             return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
 
         collection = postman_collection_from_dict(postman_data)
-        self.import_items(collection.item, Path(directory), link)
+        self.import_items(collection.item, Path(directory).joinpath(collection.info.name), link)
         return Result(id=command.id, result={})
 
     @staticmethod
