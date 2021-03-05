@@ -18,6 +18,7 @@ from requests.status_codes import _codes as status_code
 from textx import metamodel_from_file, TextXSyntaxError
 
 from .curl_utils import to_curl
+from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .exceptions import PropertyNotFoundException
 from .parse_models import Allhttp
@@ -389,7 +390,7 @@ class RequestBase(BaseModelProcessor):
                 f'payload for request is `{content}`')
             return Payload(content, header=mimetype)
         elif data_json := self.http.payload.datajson:
-            d = self.json_or_array_to_json(data_json)
+            d = json_or_array_to_json(data_json, self.get_updated_content)
             if isinstance(d, list):
                 raise PayloadDataNotValidException(payload=f"data should be json/str, current: {d}")
             # TODO convert all into string
@@ -407,7 +408,7 @@ class RequestBase(BaseModelProcessor):
             with open(upload_filename, 'rb') as f:
                 return Payload(data=f.read(), header=mimetype)
         elif json_data := self.http.payload.json:
-            d = self.json_or_array_to_json(json_data)
+            d = json_or_array_to_json(json_data, self.get_updated_content)
             return Payload(json=d, header=MIME_TYPE_JSON)
         elif files_wrap := self.http.payload.fileswrap:
             files = []
@@ -425,41 +426,6 @@ class RequestBase(BaseModelProcessor):
                     files.append((multipart_key, (None, multipart_content, mimetype)))
             return Payload(files=files)
         return Payload()
-
-    def json_or_array_to_json(self, model) -> Union[Dict, List]:
-        if isinstance(model, Dict) or isinstance(model, List):
-            # TODO
-            # this is bad
-            # hooking here could lead to other issues
-            return model
-        if array := model.array:
-            return [self.jsonmodel_to_json(value) for value in array.values]
-        elif json_object := model.object:
-            return {self.get_updated_content(member.key): self.jsonmodel_to_json(member.value) for member in
-                    json_object.members}
-
-    def jsonmodel_to_json(self, model):
-        if str_value := model.str:
-            return self.get_updated_content(str_value.value)
-        elif var_value := model.var:
-            return self.get_json_updated_value(var_value)
-        elif flt := model.flt:
-            return flt.value
-        elif bl := model.bl:
-            return bl.value
-        elif json_object := model.object:
-            return {member.key: self.jsonmodel_to_json(member.value) for member in json_object.members}
-        elif array := model.array:
-            return [self.jsonmodel_to_json(value) for value in array.values]
-        elif model == 'null':
-            return None
-
-    def get_json_updated_value(self, var_value):
-        content: str = self.get_updated_content(var_value)
-        try:
-            return json.loads(content)
-        except ValueError:
-            return content
 
     @staticmethod
     def get_mimetype_from_file(filename, mimetype: Optional[str]) -> Optional[str]:
@@ -605,7 +571,8 @@ class HttpFileFormatter(RequestBase):
         self.load_model()
         self.prop_cache = {}
 
-    def format(self, model):
+    @staticmethod
+    def format(model):
         output_str = ""
         for http in model.allhttps:
             new_line = os.linesep
@@ -640,12 +607,12 @@ class HttpFileFormatter(RequestBase):
                         data = "'" + data.replace("'", "\\'") + "'"
                     p = f'data({data}{(" ," + mime_type) if mime_type else ""})'
                 if datajson := payload.datajson:
-                    parsed_data = self.json_or_array_to_json(datajson)
+                    parsed_data = json_or_array_to_json(datajson, lambda a: a)
                     p = f'data({json.dumps(parsed_data, indent=4)})'
                 elif filetype := payload.file:
                     p = f'fileinput("{filetype}",{(" ," + mime_type) if mime_type else ""})'
                 elif json_data := payload.json:
-                    parsed_data = self.json_or_array_to_json(json_data)
+                    parsed_data = json_or_array_to_json(json_data, lambda a: a)
                     p = f'json({json.dumps(parsed_data, indent=4)})'
                 elif files_wrap := payload.fileswrap:
                     p2 = "\n\t".join(map(
