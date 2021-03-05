@@ -1,3 +1,4 @@
+import functools
 import logging
 import os
 import re
@@ -237,13 +238,13 @@ class BaseModelProcessor:
                 cache.setdefault(prop, p)
         return p
 
-    @staticmethod
-    def get_most_possible_val(*args):
+    def get_most_possible_val(self, var):
+        args = self.command_line_props.get(var), self.properties.get(var), self.prop_cache[var].value
         for arg in args:
             if arg is not None:
                 return arg
 
-    def get_updated_content(self, content):
+    def get_updated_content(self, content) -> str:
         """
             1. properties defined in file itself ({{a=10}})
                 allowed values are
@@ -261,20 +262,22 @@ class BaseModelProcessor:
         content_prop_needed = self.get_declared_props(content)
         props_needed = set(content_prop_needed.keys())
 
-        keys = set(self.properties.keys()).union(set(self.command_line_props.keys()))
-        missing_props = props_needed - keys - set(key for key in prop_cache if prop_cache[key].value is not None)
+        missing_props = props_needed - self.get_props_available()
         if len(missing_props) != 0:
             raise PropertyNotFoundException(
                 var=missing_props, propertyfile=self.property_file if self.property_file else "not specified")
         for var in props_needed:
             # command line props take preference
-            value = self.get_most_possible_val(self.command_line_props.get(var), self.properties.get(var),
-                                               prop_cache[var].value)
-            base_logger.debug(
-                f'using `{value}` for property {var} ')
-            for text_to_replace in prop_cache[var].text:
+            value = self.get_most_possible_val(var)
+            base_logger.debug(f'using `{value}` for property {var}')
+            for text_to_replace in content_prop_needed[var].text:
                 content = content.replace("{{" + text_to_replace + "}}", value)
         return content
+
+    @functools.lru_cache
+    def get_props_available(self):
+        return set(self.properties.keys()).union(set(self.command_line_props.keys())).union(set(
+            key for key in self.prop_cache if self.prop_cache[key].value is not None))
 
     def load_props_needed_for_content(self):
         self.prop_cache = self.get_declared_props(self.content)
@@ -439,7 +442,7 @@ class RequestBase(BaseModelProcessor):
         if str_value := model.str:
             return self.get_updated_content(str_value.value)
         elif var_value := model.var:
-            return self.get_updated_content(var_value)
+            return self.get_json_updated_value(var_value)
         elif flt := model.flt:
             return flt.value
         elif bl := model.bl:
@@ -450,6 +453,13 @@ class RequestBase(BaseModelProcessor):
             return [self.jsonmodel_to_json(value) for value in array.values]
         elif model == 'null':
             return None
+
+    def get_json_updated_value(self, var_value):
+        content: str = self.get_updated_content(var_value)
+        try:
+            return json.loads(content)
+        except ValueError:
+            return content
 
     @staticmethod
     def get_mimetype_from_file(filename, mimetype: Optional[str]) -> Optional[str]:
