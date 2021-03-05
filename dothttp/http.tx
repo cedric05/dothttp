@@ -97,7 +97,8 @@ Object:
 ;
 
 Member:
-    ((key=STRING) | (key=VarString)) ':' value=Value
+    (key=STRING ':' value=Value) |
+    (var=VarString ':' value=Value)
 ;
 Comment:
     UnixComment | CommentLine | CommentBlock
