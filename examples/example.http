@@ -37,7 +37,7 @@ basicauth('username', 'password')
    json --> signifies payload is json data
 */
 json({
-    "name": "{{name=adam}}", # name is templated, if spcified via env or property, it will be replaced
+    "{{name2222}}": "{{name=adam}}", # name is templated, if spcified via env or property, it will be replaced
     "org": "dothttp",
     "location": "Hyderabad",
     # "interests": ["exploring", "listening to music"],
@@ -51,10 +51,10 @@ POST https://req.dothttp.dev/post
 # define headers in .dothttp.json with env
 basicauth("{{username}}", "{{password}}")
 
-data({
+json({
+    "height": {{height}},
     "name": "Adam A",
     "org": "dothttp",
     "location": "Hyderabad",
-    "height": {{height}},
     "interests": ["exploring", "listening to music"],
 })

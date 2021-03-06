@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional, Dict
+from typing import List, Optional
 
 
 @dataclass
@@ -56,7 +56,7 @@ class FilesWrap:
 @dataclass
 class Payload:
     data: Optional[str]
-    datajson: Optional[Dict]
+    datajson: Optional
     file: Optional[str]
     json: Optional
     fileswrap: FilesWrap

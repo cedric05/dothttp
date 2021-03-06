@@ -1,0 +1,77 @@
+@name('request with no vars')
+GET https://req.dothttp.dev
+? querykey: queryvalue
+
+@name('request with vars used')
+POST https://req.dothttp.dev
+? "{{querykey}}": queryvalue
+data({
+    "{{querykey}}": "queryvalue",
+    "querykey": "{{querykey}}"
+})
+
+
+@name('request with infile json')
+POST https://req.dothttp.dev
+? "{{querykey}}": queryvalue
+json({
+    "{{querykey}}": "queryvalue",
+    "querykey": "{{querykey}}"
+})
+
+
+@name('request infile with boolean')
+POST https://req.dothttp.dev
+? "{{querykey}}": queryvalue
+json({
+    "ram": "ranga",
+    "itsstring": "{{querykey}}",
+    "itsstring2": {{itsactualstring=ramchandra}},
+    "itsint": {{querykey}},
+    "itsint2": {{int=29}},
+    "itsfloat": {{float="2.3"}},
+    "itstrue": {{true=true}},
+    "itsfalse": {{false=false}},
+    "itsonemoretrue": {{true}},
+    "itsonemorefalse": {{false}},
+    "itsnull": {{null=null}},
+    "itsarray": [
+        '{{querykey}}',
+        {{itsactualstring}},
+         {{querykey}},
+         {{int}},
+         {{true}},
+         {{false}},
+         {{null}},
+         {{float}},
+    ],
+    // currently float has issue
+})
+
+
+@name('request with vars defined, expects from outside')
+POST https://req.dothttp.dev
+? "{{querykey=10}}": queryvalue
+json({
+     "ram": 'ranga',
+    "itsstring": "{{querykey2}}",
+    "itsstring2": {{itsactualstring2}},
+    "itsint": {{querykey2}},
+    "itsint2": {{int2}},
+    "itsfloat": {{float2}},
+    "itstrue": {{true2}},
+    "itsfalse": {{false2}},
+    "itsonemoretrue": {{true2}},
+    "itsonemorefalse": {{false2}},
+    "itsnull": {{null2}},
+    "itsarray": [
+        '{{querykey2}}',
+        {{itsactualstring2}},
+         {{querykey2}},
+         {{int2}},
+         {{true2}},
+         {{false2}},
+         {{null2}},
+         {{float2}},
+    ],
+})

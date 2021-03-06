@@ -3,7 +3,7 @@ import sys
 import tempfile
 import unittest
 
-from dothttp import HttpFileException, HttpFileFormatter, CurlCompiler
+from dothttp import HttpFileException, CurlCompiler
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -72,14 +72,14 @@ http://endeavour.today/""", output)
     def test_format_print(self):
         req = self.get_req_comp(f"{base_dir}/redirect.http", format=True, stdout=True)
         req.load()
-        output = HttpFileFormatter.format(req.model)
+        output = req.format(req.model)
         self.assertEqual('GET "http://endeavour.today/"\n\n\n', output)
         print(output)
 
     def test_format2_print(self):
         req = self.get_req_comp(f"{sub_dir}/multipleenv.http", format=True, stdout=True)
         req.load()
-        output = HttpFileFormatter.format(req.model)
+        output = req.format(req.model)
         self.assertEqual("""POST "https://{{host1}}/ram"
 ? ("{{queryname1}}", "value1")
 ? ("key2", "{{valuename1}}")
