@@ -60,7 +60,7 @@ class Payload:
     datajson: Optional
     file: Optional[str]
     json: Optional
-    fileswrap: FilesWrap
+    fileswrap: Optional[FilesWrap]
     type: Optional[str]
 
 

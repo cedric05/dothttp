@@ -580,7 +580,7 @@ class HttpFileFormatter(RequestBase):
     def format(model):
         output_str = ""
         for http in model.allhttps:
-            new_line = os.linesep
+            new_line = "\n"
             if namewrap := http.namewrap:
                 output_str += f"@name(\"{namewrap.name}\"){new_line}"
             method = http.urlwrap.method if http.urlwrap.method else "GET"
@@ -620,9 +620,9 @@ class HttpFileFormatter(RequestBase):
                     parsed_data = json_or_array_to_json(json_data, lambda a: a)
                     p = f'json({json.dumps(parsed_data, indent=4)})'
                 elif files_wrap := payload.fileswrap:
-                    p2 = "\n\t".join(map(
-                        lambda file_type: f'("{file_type.method}", "{(file_type.method)}"'
-                                          f'\'{(" ," + file_type.type) if file_type.type else ""}\')'
+                    p2 = ",\n\t".join(map(
+                        lambda file_type: f'("{file_type.name}", "{(file_type.path)}"'
+                                          f'{(" ," + file_type.type) if file_type.type else ""})'
                         , files_wrap.files))
                     p = f"files({new_line}\t{p2}{new_line})"
                 output_str += f'{new_line}{p}'

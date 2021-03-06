@@ -65,9 +65,9 @@ class RunHttpFileHandler(BaseHandler):
                 }}
                 data = {}
                 data.update(response_data['response'])  # deprecated
-                data.update(request_data)
+                # data.update(request_data)
                 data.update(response_data)
-                data.update({"http": self.get_http_from_req(request)})
+                # data.update({"http": self.get_http_from_req(request)})
                 result = Result(id=command.id,
                                 result=data)
         except DotHttpException as ex:
@@ -165,8 +165,9 @@ class ImportPostmanCollection(BaseHandler):
             data = HttpFileFormatter.format(collection)
             directory.mkdir(parents=True, exist_ok=True)
             name = str(directory.joinpath("imported_from_collection.http"))
-            d[name] = f"#!/usr/bin/env dothttp{os.linesep}{os.linesep}" \
-                      f"# imported from {link}{os.linesep}{os.linesep}" \
+            newline = "\n"
+            d[name] = f"#!/usr/bin/env dothttp{newline}{newline}" \
+                      f"# imported from {link}{newline}{newline}" \
                       f"${data}\n"
         return d
 
@@ -265,9 +266,9 @@ class ImportPostmanCollection(BaseHandler):
                 return Result(id=command.id,
                               result={"error_message": "expects absolute path, as server is meant to run in background",
                                       "error": True})
-        if not (link.startswith("https://www.postman.com/collections/") or link.startswith(
-                "https://www.getpostman.com/collections")):
-            return Result(id=command.id, result={"error_message": "not a postman link", "error": True})
+        # if not (link.startswith("https://www.postman.com/collections/") or link.startswith(
+        #         "https://www.getpostman.com/collections")):
+        #     return Result(id=command.id, result={"error_message": "not a postman link", "error": True})
 
         resp = requests.get(link)
         postman_data = resp.json()
