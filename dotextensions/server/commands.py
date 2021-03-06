@@ -2,6 +2,7 @@ import json
 import mimetypes
 import os
 from collections import defaultdict
+from datetime import datetime
 from pathlib import Path
 from typing import List, Iterator, Union
 from urllib.parse import unquote
@@ -128,13 +129,15 @@ class ImportPostmanCollection(BaseHandler):
             onehttp = ImportPostmanCollection.import_leaf_item(leaf_item)
             if onehttp:
                 collection.allhttps.append(onehttp)
+        d = {}
         if len(collection.allhttps) != 0:
             data = HttpFileFormatter.format(collection)
             directory.mkdir(parents=True, exist_ok=True)
-            with open(directory.joinpath("imported_from_collection.http"), 'w') as f:
-                f.write(f"#!/usr/bin/env dothttp{os.linesep}{os.linesep}")
-                f.write(f"# imported from {link}{os.linesep}{os.linesep}")
-                f.write(data)
+            name = str(directory.joinpath("imported_from_collection.http"))
+            d[name] = f"#!/usr/bin/env dothttp{os.linesep}{os.linesep}" \
+                      f"# imported from {link}{os.linesep}{os.linesep}" \
+                      f"${data}\n"
+        return d
 
     @staticmethod
     def import_leaf_item(item: Items) -> Union[Http, None]:
@@ -216,18 +219,21 @@ class ImportPostmanCollection(BaseHandler):
     def run(self, command: Command) -> Result:
         # params
         link: str = command.params.get("link")
-        directory: str = command.params.get("directory")
+        directory: str = command.params.get("directory", "")
+        save = command.params.get("save", False)
+        overwrite = command.params.get("overwrite", False)
 
         # input validations
-        if not os.path.isdir(directory):
-            return Result(id=command.id, result={"error_message": "non existent directory", "error": True})
-        if not os.access(directory, os.X_OK | os.W_OK):
-            return Result(id=command.id,
-                          result={"error_message": "insufficient permissions", "error": True})
-        if not os.path.isabs(directory):
-            return Result(id=command.id,
-                          result={"error_message": "expects absolute path, as server is meant to run in background",
-                                  "error": True})
+        if save:
+            if not os.path.isdir(directory):
+                return Result(id=command.id, result={"error_message": "non existent directory", "error": True})
+            if not os.access(directory, os.X_OK | os.W_OK):
+                return Result(id=command.id,
+                              result={"error_message": "insufficient permissions", "error": True})
+            if not os.path.isabs(directory):
+                return Result(id=command.id,
+                              result={"error_message": "expects absolute path, as server is meant to run in background",
+                                      "error": True})
         if not (link.startswith("https://www.postman.com/collections/") or link.startswith(
                 "https://www.getpostman.com/collections")):
             return Result(id=command.id, result={"error_message": "not a postman link", "error": True})
@@ -239,13 +245,22 @@ class ImportPostmanCollection(BaseHandler):
             return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
 
         collection = postman_collection_from_dict(postman_data)
-        self.import_items(collection.item, Path(directory).joinpath(collection.info.name), link)
-        return Result(id=command.id, result={})
+        d = self.import_items(collection.item, Path(directory).joinpath(collection.info.name), link)
+        if save:
+            for path, fileout in d.items():
+                if os.path.exists(path) and not overwrite:
+                    p = Path(path)
+                    path = p.with_stem(p.stem + '-' + datetime.now().ctime())
+                with open(path, 'w') as f:
+                    f.write(fileout)
+        return Result(id=command.id, result={"files": d})
 
     @staticmethod
     def import_items(items: List[Items], directory: Path, link: str = ""):
         leaf_folder = filter(lambda item: item.request, items)
-        ImportPostmanCollection.import_requests_into_dire(leaf_folder, directory, link)
+        d = dict()
+        d.update(ImportPostmanCollection.import_requests_into_dire(leaf_folder, directory, link))
         folder = map(lambda item: (item.name, item.item), filter(lambda item: item.item, items))
         for sub_folder, subitem in folder:
-            ImportPostmanCollection.import_items(subitem, directory.joinpath(sub_folder), link)
+            d.update(ImportPostmanCollection.import_items(subitem, directory.joinpath(sub_folder), link))
+        return d
