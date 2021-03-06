@@ -1,0 +1,36 @@
+@name('path')
+GET https://req.dothttp.dev/{{path}}
+
+@name('headers')
+GET https://req.dothttp.dev
+"{{path}}": "{{path}}"
+
+@name('query')
+GET https://req.dothttp.dev
+? "{{path}}", "{{path}}"
+
+@name('auth')
+GET https://req.dothttp.dev
+basicauth("{{path}}", "{{path}}")
+
+@name("body")
+GET https://req.dothttp.dev
+data("{{path}}")
+
+@name("files")
+GET https://req.dothttp.dev
+files(
+    ("{{path}}", "{{path}}")
+)
+
+@name("data")
+GET https://req.dothttp.dev
+urlencoded({
+   {{path}}: {{path}}
+})
+
+@name("json")
+GET https://req.dothttp.dev
+json({
+   {{path}}: {{path}}
+})

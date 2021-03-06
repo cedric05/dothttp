@@ -56,6 +56,49 @@ class SubstitutionTest(TestBase):
         self.assertEqual("https://dothttp.dev/", req.url)
         self.assertEqual('dothttp.dev', req.body)
 
+    def test_substitute_one_by_one(self):
+        # path
+        req: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"])
+        self.assertEqual("https://req.dothttp.dev/get", req.url)
+
+        # header
+        req2: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"],
+                                                 target="headers")
+        self.assertEqual({'get': 'get'}, req2.headers)
+
+        # basicauth
+        req3: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"],
+                                                 target="auth")
+        self.assertEqual({'Authorization': 'Basic Z2V0OmdldA=='}, req3.headers)
+
+        # query
+        req4: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"],
+                                                 target="query")
+        self.assertEqual("https://req.dothttp.dev/?get=get", req4.url)
+
+        # data
+        req5: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"],
+                                                 target="body")
+        self.assertEqual("get", req5.body)
+
+        # files
+        req6: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http",
+                                                 properties=["path=sadfasdfasdfasdfasdfasdfasf"],
+                                                 target="files")
+        self.assertIn(b"sadfasdfasdfasdfasdfasdfasf", req6.body)
+
+        # datajson
+        req7: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http",
+                                                 properties=["path=get"],
+                                                 target="data")
+        self.assertEqual("get=get", req7.body)
+
+        # json
+        req8: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http",
+                                                 properties=["path=get"],
+                                                 target="json")
+        self.assertEqual(b'{"get": "get"}', req8.body)
+
     def test_substitution_preference(self):
         ## command line > env (last env > first env) > infile
         req: PreparedRequest = self.get_request(f"{base_dir}/simpleinfile.http", prop=f"{base_dir}/simepleinfile.json")
