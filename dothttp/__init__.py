@@ -10,7 +10,6 @@ from typing import DefaultDict, Optional
 from typing import Dict, List, Union
 
 import jstyleson as json
-import magic
 from jsonschema import validate
 from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
@@ -23,6 +22,13 @@ from .exceptions import *
 from .exceptions import PropertyNotFoundException
 from .parse_models import Allhttp
 from .property_schema import property_schema
+
+try:
+    import magic
+
+    magic = None
+except ImportError:
+    magic = None
 
 FORM_URLENCODED = "application/x-www-form-urlencoded"
 
