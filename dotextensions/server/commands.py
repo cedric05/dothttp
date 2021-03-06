@@ -8,6 +8,7 @@ from typing import List, Iterator, Union
 from urllib.parse import unquote
 
 import requests
+from requests import PreparedRequest
 
 from dothttp import RequestCompiler, Config, DotHttpException, dothttp_model, CurlCompiler, HttpFileFormatter
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
@@ -52,7 +53,7 @@ class RunHttpFileHandler(BaseHandler):
                     "response": {
                         "headers":
                             {key: value for key, value in resp.headers.items()},
-                        "body": resp.text,
+                        "body": resp.text,  # for binary out, it will fail, check for alternatives
                         "status": resp.status_code, }
                 }
                 # will be used for response
@@ -66,6 +67,7 @@ class RunHttpFileHandler(BaseHandler):
                 data.update(response_data['response'])  # deprecated
                 data.update(request_data)
                 data.update(response_data)
+                data.update({"http": self.get_http_from_req(request)})
                 result = Result(id=command.id,
                                 result=data)
         except DotHttpException as ex:
@@ -73,6 +75,21 @@ class RunHttpFileHandler(BaseHandler):
                             result={
                                 "error_message": ex.message, "error": True})
         return result
+
+    @staticmethod
+    def get_http_from_req(request: PreparedRequest):
+        return HttpFileFormatter.format(Allhttp(allhttps=[Http(
+            namewrap=None,
+            urlwrap=UrlWrap(url=request.url, method=request.method),
+            lines=[
+                Line(header=Header(key=key, value=value), query=None)
+                for key, value in
+                request.headers.items()],
+            payload=Payload(data=request.body, datajson=None,
+                            file=None, json=None, fileswrap=None,
+                            type=None),
+            output=None, basic_auth_wrap=None
+        )]))
 
 
 class FormatHttpFileHandler(BaseHandler):

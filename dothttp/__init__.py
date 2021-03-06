@@ -25,8 +25,6 @@ from .property_schema import property_schema
 
 try:
     import magic
-
-    magic = None
 except ImportError:
     magic = None
 

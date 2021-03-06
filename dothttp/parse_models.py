@@ -23,6 +23,7 @@ class BasicAuth:
     username: str
     password: str
 
+
 @dataclass
 class Query:
     key: str
@@ -72,9 +73,9 @@ class ToFile:
 class Http:
     namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
-    basic_auth_wrap: BasicAuth
-    lines: List[Line]
-    payload: Payload
+    basic_auth_wrap: Optional[BasicAuth]
+    lines: Optional[List[Line]]
+    payload: Optional[Payload]
     output: Optional[ToFile]
 
 
