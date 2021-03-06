@@ -20,7 +20,7 @@ def requirements():
 
 setup(
     name="dothttp_req",
-    version="0.0.7b",
+    version="0.0.7",
     author="prasanth",
     author_email="kesavarapu.siva@gmail.com",
     description=("DotHttp recommended tool for making http requests."),
