@@ -39,18 +39,18 @@
 - [x] Better message when connection refused issues
 - [x] standardise dependency versions
 - [x] curl print multiline
-- [ ] use sub commands for running server 
-   - [ ] [option](https://stackoverflow.com/a/19476216)
+- [x] ~~use sub commands for running server~~ (dotextensions if future could be moved to different repository, so don't
+  have to)
 - [ ] syntax issues better error reporting
     - [ ] if it failed to parse certain text, show examples on how to fix it
-- [ ] history ?
-- [ ] multiple logging options ?
-- [ ] output coloring (according to content-type) ?
-- [ ] output should have rolling output format ?
+- [x] ~~history ?~~ (like curl/httpie it will not remember history) (support will be provided by vscode-extension)
+- [x] ~~multiple logging options ?~~
+- [x] ~~output coloring (according to content-type) ?~~
+- [x] ~~output should have rolling output format ?~~
 - [ ] curl import
 - [ ] swagger to http file generator
-- [ ] postman import
+- [x] postman import
 
 # BUGS
 
-- [x] list query parameters are not working ?ram=ranga&ram=rajesh
+- [x] ~~list query parameters are not working ?ram=ranga&ram=rajesh~~

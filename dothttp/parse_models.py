@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List, Optional, Dict
+from typing import List, Optional
 
 
 @dataclass
@@ -24,11 +24,13 @@ class BasicAuth:
     password: str
 
 
+@dataclass
 class Query:
     key: str
     value: str
 
 
+@dataclass
 class Header:
     key: str
     value: str
@@ -55,10 +57,10 @@ class FilesWrap:
 @dataclass
 class Payload:
     data: Optional[str]
-    datajson: Optional[Dict]
+    datajson: Optional
     file: Optional[str]
     json: Optional
-    fileswrap: FilesWrap
+    fileswrap: Optional[FilesWrap]
     type: Optional[str]
 
 
@@ -71,10 +73,10 @@ class ToFile:
 class Http:
     namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
-    basic_auth_wrap: BasicAuth
-    lines: List[Line]
-    payload: Payload
-    output: ToFile
+    basic_auth_wrap: Optional[BasicAuth]
+    lines: Optional[List[Line]]
+    payload: Optional[Payload]
+    output: Optional[ToFile]
 
 
 @dataclass
