@@ -69,13 +69,26 @@ class Config:
 
 @dataclass
 class Payload:
-    data: Union[str, bytes, None, Dict] = None
-    json: Union[Dict, None] = None
-    header: Union[str, None] = None
+    data: Optional[Union[str, bytes, Dict]] = None
+    json: Optional[Dict] = None
+    header: Optional[str] = None
+    filename: str = None
     # [[ "key", ["filename", "content", "datatype"],
     #  ["key",  ["filename2", "content", "datatype"]],
     #  ["key2",  [None, "content", "datatype"]],]
-    files: Union[List, None] = None
+    files: Optional[List[List]] = None
+
+
+@dataclass
+class HttpDef:
+    name: str = None
+    method: str = None
+    url: str = None
+    headers: dict = None
+    query: dict = None
+    auth: tuple[str] = None
+    payload: Optional[Payload] = None
+    output: str = None
 
 
 @dataclass
@@ -330,17 +343,19 @@ class RequestBase(BaseModelProcessor):
     def __init__(self, args: Config):
         super().__init__(args)
         self._cookie: Union[LWPCookieJar, None] = None
+        self.httpdef = HttpDef()
+        self._loaded = False
 
-    def get_query(self):
+    def load_query(self):
         params: DefaultDict[List] = defaultdict(list)
         for line in self.http.lines:
             if query := line.query:
                 params[self.get_updated_content(query.key)].append(self.get_updated_content(query.value))
         request_logger.debug(
             f'computed query params from `{self.file}` are `{params}`')
-        return params
+        self.httpdef.query = params
 
-    def get_headers(self):
+    def load_headers(self):
         """
             entrypoints
                 1. dev defines headers in http file
@@ -353,26 +368,30 @@ class RequestBase(BaseModelProcessor):
         headers.update(self.default_headers)
         for line in self.http.lines:
             if header := line.header:
-                headers[header.key] = header.value
+                headers[self.get_updated_content(header.key)] = self.get_updated_content(header.value)
         request_logger.debug(
             f'computed query params from `{self.file}` are `{headers}`')
-        return headers
+        self.httpdef.headers = headers
 
-    def get_url(self):
+    def load_url(self):
         request_logger.debug(
             f'url is {self.http.urlwrap.url}')
-        return self.get_updated_content(self.http.urlwrap.url)
+        self.httpdef.url = self.get_updated_content(self.http.urlwrap.url)
 
-    def get_method(self):
+    def load_method(self):
         if method := self.http.urlwrap.method:
             request_logger.debug(
                 f'method defined in `{self.file}` is {method}')
-            return method
+            self.httpdef.method = method
+            return
         request_logger.debug(
             f'method not defined in `{self.file}`. defaults to `GET`')
-        return "GET"
+        self.httpdef.method = "GET"
 
-    def get_payload(self):
+    def load_payload(self):
+        self.httpdef.payload = self._load_payload()
+
+    def _load_payload(self):
         """
             1. dev can define data with string
             2. dev can define data with json (will be sent as form)
@@ -410,7 +429,7 @@ class RequestBase(BaseModelProcessor):
                 raise DataFileNotFoundException(datafile=upload_filename)
             mimetype = self.get_mimetype_from_file(upload_filename, self.http.payload.type)
             with open(upload_filename, 'rb') as f:
-                return Payload(data=f.read(), header=mimetype)
+                return Payload(data=f.read(), header=mimetype, filename=upload_filename)
         elif json_data := self.http.payload.json:
             d = json_or_array_to_json(json_data, self.get_updated_content)
             return Payload(json=d, header=MIME_TYPE_JSON)
@@ -458,9 +477,9 @@ class RequestBase(BaseModelProcessor):
                 f'output will be written into `{self.file}` is `{os.path.abspath(output_file)}`')
             try:
                 return open(output_file, 'wb')
-            except:
+            except Exception as e:
                 request_logger.debug(
-                    f'not able to open `{output}`. output will be written to stdout')
+                    f'not able to open `{output}`. output will be written to stdout', exc_info=True)
                 return sys.stdout
         else:
             return sys.stdout
@@ -502,15 +521,26 @@ class RequestBase(BaseModelProcessor):
         # session.hooks['response'] = self.save_cookie_call_back
         return session
 
-    def get_auth(self):
+    def load_auth(self):
         if auth_wrap := self.http.basic_auth_wrap:
-            return auth_wrap.username, auth_wrap.password
-        return None
+            self.httpdef.auth = self.get_updated_content(auth_wrap.username), self.get_updated_content(
+                auth_wrap.password)
 
-    @functools.lru_cache
+    def load_def(self):
+        if self._loaded:
+            return
+        self.httpdef.name = self.args.target or '1'
+        self.load_method()
+        self.load_url()
+        self.load_headers()
+        self.load_query()
+        self.load_payload()
+        self.load_auth()
+        self._loaded = True
+
     def get_request(self):
         prep = self.get_request_notbody()
-        payload = self.get_payload()
+        payload = self.httpdef.payload
         prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
         # prep.prepare_hooks({"response": self.save_cookie_call_back})
         if payload.header and CONTENT_TYPE not in prep.headers:
@@ -521,12 +551,13 @@ class RequestBase(BaseModelProcessor):
         return prep
 
     def get_request_notbody(self):
+        self.load_def()
         prep = PreparedRequest()
-        prep.prepare_url(self.get_url(), self.get_query())
-        prep.prepare_method(self.get_method())
-        prep.prepare_headers(self.get_headers())
+        prep.prepare_url(self.httpdef.url, self.httpdef.query)
+        prep.prepare_method(self.httpdef.method)
+        prep.prepare_headers(self.httpdef.headers)
         prep.prepare_cookies(self.get_cookie())
-        prep.prepare_auth(self.get_auth(), prep.url)
+        prep.prepare_auth(self.httpdef.auth, prep.url)
         return prep
 
     def run(self):
@@ -548,11 +579,11 @@ class CurlCompiler(RequestBase):
     def get_curl_output(self):
         prep = self.get_request_notbody()
         parts = []
+        payload = self.httpdef.payload
         if self.http.payload:
             if self.http.payload.file:
                 parts.append(('--data', "@" + self.get_updated_content(self.http.payload.file)))
             elif self.http.payload.fileswrap:
-                payload = self.get_payload()
                 if payload.files:
                     for file in payload.files:
                         if isinstance(file[1][1], str):
@@ -560,7 +591,6 @@ class CurlCompiler(RequestBase):
                         else:
                             parts.append(('--form', file[0] + "=@" + file[1][1].name))
             else:
-                payload = self.get_payload()
                 prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
         curl_req = to_curl(prep, parts)
         return curl_req
@@ -620,10 +650,10 @@ class HttpFileFormatter(RequestBase):
                     parsed_data = json_or_array_to_json(json_data, lambda a: a)
                     p = f'json({json.dumps(parsed_data, indent=4)})'
                 elif files_wrap := payload.fileswrap:
-                    p2 = ",\n\t".join(map(
-                        lambda file_type: f'("{file_type.name}", "{(file_type.path)}"'
-                                          f'{(" ," + file_type.type) if file_type.type else ""})'
-                        , files_wrap.files))
+                    p2 = ",\n\t".join(map(lambda
+                                              file_type: f'("{file_type.name}", "{(file_type.path)}"'
+                                                         f' , "{file_type.type}")' if file_type.type else ")",
+                                          files_wrap.files))
                     p = f"files({new_line}\t{p2}{new_line})"
                 output_str += f'{new_line}{p}'
             if output := http.output:

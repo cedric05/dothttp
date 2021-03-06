@@ -46,7 +46,7 @@ class Line:
 class MultiPartFile:
     name: str
     path: str
-    type: Optional[str]
+    type: Optional[str] = None
 
 
 @dataclass

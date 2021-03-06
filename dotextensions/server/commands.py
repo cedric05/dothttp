@@ -10,7 +10,7 @@ from urllib.parse import unquote
 import requests
 from requests import PreparedRequest
 
-from dothttp import RequestCompiler, Config, DotHttpException, dothttp_model, CurlCompiler, HttpFileFormatter
+from dothttp import RequestCompiler, Config, DotHttpException, dothttp_model, CurlCompiler, HttpFileFormatter, HttpDef
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
     NameWrap, Line
 from . import Command, Result, BaseHandler
@@ -47,7 +47,6 @@ class RunHttpFileHandler(BaseHandler):
                 })
             else:
                 comp = RequestCompiler(config)
-                request = comp.get_request()
                 resp = comp.get_response()
                 response_data = {
                     "response": {
@@ -57,17 +56,10 @@ class RunHttpFileHandler(BaseHandler):
                         "status": resp.status_code, }
                 }
                 # will be used for response
-                request_data = {"request": {
-                    "url": request.url,
-                    "body": request.body,
-                    "headers": request.headers,
-                    "method": request.method,
-                }}
                 data = {}
                 data.update(response_data['response'])  # deprecated
-                # data.update(request_data)
                 data.update(response_data)
-                # data.update({"http": self.get_http_from_req(request)})
+                data.update({"http": self.get_http_from_req(comp.httpdef)})
                 result = Result(id=command.id,
                                 result=data)
         except DotHttpException as ex:
@@ -77,17 +69,39 @@ class RunHttpFileHandler(BaseHandler):
         return result
 
     @staticmethod
-    def get_http_from_req(request: PreparedRequest):
+    def get_http_from_req(request: HttpDef):
+        data = None
+        datajson = None
+        file = None
+        json_payload = None
+        fileswrap = None
+        type = None
+        if request.payload.filename:
+            file = request.payload.filename
+        elif isinstance(request.payload.data, str):
+            data = request.payload.data
+        elif isinstance(request.payload.data, dict):
+            datajson = None
+        elif request.payload.json:
+            json_payload = request.payload.json
+        elif request.payload.files:
+            fileswrap = FilesWrap([])
+            for filekey, multipartdata in request.payload.files:
+                fileswrap.files.append(
+                    MultiPartFile(name=filekey,
+                                  path=multipartdata[1].name if multipartdata[0] else multipartdata[1],
+                                  type=multipartdata[2] if len(multipartdata) > 2 else None)
+                )
+
+        payload = Payload(data=data, datajson=datajson, file=file, json=json_payload, fileswrap=fileswrap, type=type)
         return HttpFileFormatter.format(Allhttp(allhttps=[Http(
-            namewrap=None,
+            namewrap=NameWrap(request.name),
             urlwrap=UrlWrap(url=request.url, method=request.method),
             lines=[
                 Line(header=Header(key=key, value=value), query=None)
                 for key, value in
                 request.headers.items()],
-            payload=Payload(data=request.body, datajson=None,
-                            file=None, json=None, fileswrap=None,
-                            type=None),
+            payload=payload,
             output=None, basic_auth_wrap=None
         )]))
 
