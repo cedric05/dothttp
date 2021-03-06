@@ -168,7 +168,7 @@ class ImportPostmanCollection(BaseHandler):
             newline = "\n"
             d[name] = f"#!/usr/bin/env dothttp{newline}{newline}" \
                       f"# imported from {link}{newline}{newline}" \
-                      f"${data}\n"
+                      f"{data}\n"
         return d
 
     @staticmethod
