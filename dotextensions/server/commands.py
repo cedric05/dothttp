@@ -45,15 +45,29 @@ class RunHttpFileHandler(BaseHandler):
                     }
                 })
             else:
-                request = RequestCompiler(config)
-                resp = request.get_response()
+                comp = RequestCompiler(config)
+                request = comp.get_request()
+                resp = comp.get_response()
+                response_data = {
+                    "response": {
+                        "headers":
+                            {key: value for key, value in resp.headers.items()},
+                        "body": resp.text,
+                        "status": resp.status_code, }
+                }
+                # will be used for response
+                request_data = {"request": {
+                    "url": request.url,
+                    "body": request.body,
+                    "headers": request.headers,
+                    "method": request.method,
+                }}
+                data = {}
+                data.update(response_data['response'])  # deprecated
+                data.update(request_data)
+                data.update(response_data)
                 result = Result(id=command.id,
-                                result={
-                                    "headers":
-                                        {key: value for key, value in resp.headers.items()},
-                                    "body": resp.text,
-                                    "status": resp.status_code,
-                                })
+                                result=data)
         except DotHttpException as ex:
             result = Result(id=command.id,
                             result={

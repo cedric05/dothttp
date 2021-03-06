@@ -503,6 +503,7 @@ class RequestBase(BaseModelProcessor):
             return auth_wrap.username, auth_wrap.password
         return None
 
+    @functools.lru_cache
     def get_request(self):
         prep = self.get_request_notbody()
         payload = self.get_payload()
