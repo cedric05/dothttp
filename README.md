@@ -32,7 +32,7 @@ Go through this example for better understanding. for babysteps click [here](#fi
 # makes are get request, with url `https://req.dothttp.dev/user`
 GET https://req.dothttp.dev/user
 
-# below is an header example, if api_key is not defined, it will be defaulted to `121245454125454121245451`
+# below is an header example
 "Authorization": "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
 
 # below is how you set url params '?' --> signifies url quary param
@@ -85,7 +85,7 @@ data({
 ### From pypi
 
 ```shell
-pip install dothttp-req==0.0.6
+pip install dothttp-req==0.0.7
 ```
 
 ### From source
@@ -93,6 +93,7 @@ pip install dothttp-req==0.0.6
 ```shell
 git clone git@github.com:cedric05/dothttp.git
 cd dothttp
+
 python3 -m pip install pipenv
 pipenv install
 ```
