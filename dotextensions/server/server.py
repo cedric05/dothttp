@@ -5,9 +5,6 @@ import sys
 from json import JSONDecodeError
 from typing import Dict
 
-from flask import Flask
-from flask import request
-
 from . import Command, BaseHandler
 from .commands import RunHttpFileHandler, FormatHttpFileHandler, GetNameReferencesHandler, ImportPostmanCollection
 
@@ -40,6 +37,7 @@ class Base:
 
 class HttpServer(Base):
     def __init__(self, port=5000):
+        from flask import Flask
         app = Flask("dothttp-server")
         self.app = app
         self.port = port
@@ -52,6 +50,7 @@ class HttpServer(Base):
 
     def get_handler(self, handler):
         def flask_api_handler():
+            from flask import request
             try:
                 id = int(request.args['id'])
                 command = {'method': handler, 'params': json.loads(request.data), 'id': id}
