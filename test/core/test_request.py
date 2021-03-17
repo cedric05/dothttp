@@ -51,7 +51,7 @@ class RequestTest(TestBase):
             req.run()
             data = f.read()
             self.assertIn(
-                b'curl "https://dothttp.azurewebsites.net/" \\\n    -X GET \\\n    -H "connection: Keep-Alive" \\\n    -H ',
+                b'curl "https://req.dothttp.dev/" \\\n    -X GET \\\n    -H "connection: Keep-Alive" \\\n    -H ',
                 data
             )
 

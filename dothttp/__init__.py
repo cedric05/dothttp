@@ -1,4 +1,3 @@
-import functools
 import logging
 import os
 import re
@@ -22,6 +21,7 @@ from .exceptions import *
 from .exceptions import PropertyNotFoundException
 from .parse_models import Allhttp
 from .property_schema import property_schema
+from .property_util import PropertyProvider
 
 try:
     import magic
@@ -164,18 +164,14 @@ class BaseModelProcessor:
         else:
             props = {}
         self.default_headers.update(props.get('headers', {}))
-        self.properties.update(props.get("*", {}))
+        self.property_util.add_env_property_from_dict(props.get("*", {}))
         if self.env:
             for env_name in self.env:
-                self.properties.update(props.get(env_name, {}))
-
-        return self.properties
+                self.property_util.add_env_property_from_dict(props.get(env_name, {}))
 
     def __init__(self, args: Config):
         self.args = args
         self.file = args.file
-        self.command_line_props = {}
-        self.properties = {}
         # dev can define default headers, which dev dont want to do it for all requests
         # in most scenarios, headers are either computed or common across all other requests
         # best syntax would be headers section of property file will define default headers
@@ -184,6 +180,7 @@ class BaseModelProcessor:
         self.env = args.env
         self.content = ''
         self.original_content = self.content = ''
+        self.property_util = PropertyProvider(self.property_file)
         self.load()
 
     def load(self):
@@ -200,7 +197,7 @@ class BaseModelProcessor:
             try:
                 key, value = prop.split("=")
                 base_logger.debug(f"detected command line property {key} value: {value}")
-                self.command_line_props[key] = value
+                self.property_util.add_command_property(key, value)
             except:
                 raise CommandLinePropError(prop=prop)
 
@@ -221,91 +218,8 @@ class BaseModelProcessor:
         with open(self.file, 'r') as f:
             self.original_content = self.content = f.read()
 
-    @staticmethod
-    def validate_n_gen(prop, cache: Dict[str, Property]):
-        p: Union[Property, None] = None
-        if '=' in prop:
-            key_values = prop.split('=')
-            if len(key_values) != 2:
-                raise HttpFileException(message='default property should not have multiple `=`')
-            key, value = key_values
-            # strip white space for keys
-            key = key.strip()
-
-            # strip white space for values
-            value = value.strip()
-            if value and value[0] == value[-1] and value[0] in {"'", '"'}:
-                # strip "'" "'" if it has any
-                # like ranga=" ramprasad" --> we should replace with " ramprasad"
-                value = value[1:-1]
-            if key in cache:
-                if cache[key].value and value != cache[key].value:
-                    raise HttpFileException(
-                        message=f'property: `{key}` is defaulted with two/more different values, panicked ')
-                p = cache[key]
-                p.text.append(prop)
-                p.value = value
-            else:
-                p = Property([prop], key, value)
-            cache.setdefault(key, p)
-        else:
-            if prop in cache:
-                cache[prop].text.append(prop)
-            else:
-                p = Property([prop])
-                cache.setdefault(prop, p)
-        return p
-
-    def get_most_possible_val(self, var):
-        args = self.command_line_props.get(var), self.properties.get(var), self.prop_cache[var].value
-        for arg in args:
-            if arg is not None:
-                return arg
-
     def get_updated_content(self, content) -> str:
-        """
-            1. properties defined in file itself ({{a=10}})
-                allowed values are
-                {{ a=ranga}} {{a=ranga }} {{ a=ranga }} {{ a="ranga" }} {{ a='ranga' }}
-                a=ranga for all above
-                {{ a="ranga "}}
-                in above case whitespace is considered
-            2. properties from command line
-            3. properties from file's activated env
-            4. properties from files's '*'
-        :return:
-        """
-        prop_cache = self.prop_cache
-
-        content_prop_needed = self.get_declared_props(content)
-        props_needed = set(content_prop_needed.keys())
-
-        missing_props = props_needed - self.get_props_available()
-        if len(missing_props) != 0:
-            raise PropertyNotFoundException(
-                var=missing_props, propertyfile=self.property_file if self.property_file else "not specified")
-        for var in props_needed:
-            # command line props take preference
-            value = self.get_most_possible_val(var)
-            base_logger.debug(f'using `{value}` for property {var}')
-            for text_to_replace in content_prop_needed[var].text:
-                content = content.replace("{{" + text_to_replace + "}}", value)
-        return content
-
-    @functools.lru_cache
-    def get_props_available(self):
-        return set(self.properties.keys()).union(set(self.command_line_props.keys())).union(set(
-            key for key in self.prop_cache if self.prop_cache[key].value is not None))
-
-    def load_props_needed_for_content(self):
-        self.prop_cache = self.get_declared_props(self.content)
-
-    def get_declared_props(self, content):
-        out = BaseModelProcessor.var_regex.findall(content)
-        base_logger.debug(f'property used in `{self.file}` are `{out}`')
-        prop_cache: Dict[str, Property] = {}
-        tuple(self.validate_n_gen(x, prop_cache) for x in out if x)  # generates prop_cache, this could be done better
-        return prop_cache
+        return self.property_util.get_updated_content(content)
 
     def select_target(self):
         if target := self.args.target:
@@ -337,6 +251,9 @@ class BaseModelProcessor:
                 raise HttpFileException(message=f"target: `{name}` appeared twice or more. panicked while processing")
             names.append(name)
             names.append(str(index + 1))
+
+    def load_props_needed_for_content(self):
+        self.property_util.add_infile_properties(self.content)
 
 
 class RequestBase(BaseModelProcessor):
