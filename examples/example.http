@@ -53,7 +53,7 @@ basicauth("{{username}}", "{{password}}")
 
 json({
     "height": {{height}},
-    "name": "Adam A",
+    "name": "Adam {{$randomStr:3}}",
     "org": "dothttp",
     "location": "Hyderabad",
     "interests": ["exploring", "listening to music"],

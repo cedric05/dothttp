@@ -221,6 +221,9 @@ class BaseModelProcessor:
     def get_updated_content(self, content) -> str:
         return self.property_util.get_updated_content(content)
 
+    def get_updated_content_object(self, content) -> str:
+        return self.property_util.get_updated_content(content, 'obj')
+
     def select_target(self):
         if target := self.args.target:
             if not isinstance(target, str):
