@@ -52,7 +52,7 @@ def get_random_float(*_args):
 
 def get_random_bool(*_args):
     random = PropertyProvider.random
-    return random.choice([True, False])
+    return random.choice(['true', 'false'])
 
 
 class PropertyProvider:
@@ -75,7 +75,7 @@ class PropertyProvider:
         '$randomStr': get_random_str,
         '$randomInt': get_random_int,
         '$randomFloat': get_random_float,
-        '$randomBool': get_random_str
+        '$randomBool': get_random_bool
     }
 
     def __init__(self, property_file=""):
