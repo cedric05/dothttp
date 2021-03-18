@@ -89,7 +89,10 @@ class PropertyProvider:
         self.command_properties[key] = value
 
     def add_env_property_from_dict(self, env: dict):
-        self.env_properties.update(env)
+        # TODO fix this, this could be json.dumps and
+        #  json.loads will create performance issues
+        for key in env:
+            self.env_properties[key] = json.dumps(env[key])
 
     def add_env_property(self, key: str, value: str):
         self.env_properties[key] = value
