@@ -195,7 +195,9 @@ class BaseModelProcessor:
     def load_command_line_props(self):
         for prop in self.args.properties:
             try:
-                key, value = prop.split("=")
+                index = prop.find("=")
+                key = prop[:index]
+                value = prop[index + 1:]
                 base_logger.debug(f"detected command line property {key} value: {value}")
                 self.property_util.add_command_property(key, value)
             except:
