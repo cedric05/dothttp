@@ -92,7 +92,10 @@ class PropertyProvider:
         # TODO fix this, this could be json.dumps and
         #  json.loads will create performance issues
         for key in env:
-            self.env_properties[key] = json.dumps(env[key])
+            if isinstance(env[key], dict):
+                self.env_properties[key] = json.dumps(env[key])
+            else:
+                self.env_properties[key] = env[key]
 
     def add_env_property(self, key: str, value: str):
         self.env_properties[key] = value

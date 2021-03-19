@@ -196,6 +196,8 @@ class BaseModelProcessor:
         for prop in self.args.properties:
             try:
                 index = prop.find("=")
+                if index == -1:
+                    raise
                 key = prop[:index]
                 value = prop[index + 1:]
                 base_logger.debug(f"detected command line property {key} value: {value}")
