@@ -56,6 +56,11 @@ class SubstitutionTest(TestBase):
         self.assertEqual("https://dothttp.dev/", req.url)
         self.assertEqual('dothttp.dev', req.body)
 
+    def test_object_substitution(self):
+        req: PreparedRequest = self.get_request(f"{base_dir}/envvariableswithjson.http", env=['env3'])
+        self.assertEqual(b'{"object": {"key": "value"}, "int": 3, "str": "str", "null": null, "true": t'
+                         b'rue, "false": false, "float": 1.23}', req.body)
+
     def test_substitute_one_by_one(self):
         # path
         req: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"])
