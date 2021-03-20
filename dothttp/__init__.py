@@ -1,3 +1,4 @@
+import functools
 import logging
 import os
 import re
@@ -22,6 +23,11 @@ from .exceptions import PropertyNotFoundException
 from .parse_models import Allhttp
 from .property_schema import property_schema
 from .property_util import PropertyProvider
+
+try:
+    import magic
+except ImportError:
+    magic = None
 
 try:
     import magic
@@ -462,6 +468,7 @@ class RequestBase(BaseModelProcessor):
         self.load_auth()
         self._loaded = True
 
+    @functools.lru_cache
     def get_request(self):
         prep = self.get_request_notbody()
         payload = self.httpdef.payload
