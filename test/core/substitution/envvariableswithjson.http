@@ -1,0 +1,10 @@
+POST http://req.dothttp.dev
+json({
+   "object": {{object}},
+    "int": {{int}},
+    "str": {{str}},
+    "null": {{null}},
+    "true": {{true}},
+    "false": {{false}},
+    "float": {{float}}
+})

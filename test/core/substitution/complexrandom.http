@@ -1,0 +1,36 @@
+@name('int')
+GET https://req.dothttp.dev/{{$randomStr:3}}
+? "key", "{{$randomStr:3}}"
+? "{{$randomStr:3}}", "value"
+data("
+{{$randomStr:3}}
+")
+
+
+@name('reuse')
+GET https://req.dothttp.dev/
+? "int", "{{int=$randomInt:3}}"
+? "bool" = "{{bool=$randomBool:3}}"
+? "str" ="{{str=$randomStr:3}}"
+? "float" ="{{float=$randomFloat}}"
+json({
+   "int": {{int}},
+   "bool": {{bool}},
+   "str": {{str}},
+   "float": {{float}}
+})
+
+
+@name('reuse2')
+GET https://req.dothttp.dev/
+? "str" ="{{str2=$randomStr:3}}"
+data({
+   "str": {{str2}},
+})
+
+
+
+@name('reuse3')
+GET https://req.dothttp.dev/
+? "str" ="{{str3=$randomStr:3}}"
+data("{{str3}}")

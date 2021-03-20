@@ -23,7 +23,7 @@ def json_or_array_to_json(model, update_content_func) -> Union[Dict, List]:
 def get_key(member, update_content_func):
     if member.key:
         return update_content_func(member.key)
-    return get_json_data(member.var, update_content_func)
+    return update_content_func(member.var)
 
 
 def jsonmodel_to_json(model, update_content_func):

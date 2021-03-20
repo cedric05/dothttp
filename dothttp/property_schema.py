@@ -5,7 +5,7 @@ property_schema = {
             "type": "object",
             "patternProperties": {
                 "\\w*$": {
-                    "type": "string"
+                    "type": ["number", "string", "object", "array", "null", "boolean", "integer"]
                 }
             }
         }
