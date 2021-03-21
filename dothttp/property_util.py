@@ -70,6 +70,8 @@ class PropertyProvider:
     """
     random = Random()
     var_regex = re.compile(r'{{(?P<var>.*?)}}')
+    random_string_regex = re.compile(
+        r'(?P<category>\$randomStr|\$randomInt|\$randomBool|\$randomFloat)(?P<length>:\d*)?')
 
     rand_map = {
         '$randomStr': get_random_str,
@@ -160,9 +162,7 @@ class PropertyProvider:
                 value = value[1:-1]
 
             # if result is randomType
-            if PropertyProvider.is_random_key(value):
-                # use random
-                value = PropertyProvider.resolve_random(value)
+            value = PropertyProvider.resolve_random(value)
 
             if key in cache:
                 if cache[key].value and value != cache[key].value:
@@ -184,18 +184,14 @@ class PropertyProvider:
 
     @staticmethod
     def resolve_random(prop):
-        splitted = prop.split(':')
-        if len(splitted) > 2:
-            raise HttpFileException(message='randomProperty Key should only have single `:`')
-        category = splitted[0]
-        if len(splitted) == 1:
-            rand_length = None
-        else:
-            try:
-                rand_length = int(splitted[1])
-            except ValueError:
-                rand_length = None
-        return str(PropertyProvider.rand_map[category](rand_length))
+        match = PropertyProvider.random_string_regex.match(prop)
+        if (match):
+            groups = match.groupdict()
+            category = groups['category']
+            rand_length = int((groups.get('length') if groups.get('length') else ':0')[1:])
+            value = str(PropertyProvider.rand_map[category](rand_length))
+            return prop.replace("".join(i for i in match.groups() if i), value)
+        return prop
 
     def resolve_property_string(self, key: str):
         if PropertyProvider.is_random_key(key):

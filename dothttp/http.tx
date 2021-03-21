@@ -115,7 +115,7 @@ CommentBlock:
 ;
 
 VarString:
-    "{{" /[\w,$,:]+/ ("="  (/\w+/ | STRING))? "}}"
+    "{{" /[\w,$,:,=]+/ ("="  (/\w+/ | STRING))? "}}"
 ;
 
 DotString:
