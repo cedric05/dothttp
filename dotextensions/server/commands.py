@@ -134,7 +134,7 @@ class GetNameReferencesHandler(BaseHandler):
                     if http.namewrap:
                         name = http.namewrap.name if http.namewrap else str(index)
                         start = http.namewrap._tx_position
-                        end = http.namewrap._tx_position_end
+                        end = http._tx_position_end
                     else:
                         start = http.urlwrap._tx_position
                         end = http.urlwrap._tx_position_end
