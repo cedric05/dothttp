@@ -98,9 +98,14 @@ class RunHttpFileHandler(BaseHandler):
             namewrap=NameWrap(request.name),
             urlwrap=UrlWrap(url=request.url, method=request.method),
             lines=[
-                Line(header=Header(key=key, value=value), query=None)
-                for key, value in
-                request.headers.items()],
+                      Line(header=Header(key=key, value=value), query=None)
+                      for key, value in
+                      request.headers.items()] +
+                  [
+                      Line(header=None, query=Query(key=key, value=value))
+                      for key, value in
+                      request.query.items()]
+            ,
             payload=payload,
             output=None, basic_auth_wrap=None
         )]))
