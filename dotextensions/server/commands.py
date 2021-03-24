@@ -4,17 +4,17 @@ import os
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import List, Iterator, Union
+from typing import List, Iterator, Union, Dict
 from urllib.parse import unquote
 
 import requests
-from requests import PreparedRequest
 
 from dothttp import RequestCompiler, Config, DotHttpException, dothttp_model, CurlCompiler, HttpFileFormatter, HttpDef
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
     NameWrap, Line
 from . import Command, Result, BaseHandler
 from .postman import postman_collection_from_dict, Items, URLClass
+from .utils import clean_filename
 
 DEFAULT_URL = "https://req.dothttp.dev/"
 
@@ -230,7 +230,6 @@ class ImportPostmanCollection(BaseHandler):
         d = {}
         if len(collection.allhttps) != 0:
             data = HttpFileFormatter.format(collection)
-            directory.mkdir(parents=True, exist_ok=True)
             name = str(directory.joinpath("imported_from_collection.http"))
             newline = "\n"
             d[name] = f"#!/usr/bin/env dothttp{newline}{newline}" \
@@ -302,7 +301,7 @@ class ImportPostmanCollection(BaseHandler):
                         payload_json = json.loads(rawbody)
                         payload_data = None
             elif urlencoded_body := req.body.urlencoded:
-                encodedbody = defaultdict(default_factory=lambda: [])
+                encodedbody: Dict[str, list] = defaultdict(lambda: [])
                 for one_form_field in urlencoded_body:
                     encodedbody[one_form_field.key].append(one_form_field.value)
                 payload_datajson = encodedbody
@@ -344,12 +343,13 @@ class ImportPostmanCollection(BaseHandler):
             return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
 
         collection = postman_collection_from_dict(postman_data)
-        d = self.import_items(collection.item, Path(directory).joinpath(collection.info.name), link)
+        d = self.import_items(collection.item, Path(directory).joinpath(clean_filename(collection.info.name)), link)
         if save:
             for path, fileout in d.items():
                 if os.path.exists(path) and not overwrite:
                     p = Path(path)
-                    path = p.with_stem(p.stem + '-' + datetime.now().ctime())
+                    path = p.with_stem(clean_filename(p.stem + '-' + datetime.now().ctime()))
+                Path(path).parent.mkdir(parents=True, exist_ok=True)
                 with open(path, 'w') as f:
                     f.write(fileout)
         return Result(id=command.id, result={"files": d})
@@ -361,5 +361,6 @@ class ImportPostmanCollection(BaseHandler):
         d.update(ImportPostmanCollection.import_requests_into_dire(leaf_folder, directory, link))
         folder = map(lambda item: (item.name, item.item), filter(lambda item: item.item, items))
         for sub_folder, subitem in folder:
-            d.update(ImportPostmanCollection.import_items(subitem, directory.joinpath(sub_folder), link))
+            d.update(
+                ImportPostmanCollection.import_items(subitem, directory.joinpath(clean_filename(sub_folder)), link))
         return d

@@ -582,8 +582,8 @@ class HttpFileFormatter(RequestBase):
                     p = f'json({json.dumps(parsed_data, indent=4)})'
                 elif files_wrap := payload.fileswrap:
                     p2 = ",\n\t".join(map(lambda
-                                              file_type: f'("{file_type.name}", "{(file_type.path)}"'
-                                                         f' , "{file_type.type}")' if file_type.type else ")",
+                                              file_type: f'("{file_type.name}", "{(file_type.path)}"' +
+                                                         (f' , "{file_type.type}")' if file_type.type else ")"),
                                           files_wrap.files))
                     p = f"files({new_line}\t{p2}{new_line})"
                 output_str += f'{new_line}{p}'
