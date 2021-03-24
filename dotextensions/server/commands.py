@@ -26,18 +26,10 @@ class RunHttpFileHandler(BaseHandler):
         return RunHttpFileHandler.name
 
     def run(self, command: Command) -> Result:
-        filename = command.params.get("file")
-        envs = command.params.get("env", [])
-        target = command.params.get("target", '1')
-        nocookie = command.params.get("nocookie", False)
-        curl = command.params.get("curl", False)
-        props = command.params.get('properties', {})
-        properties = [f"{i}={j}" for i, j in props.items()]
+        config = self.get_config(command)
         try:
-            config = Config(file=filename, env=envs, properties=properties, curl=curl, property_file=None, debug=True,
-                            no_cookie=nocookie, format=False, info=False, target=target)
             if config.curl:
-                req = CurlCompiler(config)
+                req = self.get_curl_comp(config)
                 result = req.get_curl_output()
                 result = Result(id=command.id, result={
                     "body": result,
@@ -46,27 +38,49 @@ class RunHttpFileHandler(BaseHandler):
                     }
                 })
             else:
-                comp = RequestCompiler(config)
-                resp = comp.get_response()
-                response_data = {
-                    "response": {
-                        "headers":
-                            {key: value for key, value in resp.headers.items()},
-                        "body": resp.text,  # for binary out, it will fail, check for alternatives
-                        "status": resp.status_code, }
-                }
-                # will be used for response
-                data = {}
-                data.update(response_data['response'])  # deprecated
-                data.update(response_data)
-                data.update({"http": self.get_http_from_req(comp.httpdef)})
-                result = Result(id=command.id,
-                                result=data)
+                comp = self.get_request_comp(config)
+                result = self.get_request_result(command, comp)
         except DotHttpException as ex:
             result = Result(id=command.id,
                             result={
                                 "error_message": ex.message, "error": True})
         return result
+
+    def get_curl_comp(self, config):
+        return CurlCompiler(config)
+
+    def get_config(self, command):
+        filename = command.params.get("file")
+        envs = command.params.get("env", [])
+        target = command.params.get("target", '1')
+        nocookie = command.params.get("nocookie", False)
+        curl = command.params.get("curl", False)
+        props = command.params.get('properties', {})
+        properties = [f"{i}={j}" for i, j in props.items()]
+        config = Config(file=filename, env=envs, properties=properties, curl=curl, property_file=None, debug=True,
+                        no_cookie=nocookie, format=False, info=False, target=target)
+        return config
+
+    def get_request_result(self, command, comp):
+        resp = comp.get_response()
+        response_data = {
+            "response": {
+                "headers":
+                    {key: value for key, value in resp.headers.items()},
+                "body": resp.text,  # for binary out, it will fail, check for alternatives
+                "status": resp.status_code, }
+        }
+        # will be used for response
+        data = {}
+        data.update(response_data['response'])  # deprecated
+        data.update(response_data)
+        data.update({"http": self.get_http_from_req(comp.httpdef)})
+        result = Result(id=command.id,
+                        result=data)
+        return result
+
+    def get_request_comp(self, config):
+        return RequestCompiler(config)
 
     @staticmethod
     def get_http_from_req(request: HttpDef):
@@ -109,6 +123,40 @@ class RunHttpFileHandler(BaseHandler):
             payload=payload,
             output=None, basic_auth_wrap=None
         )]))
+
+
+class ContentBase:
+    def __init__(self, config: Config):
+        super().__init__(config)
+
+    def load_content(self):
+        self.original_content = self.content = self.args.file
+
+
+class ContentRequestCompiler(ContentBase, RequestCompiler):
+    pass
+
+
+class ContentCurlCompiler(ContentBase, CurlCompiler):
+    pass
+
+
+class ContentExecuteHandler(RunHttpFileHandler):
+    name = "/content/execute"
+
+    def get_config(self, command):
+        config = super().get_config(command)
+        config.file = command.params.get('content')
+        return config
+
+    def get_method(self):
+        return ContentExecuteHandler.name
+
+    def get_request_comp(self, config):
+        return ContentRequestCompiler(config)
+
+    def get_curl_comp(self, config):
+        return ContentCurlCompiler(config)
 
 
 class FormatHttpFileHandler(BaseHandler):
