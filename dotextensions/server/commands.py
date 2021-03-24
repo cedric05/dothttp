@@ -298,9 +298,12 @@ class ImportPostmanCollection(BaseHandler):
             elif rawbody := req.body.raw:
                 payload_data = rawbody
                 if optins and 'raw' in optins and 'language' in optins.get('raw'):
-                    if optins['raw']['language']:
-                        payload_json = json.loads(rawbody)
-                        payload_data = None
+                    if optins['raw']['language'] == 'json':
+                        try:
+                            payload_json = json.loads(rawbody)
+                            payload_data = None
+                        except:
+                            pass
             elif urlencoded_body := req.body.urlencoded:
                 encodedbody: Dict[str, list] = defaultdict(lambda: [])
                 for one_form_field in urlencoded_body:
