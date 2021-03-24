@@ -554,7 +554,7 @@ class HttpFileFormatter(RequestBase):
                                                    line.header, lines)))
                 if headers:
                     output_str += f"\n{headers}"
-                query = new_line.join(map(lambda line: f'? ("{line.query.key}", "{line.query.value}")',
+                query = new_line.join(map(lambda line: f'? "{line.query.key}"= "{line.query.value}"',
                                           filter(lambda line:
                                                  line.query, lines)))
                 if query:

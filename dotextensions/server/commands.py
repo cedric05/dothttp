@@ -108,17 +108,18 @@ class RunHttpFileHandler(BaseHandler):
                 )
 
         payload = Payload(data=data, datajson=datajson, file=file, json=json_payload, fileswrap=fileswrap, type=type)
+
+        query_lines = []
+        for key, values in request.query.items():
+            for value in values:
+                query_lines.append(Line(header=None, query=Query(key=key, value=value)))
         return HttpFileFormatter.format(Allhttp(allhttps=[Http(
             namewrap=NameWrap(request.name),
             urlwrap=UrlWrap(url=request.url, method=request.method),
             lines=[
                       Line(header=Header(key=key, value=value), query=None)
                       for key, value in
-                      request.headers.items()] +
-                  [
-                      Line(header=None, query=Query(key=key, value=value))
-                      for key, value in
-                      request.query.items()]
+                      request.headers.items()] + query_lines
             ,
             payload=payload,
             output=None, basic_auth_wrap=None
