@@ -2,10 +2,11 @@ import argparse
 import logging
 import sys
 
-from dothttp.log_utils import setup_logging
-from . import CurlCompiler, RequestCompiler, HttpFileFormatter, Config, eprint
-from .exceptions import DotHttpException
 from requests.exceptions import RequestException
+
+from dothttp.log_utils import setup_logging
+from .exceptions import DotHttpException
+from .request_base import CurlCompiler, RequestCompiler, HttpFileFormatter, Config, eprint
 
 logger = logging.getLogger('dothttp')
 

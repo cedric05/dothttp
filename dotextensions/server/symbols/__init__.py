@@ -1,6 +1,6 @@
 from typing import Optional
 
-from dothttp import RequestCompiler
+from dothttp.request_base import RequestCompiler
 
 
 class allkey(dict):

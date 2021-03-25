@@ -1,6 +1,6 @@
 import unittest
 
-from dothttp import Config, RequestCompiler, CurlCompiler, HttpFileFormatter
+from dothttp.request_base import Config, RequestCompiler, CurlCompiler, HttpFileFormatter
 
 
 class TestBase(unittest.TestCase):
