@@ -4,10 +4,15 @@ import re
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Union, List, Optional, Dict, DefaultDict
+from typing import Union, List, Optional, Dict, DefaultDict, Tuple
 
-import jstyleson as json
-from jsonschema import validate
+try:
+    import jstyleson as json
+    from jsonschema import validate
+except:
+    import json
+
+    validate = None
 from textx import TextXSyntaxError, metamodel_from_file
 
 from .dsl_jsonparser import json_or_array_to_json
@@ -74,7 +79,7 @@ class HttpDef:
     url: str = None
     headers: dict = None
     query: dict = None
-    auth: tuple[str] = None
+    auth: Tuple[str] = None
     payload: Optional[Payload] = None
     output: str = None
 
@@ -142,7 +147,8 @@ class BaseModelProcessor:
                     raise PropertyFileNotJsonException(
                         propertyfile=self.property_file)
                 try:
-                    validate(instance=props, schema=property_schema)
+                    if validate:
+                        validate(instance=props, schema=property_schema)
                 except Exception as e:
                     base_logger.error(f'property json schema validation failed! ', exc_info=True)
                     raise PropertyFileException(message="property file has invalid json schema",

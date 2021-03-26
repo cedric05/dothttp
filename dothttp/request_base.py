@@ -10,7 +10,7 @@ from requests import PreparedRequest, Session, Response
 from requests.status_codes import _codes as status_code
 from textx import metamodel_from_file
 
-from . import eprint, Config, HttpDef, HttpDefBase
+from . import eprint, Config, HttpDefBase
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 
@@ -50,8 +50,6 @@ class RequestBase(HttpDefBase):
     def __init__(self, args: Config):
         super().__init__(args)
         self._cookie: Union[LWPCookieJar, None] = None
-        self.httpdef = HttpDef()
-        self._loaded = False
 
     def get_cookie(self):
         """
