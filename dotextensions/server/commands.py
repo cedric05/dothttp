@@ -9,7 +9,9 @@ from urllib.parse import unquote
 
 import requests
 
-from dothttp import RequestCompiler, Config, DotHttpException, dothttp_model, CurlCompiler, HttpFileFormatter, HttpDef
+from dothttp import DotHttpException, HttpDef
+from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
+    HttpFileFormatter
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
     NameWrap, Line
 from . import Command, Result, BaseHandler
