@@ -23,3 +23,12 @@ GET https://req.dothttp.dev
 json({
  "test":{{$randomFloat}}
 })
+
+@name('random+string')
+GET https://req.dothttp.dev
+json({
+ "test":{{$randomFloat}},
+ "test2":"{{hai=$randomStr:10@gmail.com}}",
+ "test4":"{{hai}}",
+ "test5":"{{hai}}",
+})

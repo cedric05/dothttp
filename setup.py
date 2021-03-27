@@ -20,7 +20,7 @@ def requirements():
 
 setup(
     name="dothttp_req",
-    version="0.0.9",
+    version="0.0.10",
     author="prasanth",
     author_email="kesavarapu.siva@gmail.com",
     description=("DotHttp recommended tool for making http requests."),
@@ -34,6 +34,7 @@ setup(
     options={"bdist_wheel": {"universal": False}},
     packages=find_packages(),
     install_requires=requirements(),
+    extras_require= {},
     long_description=read('README.md'),
     long_description_content_type=('text/markdown'),
     classifiers=[

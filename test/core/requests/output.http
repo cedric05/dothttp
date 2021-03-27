@@ -1,2 +1,2 @@
-"https://dothttp.azurewebsites.net"
+"https://req.dothttp.dev"
 output("{{file}}")

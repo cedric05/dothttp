@@ -13,5 +13,16 @@
     "host1": "httpbing.org",
     "queryname2": "qu2",
     "valuename2": "va2"
+  },
+  "env3": {
+    "object": {
+      "key": "value"
+    },
+    "int": 3,
+    "str": "str",
+    "null": null,
+    "true": true,
+    "false": false,
+    "float": 1.23
   }
 }

@@ -4,17 +4,19 @@ import os
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import List, Iterator, Union
+from typing import List, Iterator, Union, Dict
 from urllib.parse import unquote
 
 import requests
-from requests import PreparedRequest
 
-from dothttp import RequestCompiler, Config, DotHttpException, dothttp_model, CurlCompiler, HttpFileFormatter, HttpDef
+from dothttp import DotHttpException, HttpDef
+from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
+    HttpFileFormatter
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
     NameWrap, Line
 from . import Command, Result, BaseHandler
 from .postman import postman_collection_from_dict, Items, URLClass
+from .utils import clean_filename
 
 DEFAULT_URL = "https://req.dothttp.dev/"
 
@@ -26,18 +28,10 @@ class RunHttpFileHandler(BaseHandler):
         return RunHttpFileHandler.name
 
     def run(self, command: Command) -> Result:
-        filename = command.params.get("file")
-        envs = command.params.get("env", [])
-        target = command.params.get("target", '1')
-        nocookie = command.params.get("nocookie", False)
-        curl = command.params.get("curl", False)
-        props = command.params.get('properties', {})
-        properties = [f"{i}={j}" for i, j in props.items()]
+        config = self.get_config(command)
         try:
-            config = Config(file=filename, env=envs, properties=properties, curl=curl, property_file=None, debug=True,
-                            no_cookie=nocookie, format=False, info=False, target=target)
             if config.curl:
-                req = CurlCompiler(config)
+                req = self.get_curl_comp(config)
                 result = req.get_curl_output()
                 result = Result(id=command.id, result={
                     "body": result,
@@ -46,27 +40,49 @@ class RunHttpFileHandler(BaseHandler):
                     }
                 })
             else:
-                comp = RequestCompiler(config)
-                resp = comp.get_response()
-                response_data = {
-                    "response": {
-                        "headers":
-                            {key: value for key, value in resp.headers.items()},
-                        "body": resp.text,  # for binary out, it will fail, check for alternatives
-                        "status": resp.status_code, }
-                }
-                # will be used for response
-                data = {}
-                data.update(response_data['response'])  # deprecated
-                data.update(response_data)
-                data.update({"http": self.get_http_from_req(comp.httpdef)})
-                result = Result(id=command.id,
-                                result=data)
+                comp = self.get_request_comp(config)
+                result = self.get_request_result(command, comp)
         except DotHttpException as ex:
             result = Result(id=command.id,
                             result={
                                 "error_message": ex.message, "error": True})
         return result
+
+    def get_curl_comp(self, config):
+        return CurlCompiler(config)
+
+    def get_config(self, command):
+        filename = command.params.get("file")
+        envs = command.params.get("env", [])
+        target = command.params.get("target", '1')
+        nocookie = command.params.get("nocookie", False)
+        curl = command.params.get("curl", False)
+        props = command.params.get('properties', {})
+        properties = [f"{i}={j}" for i, j in props.items()]
+        config = Config(file=filename, env=envs, properties=properties, curl=curl, property_file=None, debug=True,
+                        no_cookie=nocookie, format=False, info=False, target=target)
+        return config
+
+    def get_request_result(self, command, comp):
+        resp = comp.get_response()
+        response_data = {
+            "response": {
+                "headers":
+                    {key: value for key, value in resp.headers.items()},
+                "body": resp.text,  # for binary out, it will fail, check for alternatives
+                "status": resp.status_code, }
+        }
+        # will be used for response
+        data = {}
+        data.update(response_data['response'])  # deprecated
+        data.update(response_data)
+        data.update({"http": self.get_http_from_req(comp.httpdef)})
+        result = Result(id=command.id,
+                        result=data)
+        return result
+
+    def get_request_comp(self, config):
+        return RequestCompiler(config)
 
     @staticmethod
     def get_http_from_req(request: HttpDef):
@@ -94,16 +110,56 @@ class RunHttpFileHandler(BaseHandler):
                 )
 
         payload = Payload(data=data, datajson=datajson, file=file, json=json_payload, fileswrap=fileswrap, type=type)
+
+        query_lines = []
+        for key, values in request.query.items():
+            for value in values:
+                query_lines.append(Line(header=None, query=Query(key=key, value=value)))
         return HttpFileFormatter.format(Allhttp(allhttps=[Http(
             namewrap=NameWrap(request.name),
             urlwrap=UrlWrap(url=request.url, method=request.method),
             lines=[
-                Line(header=Header(key=key, value=value), query=None)
-                for key, value in
-                request.headers.items()],
+                      Line(header=Header(key=key, value=value), query=None)
+                      for key, value in
+                      request.headers.items()] + query_lines
+            ,
             payload=payload,
             output=None, basic_auth_wrap=None
         )]))
+
+
+class ContentBase:
+    def __init__(self, config: Config):
+        super().__init__(config)
+
+    def load_content(self):
+        self.original_content = self.content = self.args.file
+
+
+class ContentRequestCompiler(ContentBase, RequestCompiler):
+    pass
+
+
+class ContentCurlCompiler(ContentBase, CurlCompiler):
+    pass
+
+
+class ContentExecuteHandler(RunHttpFileHandler):
+    name = "/content/execute"
+
+    def get_config(self, command):
+        config = super().get_config(command)
+        config.file = command.params.get('content')
+        return config
+
+    def get_method(self):
+        return ContentExecuteHandler.name
+
+    def get_request_comp(self, config):
+        return ContentRequestCompiler(config)
+
+    def get_curl_comp(self, config):
+        return ContentCurlCompiler(config)
 
 
 class FormatHttpFileHandler(BaseHandler):
@@ -130,22 +186,31 @@ class GetNameReferencesHandler(BaseHandler):
                 http_data = f.read()
                 model = dothttp_model.model_from_str(http_data)
                 all_names = []
+                all_urls = []
                 for index, http in enumerate(model.allhttps):
                     if http.namewrap:
                         name = http.namewrap.name if http.namewrap else str(index)
                         start = http.namewrap._tx_position
-                        end = http.namewrap._tx_position_end
+                        end = http._tx_position_end
                     else:
                         start = http.urlwrap._tx_position
-                        end = http.urlwrap._tx_position_end
+                        end = http._tx_position_end
                         name = str(index + 1)
                     name = {
                         'name': name,
+                        'method': http.urlwrap.method,
                         'start': start,
                         'end': end
                     }
+                    url = {
+                        'url': http.urlwrap.url,
+                        'method': http.urlwrap.method or 'GET',
+                        'start': http.urlwrap._tx_position,
+                        'end': http.urlwrap._tx_position_end,
+                    }
                     all_names.append(name)
-                result = Result(id=command.id, result={"names": all_names})
+                    all_urls.append(url)
+                result = Result(id=command.id, result={"names": all_names, "urls": all_urls})
         except DotHttpException as ex:
             result = Result(id=command.id,
                             result={
@@ -177,7 +242,6 @@ class ImportPostmanCollection(BaseHandler):
         d = {}
         if len(collection.allhttps) != 0:
             data = HttpFileFormatter.format(collection)
-            directory.mkdir(parents=True, exist_ok=True)
             name = str(directory.joinpath("imported_from_collection.http"))
             newline = "\n"
             d[name] = f"#!/usr/bin/env dothttp{newline}{newline}" \
@@ -245,11 +309,14 @@ class ImportPostmanCollection(BaseHandler):
             elif rawbody := req.body.raw:
                 payload_data = rawbody
                 if optins and 'raw' in optins and 'language' in optins.get('raw'):
-                    if optins['raw']['language']:
-                        payload_json = json.loads(rawbody)
-                        payload_data = None
+                    if optins['raw']['language'] == 'json':
+                        try:
+                            payload_json = json.loads(rawbody)
+                            payload_data = None
+                        except:
+                            pass
             elif urlencoded_body := req.body.urlencoded:
-                encodedbody = defaultdict(default_factory=lambda: [])
+                encodedbody: Dict[str, list] = defaultdict(lambda: [])
                 for one_form_field in urlencoded_body:
                     encodedbody[one_form_field.key].append(one_form_field.value)
                 payload_datajson = encodedbody
@@ -291,12 +358,13 @@ class ImportPostmanCollection(BaseHandler):
             return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
 
         collection = postman_collection_from_dict(postman_data)
-        d = self.import_items(collection.item, Path(directory).joinpath(collection.info.name), link)
+        d = self.import_items(collection.item, Path(directory).joinpath(clean_filename(collection.info.name)), link)
         if save:
             for path, fileout in d.items():
                 if os.path.exists(path) and not overwrite:
                     p = Path(path)
-                    path = p.with_stem(p.stem + '-' + datetime.now().ctime())
+                    path = p.with_stem(clean_filename(p.stem + '-' + datetime.now().ctime()))
+                Path(path).parent.mkdir(parents=True, exist_ok=True)
                 with open(path, 'w') as f:
                     f.write(fileout)
         return Result(id=command.id, result={"files": d})
@@ -308,5 +376,6 @@ class ImportPostmanCollection(BaseHandler):
         d.update(ImportPostmanCollection.import_requests_into_dire(leaf_folder, directory, link))
         folder = map(lambda item: (item.name, item.item), filter(lambda item: item.item, items))
         for sub_folder, subitem in folder:
-            d.update(ImportPostmanCollection.import_items(subitem, directory.joinpath(sub_folder), link))
+            d.update(
+                ImportPostmanCollection.import_items(subitem, directory.joinpath(clean_filename(sub_folder)), link))
         return d

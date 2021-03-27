@@ -37,7 +37,7 @@ class SubstitutionTest(TestBase):
         int_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='int')
         int_payload = json.loads(int_request.body)
         intValue = int(int_payload['test'])
-        self.assertTrue(100 <= intValue < 1000)
+        self.assertTrue(100 <= intValue < 1000, f'value is {intValue}')
         self.assertTrue(int(int_payload['test2']))
 
         bool_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target=2)
@@ -46,12 +46,18 @@ class SubstitutionTest(TestBase):
 
         str_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='str')
         data = json.loads(str_request.body)
-        self.assertTrue(10 == len(data['test']))
+        self.assertTrue(10 == len(data['test']), f'this is skeptical {str_request.body}')
         self.assertTrue(1 < len(data['test2']) <= 10, data['test2'])
 
         float_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='float')
         request_data = json.loads(float_request.body)
         self.assertTrue(float(request_data['test']))
+
+        float_request2: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='random+string')
+        request_data = json.loads(float_request2.body)
+        self.assertTrue(request_data['test2'].endswith('@gmail.com'))
+        self.assertTrue(request_data['test2'], request_data['test4'])
+        self.assertTrue(request_data['test2'], request_data['test4'])
 
     def test_complex(self):
         should_load_basic: PreparedRequest = self.get_request(file=f'{base_dir}/complexrandom.http', target=1)

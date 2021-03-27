@@ -3,7 +3,8 @@ import sys
 import tempfile
 import unittest
 
-from dothttp import HttpFileException, CurlCompiler
+from dothttp.exceptions import *
+from dothttp.request_base import CurlCompiler
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -81,8 +82,8 @@ http://endeavour.today/""", output)
         req.load()
         output = req.format(req.model)
         self.assertEqual("""POST "https://{{host1}}/ram"
-? ("{{queryname1}}", "value1")
-? ("key2", "{{valuename1}}")
+? "{{queryname1}}"= "value1"
+? "key2"= "{{valuename1}}"
 json({
     "{{queryname2}}": "{{valuename2}}"
 })
