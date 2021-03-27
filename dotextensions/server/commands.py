@@ -186,6 +186,7 @@ class GetNameReferencesHandler(BaseHandler):
                 http_data = f.read()
                 model = dothttp_model.model_from_str(http_data)
                 all_names = []
+                all_urls = []
                 for index, http in enumerate(model.allhttps):
                     if http.namewrap:
                         name = http.namewrap.name if http.namewrap else str(index)
@@ -193,15 +194,23 @@ class GetNameReferencesHandler(BaseHandler):
                         end = http._tx_position_end
                     else:
                         start = http.urlwrap._tx_position
-                        end = http.urlwrap._tx_position_end
+                        end = http._tx_position_end
                         name = str(index + 1)
                     name = {
                         'name': name,
+                        'method': http.urlwrap.method,
                         'start': start,
                         'end': end
                     }
+                    url = {
+                        'url': http.urlwrap.url,
+                        'method': http.urlwrap.method or 'GET',
+                        'start': http.urlwrap._tx_position,
+                        'end': http.urlwrap._tx_position_end,
+                    }
                     all_names.append(name)
-                result = Result(id=command.id, result={"names": all_names})
+                    all_urls.append(url)
+                result = Result(id=command.id, result={"names": all_names, "urls": all_urls})
         except DotHttpException as ex:
             result = Result(id=command.id,
                             result={
