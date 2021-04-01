@@ -1,0 +1,1 @@
+{"files": {"SugarJS_and_native_prototypes_work\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/prototype-check.postman_collection.json\n\n@name(\"objectPrototype\")\nGET \"postman-echo.com/get\"\n\n\n\n\n"}}

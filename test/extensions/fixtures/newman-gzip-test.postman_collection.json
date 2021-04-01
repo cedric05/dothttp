@@ -1,0 +1,1 @@
+{"files": {"gzip-encoded_responses\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/newman-gzip-test.postman_collection.json\n\n@name(\"https://postman-echo.com/gzip\")\nGET \"https://postman-echo.com/gzip\"\n\n\n\n\n"}}
