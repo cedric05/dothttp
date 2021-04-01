@@ -1,0 +1,1 @@
+{"files": {"Crypto-MD5_should_work_in_the_sandbox\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/crypto-md5.postman_collection.json\n\n@name(\"r1\")\nGET \"https://postman-echo.com/get?a={{a}}\"\n\n\n\n\n"}}

@@ -1,0 +1,1 @@
+{"files": {"Request_Name_In_Script\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/request-name-in-script.postman_collection.json\n\n@name(\"r1\")\nGET \"postman-echo.com/get\"\n\n\n\n\n"}}
