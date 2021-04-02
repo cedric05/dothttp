@@ -8,6 +8,12 @@ def read(fname):
         return f.read()
 
 
+here = os.path.abspath(os.path.dirname(__file__))
+about = {}
+with open(os.path.join(here, 'dothttp', '__version__.py'), 'r') as f:
+    exec(f.read(), about)
+
+
 # windows_req = "python-magic-bin==0.4.14"
 
 
@@ -41,5 +47,5 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.8',
-    version="0.0.10",
+    version=about['__version__'],
 )
