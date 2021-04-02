@@ -2,6 +2,7 @@ import logging
 import sys
 
 from dothttp.log_utils import setup_logging as root_logging_setup
+from dothttp.__version__ import __version__
 from .server import CmdServer, HttpServer
 
 
@@ -28,7 +29,11 @@ def main():
             except ValueError:
                 pass
         HttpServer(port).run_forever()
-    sys.exit(1)
+    elif type_of_server == "version":
+        print(__version__)
+    else:
+        sys.exit(1)
+    sys.exit(0)
 
 
 if __name__ == "__main__":
