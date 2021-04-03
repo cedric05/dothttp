@@ -1,7 +1,6 @@
 import json
 import os
 import sys
-import unittest
 
 from dotextensions.server import Command
 from dotextensions.server.commands import ImportPostmanCollection
@@ -11,14 +10,14 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 fixtures_dir = f"{dir_path}/fixtures"
 
 
-@unittest.skipUnless(sys.platform.startswith("windows"), "tests are written using windows")
 class FileExecute(TestBase):
     def setUp(self) -> None:
         self.execute_handler = ImportPostmanCollection()
 
-    def compoare(self,
-                 link,
-                 fileToCompare):
+    def compare(self,
+                link,
+                file_to_compare):
+        print(f"running for ${link} comparing with file ${file_to_compare}")
         response = self.execute_handler.run(Command(
             method=ImportPostmanCollection.name,
             params={
@@ -26,13 +25,21 @@ class FileExecute(TestBase):
             },
             id=1)
         )
-        with open(os.path.join(fixtures_dir, fileToCompare), 'r') as f:
-            self.assertEqual(json.load(f), response.result)
+        with open(os.path.join(fixtures_dir, file_to_compare), 'r') as f:
+            if sys.platform.startswith("windows"):
+                self.assertEqual(json.load(f), response.result)
+            else:
+                if ('error' in response.result):
+                    return self.assertEqual(json.load(f), response.result)
+                result_normalize = {}
+                for file in response.result["files"]:
+                    result_normalize[file.replace('/', "\\")] = response.result["files"][file]
+                self.assertEqual(json.load(f), {"files": result_normalize})
 
     def test_base(self):
-        self.compoare(
+        self.compare(
             link="https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/dynamic-var-replacement.postman_collection.json",
-            fileToCompare="fixtures.json")
+            file_to_compare="fixtures.json")
 
     def test_more(self):
         links = [
@@ -64,4 +71,4 @@ class FileExecute(TestBase):
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/var-replacement.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/whatwg-url.postman_collection.json"]
         for link in links:
-            self.compoare(link, os.path.join(fixtures_dir, os.path.basename(link)))
+            self.compare(link, os.path.join(fixtures_dir, os.path.basename(link)))
