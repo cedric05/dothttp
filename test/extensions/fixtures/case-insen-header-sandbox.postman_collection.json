@@ -1,0 +1,1 @@
+{"files": {"Sandbox_getResponseHeader_method_should_be_case_insensitive\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/case-insen-header-sandbox.postman_collection.json\n\n@name(\"Get json response\")\nGET \"https://postman-echo.com/get\"\n\n\n\n\n"}}

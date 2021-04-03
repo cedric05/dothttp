@@ -10,7 +10,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 command_dir = f"{dir_path}/commands"
 
 
-class CommandTest(TestBase):
+class TargetTest(TestBase):
 
     def setUp(self) -> None:
         self.name_handler = GetNameReferencesHandler()
@@ -21,9 +21,26 @@ class CommandTest(TestBase):
             params={"file": f"{command_dir}/names.http"},
             id=1
         ))
-        self.assertEqual({'names': [{'name': 'test', 'start': 0, 'end': 13}, {'name': 'test2', 'start': 79, 'end': 91},
-                                    {'name': 'test3', 'start': 209, 'end': 221},
-                                    {'name': 'test4.test', 'start': 339, 'end': 358}]},
+        self.assertEqual({'names': [{'end': 77, 'method': 'GET', 'name': 'test', 'start': 0},
+                                    {'end': 207, 'method': 'POST', 'name': 'test2', 'start': 79},
+                                    {'end': 337, 'method': 'POST', 'name': 'test3', 'start': 209},
+                                    {'end': 398, 'method': 'POST', 'name': 'test4.test', 'start': 339}],
+                          'urls': [{'end': 41,
+                                    'method': 'GET',
+                                    'start': 14,
+                                    'url': 'https://req.dothttp.dev'},
+                                   {'end': 120,
+                                    'method': 'POST',
+                                    'start': 92,
+                                    'url': 'https://req.dothttp.dev'},
+                                   {'end': 250,
+                                    'method': 'POST',
+                                    'start': 222,
+                                    'url': 'https://req.dothttp.dev'},
+                                   {'end': 387,
+                                    'method': 'POST',
+                                    'start': 359,
+                                    'url': 'https://req.dothttp.dev'}]},
                          result.result)
 
     def test_notexistant_file(self):
@@ -43,7 +60,7 @@ class CommandTest(TestBase):
         self.assertTrue(result.result['error'])
 
 
-class RunHandler(TestBase):
+class FileExecute(TestBase):
     def setUp(self) -> None:
         self.execute_handler = RunHttpFileHandler()
 
@@ -98,7 +115,7 @@ class RunHandler(TestBase):
                 "file": f"{command_dir}/complexrun.http",
                 "target": "3",
                 "properties": {
-                    "host": "req.dothttp.dev"
+                    "host": "httpbin.org"
                 }
             },
             id=1)
