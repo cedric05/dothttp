@@ -4,8 +4,9 @@
 name: Upload Python Package
 
 on:
-  release:
-    types: [created]
+    push:
+       tags:
+           - 'v*'
 
 jobs:
   deploy:
@@ -20,7 +21,7 @@ jobs:
         python-version: '3.9'
     - name: Install dependencies
       run: |
-        python -m pip -r requirements.txt
+        python -m pip install -r requirements.txt
         python -m unittest 
     - name: Install dependencies
       run: |

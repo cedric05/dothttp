@@ -1,5 +1,7 @@
 import json
 import os
+import sys
+import unittest
 
 from dotextensions.server import Command
 from dotextensions.server.commands import ImportPostmanCollection
@@ -9,6 +11,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 fixtures_dir = f"{dir_path}/fixtures"
 
 
+@unittest.skipUnless(sys.platform.startswith("windows"), "tests are written using windows")
 class FileExecute(TestBase):
     def setUp(self) -> None:
         self.execute_handler = ImportPostmanCollection()
