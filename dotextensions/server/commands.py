@@ -1,4 +1,5 @@
 import json
+import logging
 import mimetypes
 import os
 from collections import defaultdict
@@ -19,6 +20,7 @@ from .postman import postman_collection_from_dict, Items, URLClass
 from .utils import clean_filename
 
 DEFAULT_URL = "https://req.dothttp.dev/"
+logger = logging.getLogger('handler')
 
 
 class RunHttpFileHandler(BaseHandler):
@@ -70,7 +72,7 @@ class RunHttpFileHandler(BaseHandler):
                 "headers":
                     {key: value for key, value in resp.headers.items()},
                 "body": resp.text,  # for binary out, it will fail, check for alternatives
-                "status": resp.status_code, }
+                "status": resp.status_code, "url": resp.url}
         }
         # will be used for response
         data = {}
@@ -224,6 +226,37 @@ class GetNameReferencesHandler(BaseHandler):
 
 def slashed_path_to_normal_path(path):
     return path
+
+
+class ParseHttpData():
+    name = "/file/parse"
+
+    def get_method(self):
+        return ParseHttpData.name
+
+    def run(self, command: Command) -> Result:
+        params = command.params
+        filename = params.get("file")
+        content = params.get('content')
+        result = Result(id=command.id)
+        if not (filename and os.path.exists(filename) and os.path.isfile(filename)) and not content:
+            result.result = {"error_message": "filename or content is mandatory", "error": True}
+            return result
+        try:
+            if filename:
+                executor = RunHttpFileHandler()
+            else:
+                executor = ContentExecuteHandler()
+            config = executor.get_config(command)
+            request_compiler_obj = executor.get_request_comp(config)
+            request_compiler_obj.load()
+            request_compiler_obj.load_def()
+            result.result = {"target": {config.target: request_compiler_obj.httpdef.get_har()}}
+            return result
+        except Exception as e:
+            logger.error("unknown error happened", exc_info=True)
+            result.result = {"error_message": str(e), "error": True}
+            return result
 
 
 class ImportPostmanCollection(BaseHandler):
