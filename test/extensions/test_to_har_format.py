@@ -1,4 +1,5 @@
 import os
+import sys
 
 from dotextensions.server import Command
 from dotextensions.server.commands import ParseHttpData
@@ -105,13 +106,6 @@ class ToHar(TestBase):
                                               'query': [],
                                               'url': 'https://req.dothttp.dev'}}},
                          self.execute_payload(target='json', **kwargs).result)
-        self.assertEqual({'target': {'text': {'headers': [],
-                                              'method': 'POST',
-                                              'payload': {'mimeType': 'application/octet-stream',
-                                                          'text': 'raw data'},
-                                              'query': [],
-                                              'url': 'https://req.dothttp.dev'}}},
-                         self.execute_payload(target='text', **kwargs).result)
         self.assertEqual({'target': {'urlencode': {'headers': [],
                                                    'method': 'POST',
                                                    'payload': {'mimeType': 'application/x-www-form-urlencoded',
@@ -140,6 +134,15 @@ class ToHar(TestBase):
                                                'query': [],
                                                'url': 'https://req.dothttp.dev'}}},
                          self.execute_payload(target='files', **kwargs).result)
+        linux = {'target': {'text': {'headers': [],
+                                     'method': 'POST',
+                                     'payload': {'mimeType': 'application/octet-stream' if sys.platform.startswith(
+                                         "win32") else 'text/plain',
+                                                 'text': 'raw data'},
+                                     'query': [],
+                                     'url': 'https://req.dothttp.dev'}}}
+        self.assertEqual(linux,
+                         self.execute_payload(target='text', **kwargs).result)
 
     def test_headers_file(self):
         filename = f"{command_dir}/payload.http"

@@ -72,7 +72,7 @@ class Payload:
     #  ["key",  ["filename2", "content", "datatype"]],
     #  ["key2",  [None, "content", "datatype"]],]
     files: Optional[
-        list[Union[tuple[str, tuple[str, BinaryIO, Optional[str]]], tuple[str, tuple[None, str, None]]]]] = None
+        List[Union[Tuple[str, Tuple[str, BinaryIO, Optional[str]]], Tuple[str, Tuple[None, str, None]]]]] = None
 
 
 @dataclass
