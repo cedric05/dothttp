@@ -4,6 +4,7 @@ import re
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
+from io import IOBase
 from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO
 from urllib.parse import urlencode
 
@@ -111,10 +112,14 @@ class HttpDef:
         elif payload.files:
             params = []
             for (name, (multipart_filename, multipart_content, mimetype)) in payload.files:
+                content = multipart_content
+                if isinstance(content, IOBase):
+                    multipart_filename = multipart_content.name
+                    content = None
                 params.append({
                     "name": name,
                     "fileName": multipart_filename,
-                    "value": multipart_content,
+                    "value": content,
                     "contentType": mimetype
                 })
             return_data["params"] = params

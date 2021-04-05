@@ -33,3 +33,10 @@ files(
 POST https://req.dothttp.dev
 key : value
 key2 : value
+
+
+@name('files2')
+POST https://req.dothttp.dev
+files(
+    ("file", "{{filename}}"),
+)

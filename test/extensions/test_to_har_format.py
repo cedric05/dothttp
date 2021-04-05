@@ -143,6 +143,17 @@ class ToHar(TestBase):
                                      'url': 'https://req.dothttp.dev'}}}
         self.assertEqual(linux,
                          self.execute_payload(target='text', **kwargs).result)
+        filename = f"{command_dir}/payload.http"
+        self.assertEqual({'target': {'files2': {'headers': [],
+                                                'method': 'POST',
+                                                'payload': {'mimeType': 'multipart/form-data',
+                                                            'params': [{'contentType': 'text/plain',
+                                                                        'fileName': filename,
+                                                                        'name': 'file',
+                                                                        'value': None}]},
+                                                'query': [],
+                                                'url': 'https://req.dothttp.dev'}}},
+                         self.execute_payload(target='files2', **kwargs).result)
 
     def test_headers_file(self):
         filename = f"{command_dir}/payload.http"
@@ -155,6 +166,7 @@ class ToHar(TestBase):
                          self.execute_payload(target='headers', file=filename).result)
 
     def execute_payload(self, **kwargs):
+        kwargs["properties"] = {"filename": os.path.join(dir_path, f"{command_dir}/payload.http")}
         command = Command(
             method=ParseHttpData.name,
             params=kwargs,
