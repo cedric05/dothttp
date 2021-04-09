@@ -1,0 +1,42 @@
+@name('json')
+POST https://req.dothttp.dev
+json({
+   "paylaod": "json"
+})
+
+@name('urlencode')
+POST https://req.dothttp.dev
+data({
+   "paylaod": "json"
+})
+
+
+@name('text')
+POST https://req.dothttp.dev
+data("raw data")
+
+
+@name('text-other-content')
+POST https://req.dothttp.dev
+data("raw data", "other-content-type")
+
+
+@name('files')
+POST https://req.dothttp.dev
+files(
+    ("raw data", "other-content-type"),
+    ("raw data", "other-content-type")
+)
+
+
+@name('headers')
+POST https://req.dothttp.dev
+key : value
+key2 : value
+
+
+@name('files2')
+POST https://req.dothttp.dev
+files(
+    ("file", "{{filename}}"),
+)

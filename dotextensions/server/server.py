@@ -7,7 +7,7 @@ from typing import Dict
 
 from . import Command, BaseHandler
 from .commands import RunHttpFileHandler, FormatHttpFileHandler, GetNameReferencesHandler, ImportPostmanCollection, \
-    ContentExecuteHandler
+    ContentExecuteHandler, ParseHttpData
 
 logger = logging.getLogger('handler')
 
@@ -15,6 +15,7 @@ handlers: Dict[str, BaseHandler] = {handler.get_method(): handler for handler in
                                     (FormatHttpFileHandler(), RunHttpFileHandler(), GetNameReferencesHandler(),
                                      ImportPostmanCollection(),
                                      ContentExecuteHandler(),
+                                     ParseHttpData()
                                      )}
 
 

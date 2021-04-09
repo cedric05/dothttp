@@ -4,7 +4,9 @@ import re
 import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
-from typing import Union, List, Optional, Dict, DefaultDict, Tuple
+from io import IOBase
+from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO
+from urllib.parse import urlencode
 
 try:
     import jstyleson as json
@@ -32,6 +34,7 @@ curl_logger = logging.getLogger("curl")
 
 MIME_TYPE_JSON = "application/json"
 FORM_URLENCODED = "application/x-www-form-urlencoded"
+MULTIPART_FORM_INPUT = "multipart/form-data"
 
 if os.path.exists(__file__):
     dir_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'http.tx')
@@ -69,7 +72,8 @@ class Payload:
     # [[ "key", ["filename", "content", "datatype"],
     #  ["key",  ["filename2", "content", "datatype"]],
     #  ["key2",  [None, "content", "datatype"]],]
-    files: Optional[List[List]] = None
+    files: Optional[
+        List[Union[Tuple[str, Tuple[str, BinaryIO, Optional[str]]], Tuple[str, Tuple[None, str, None]]]]] = None
 
 
 @dataclass
@@ -82,6 +86,51 @@ class HttpDef:
     auth: Tuple[str] = None
     payload: Optional[Payload] = None
     output: str = None
+
+    def get_har(self):
+        target = {
+            "url": self.url,
+            "method": self.method,
+            "query": self.get_query(),
+            "headers": self.get_headers(),
+            "payload": self.get_payload(),
+        }
+        return target
+
+    def get_payload(self):
+        if not self.payload:
+            return None
+        payload = self.payload
+        return_data = {"mimeType": self.payload.header}
+        if payload.data:
+            if isinstance(payload.data, dict):
+                return_data["text"] = urlencode(payload.data)
+            else:
+                return_data["text"] = payload.data
+        elif payload.json:
+            return_data["text"] = json.dumps(payload.json)
+        elif payload.files:
+            params = []
+            for (name, (multipart_filename, multipart_content, mimetype)) in payload.files:
+                content = multipart_content
+                if isinstance(content, IOBase):
+                    multipart_filename = multipart_content.name
+                    content = None
+                params.append({
+                    "name": name,
+                    "fileName": multipart_filename,
+                    "value": content,
+                    "contentType": mimetype
+                })
+            return_data["params"] = params
+        return return_data
+
+    def get_query(self):
+        return [{"name": key, "value": value} for key, values in self.query.items() for value in
+                values] if self.query else []
+
+    def get_headers(self):
+        return [{"name": key, "value": value} for key, value in self.headers.items()] if self.headers else []
 
 
 @dataclass
@@ -364,7 +413,7 @@ class HttpDefBase(BaseModelProcessor):
                     # mimetype = self.get_mimetype_from_buffer(multipart_content, mimetype)
                     mimetype = None
                     files.append((multipart_key, (None, multipart_content, mimetype)))
-            return Payload(files=files)
+            return Payload(files=files, header=MULTIPART_FORM_INPUT)
         return Payload()
 
     @staticmethod
