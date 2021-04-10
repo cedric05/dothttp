@@ -410,8 +410,7 @@ class HttpDefBase(BaseModelProcessor):
                     multipart_content = open(multipart_content, 'rb')
                     files.append((multipart_key, (multipart_filename, multipart_content, mimetype)))
                 else:
-                    # mimetype = self.get_mimetype_from_buffer(multipart_content, mimetype)
-                    mimetype = None
+                    mimetype = self.get_mimetype_from_buffer(multipart_content, mimetype)
                     files.append((multipart_key, (None, multipart_content, mimetype)))
             return Payload(files=files, header=MULTIPART_FORM_INPUT)
         return Payload()
