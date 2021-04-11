@@ -12,6 +12,7 @@ fixtures_dir = f"{dir_path}/fixtures"
 
 class ToHar(TestBase):
     def setUp(self) -> None:
+        self.maxDiff = None
         self.execute_handler = ParseHttpData()
 
     def test_error(self):
@@ -120,14 +121,15 @@ class ToHar(TestBase):
                                                             'query': [],
                                                             'url': 'https://req.dothttp.dev'}}},
                          self.execute_payload(target='text-other-content', **kwargs).result)
+        mimetype = 'application/octet-stream' if sys.platform.startswith("win32") else 'text/plain'
         self.assertEqual({'target': {'files': {'headers': [],
                                                'method': 'POST',
                                                'payload': {'mimeType': 'multipart/form-data',
-                                                           'params': [{'contentType': None,
+                                                           'params': [{'contentType': mimetype,
                                                                        'fileName': None,
                                                                        'name': 'raw data',
                                                                        'value': 'other-content-type'},
-                                                                      {'contentType': None,
+                                                                      {'contentType': mimetype,
                                                                        'fileName': None,
                                                                        'name': 'raw data',
                                                                        'value': 'other-content-type'}]},
@@ -136,8 +138,7 @@ class ToHar(TestBase):
                          self.execute_payload(target='files', **kwargs).result)
         linux = {'target': {'text': {'headers': [],
                                      'method': 'POST',
-                                     'payload': {'mimeType': 'application/octet-stream' if sys.platform.startswith(
-                                         "win32") else 'text/plain',
+                                     'payload': {'mimeType': mimetype,
                                                  'text': 'raw data'},
                                      'query': [],
                                      'url': 'https://req.dothttp.dev'}}}
