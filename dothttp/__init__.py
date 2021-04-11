@@ -371,6 +371,10 @@ class HttpDefBase(BaseModelProcessor):
         if not self.http.payload:
             return Payload()
         elif data := self.http.payload.data:
+            if getattr(data, "act"):
+                # quoted string allow
+                # check MULTILINE_STRING in http.tx
+                data = data.act
             content = self.get_updated_content(data)
             mimetype = self.get_mimetype_from_buffer(content,
                                                      self.get_updated_content(self.http.payload.type))

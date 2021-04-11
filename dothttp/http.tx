@@ -47,7 +47,7 @@ QUERY:
 ;
 
 PAYLOAD: 
-    (   'data' '(' data=STRING (',' type=STRING)? ','?  ')'
+    (   'data' '(' data=MULTILINE_STRING (',' type=STRING)? ','?  ')'
         | 'data' '(' datajson=JSON (',' type=STRING)? ','? ')'
         | 'urlencoded' '(' datajson=JSON (',' type=STRING)? ','? ')'
         | 'fileinput' '(' file=STRING   (',' type=STRING)? ','?  ')'
@@ -122,6 +122,10 @@ DotString:
     STRING | /\w+/
 ;
 // allow only alphanumeric or string in double/single quotes
+
+MULTILINE_STRING:
+    "'''"  act=/.*/ "'''"  | '"""'  act=/.*/ '"""'
+;
 
 URLString:
     STRING | /https\:\/\/(\S)+/
