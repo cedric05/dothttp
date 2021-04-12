@@ -47,7 +47,8 @@ QUERY:
 ;
 
 PAYLOAD: 
-    (   'data' '(' data=MULTILINE_STRING (',' type=STRING)? ','?  ')'
+    (   'data' '(' data=STRING (',' type=STRING)? ','?  ')'
+        | 'data' '(' multi=MULTILINE_STRING (',' type=STRING)? ','?  ')'
         | 'data' '(' datajson=JSON (',' type=STRING)? ','? ')'
         | 'urlencoded' '(' datajson=JSON (',' type=STRING)? ','? ')'
         | 'fileinput' '(' file=STRING   (',' type=STRING)? ','?  ')'
@@ -62,7 +63,7 @@ FILES:
 ;
 
 FILETYPE:
-    ( '(' name=STRING ',' path=STRING (',' type=STRING)? ')')
+    ( '(' name=STRING ',' path=STRING  (',' (type=STRING)?)? ')')
 ;
 
 TOFILE: 'output' '('output=STRING ')';
@@ -124,7 +125,8 @@ DotString:
 // allow only alphanumeric or string in double/single quotes
 
 MULTILINE_STRING:
-    "'''"  act=/.*/ "'''"  | '"""'  act=/.*/ '"""'
+        /"""[\S\s]*"""/ | /'''[\S\s]*'''/
+
 ;
 
 URLString:
