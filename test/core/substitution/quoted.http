@@ -1,0 +1,8 @@
+POST "https://{{host1}}/ram"
+? '{{queryname1}}' , 'value1'
+? 'key2' , '{{valuename1}}'
+data("""
+"hi this is good"
+'this barbarian'
+""")
+output('test')

@@ -1,0 +1,7 @@
+POST https://httpbin.org/post
+data(
+"""
+"'this can have quotes with escape sequence'"
+
+"""
+)
