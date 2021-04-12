@@ -63,7 +63,7 @@ FILES:
 ;
 
 FILETYPE:
-    ( '(' name=STRING ',' path=STRING (',' type=STRING)? ')')
+    ( '(' name=STRING ',' path=STRING  (',' (type=STRING)?)? ')')
 ;
 
 TOFILE: 'output' '('output=STRING ')';
