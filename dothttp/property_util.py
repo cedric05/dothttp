@@ -69,7 +69,7 @@ class PropertyProvider:
     :return:
     """
     random = Random()
-    var_regex = re.compile(r'{{(?P<var>.*?)}}')
+    var_regex = re.compile(r'{{(?P<var>.*?)}}', re.DOTALL)
     random_string_regex = re.compile(
         r'(?P<category>\$randomStr|\$randomInt|\$randomBool|\$randomFloat)(?P<length>:\d*)?')
 

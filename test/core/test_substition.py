@@ -46,6 +46,12 @@ class SubstitutionTest(TestBase):
         self.assertEqual("POST", req.method)
         self.assertEqual(b'{"key": " space in between quotes"}', req.body)
 
+    def test_json_substition(self):
+        req: PreparedRequest = self.get_request(f"{base_dir}/jsonsub.http")
+        self.assertEqual("https://httpbin.org/post", req.url)
+        self.assertEqual("POST", req.method)
+        self.assertEqual(b'{"test": {"data": {"candidateID": "1117026", "isAnonymous": true}}}', req.body)
+
     def test_substitution_infile_with_multiple_suages(self):
         req: PreparedRequest = self.get_request(f"{base_dir}/infilesinglewithmultipleusages.http")
         self.assertEqual("https://google.com/", req.url)

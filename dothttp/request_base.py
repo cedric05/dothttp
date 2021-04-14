@@ -48,6 +48,7 @@ dothttp_model = metamodel_from_file(dir_path)
 
 
 class RequestBase(HttpDefBase):
+    global_session = Session()
     def __init__(self, args: Config):
         super().__init__(args)
         self._cookie: Union[LWPCookieJar, None] = None
@@ -82,7 +83,7 @@ class RequestBase(HttpDefBase):
         return self._cookie
 
     def get_session(self):
-        session = Session()
+        session = self.global_session
         if not self.args.no_cookie:
             if cookie := self.get_cookie():
                 session.cookies = cookie
