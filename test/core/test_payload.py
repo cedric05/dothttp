@@ -154,3 +154,17 @@ class PayLoadTest(TestBase):
 
         loadfile.close()
         os.unlink(loadfile.name)
+
+    def test_data_json_payload(self):
+        req = self.get_request(f"{base_dir}/quoted.http")
+        self.assertEqual("""
+"'this can have quotes with escape sequence'"
+
+""", req.body)
+
+    def test_data_json_payload(self):
+        req = self.get_request(f"{base_dir}/quoted2.http")
+        self.assertEqual("""
+"'this can have quotes with escape sequence'"
+
+""", req.body)

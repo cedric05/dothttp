@@ -1,0 +1,13 @@
+POST https://httpbin.org/post
+/*
+{{ram="{ "data":
+{"candidateID": "1117026","isAnonymous": true } }"
+
+}}
+
+*/
+json(
+  {
+    "test": {{ram}},
+	}
+)

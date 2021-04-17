@@ -370,7 +370,8 @@ class HttpDefBase(BaseModelProcessor):
         # can be short circuted
         if not self.http.payload:
             return Payload()
-        elif data := self.http.payload.data:
+        elif self.http.payload.data or self.http.payload.multi:
+            data = self.http.payload.data or self.http.payload.multi[3:-3]
             content = self.get_updated_content(data)
             mimetype = self.get_mimetype_from_buffer(content,
                                                      self.get_updated_content(self.http.payload.type))

@@ -92,6 +92,22 @@ output(test)
 
 """, output)
 
+    def test_quoted3_format_print(self):
+        req = self.get_req_comp(f"{sub_dir}/quoted.http", format=True, stdout=True, target=2)
+        req.load()
+        output = req.format(req.model)
+        self.assertEqual("""POST "https://{{host1}}/ram"
+? "{{queryname1}}"= "value1"
+? "key2"= "{{valuename1}}"
+data('
+"hi this is good"
+\\'this barbarian\\'
+')
+output(test)
+
+
+""", output)
+
     @unittest.skipUnless(sys.platform.startswith("win"), "requires Windows")
     def test_multiline_curl(self):
         with tempfile.NamedTemporaryFile(delete=False) as f:

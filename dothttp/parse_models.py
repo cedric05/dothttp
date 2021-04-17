@@ -62,6 +62,7 @@ class Payload:
     json: Optional
     fileswrap: Optional[FilesWrap]
     type: Optional[str]
+    multi: Optional[str] = None
 
 
 @dataclass
