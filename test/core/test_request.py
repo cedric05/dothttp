@@ -145,9 +145,11 @@ https://httpbin.org/post''', self.get_curl_out(f, 2))
 
             # with json out
             self.assertEqual('''curl -X POST \\
--H 'Content-Length: 13' \\
--H 'Content-Type: application/json' \\
--d '{"hi": "hi2"}' \\
+-H 'Content-Length: 19' \\
+-H 'content-type: application/json' \\
+-d '{
+    "hi": "hi2"
+}' \\
 https://httpbin.org/post''', self.get_curl_out(f, 3))
 
     def get_curl_out(self, f, target=1):
