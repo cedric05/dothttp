@@ -207,10 +207,10 @@
         },
         "pyinstaller": {
             "hashes": [
-                "sha256:f5c0eeb2aa663cce9a5404292c0195011fa500a6501c873a466b2e8cad3c950c"
+                "sha256:5ecf8bbc230d7298a796e52bb745b95eee12878d141f1645612c99246ecd23f2"
             ],
             "index": "pypi",
-            "version": "==4.2"
+            "version": "==4.3"
         },
         "pyinstaller-hooks-contrib": {
             "hashes": [
