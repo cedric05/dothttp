@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from io import IOBase
 from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO
 from urllib.parse import urlencode
+import mimetypes
 
 try:
     import jstyleson as json
@@ -421,9 +422,10 @@ class HttpDefBase(BaseModelProcessor):
         if mimetype:
             return mimetype
         if magic:
-            return magic.from_file(filename, mime=True)
-        else:
-            return None
+            mimetype = magic.from_file(filename, mime=True)
+        elif mimetypes:
+            mimetype = mimetypes.guess_type(filename, strict=False)[0]
+        return mimetype
 
     @staticmethod
     def get_mimetype_from_buffer(data, mimetype: Optional[str]) -> Optional[str]:
