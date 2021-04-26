@@ -49,6 +49,7 @@ dothttp_model = metamodel_from_file(dir_path)
 
 class RequestBase(HttpDefBase):
     global_session = Session()
+
     def __init__(self, args: Config):
         super().__init__(args)
         self._cookie: Union[LWPCookieJar, None] = None
@@ -143,6 +144,10 @@ class CurlCompiler(RequestBase):
                             parts.append(('--form', file[0] + "=" + file[1][1]))
                         else:
                             parts.append(('--form', file[0] + "=@" + file[1][1].name))
+            elif self.http.payload.json:
+                dumps = json.dumps(payload.json, indent=4)
+                prep.headers["content-type"] = "application/json"
+                prep.prepare_body(data=dumps, files=None)
             else:
                 prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
         curl_req = to_curl(prep, parts)
