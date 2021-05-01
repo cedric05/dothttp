@@ -16,3 +16,10 @@ POST https://httpbin.org/post
 json({
    'hi':'hi2'
 })
+
+
+POST https://httpbin.org/post
+data('<xml>
+    <body> hi this is test body</body>
+</xml>
+', "text/xml")

@@ -152,6 +152,15 @@ https://httpbin.org/post''', self.get_curl_out(f, 2))
 }' \\
 https://httpbin.org/post''', self.get_curl_out(f, 3))
 
+            self.assertEqual('''curl -X POST \\
+-H 'Content-Length: 52' \\
+-H 'content-type: text/xml' \\
+-d '<xml>
+    <body> hi this is test body</body>
+</xml>
+' \\
+https://httpbin.org/post''', self.get_curl_out(f, 4))
+
     def get_curl_out(self, f, target=1):
         comp2 = self.get_req_comp(f'{base_dir}/curlgen.http', curl=True, properties=[f"filename={f.name}"],
                                   target=target)
