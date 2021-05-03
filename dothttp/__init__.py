@@ -175,7 +175,7 @@ class BaseModelProcessor:
             currently environment has restriction to not use "*" and "headers"
         :return:
         """
-        if not self.property_file:
+        if not self.property_file and self.file:
             base_logger.debug('property file not specified')
             default = os.path.join(os.path.dirname(self.file), ".dothttp.json")
             if os.path.exists(default):
