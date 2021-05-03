@@ -11,10 +11,10 @@ from urllib.parse import unquote
 import requests
 
 from dothttp import DotHttpException, HttpDef
-from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
-    HttpFileFormatter
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
     NameWrap, Line
+from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
+    HttpFileFormatter
 from . import Command, Result, BaseHandler
 from .postman import postman_collection_from_dict, Items, URLClass
 from .utils import clean_filename
@@ -61,8 +61,9 @@ class RunHttpFileHandler(BaseHandler):
         curl = command.params.get("curl", False)
         props = command.params.get('properties', {})
         properties = [f"{i}={j}" for i, j in props.items()]
+        content = command.params.get("content")
         config = Config(file=filename, env=envs, properties=properties, curl=curl, property_file=None, debug=True,
-                        no_cookie=nocookie, format=False, info=False, target=target)
+                        no_cookie=nocookie, format=False, info=False, target=target, content=content)
         return config
 
     def get_request_result(self, command, comp):
@@ -135,7 +136,7 @@ class ContentBase:
         super().__init__(config)
 
     def load_content(self):
-        self.original_content = self.content = self.args.file
+        self.original_content = self.content = self.args.content
 
 
 class ContentRequestCompiler(ContentBase, RequestCompiler):
@@ -151,7 +152,7 @@ class ContentExecuteHandler(RunHttpFileHandler):
 
     def get_config(self, command):
         config = super().get_config(command)
-        config.file = command.params.get('content')
+        # config.file = command.params.get('content')
         return config
 
     def get_method(self):

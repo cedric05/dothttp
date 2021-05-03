@@ -1,4 +1,5 @@
 import logging
+import mimetypes
 import os
 import re
 import sys
@@ -7,7 +8,6 @@ from dataclasses import dataclass, field
 from io import IOBase
 from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO
 from urllib.parse import urlencode
-import mimetypes
 
 try:
     import jstyleson as json
@@ -62,6 +62,7 @@ class Config:
     stdout: bool = False
     experimental: bool = False
     target: str = field(default_factory=lambda: '1')
+    content: str = None
 
 
 @dataclass
