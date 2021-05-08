@@ -185,35 +185,7 @@ class GetNameReferencesHandler(BaseHandler):
     def run(self, command: Command) -> Result:
         filename = command.params.get("file")
         try:
-            with open(filename) as f:
-                http_data = f.read()
-                model = dothttp_model.model_from_str(http_data)
-                all_names = []
-                all_urls = []
-                for index, http in enumerate(model.allhttps):
-                    if http.namewrap:
-                        name = http.namewrap.name if http.namewrap else str(index)
-                        start = http.namewrap._tx_position
-                        end = http._tx_position_end
-                    else:
-                        start = http.urlwrap._tx_position
-                        end = http._tx_position_end
-                        name = str(index + 1)
-                    name = {
-                        'name': name,
-                        'method': http.urlwrap.method,
-                        'start': start,
-                        'end': end
-                    }
-                    url = {
-                        'url': http.urlwrap.url,
-                        'method': http.urlwrap.method or 'GET',
-                        'start': http.urlwrap._tx_position,
-                        'end': http.urlwrap._tx_position_end,
-                    }
-                    all_names.append(name)
-                    all_urls.append(url)
-                result = Result(id=command.id, result={"names": all_names, "urls": all_urls})
+            result = self.execute(command, filename)
         except DotHttpException as ex:
             result = Result(id=command.id,
                             result={
@@ -222,6 +194,52 @@ class GetNameReferencesHandler(BaseHandler):
             result = Result(id=command.id,
                             result={
                                 "error_message": str(e), "error": True})
+        return result
+
+    def execute(self, command: Command, filename):
+        with open(filename) as f:
+            http_data = f.read()
+            all_names, all_urls = self.parse_n_get(http_data)
+            result = Result(id=command.id, result={"names": all_names, "urls": all_urls})
+        return result
+
+    def parse_n_get(self, http_data):
+        model = dothttp_model.model_from_str(http_data)
+        all_names = []
+        all_urls = []
+        for index, http in enumerate(model.allhttps):
+            if http.namewrap:
+                name = http.namewrap.name if http.namewrap else str(index)
+                start = http.namewrap._tx_position
+                end = http._tx_position_end
+            else:
+                start = http.urlwrap._tx_position
+                end = http._tx_position_end
+                name = str(index + 1)
+            name = {
+                'name': name,
+                'method': http.urlwrap.method,
+                'start': start,
+                'end': end
+            }
+            url = {
+                'url': http.urlwrap.url,
+                'method': http.urlwrap.method or 'GET',
+                'start': http.urlwrap._tx_position,
+                'end': http.urlwrap._tx_position_end,
+            }
+            all_names.append(name)
+            all_urls.append(url)
+        return all_names, all_urls
+
+
+class ContentNameReferencesHandler(GetNameReferencesHandler):
+    name = "/content/names"
+
+    def execute(self, command, filename):
+        http_data = command.params.get("content", "")
+        all_names, all_urls = self.parse_n_get(http_data)
+        result = Result(id=command.id, result={"names": all_names, "urls": all_urls})
         return result
 
 
