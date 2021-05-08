@@ -236,6 +236,9 @@ class GetNameReferencesHandler(BaseHandler):
 class ContentNameReferencesHandler(GetNameReferencesHandler):
     name = "/content/names"
 
+    def get_method(self):
+        return ContentNameReferencesHandler.name
+
     def execute(self, command, filename):
         http_data = command.params.get("content", "")
         all_names, all_urls = self.parse_n_get(http_data)
