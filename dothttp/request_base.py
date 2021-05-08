@@ -149,6 +149,8 @@ class CurlCompiler(RequestBase):
                 prep.headers["content-type"] = "application/json"
                 prep.prepare_body(data=dumps, files=None)
             else:
+                if payload.header:
+                    prep.headers['content-type'] = payload.header
                 prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
         curl_req = to_curl(prep, parts)
         return curl_req

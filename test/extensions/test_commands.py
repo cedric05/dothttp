@@ -21,6 +21,9 @@ class TargetTest(TestBase):
             params={"file": f"{command_dir}/names.http"},
             id=1
         ))
+        return self.execute_and_compare_names(result)
+
+    def execute_and_compare_names(self, result):
         self.assertEqual({'names': [{'end': 77, 'method': 'GET', 'name': 'test', 'start': 0},
                                     {'end': 207, 'method': 'POST', 'name': 'test2', 'start': 79},
                                     {'end': 337, 'method': 'POST', 'name': 'test3', 'start': 209},
@@ -42,6 +45,16 @@ class TargetTest(TestBase):
                                     'start': 359,
                                     'url': 'https://req.dothttp.dev'}]},
                          result.result)
+
+    def test_content_names2(self):
+        filename = f"{command_dir}/names.http"
+        with open(filename) as f:
+            result = ContentNameReferencesHandler().run(Command(
+                method=ContentNameReferencesHandler.name,
+                params={"content": f.read()},
+                id=1
+            ))
+            return self.execute_and_compare_names(result)
 
     def test_notexistant_file(self):
         result = self.name_handler.run(Command(
