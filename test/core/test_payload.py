@@ -155,16 +155,26 @@ class PayLoadTest(TestBase):
         loadfile.close()
         os.unlink(loadfile.name)
 
-    def test_data_json_payload(self):
+    def test_data_multi_payload(self):
         req = self.get_request(f"{base_dir}/quoted.http")
         self.assertEqual("""
 "'this can have quotes with escape sequence'"
 
 """, req.body)
 
-    def test_data_json_payload(self):
+    def test_data_multi2_payload(self):
         req = self.get_request(f"{base_dir}/quoted2.http")
         self.assertEqual("""
 "'this can have quotes with escape sequence'"
 
 """, req.body)
+
+    def test_multi_in_json_payload(self):
+        self.assertEqual(b'{"simple": "test"}', self.get_request(f"{base_dir}/multilinejson.http", target='1').body)
+        self.assertEqual(b'{"simple": "test"}', self.get_request(f"{base_dir}/multilinejson.http", target="2").body)
+        self.assertEqual(b'{"simple": "\\ntest\\n\\"simple 1\\"\\n\'simple 2\'\\n\'\'simple 3\'\'\\n'
+                         b'\\"\\"simple 4\\"\\"\\n\\n"}',
+                         self.get_request(f"{base_dir}/multilinejson.http", target="3").body)
+        self.assertEqual(b'{"simple": "\\ntest\\n\\"simple 1\\"\\n\'simple 2\'\\n\'\'simple 3\'\'\\n'
+                         b'\\"\\"simple 4\\"\\"\\n\\n"}',
+                         self.get_request(f"{base_dir}/multilinejson.http", target="4").body)

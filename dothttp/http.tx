@@ -77,7 +77,7 @@ Array:
 ;
 
 Value:
-    str=String | var=VarString | flt=Float | bl=Bool | object=Object | array=Array | null="null"
+    multi=MULTILINE_STRING | str=String | var=VarString | flt=Float | bl=Bool | object=Object | array=Array | null="null"
 ;
 
 
@@ -98,6 +98,7 @@ Object:
 ;
 
 Member:
+    (multi=MULTILINE_STRING ':' value=Value) |
     (key=STRING ':' value=Value) |
     (var=VarString ':' value=Value)
 ;
@@ -125,7 +126,7 @@ DotString:
 // allow only alphanumeric or string in double/single quotes
 
 MULTILINE_STRING:
-        /"""[\S\s]*"""/ | /'''[\S\s]*'''/
+        /"""[\S\s]*?"""/ | /'''[\S\s]*?'''/
 
 ;
 
