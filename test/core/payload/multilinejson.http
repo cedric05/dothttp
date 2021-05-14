@@ -1,0 +1,40 @@
+@name("simple1")
+POST https://httpbin.org/post
+json({
+   "simple": """test"""
+})
+
+@name("simple2")
+POST https://httpbin.org/post
+json({
+   "simple": '''test'''
+})
+
+
+@name("withquotes")
+POST https://httpbin.org/post
+json({
+   "simple": '''
+test
+"simple 1"
+'simple 2'
+''simple 3''
+""simple 4""
+
+'''
+})
+
+
+
+@name("withquoteskey")
+POST https://httpbin.org/post
+json({
+   """simple""": '''
+test
+"simple 1"
+'simple 2'
+''simple 3''
+""simple 4""
+
+'''
+})

@@ -73,7 +73,9 @@ class RunHttpFileHandler(BaseHandler):
                 "headers":
                     {key: value for key, value in resp.headers.items()},
                 "body": resp.text,  # for binary out, it will fail, check for alternatives
-                "status": resp.status_code, "url": resp.url}
+                "status": resp.status_code,
+                "method": resp.request.method,
+                "url": resp.url}
         }
         # will be used for response
         data = {}
@@ -235,6 +237,9 @@ class GetNameReferencesHandler(BaseHandler):
 
 class ContentNameReferencesHandler(GetNameReferencesHandler):
     name = "/content/names"
+
+    def get_method(self):
+        return ContentNameReferencesHandler.name
 
     def execute(self, command, filename):
         http_data = command.params.get("content", "")

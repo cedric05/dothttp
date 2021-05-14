@@ -71,7 +71,7 @@ class PropertyProvider:
     random = Random()
     var_regex = re.compile(r'{{(?P<var>.*?)}}', re.DOTALL)
     random_string_regex = re.compile(
-        r'(?P<category>\$randomStr|\$randomInt|\$randomBool|\$randomFloat)(?P<length>:\d*)?')
+        r'.*?(?P<category>\$randomStr|\$randomInt|\$randomBool|\$randomFloat)(?P<length>:\d*)?')
 
     rand_map = {
         '$randomStr': get_random_str,
