@@ -36,6 +36,8 @@ def jsonmodel_to_json(model, update_content_func):
         return get_json_data(var_value, update_content_func)
     elif multi_value := model.multi:
         return get_json_data(multi_value[3:-3], update_content_func)
+    elif int_val := model.int:
+        return int_val.value
     elif flt := model.flt:
         return flt.value
     elif bl := model.bl:

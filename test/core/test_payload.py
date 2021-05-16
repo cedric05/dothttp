@@ -26,7 +26,7 @@ class PayLoadTest(TestBase):
                          "incorrect url computed")
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual(
-            b'{"string": "simple", "list": ["dothttp", "azure"], "null": null, "bool": false, "bool2": true, "float": 1.121212, "float2": 1.0}',
+            b'{"string": "simple", "list": ["dothttp", "azure"], "null": null, "bool": false, "bool2": true, "float": 1.121212, "float2": 1}',
             req.body,
             "incorrect method")
 
