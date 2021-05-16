@@ -26,7 +26,7 @@ class PayLoadTest(TestBase):
                          "incorrect url computed")
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual(
-            b'{"string": "simple", "list": ["dothttp", "azure"], "null": null, "bool": false, "bool2": true, "float": 1.121212, "float2": 1.0}',
+            b'{"string": "simple", "list": ["dothttp", "azure"], "null": null, "bool": false, "bool2": true, "float": 1.121212, "float2": 1}',
             req.body,
             "incorrect method")
 
@@ -97,7 +97,17 @@ class PayLoadTest(TestBase):
         self.assertEqual("https://dothttp.azurewebsites.net/", req.url,
                          "incorrect url computed")
         self.assertEqual("POST", req.method, "incorrect method")
-        self.assertEqual("{}", req.body, "incorrect method")
+        self.assertEqual("{}", req.body, "incorrect body")
+
+    def test_smileys_or_special(self):
+        comp = self.get_req_comp(f"{base_dir}/payload.http", target=2)
+        req = comp.get_request()
+        self.assertEqual("https://dothttp.azurewebsites.net/", req.url,
+                         "incorrect url computed")
+        self.assertEqual("POST", req.method, "incorrect method")
+        self.assertEqual("😻", req.body, "incorrect method")
+        resp = comp.get_response()
+        print(resp)
 
     def test_payload2(self):
         req = self.get_request(f"{base_dir}/payload2.http")

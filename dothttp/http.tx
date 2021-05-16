@@ -77,7 +77,7 @@ Array:
 ;
 
 Value:
-    multi=MULTILINE_STRING | str=String | var=VarString | flt=Float | bl=Bool | object=Object | array=Array | null="null"
+    multi=MULTILINE_STRING | str=String | var=VarString |  flt=Float | int=Int | bl=Bool | object=Object | array=Array | null="null"
 ;
 
 
@@ -85,8 +85,12 @@ Bool:
     value=BOOL
 ;
 
+Int:
+    value=INT
+;
+
 Float:
-    value=FLOAT
+    value=STRICTFLOAT
 ;
 
 String: 

@@ -1,4 +1,5 @@
 import unittest
+from typing import Union
 
 from dothttp.request_base import Config, RequestCompiler, CurlCompiler, HttpFileFormatter
 
@@ -12,7 +13,8 @@ class TestBase(unittest.TestCase):
     @staticmethod
     def get_req_comp(file, env=None, prop=None, properties=None,
                      info=False, debug=False, curl=False,
-                     format=False, stdout=False, target=None):
+                     format=False, stdout=False, target=None) -> Union[
+        HttpFileFormatter, CurlCompiler, RequestCompiler]:
         if properties is None:
             properties = []
         if env is None:

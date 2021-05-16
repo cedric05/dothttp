@@ -265,7 +265,16 @@ class RequestCompiler(RequestBase):
     def get_response(self):
         session = self.get_session()
         request = self.get_request()
-        resp: Response = session.send(request)
+        try:
+            resp: Response = session.send(request)
+        except UnicodeEncodeError:
+            # for Chinese, smiley all other default encode converts into latin-1
+            # as latin-1 didn't consist of those charectors it willfail
+            # in those scenarios, request will try to encode with utf-8
+            # as a last resort, it may not be correct solution. may be it is.
+            # for now proceeding with this
+            request.prepare_body(request.body.encode("utf-8"), files=None)
+            resp: Response = session.send(request)
         if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
             session.cookies.save()  # lwpCookie has .save method
         return resp
