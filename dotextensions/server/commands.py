@@ -62,6 +62,11 @@ class RunHttpFileHandler(BaseHandler):
         props = command.params.get('properties', {})
         properties = [f"{i}={j}" for i, j in props.items()]
         content = command.params.get("content")
+        if content:
+            try:
+                content = "\n".join(content.splitlines())
+            except:
+                content = None
         config = Config(file=filename, env=envs, properties=properties, curl=curl, property_file=None, debug=True,
                         no_cookie=nocookie, format=False, info=False, target=target, content=content)
         return config
