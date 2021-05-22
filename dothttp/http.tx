@@ -2,14 +2,15 @@
 MULTISET: allhttps=HTTP+;
 
 HTTP:((namewrap=NAMEWRAP)?
+    /curl/?
     urlwrap=URL
     (basic_auth_wrap=BASICAUTH)?
     (lines *= LINE)?
     (payload=PAYLOAD)?
     (output=TOFILE)?);
 
-URL: 
-    (method=METHODTYPE)? url=URLString
+URL:
+    ('-X'? method=METHODTYPE)? url=URLString
 ;
 
 NAMEWRAP:
@@ -23,11 +24,22 @@ LINE:
 HEADER: 
     'header' '(' key=DotString ',' value=DotString ')'
     | key=DotString ':' value=DotString
+    | /-H|--header/  key=/[\w-]*/ ':' value=/\S.*\S/
 ;
 
 BASICAUTH:
     'basicauth' '(' username=DotString ',' password= DotString ')'
 ;
+
+METHODTYPE2:
+    "get" | "post" | "options"
+    | "delete" | "connect" | "put"
+    | "head" | "trace" | "patch"
+    | "copy" | "link" | "unlink"
+    | "purge" | "lock" | "unlock"
+    | "propfind" | "view"
+;
+
 
 METHODTYPE: 
     "GET" | "POST" | "OPTIONS"
@@ -50,6 +62,7 @@ PAYLOAD:
     (   'data' '(' data=STRING (',' type=STRING)? ','?  ')'
         | 'data' '(' multi=MULTILINE_STRING (',' type=STRING)? ','?  ')'
         | 'data' '(' datajson=JSON (',' type=STRING)? ','? ')'
+        | /-d|--data/ data=STRING
         | 'urlencoded' '(' datajson=JSON (',' type=STRING)? ','? ')'
         | 'fileinput' '(' file=STRING   (',' type=STRING)? ','?  ')'
         | ('json' '(' json=JSON  ')' )

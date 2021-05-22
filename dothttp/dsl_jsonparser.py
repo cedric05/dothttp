@@ -52,6 +52,7 @@ def jsonmodel_to_json(model, update_content_func):
 
 def get_json_data(var_value, update_content_func):
     content: str = update_content_func(var_value)
+    if content == var_value: return var_value
     try:
         return json.loads(content)
     except ValueError:
