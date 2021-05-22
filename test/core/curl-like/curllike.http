@@ -1,0 +1,25 @@
+@name('header')
+curl -X GET https://google.com
+--header simplekey1 : simplevalue1
+--header simplekey2: simplevalue2
+--header simple-key3 : simplevalue3
+--header simple-key4:  simplevalue4
+-H simplekey5 : simplevalue5
+-H simplekey6:  simplevalue6
+-H simple-key7 :  simplevalue7
+"simple-key8":  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+-H simplekey9 :  {{test}}
+
+@name('data')
+curl -X POST https://req.dothttp.dev
+--data 'this is example'
+
+
+@name('d')
+POST https://req.dothttp.dev
+-d 'this is
+multiline
+{{test}}
+example'
+
+// D:\dothttp\dothttp-dsl\test\core\curl-like\curllike.http --curl --debug --no-cookie
