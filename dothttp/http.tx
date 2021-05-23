@@ -24,10 +24,10 @@ LINE:
 HEADER: 
     'header' '(' key=DotString ',' value=DotString ')'
     | key=DotString ':' value=DotString
-    | /-H|--header/  key=/'[\w-]*/ ':' value=/\S.*\S'/ SLASH?
-    | /-H|--header/  key=/"[\w-]*/ ':' value=/\S.*\S"/ SLASH?
-    | /-H|--header/  key=/[\w-]*/ ':' value=/\S.*\S/
-    | key=/'[\w-]*/ ':' value=/\S.*\S'/
+    | /-H|--header/  key=/'[\w-]+/ ':' value=/\S(.*\S)?'/ SLASH?
+    | /-H|--header/  key=/"[\w-]+/ ':' value=/\S(.*\S)?"/ SLASH?
+    | /-H|--header/  key=/[\w-]+/ ':' value=/\S(.*\S)?/
+    | key=/'[\w-]+/ ':' value=/\S(.*\S)?'/
 ;
 
 BASICAUTH:
