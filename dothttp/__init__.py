@@ -360,7 +360,10 @@ class HttpDefBase(BaseModelProcessor):
             return
         request_logger.debug(
             f'method not defined in `{self.file}`. defaults to `GET`')
-        self.httpdef.method = "GET"
+        if self.http.payload:
+            self.httpdef.method = "POST"
+        else:
+            self.httpdef.method = "GET"
 
     def load_payload(self):
         self.httpdef.payload = self._load_payload()
