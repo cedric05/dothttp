@@ -10,7 +10,7 @@ HTTP:((namewrap=NAMEWRAP)?
     (output=TOFILE)?);
 
 URL:
-    ('-X'? method=METHODTYPE)? url=URLString
+    ('-X'? method=METHODTYPE)? url=URLString SLASH?
 ;
 
 NAMEWRAP:
@@ -24,7 +24,10 @@ LINE:
 HEADER: 
     'header' '(' key=DotString ',' value=DotString ')'
     | key=DotString ':' value=DotString
+    | /-H|--header/  key=/'[\w-]*/ ':' value=/\S.*\S'/ SLASH?
+    | /-H|--header/  key=/"[\w-]*/ ':' value=/\S.*\S"/ SLASH?
     | /-H|--header/  key=/[\w-]*/ ':' value=/\S.*\S/
+    | key=/'[\w-]*/ ':' value=/\S.*\S'/
 ;
 
 BASICAUTH:
@@ -151,4 +154,9 @@ URLString:
     STRING | /https\:\/\/(\S)+/
     | /http\:\/\/(\S)+/
 ;
-// allows http or https till space otherwise go for string
+// allows http or https till space otherwise go for
+
+
+SLASH:
+    '\'
+;

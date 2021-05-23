@@ -17,7 +17,8 @@ class PayLoadTest(TestBase):
                           'simple-key4': 'simplevalue4', 'simplekey5': 'simplevalue5', 'simplekey6': 'simplevalue6',
                           'simple-key7': 'simplevalue7',
                           'simple-key8': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                          'simplekey9': 'var'},
+                          'simplekey9': 'var',
+                          'simplekey10': 'var'},
                          req.headers)
 
     def test_single_line(self):
