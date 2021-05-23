@@ -7,8 +7,9 @@ curl -X GET https://google.com
 -H simplekey5 : simplevalue5
 -H simplekey6:  simplevalue6
 -H simple-key7 :  simplevalue7
+-H "simplekey9 :  {{test}}" \
+-H 'simplekey10 :  {{test}}' \
 "simple-key8":  "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
--H simplekey9 :  {{test}}
 
 @name('data')
 curl -X POST https://req.dothttp.dev

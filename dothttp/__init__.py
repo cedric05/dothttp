@@ -322,6 +322,11 @@ class HttpDefBase(BaseModelProcessor):
             f'computed query params from `{self.file}` are `{params}`')
         self.httpdef.query = params
 
+    def remove_quotes(self, header, s="'"):
+        if header.key.startswith(s) and header.value.endswith(s):
+            header.key = header.key[1:]
+            header.value = header.value[:-1]
+
     def load_headers(self):
         """
             entrypoints
@@ -335,6 +340,8 @@ class HttpDefBase(BaseModelProcessor):
         headers.update(self.default_headers)
         for line in self.http.lines:
             if header := line.header:
+                self.remove_quotes(header, "'")
+                self.remove_quotes(header, '"')
                 headers[self.get_updated_content(header.key)] = self.get_updated_content(header.value)
         request_logger.debug(
             f'computed query params from `{self.file}` are `{headers}`')
@@ -353,7 +360,10 @@ class HttpDefBase(BaseModelProcessor):
             return
         request_logger.debug(
             f'method not defined in `{self.file}`. defaults to `GET`')
-        self.httpdef.method = "GET"
+        if self.http.payload:
+            self.httpdef.method = "POST"
+        else:
+            self.httpdef.method = "GET"
 
     def load_payload(self):
         self.httpdef.payload = self._load_payload()

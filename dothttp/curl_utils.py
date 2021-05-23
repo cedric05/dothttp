@@ -19,7 +19,6 @@ def to_curl(request, bodydata=None):
     if isinstance(bodydata, list):
         for p in bodydata:
             parts.append(p)
-    parts += [(None, request.url)]
 
     flat_parts = []
     for k, v in parts:
@@ -30,4 +29,4 @@ def to_curl(request, bodydata=None):
         elif v:
             flat_parts.append(quote(v))
 
-    return f'curl -X {request.method} \\\n' + ' \\\n'.join(flat_parts)
+    return f'curl -X {request.method} {request.url} \\\n' + ' \\\n'.join(flat_parts)
