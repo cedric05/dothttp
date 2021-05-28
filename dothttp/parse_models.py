@@ -55,8 +55,14 @@ class FilesWrap:
 
 
 @dataclass
+class TripleOrDouble:
+    triple: Optional[str] = None
+    str: Optional[str] = None
+
+
+@dataclass
 class Payload:
-    data: Optional[str]
+    data: Optional[List[TripleOrDouble]]
     datajson: Optional
     file: Optional[str]
     json: Optional
