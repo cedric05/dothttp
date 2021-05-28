@@ -10,10 +10,13 @@ from requests import PreparedRequest, Session, Response
 from requests.status_codes import _codes as status_code
 from textx import metamodel_from_file
 
-from dothttp.parse_models import Allhttp
 from . import eprint, Config, HttpDefBase
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
+from .json_utils import JSONEncoder
+from .parse_models import Allhttp
+
+JSON_ENCODER = JSONEncoder(indent=4)
 
 try:
     import magic
@@ -191,8 +194,8 @@ class HttpFileFormatter(RequestBase):
             if payload := http.payload:
                 p = ""
                 mime_type = payload.type
-                if payload.data or payload.multi:
-                    data = payload.data or payload.multi[3:-3]
+                if payload.data:
+                    data = "".join([i.triple[3:-3] if i.triple else i.str for i in payload.data])
                     if '"' in data and "'" not in data:
                         data = f"'{data}'"
                     elif '"' not in data and "'" in data:
@@ -209,7 +212,7 @@ class HttpFileFormatter(RequestBase):
                     p = f'fileinput("{filetype}",{(" ," + mime_type) if mime_type else ""})'
                 elif json_data := payload.json:
                     parsed_data = json_or_array_to_json(json_data, lambda a: a)
-                    p = f'json({json.dumps(parsed_data, indent=4)})'
+                    p = f'json({JSON_ENCODER.encode(parsed_data)})'
                 elif files_wrap := payload.fileswrap:
                     p2 = ",\n\t".join(map(lambda
                                               file_type: f'("{file_type.name}", "{(file_type.path)}"' +

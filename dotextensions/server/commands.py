@@ -12,7 +12,7 @@ import requests
 
 from dothttp import DotHttpException, HttpDef
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
-    NameWrap, Line
+    NameWrap, Line, TripleOrDouble
 from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
     HttpFileFormatter
 from . import Command, Result, BaseHandler
@@ -369,7 +369,7 @@ class ImportPostmanCollection(BaseHandler):
                 # TODO file is back slash escaped
                 payload_file = slashed_path_to_normal_path(filebody.src)
             elif rawbody := req.body.raw:
-                payload_data = rawbody
+                payload_data = [TripleOrDouble(str=rawbody)]
                 if optins and 'raw' in optins and 'language' in optins.get('raw'):
                     if optins['raw']['language'] == 'json':
                         try:

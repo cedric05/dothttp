@@ -188,3 +188,13 @@ class PayLoadTest(TestBase):
         self.assertEqual(b'{"simple": "\\ntest\\n\\"simple 1\\"\\n\'simple 2\'\\n\'\'simple 3\'\'\\n'
                          b'\\"\\"simple 4\\"\\"\\n\\n"}',
                          self.get_request(f"{base_dir}/multilinejson.http", target="4").body)
+
+    def test_payload_with_breaks(self):
+        self.assertEqual("simple string", self.get_request(f"{base_dir}/datapayloadwithbreaks.http", target='1').body)
+        self.assertEqual("simple string", self.get_request(f"{base_dir}/datapayloadwithbreaks.http", target='2').body)
+        self.assertEqual("simple string", self.get_request(f"{base_dir}/datapayloadwithbreaks.http", target='3').body)
+        self.assertEqual("simple string", self.get_request(f"{base_dir}/datapayloadwithbreaks.http", target='4').body)
+        self.assertEqual("simple string", self.get_request(f"{base_dir}/datapayloadwithbreaks.http", target='5').body)
+        self.assertEqual("simple string", self.get_request(f"{base_dir}/datapayloadwithbreaks.http", target='6').body)
+        self.assertEqual('simple' ' triple' ' break' ' string',
+                         self.get_request(f"{base_dir}/datapayloadwithbreaks.http", target='7').body)
