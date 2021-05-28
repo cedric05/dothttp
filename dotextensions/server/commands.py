@@ -105,7 +105,7 @@ class RunHttpFileHandler(BaseHandler):
         if request.payload.filename:
             file = request.payload.filename
         elif isinstance(request.payload.data, str):
-            data = request.payload.data
+            data = [TripleOrDouble(str=request.payload.data)]
         elif isinstance(request.payload.data, dict):
             datajson = None
         elif request.payload.json:
