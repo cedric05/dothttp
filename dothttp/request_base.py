@@ -194,8 +194,8 @@ class HttpFileFormatter(RequestBase):
             if payload := http.payload:
                 p = ""
                 mime_type = payload.type
-                if payload.data or payload.multi:
-                    data = payload.data or payload.multi[3:-3]
+                if payload.data:
+                    data = "".join([i.triple[3:-3] if i.triple else i.str for i in payload.data])
                     if '"' in data and "'" not in data:
                         data = f"'{data}'"
                     elif '"' not in data and "'" in data:

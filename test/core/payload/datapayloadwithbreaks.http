@@ -1,0 +1,23 @@
+POST 'https://req.dothttp.dev'
+data('simple string')
+
+POST 'https://req.dothttp.dev'
+data('simple'' string')
+
+POST 'https://req.dothttp.dev'
+data('simple' ' string')
+
+POST 'https://req.dothttp.dev'
+data('''simple string''')
+
+
+POST 'https://req.dothttp.dev'
+data('''simple ''' 'string')
+
+
+POST 'https://req.dothttp.dev'
+data('''simple ''' '''string''')
+
+
+POST 'https://req.dothttp.dev'
+data('simple' ' triple' ' break' ' string')
