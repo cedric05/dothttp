@@ -26,8 +26,10 @@ HEADER:
     | key=DotString ':' value=DotString
     | /-H|--header/  key=/'[\w-]+/ ':' value=/\S(.*\S)?'/ SLASH?
     | /-H|--header/  key=/"[\w-]+/ ':' value=/\S(.*\S)?"/ SLASH?
-    | /-H|--header/  key=/[\w-]+/ ':' value=/\S(.*\S)?/
-    | key=/'[\w-]+/ ':' value=/\S(.*\S)?'/
+    | /-H|--header/  key=/[\w-]+/ ':' value=/\S(.*\S)?/ SLASH?
+    | key=/'[\w-]+/ ':' value=/\S(.*\S)?'/ SLASH?
+    | key=/"[\w-]+/ ':' value=/\S(.*\S)?"/ SLASH?
+    | key=/[\w-]+/ ':' value=/\S(.*\S)?/ SLASH?
 ;
 
 BASICAUTH:
