@@ -2,7 +2,7 @@ import os
 
 from setuptools import setup, find_packages
 
-EXCLUDE = ['test', 'test.core', 'test.extensions', 'benchmarks', 'dothttp']
+EXCLUDE = ['test', 'test.core', 'test.extensions', 'benchmarks', ]
 
 
 def read(fname):
