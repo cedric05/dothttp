@@ -1,0 +1,66 @@
+@name("text payload")
+GET http://httpbin.org/robots.txt
+> {%
+client.test("check status", function(){
+    // checking test and assert
+    client.assert(response.status ===200, "status is 200")
+})
+client.test("check json", function(){
+    // were able to check headers
+    client.assert(response.headers.valueOf('content-type') === "application/json", "content-type is json")
+})
+// were able to check json response
+client.global.set("outputval", response.body);
+
+%}
+
+@name("json_payload")
+POST http://httpbin.org/post
+
+json({"token": "secret_token"})
+> {%
+client.test("check status", function(){
+    // checking test and assert
+    client.assert(response.status ===200, "status is 200")
+})
+client.test("check headers", function(){
+    // were able to check headers
+    client.assert(response.headers.valueOf('content-type') === "application/json", "content-type is json")
+})
+// were able to check json response
+client.global.set("outputval", response.body.json.token);
+client.log("this is sample log");
+%}
+
+
+
+@name("isEquals check")
+POST http://httpbin.org/post
+
+json(
+{'simpleKey':'simpleValue',
+	"keyWithObjects": [
+		"hi",
+		"hi2",
+		{
+			"simpleKey2": "simpleValue2"
+		}
+	]
+}
+)
+> {%
+
+client.test("checks payload output recursive",  function(){
+    client.assert(isEqual(response.body, {'simpleKey':'simpleValue',
+	"keyWithObjects": [
+		"hi",
+		"hi2",
+		{
+			"simpleKey2": "simpleValue2"
+		}
+	]
+}), "paylaod changed")
+
+});
+
+%}

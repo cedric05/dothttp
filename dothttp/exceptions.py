@@ -73,3 +73,8 @@ class PayloadNotValidException(HttpFileException):
 @exception_wrapper("invalid payload data, expected str,json payload: `{payload}`")
 class PayloadDataNotValidException(PayloadNotValidException):
     pass
+
+
+@exception_wrapper("js test script compilation failed `{payload}`")
+class ScriptException(DotHttpException):
+    pass
