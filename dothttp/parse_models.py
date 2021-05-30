@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import List, Optional
 
 
@@ -77,6 +77,11 @@ class ToFile:
 
 
 @dataclass
+class TestScript:
+    script: Optional[str]
+
+
+@dataclass
 class Http:
     namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
@@ -84,6 +89,7 @@ class Http:
     lines: Optional[List[Line]]
     payload: Optional[Payload]
     output: Optional[ToFile]
+    script_wrap: Optional[TestScript] = field(default_factory=lambda: TestScript(''))
 
 
 @dataclass

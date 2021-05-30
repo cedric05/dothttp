@@ -10,7 +10,7 @@ from requests import PreparedRequest, Session, Response
 from requests.status_codes import _codes as status_code
 from textx import metamodel_from_file
 
-from . import eprint, Config, HttpDefBase
+from . import eprint, Config, HttpDefBase, js3py
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .json_utils import JSONEncoder
@@ -154,7 +154,7 @@ class CurlCompiler(RequestBase):
             else:
                 if payload.header:
                     prep.headers['content-type'] = payload.header
-                prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
+                prep.prepare_body(data=payload.js_template, json=payload.json, files=payload.files)
         curl_req = to_curl(prep, parts)
         return curl_req
 
@@ -272,7 +272,7 @@ class RequestCompiler(RequestBase):
             resp: Response = session.send(request)
         except UnicodeEncodeError:
             # for Chinese, smiley all other default encode converts into latin-1
-            # as latin-1 didn't consist of those charectors it willfail
+            # as latin-1 didn't consist of those characters it will fail
             # in those scenarios, request will try to encode with utf-8
             # as a last resort, it may not be correct solution. may be it is.
             # for now proceeding with this
@@ -281,6 +281,19 @@ class RequestCompiler(RequestBase):
         if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
             session.cookies.save()  # lwpCookie has .save method
         return resp
+
+    def execute_script(self, resp: Response):
+        try:
+            return js3py.execute_script(
+                is_json=resp.headers.get('content-type', 'text/plain') == "application/json",
+                script=self.httpdef.test_script,
+                status_code=resp.status_code,
+                headers=dict(resp.headers),
+                properties=self.property_util.get_all_properties_variables(),
+                response_body_text=resp.text,
+            )
+        except Exception as e:
+            request_logger.error(f"unknown exception {e} happened", e)
 
     def print_req_info(self, request: Union[PreparedRequest, Response], prefix=">"):
         if not (self.args.debug or self.args.info):

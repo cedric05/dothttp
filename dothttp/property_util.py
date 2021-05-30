@@ -128,6 +128,12 @@ class PropertyProvider:
             set(key for key in self.infile_properties if
                 self.infile_properties[key].value is not None or PropertyProvider.is_random_key(key)))
 
+    def get_all_properties_variables(self):
+        # TODO
+        d = dict()
+        d.update(self.command_properties)
+        return d
+
     @staticmethod
     def is_random_key(key):
         return any(key.startswith(rand_category_name) for rand_category_name in PropertyProvider.rand_map)

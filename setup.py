@@ -2,6 +2,8 @@ import os
 
 from setuptools import setup, find_packages
 
+EXCLUDE = ['test', 'test.core', 'test.extensions', 'benchmarks', 'dothttp']
+
 
 def read(fname):
     with open(os.path.join(os.path.dirname(__file__), fname)) as f:
@@ -33,11 +35,12 @@ setup(
     package_data={
         "": ["*.tx", "*.md"]
     },
+    include_package_data=True,
     entry_points={
         'console_scripts': ['dothttp=dothttp.__main__:main'],
     },
     options={"bdist_wheel": {"universal": False}},
-    packages=find_packages(),
+    packages=find_packages(exclude=EXCLUDE),
     install_requires=requirements(),
     extras_require={},
     long_description=read('README.md'),

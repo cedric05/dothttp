@@ -1,0 +1,35 @@
+@name("json payload")
+POST https://httpbin.org/post
+
+> {%
+client.test("check status", function(){
+    // checking test and assert
+    client.assert(response.status ===200, "status is 200")
+})
+client.test("check headers", function(){
+    // were able to check headers
+    client.assert(response.headers.valueOf('content-type') === "application/json", "content-type is json")
+})
+// were able to check json response
+client.global.set("outputval", response.body.json.token);
+
+%}
+
+@name("text_payload")
+POST https://httpbin.org/post
+
+data("this is sample token")
+> {%
+client.test("check status", function(){
+    // checking test and assert
+    client.assert(response.status ===200, "status is 200")
+})
+client.test("check headers", function(){
+    // were able to check headers
+    client.assert(response.headers.valueOf('content-type') === "application/json", "content-type is json")
+})
+// were able to check json response
+client.global.set("outputval", response.body.json.data);
+client.log("this is sample log")
+
+%}

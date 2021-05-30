@@ -2,12 +2,15 @@
 MULTISET: allhttps=HTTP+;
 
 HTTP:((namewrap=NAMEWRAP)?
-    /curl/?
-    urlwrap=URL
-    (basic_auth_wrap=BASICAUTH)?
-    (lines *= LINE)?
-    (payload=PAYLOAD)?
-    (output=TOFILE)?);
+        "curl"?
+        urlwrap=URL
+        (basic_auth_wrap=BASICAUTH)?
+        (lines *= LINE)?
+        (payload=PAYLOAD)?
+        (output=TOFILE)?
+        (script_wrap=HTTP_TEST_SCRIPT)?
+    )
+;
 
 URL:
     ('-X'? method=METHODTYPE)? url=URLString SLASH?
@@ -88,7 +91,9 @@ FILETYPE:
     ( '(' name=STRING ',' path=STRING  (',' (type=STRING)?)? ')')
 ;
 
-TOFILE: 'output' '('output=STRING ')';
+TOFILE:
+    ('output' '('output=STRING ')')
+;
 
 JSON:
     array=Array | object=Object
@@ -162,6 +167,9 @@ URLString:
 ;
 // allows http or https till space otherwise go for
 
+HTTP_TEST_SCRIPT:
+    script=/> {%[\s\S]*%}/
+;
 
 SLASH:
     '\'
