@@ -71,8 +71,9 @@ class RunHttpFileHandler(BaseHandler):
                         no_cookie=nocookie, format=False, info=False, target=target, content=content)
         return config
 
-    def get_request_result(self, command, comp):
+    def get_request_result(self, command, comp: RequestCompiler):
         resp = comp.get_response()
+        script_result = comp.execute_script(resp).as_json()
         response_data = {
             "response": {
                 "headers":
@@ -80,7 +81,8 @@ class RunHttpFileHandler(BaseHandler):
                 "body": resp.text,  # for binary out, it will fail, check for alternatives
                 "status": resp.status_code,
                 "method": resp.request.method,
-                "url": resp.url}
+                "url": resp.url},
+            "script_result": script_result,
         }
         # will be used for response
         data = {}
@@ -105,7 +107,7 @@ class RunHttpFileHandler(BaseHandler):
         if request.payload.filename:
             file = request.payload.filename
         elif isinstance(request.payload.data, str):
-            data = request.payload.data
+            data = [TripleOrDouble(str=request.payload.data)]
         elif isinstance(request.payload.data, dict):
             datajson = None
         elif request.payload.json:
