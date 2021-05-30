@@ -31,3 +31,36 @@ client.test("check headers", function(){
 client.global.set("outputval", response.body.json.token);
 client.log("this is sample log");
 %}
+
+
+
+@name("isEquals check")
+POST http://httpbin.org/post
+
+json(
+{'simpleKey':'simpleValue',
+	"keyWithObjects": [
+		"hi",
+		"hi2",
+		{
+			"simpleKey2": "simpleValue2"
+		}
+	]
+}
+)
+> {%
+
+client.test("checks payload output recursive",  function(){
+    client.assert(isEqual(response.body, {'simpleKey':'simpleValue',
+	"keyWithObjects": [
+		"hi",
+		"hi2",
+		{
+			"simpleKey2": "simpleValue2"
+		}
+	]
+}), "paylaod changed")
+
+});
+
+%}

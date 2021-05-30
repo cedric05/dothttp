@@ -31,6 +31,17 @@ class ScriptExecutionTest(TestBase):
                                     {'name': 'check status', 'result': None, 'success': True}]},
                          result.result['script_result'])
 
+    def test_execute_is_equals_script3(self):
+        result = self.execute_target("3")
+        self.assertEqual({'compiled': True,
+                          'error': '',
+                          'properties': {},
+                          'stdout': '',
+                          'tests': [{'name': 'checks payload output recursive',
+                                     'result': None,
+                                     'success': True}]},
+                         result.result['script_result'])
+
     def execute_target(self, target):
         result = self.execute_handler.run(Command(
             method=RunHttpFileHandler.name,

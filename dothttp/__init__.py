@@ -9,6 +9,8 @@ from io import IOBase
 from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO
 from urllib.parse import urlencode
 
+from .utils import get_real_file_path
+
 try:
     import jstyleson as json
     from jsonschema import validate
@@ -37,11 +39,7 @@ MIME_TYPE_JSON = "application/json"
 FORM_URLENCODED = "application/x-www-form-urlencoded"
 MULTIPART_FORM_INPUT = "multipart/form-data"
 
-if os.path.exists(__file__):
-    dir_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'http.tx')
-else:
-    dir_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'http.tx')
-dothttp_model = metamodel_from_file(dir_path)
+dothttp_model = metamodel_from_file(get_real_file_path(path="http.tx", current_file=__file__))
 
 
 def eprint(*args, **kwargs):
@@ -88,6 +86,7 @@ class HttpDef:
     auth: Tuple[str] = None
     payload: Optional[Payload] = None
     output: str = None
+    test_script: str = ""
 
     def get_har(self):
         target = {
@@ -478,4 +477,11 @@ class HttpDefBase(BaseModelProcessor):
         self.load_query()
         self.load_payload()
         self.load_auth()
+        self.load_test_script()
         self._loaded = True
+
+    def load_test_script(self):
+        self.httpdef.test_script = ""
+        if script_wrap := self.http.script_wrap:
+            script = script_wrap.script[4:-2]
+            self.httpdef.test_script = script.strip()
