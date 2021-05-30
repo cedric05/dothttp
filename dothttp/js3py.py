@@ -48,7 +48,7 @@ def execute_script(is_json: bool, properties: typing.Dict[str, object],
         context.execute(js_template.replace("JS_CODE_REPLACE", script))
         client = context.jsHandler(is_json, properties, response_body_text, status_code, headers)
     except JsException as e:
-        request_logger.error("js compile failed with error", e)
+        request_logger.error(f"js compile failed with error {e}")
         script_result.compiled = False
         script_result.error = str(e)
         return script_result
@@ -56,7 +56,7 @@ def execute_script(is_json: bool, properties: typing.Dict[str, object],
         test_result = TestResult(test_name)
         try:
             test_result.result = client.tests[test_name]()
-            test_result.success = bool(test_result.result)
+            test_result.success = True
         except Exception as e:
             test_result.error = str(e)
             test_result.success = False

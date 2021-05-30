@@ -154,7 +154,7 @@ class CurlCompiler(RequestBase):
             else:
                 if payload.header:
                     prep.headers['content-type'] = payload.header
-                prep.prepare_body(data=payload.js_template, json=payload.json, files=payload.files)
+                prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
         curl_req = to_curl(prep, parts)
         return curl_req
 
