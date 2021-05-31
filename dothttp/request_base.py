@@ -284,8 +284,12 @@ class RequestCompiler(RequestBase):
 
     def execute_script(self, resp: Response):
         try:
+            content_type = resp.headers.get('content-type', 'text/plain')
+            # in some cases mimetype can have charset
+            # like text/plain; charset=utf-8
+            content_type = content_type.split(";")[0] if ';' in content_type else content_type
             return js3py.execute_script(
-                is_json=resp.headers.get('content-type', 'text/plain') == "application/json",
+                is_json=content_type == MIME_TYPE_JSON,
                 script=self.httpdef.test_script,
                 status_code=resp.status_code,
                 headers=dict(resp.headers),
