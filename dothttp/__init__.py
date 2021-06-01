@@ -9,7 +9,7 @@ from io import IOBase
 from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO
 from urllib.parse import urlencode
 
-from .utils import get_real_file_path
+from .utils import get_real_file_path, triple_or_double_tostring
 
 try:
     import jstyleson as json
@@ -382,8 +382,7 @@ class HttpDefBase(BaseModelProcessor):
         if not self.http.payload:
             return Payload()
         elif self.http.payload.data:
-            data = "".join([i.triple[3:-3] if i.triple else i.str for i in self.http.payload.data])
-            content = self.get_updated_content(data)
+            content = triple_or_double_tostring(self.http.payload.data, self.get_updated_content)
             mimetype = self.get_mimetype_from_buffer(content,
                                                      self.get_updated_content(self.http.payload.type))
             request_logger.debug(

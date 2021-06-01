@@ -1,13 +1,14 @@
 POST "https://dothttp.azurewebsites.net"
 json({"menu": {
     "header": "SVG Viewer",
-    "items": [
+    "ite""ms": [
         {"id": "Open"},
         {"id": "OpenNew", "label": "Open New"},
         null,
         {"id": "ZoomIn", "label": "Zoom In"},
         {"id": "ZoomOut", "label": "Zoom Out"},
-        {"id": "OriginalView", "label": "Original View"},
+        {"id": "OriginalView", "label":
+        "Original" " View"},
         null,
         {"id": "Quality"},
         {"id": "Pause"},
@@ -19,7 +20,8 @@ json({"menu": {
         {"id": "CopyAgain", "label": "Copy Again"},
         {"id": "CopySVG", "label": "Copy SVG"},
         {"id": "ViewSVG", "label": "View SVG"},
-        {"id": "ViewSource", "label": "View Source"},
+        {"id": "ViewSource", "label": "View"
+        " Source"},
         {"id": "SaveAs", "label": "Save As"},
         null,
         {"id": "Help"},
