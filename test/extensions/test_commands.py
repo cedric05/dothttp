@@ -1,10 +1,7 @@
-import json
-import os
 import unittest
 
-from test import TestBase
-
 from dotextensions.server.commands import *
+from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 command_dir = f"{dir_path}/commands"
@@ -105,6 +102,13 @@ class FileExecute(TestBase):
         self.assertEqual(200, result.result["status"])
         self.assertTrue("headers" in result.result)
         self.assertEqual("https://httpbin.org/post?startusing=dothttp", body['url'])
+        self.assertEqual('''@name("2")
+POST "https://httpbin.org/post"
+? "startusing"= "dothttp"
+
+
+
+''', result.result['http'])
 
         result2 = self.execute_handler.run(Command(
             method=RunHttpFileHandler.name,
@@ -121,6 +125,13 @@ class FileExecute(TestBase):
         self.assertEqual(200, result2.result["status"])
         self.assertTrue("headers" in result2.result)
         self.assertEqual("https://httpbin.org/post?startusing=dothttp", body['url'])
+        self.assertEqual("""@name("2")
+POST "https://req.dothttp.dev/post"
+? "startusing"= "dothttp"
+
+
+
+""", result2.result['http'])
 
         result3 = self.execute_handler.run(Command(
             method=RunHttpFileHandler.name,
@@ -133,7 +144,34 @@ class FileExecute(TestBase):
             },
             id=1)
         )
+        self.assertEqual("""@name("3")
+POST "https://httpbin.org/POST"
+? "startusing"= "dothttp"
+
+
+
+""", result3.result['http'])
         self.assertEqual(404, result3.result["status"])
+
+        result4 = self.execute_handler.run(Command(
+            method=RunHttpFileHandler.name,
+            params={
+                "file": f"{command_dir}/complexrun.http",
+                "target": "4",
+                "properties": {
+                    "host": "httpbin.org"
+                }
+            },
+            id=1)
+        )
+        self.assertEqual(200, result4.result["status"])
+        self.assertEqual("""@name("4")
+GET "https://httpbin.org/get"
+basicauth("username", "password")
+
+
+
+""", result4.result['http']);
 
     def test_non_existant_file(self):
         result = self.execute_file(f"{command_dir}/syntax2.http")

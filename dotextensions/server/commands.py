@@ -136,7 +136,7 @@ class RunHttpFileHandler(BaseHandler):
                       request.headers.items()] + query_lines
             ,
             payload=payload,
-            output=None, basic_auth_wrap=None
+            output=None, basic_auth_wrap=BasicAuth(*request.auth) if request.auth else None
         )]))
 
 
