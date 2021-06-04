@@ -11,7 +11,7 @@ def json_or_array_to_json(model, update_content_func) -> Union[Dict, List]:
         # hooking here could lead to other issues
         return model
     if array := model.array:
-        return [update_content_func(value, update_content_func) for value in array.values]
+        return [jsonmodel_to_json(value, update_content_func) for value in array.values]
     elif json_object := model.object:
         return {
             # TODO i'm confused about key weather it should be string or int or float (value has float, number,

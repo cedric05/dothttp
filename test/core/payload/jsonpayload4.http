@@ -21,3 +21,11 @@ json({
         }
     }
 })
+
+@name('root_array')
+POST https://httpbin.org/post
+json(
+ [   {
+        "token": "secret_value"
+    }]
+)

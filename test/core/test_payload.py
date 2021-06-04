@@ -63,6 +63,15 @@ class PayLoadTest(TestBase):
             ]
         }}, json.loads(req.body), "json Payload parsed wrong")
 
+    def test_root_array(self):
+        req = self.get_request(f"{base_dir}/jsonpayload4.http", target="root_array")
+        self.assertEqual("https://httpbin.org/post", req.url,
+                         "incorrect url computed")
+        self.assertEqual("POST", req.method, "incorrect method")
+        self.assertEqual([{
+            "token": "secret_value"
+        }], json.loads(req.body), "json Payload parsed wrong")
+
     def test_json_payload_complex(self):
         req = self.get_request(f"{base_dir}/jsonpayload4.http")
         self.assertEqual("https://dothttp.azurewebsites.net/", req.url,
