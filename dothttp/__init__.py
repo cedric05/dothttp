@@ -344,6 +344,7 @@ class BaseModelProcessor:
                                              value=target)
         else:
             self.http = self.model.allhttps[0]
+        self.base_http = None
         if self.http.namewrap and self.http.namewrap.base:
             base = self.http.namewrap.base
             self.base_http = None
@@ -405,6 +406,8 @@ class HttpDefBase(BaseModelProcessor):
         self.httpdef.headers = headers
 
     def load_headers_to_dict(self, http, headers):
+        if not http:
+            return
         for line in http.lines:
             if header := line.header:
                 self.remove_quotes(header, "'")
@@ -527,7 +530,11 @@ class HttpDefBase(BaseModelProcessor):
             return sys.stdout
 
     def load_auth(self):
-        auth_wrap = self.http.authwrap if self.http.authwrap else self.base_http.authwrap
+        auth_wrap = None
+        if self.http.authwrap:
+            auth_wrap = self.http.authwrap
+        elif self.base_http:
+            auth_wrap = self.base_http.authwrap
         if auth_wrap:
             if basic_auth := auth_wrap.basic_auth:
                 self.httpdef.auth = HTTPBasicAuth(self.get_updated_content(basic_auth.username),
