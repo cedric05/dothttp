@@ -520,9 +520,9 @@ class HttpDefBase(BaseModelProcessor):
                                                   self.get_updated_content(
                                                       basic_auth.password))
             elif digest_auth := auth_wrap.digest_auth:
-                self.httpdef.auth = HTTPDigestAuth(self.get_updated_content(basic_auth.username),
+                self.httpdef.auth = HTTPDigestAuth(self.get_updated_content(digest_auth.username),
                                                    self.get_updated_content(
-                                                       basic_auth.password))
+                                                       digest_auth.password))
 
     def load_def(self):
         if self._loaded:

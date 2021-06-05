@@ -182,8 +182,7 @@ class HttpFileFormatter(RequestBase):
                 if basic_auth := auth_wrap.basic_auth:
                     output_str += f'{new_line}basicauth("{basic_auth.username}", "{basic_auth.password}")'
                 elif digest_auth := auth_wrap.digest_auth:
-                    print("h")
-                #     output_str += f'{new_line}digestauth("{digest_auth.username}", "{digest_auth.password}")'
+                    output_str += f'{new_line}digestauth("{digest_auth.username}", "{digest_auth.password}")'
             if lines := http.lines:
                 headers = new_line.join(map(lambda line: f'"{line.header.key}": "{line.header.value}"',
                                             filter(lambda line:
