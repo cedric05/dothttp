@@ -1,6 +1,6 @@
 import os
 
-from dothttp import UndefinedHttpToExtend
+from dothttp import UndefinedHttpToExtend, ParameterException
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -46,3 +46,8 @@ class ExtendTests(TestBase):
         filename = f"{base_dir}/auth_extend.http"
         request = self.get_request(filename, target="query2")
         self.assertEqual("https://httpbin.org/digest-auth/20202/username/password/md5", request.url)
+
+    def test_recursive(self):
+        filename = f"{base_dir}/auth_extend.http"
+        with self.assertRaises(ParameterException):
+            self.get_request(filename, target="recursive")

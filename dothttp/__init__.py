@@ -325,35 +325,40 @@ class BaseModelProcessor:
 
     def select_target(self):
         if target := self.args.target:
-            if not isinstance(target, str):
-                target = str(target)
-            if target.isdecimal():
-                if 1 <= int(target) <= len(self.model.allhttps):
-                    self.http = self.model.allhttps[int(target) - 1]
-                else:
-                    raise ParameterException(message="target startswith 1", key='target',
-                                             value=target)
-            else:
-                try:
-                    # if multiple names have same value, it will create confusion
-                    # if they want to go with that. then pass id
-                    self.http = next(filter(lambda http: http.namewrap.name == target,
-                                            (http for http in self.model.allhttps if http.namewrap)))
-                except StopIteration:
-                    raise ParameterException(message="target is not spelled correctly", key='target',
-                                             value=target)
+            self.http = self.get_target(target, self.model.allhttps)
         else:
             self.http = self.model.allhttps[0]
         self.base_http = None
         if self.http.namewrap and self.http.namewrap.base:
             base = self.http.namewrap.base
-            self.base_http = None
-            for http in self.model.allhttps:
-                if http.namewrap and http.namewrap.name == base:
-                    self.base_http = http
-                    break
-            if not self.base_http:
+            if base == self.http.namewrap.name:
+                raise ParameterException(message="target and base should not be equal", key=target,
+                                         value=base)
+            try:
+                self.base_http = self.get_target(base, self.model.allhttps)
+            except Exception:
                 raise UndefinedHttpToExtend(target=self.http.namewrap.name, base=base)
+
+    @staticmethod
+    def get_target(target: Union[str, int], http_def_list: List[Http]):
+        if not isinstance(target, str):
+            target = str(target)
+        if target.isdecimal():
+            if 1 <= int(target) <= len(http_def_list):
+                selected = http_def_list[int(target) - 1]
+            else:
+                raise ParameterException(message="target startswith 1", key='target',
+                                         value=target)
+        else:
+            try:
+                # if multiple names have same value, it will create confusion
+                # if they want to go with that. then pass id
+                selected = next(filter(lambda http: http.namewrap.name == target,
+                                       (http for http in http_def_list if http.namewrap)))
+            except StopIteration:
+                raise ParameterException(message="target is not spelled correctly", key='target',
+                                         value=target)
+        return selected
 
     def validate_names(self):
         names = []

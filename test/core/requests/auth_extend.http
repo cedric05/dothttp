@@ -35,3 +35,7 @@ GET "https://httpbin.org/digest-auth/20202/username/password/md5"
 @name("query2"): query
 POST "https://httpbin.org/digest-auth/20202/username/password/md5"
 
+
+@name("recursive"): recursive
+POST "https://httpbin.org/digest-auth/20202/username/password/md5"
+
