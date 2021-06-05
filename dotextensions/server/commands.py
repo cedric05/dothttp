@@ -5,7 +5,7 @@ import os
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import List, Iterator, Union, Dict
+from typing import List, Iterator, Union, Dict, Optional
 from urllib.parse import unquote
 
 import requests
@@ -16,7 +16,7 @@ from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, Mul
 from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
     HttpFileFormatter
 from . import Command, Result, BaseHandler
-from .postman import postman_collection_from_dict, Items, URLClass
+from .postman import postman_collection_from_dict, Items, URLClass, Auth
 from .utils import clean_filename
 
 DEFAULT_URL = "https://req.dothttp.dev/"
@@ -136,7 +136,7 @@ class RunHttpFileHandler(BaseHandler):
                       request.headers.items()] + query_lines
             ,
             payload=payload,
-            output=None, basic_auth_wrap=None
+            output=None, basic_auth_wrap=BasicAuth(*request.auth) if request.auth else None
         )]))
 
 
@@ -297,10 +297,10 @@ class ImportPostmanCollection(BaseHandler):
         return ImportPostmanCollection.name
 
     @staticmethod
-    def import_requests_into_dire(items: Iterator[Items], directory: Path, link: str):
+    def import_requests_into_dire(items: Iterator[Items], directory: Path, auth: Optional[Auth], link: str):
         collection = Allhttp(allhttps=[])
         for leaf_item in items:
-            onehttp = ImportPostmanCollection.import_leaf_item(leaf_item)
+            onehttp = ImportPostmanCollection.import_leaf_item(leaf_item, auth)
             if onehttp:
                 collection.allhttps.append(onehttp)
         d = {}
@@ -314,7 +314,7 @@ class ImportPostmanCollection(BaseHandler):
         return d
 
     @staticmethod
-    def import_leaf_item(item: Items) -> Union[Http, None]:
+    def import_leaf_item(item: Items, auth: Optional[Auth]) -> Union[Http, None]:
         if not item.request:
             return None
         # currently comments are not supported
@@ -325,6 +325,8 @@ class ImportPostmanCollection(BaseHandler):
         lines = []
         payload = None
         basicauthwrap = None
+
+        request_auth = req.auth or auth
 
         if isinstance(req.url, URLClass):
             host = ".".join(req.url.host)
@@ -342,7 +344,7 @@ class ImportPostmanCollection(BaseHandler):
             for header in req.header:
                 lines.append(
                     Line(header=Header(key=header.key, value=slashed_path_to_normal_path(header.value)), query=None))
-        if req.auth and (basic_auth := req.auth.basic):
+        if request_auth and (basic_auth := request_auth.basic):
             # TODO don't add creds to http file directly
             # add .dothttp.json file
             basicauthwrap = BasicAuth(username=basic_auth['username'], password=basic_auth['password'])
@@ -422,7 +424,11 @@ class ImportPostmanCollection(BaseHandler):
             return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
 
         collection = postman_collection_from_dict(postman_data)
-        d = self.import_items(collection.item, Path(directory).joinpath(clean_filename(collection.info.name)), link)
+        d = self.import_items(collection.item,
+                              Path(directory).joinpath(clean_filename(collection.info.name)),
+                              collection.auth,
+                              link,
+                              )
         if save:
             for path, fileout in d.items():
                 if os.path.exists(path) and not overwrite:
@@ -434,12 +440,15 @@ class ImportPostmanCollection(BaseHandler):
         return Result(id=command.id, result={"files": d})
 
     @staticmethod
-    def import_items(items: List[Items], directory: Path, link: str = ""):
+    def import_items(items: List[Items], directory: Path, auth: Optional[Auth], link: str = ""):
         leaf_folder = filter(lambda item: item.request, items)
         d = dict()
-        d.update(ImportPostmanCollection.import_requests_into_dire(leaf_folder, directory, link))
-        folder = map(lambda item: (item.name, item.item), filter(lambda item: item.item, items))
-        for sub_folder, subitem in folder:
+        d.update(ImportPostmanCollection.import_requests_into_dire(leaf_folder, directory, auth, link))
+        folder = map(lambda item: (item.name, item.item, item.auth), filter(lambda item: item.item, items))
+        for sub_folder, subitem, item_auth in folder:
             d.update(
-                ImportPostmanCollection.import_items(subitem, directory.joinpath(clean_filename(sub_folder)), link))
+                ImportPostmanCollection.import_items(subitem,
+                                                     directory.joinpath(clean_filename(sub_folder)),
+                                                     item_auth or auth,
+                                                     link))
         return d

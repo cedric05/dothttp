@@ -7,3 +7,7 @@ POST https://{{host}}/post
 
 POST https://{{host}}/POST // status 404
 ? startusing, dothttp
+
+@name(basicauth)
+GET https://{{host=httpbin.org}}/get
+basicauth('username', 'password')

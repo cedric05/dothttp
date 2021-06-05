@@ -104,7 +104,7 @@ Array:
 ;
 
 Value:
-    multi=TRIPLE_QUOTE_STRING | str=String | var=VarString |  flt=Float | int=Int | bl=Bool | object=Object | array=Array | null="null"
+    strs += TRIPLE_OR_DOUBLE_STRING | var=VarString |  flt=Float | int=Int | bl=Bool | object=Object | array=Array | null="null"
 ;
 
 
@@ -129,8 +129,7 @@ Object:
 ;
 
 Member:
-    (multi=TRIPLE_QUOTE_STRING ':' value=Value) |
-    (key=STRING ':' value=Value) |
+    (key+=TRIPLE_OR_DOUBLE_STRING ':' value=Value) |
     (var=VarString ':' value=Value)
 ;
 Comment:
