@@ -17,7 +17,9 @@ URL:
 ;
 
 NAMEWRAP:
-    '@name' '(' name=DotString ')'
+    // postman does it same like inherit auth
+    // here we extend both headers and auth
+    '@name' '(' name=DotString ')' (':' base=DotString)?
 ;
 
 LINE: 

@@ -10,6 +10,7 @@ class Allhttp:
 @dataclass
 class NameWrap:
     name: str
+    base: Optional[str] = None
 
 
 @dataclass

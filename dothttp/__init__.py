@@ -344,6 +344,15 @@ class BaseModelProcessor:
                                              value=target)
         else:
             self.http = self.model.allhttps[0]
+        if self.http.namewrap and self.http.namewrap.base:
+            base = self.http.namewrap.base
+            self.base_http = None
+            for http in self.model.allhttps:
+                if http.namewrap and http.namewrap.name == base:
+                    self.base_http = http
+                    break
+            if not self.base_http:
+                raise UndefinedHttpToExtend(target=self.http.namewrap.name, base=base)
 
     def validate_names(self):
         names = []
@@ -389,14 +398,18 @@ class HttpDefBase(BaseModelProcessor):
         """
         headers = {}
         headers.update(self.default_headers)
-        for line in self.http.lines:
+        self.load_headers_to_dict(self.base_http, headers)
+        self.load_headers_to_dict(self.http, headers)
+        request_logger.debug(
+            f'computed query params from `{self.file}` are `{headers}`')
+        self.httpdef.headers = headers
+
+    def load_headers_to_dict(self, http, headers):
+        for line in http.lines:
             if header := line.header:
                 self.remove_quotes(header, "'")
                 self.remove_quotes(header, '"')
                 headers[self.get_updated_content(header.key)] = self.get_updated_content(header.value)
-        request_logger.debug(
-            f'computed query params from `{self.file}` are `{headers}`')
-        self.httpdef.headers = headers
 
     def load_url(self):
         request_logger.debug(
@@ -514,7 +527,8 @@ class HttpDefBase(BaseModelProcessor):
             return sys.stdout
 
     def load_auth(self):
-        if auth_wrap := self.http.authwrap:
+        auth_wrap = self.http.authwrap if self.http.authwrap else self.base_http.authwrap
+        if auth_wrap:
             if basic_auth := auth_wrap.basic_auth:
                 self.httpdef.auth = HTTPBasicAuth(self.get_updated_content(basic_auth.username),
                                                   self.get_updated_content(

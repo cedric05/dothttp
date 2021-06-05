@@ -14,6 +14,11 @@ class DotHttpException(Exception):
     pass
 
 
+@exception_wrapper("http def with name `{base}` not defined for http  with name `{target}`")
+class UndefinedHttpToExtend(Exception):
+    pass
+
+
 @exception_wrapper("incorrect paramter key: `{key}` value: `{value}` . message `{message}`")
 class ParameterException(DotHttpException):
     pass
