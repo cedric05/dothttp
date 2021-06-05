@@ -25,6 +25,8 @@ class FileExecute(TestBase):
             },
             id=1)
         )
+        # with open(os.path.join(fixtures_dir, file_to_compare), 'w') as f:
+        #     json.dump(response.result, f)
         with open(os.path.join(fixtures_dir, file_to_compare), 'r') as f:
             if sys.platform.startswith("windows"):
                 self.assertEqual(json.load(f), response.result)

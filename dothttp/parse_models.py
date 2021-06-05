@@ -10,6 +10,7 @@ class Allhttp:
 @dataclass
 class NameWrap:
     name: str
+    base: Optional[str] = None
 
 
 @dataclass
@@ -22,6 +23,19 @@ class UrlWrap:
 class BasicAuth:
     username: str
     password: str
+
+
+@dataclass
+class DigestAuth:
+    username: str
+    password: str
+
+
+@dataclass
+class AuthWrap:
+    # digest = DIGESTAUTH | basicauth = BASICAUTH
+    digest_auth: Optional[DigestAuth] = None
+    basic_auth: Optional[BasicAuth] = None
 
 
 @dataclass
@@ -85,7 +99,7 @@ class TestScript:
 class Http:
     namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
-    basic_auth_wrap: Optional[BasicAuth]
+    authwrap: Optional[AuthWrap]
     lines: Optional[List[Line]]
     payload: Optional[Payload]
     output: Optional[ToFile]

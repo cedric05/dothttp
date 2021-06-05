@@ -4,7 +4,7 @@ MULTISET: allhttps=HTTP+;
 HTTP:((namewrap=NAMEWRAP)?
         "curl"?
         urlwrap=URL
-        (basic_auth_wrap=BASICAUTH)?
+        (authwrap=AUTHWRAP)?
         (lines *= LINE)?
         (payload=PAYLOAD)?
         (output=TOFILE)?
@@ -17,7 +17,9 @@ URL:
 ;
 
 NAMEWRAP:
-    '@name' '(' name=DotString ')'
+    // postman does it same like inherit auth
+    // here we extend both headers and auth
+    '@name' '(' name=DotString ')' (':' base=DotString)?
 ;
 
 LINE: 
@@ -33,6 +35,16 @@ HEADER:
     | key=/'[\w-]+/ ':' value=/\S(.*\S)?'/ SLASH?
     | key=/"[\w-]+/ ':' value=/\S(.*\S)?"/ SLASH?
     | key=/[\w-]+/ ':' value=/\S(.*\S)?/ SLASH?
+;
+
+AUTHWRAP:
+    digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH
+;
+
+
+DIGESTAUTH:
+    'digestauth' '(' username=DotString ',' password= DotString ')'
+
 ;
 
 BASICAUTH:

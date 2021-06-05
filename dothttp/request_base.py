@@ -178,8 +178,11 @@ class HttpFileFormatter(RequestBase):
                 output_str += f"@name(\"{namewrap.name}\"){new_line}"
             method = http.urlwrap.method if http.urlwrap.method else "GET"
             output_str += f'{method} "{http.urlwrap.url}"'
-            if auth_wrap := http.basic_auth_wrap:
-                output_str += f'{new_line}basicauth("{auth_wrap.username}", "{auth_wrap.password}")'
+            if auth_wrap := http.authwrap:
+                if basic_auth := auth_wrap.basic_auth:
+                    output_str += f'{new_line}basicauth("{basic_auth.username}", "{basic_auth.password}")'
+                elif digest_auth := auth_wrap.digest_auth:
+                    output_str += f'{new_line}digestauth("{digest_auth.username}", "{digest_auth.password}")'
             if lines := http.lines:
                 headers = new_line.join(map(lambda line: f'"{line.header.key}": "{line.header.value}"',
                                             filter(lambda line:
