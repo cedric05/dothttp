@@ -25,6 +25,19 @@ class BasicAuth:
 
 
 @dataclass
+class DigestAuth:
+    username: str
+    password: str
+
+
+@dataclass
+class AuthWrap:
+    # digest = DIGESTAUTH | basicauth = BASICAUTH
+    digest_auth: Optional[DigestAuth] = None
+    basic_auth: Optional[BasicAuth] = None
+
+
+@dataclass
 class Query:
     key: str
     value: str
@@ -85,7 +98,7 @@ class TestScript:
 class Http:
     namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
-    basic_auth_wrap: Optional[BasicAuth]
+    authwrap: Optional[AuthWrap]
     lines: Optional[List[Line]]
     payload: Optional[Payload]
     output: Optional[ToFile]

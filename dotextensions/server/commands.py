@@ -12,7 +12,7 @@ import requests
 
 from dothttp import DotHttpException, HttpDef
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
-    NameWrap, Line, TripleOrDouble
+    NameWrap, Line, TripleOrDouble, AuthWrap, DigestAuth
 from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
     HttpFileFormatter
 from . import Command, Result, BaseHandler
@@ -98,46 +98,8 @@ class RunHttpFileHandler(BaseHandler):
 
     @staticmethod
     def get_http_from_req(request: HttpDef):
-        data = None
-        datajson = None
-        file = None
-        json_payload = None
-        fileswrap = None
-        type = None
-        if request.payload.filename:
-            file = request.payload.filename
-        elif isinstance(request.payload.data, str):
-            data = [TripleOrDouble(str=request.payload.data)]
-        elif isinstance(request.payload.data, dict):
-            datajson = None
-        elif request.payload.json:
-            json_payload = request.payload.json
-        elif request.payload.files:
-            fileswrap = FilesWrap([])
-            for filekey, multipartdata in request.payload.files:
-                fileswrap.files.append(
-                    MultiPartFile(name=filekey,
-                                  path=multipartdata[1].name if multipartdata[0] else multipartdata[1],
-                                  type=multipartdata[2] if len(multipartdata) > 2 else None)
-                )
-
-        payload = Payload(data=data, datajson=datajson, file=file, json=json_payload, fileswrap=fileswrap, type=type)
-
-        query_lines = []
-        for key, values in request.query.items():
-            for value in values:
-                query_lines.append(Line(header=None, query=Query(key=key, value=value)))
-        return HttpFileFormatter.format(Allhttp(allhttps=[Http(
-            namewrap=NameWrap(request.name),
-            urlwrap=UrlWrap(url=request.url, method=request.method),
-            lines=[
-                      Line(header=Header(key=key, value=value), query=None)
-                      for key, value in
-                      request.headers.items()] + query_lines
-            ,
-            payload=payload,
-            output=None, basic_auth_wrap=BasicAuth(*request.auth) if request.auth else None
-        )]))
+        http_def = request.get_http_from_req()
+        return HttpFileFormatter.format(http_def)
 
 
 class ContentBase:
@@ -324,7 +286,7 @@ class ImportPostmanCollection(BaseHandler):
         urlwrap = UrlWrap(url="https://", method=req.method)
         lines = []
         payload = None
-        basicauthwrap = None
+        auth_wrap = None
 
         request_auth = req.auth or auth
 
@@ -344,10 +306,15 @@ class ImportPostmanCollection(BaseHandler):
             for header in req.header:
                 lines.append(
                     Line(header=Header(key=header.key, value=slashed_path_to_normal_path(header.value)), query=None))
-        if request_auth and (basic_auth := request_auth.basic):
+        if request_auth:
             # TODO don't add creds to http file directly
             # add .dothttp.json file
-            basicauthwrap = BasicAuth(username=basic_auth['username'], password=basic_auth['password'])
+            if basic_auth := request_auth.basic:
+                auth_wrap = AuthWrap(
+                    basic_auth=BasicAuth(username=basic_auth['username'], password=basic_auth['password']))
+            elif digest_auth := request_auth.digest:
+                auth_wrap = AuthWrap(
+                    digest_auth=DigestAuth(username=digest_auth['username'], password=digest_auth['password']))
         if req.body:
             # use mode rather than None check
             mode = req.body.mode
@@ -391,7 +358,7 @@ class ImportPostmanCollection(BaseHandler):
                 pass
             payload = Payload(datajson=payload_datajson, data=payload_data, fileswrap=payload_fileswrap,
                               json=payload_json, file=payload_file, type=payload_type)
-        http = Http(namewrap=namewrap, urlwrap=urlwrap, payload=payload, lines=lines, basic_auth_wrap=basicauthwrap,
+        http = Http(namewrap=namewrap, urlwrap=urlwrap, payload=payload, lines=lines, authwrap=auth_wrap,
                     output=None)
         return http
 

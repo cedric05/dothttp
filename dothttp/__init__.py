@@ -9,6 +9,8 @@ from io import IOBase
 from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO
 from urllib.parse import urlencode
 
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
+
 from .utils import get_real_file_path, triple_or_double_tostring
 
 try:
@@ -22,7 +24,8 @@ from textx import TextXSyntaxError, metamodel_from_file
 
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
-from .parse_models import Allhttp
+from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, Query, Http, NameWrap, UrlWrap, Header, \
+    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -83,7 +86,7 @@ class HttpDef:
     url: str = None
     headers: dict = None
     query: dict = None
-    auth: Tuple[str] = None
+    auth: AuthBase = None
     payload: Optional[Payload] = None
     output: str = None
     test_script: str = ""
@@ -132,6 +135,55 @@ class HttpDef:
 
     def get_headers(self):
         return [{"name": key, "value": value} for key, value in self.headers.items()] if self.headers else []
+
+    def get_http_from_req(self):
+        data = None
+        datajson = None
+        file = None
+        json_payload = None
+        fileswrap = None
+        type = None
+        if self.payload.filename:
+            file = self.payload.filename
+        elif isinstance(self.payload.data, str):
+            data = [TripleOrDouble(str=self.payload.data)]
+        elif isinstance(self.payload.data, dict):
+            datajson = None
+        elif self.payload.json:
+            json_payload = self.payload.json
+        elif self.payload.files:
+            fileswrap = FilesWrap([])
+            for filekey, multipartdata in self.payload.files:
+                fileswrap.files.append(
+                    MultiPartFile(name=filekey,
+                                  path=multipartdata[1].name if multipartdata[0] else multipartdata[1],
+                                  type=multipartdata[2] if len(multipartdata) > 2 else None)
+                )
+
+        payload = ParsePayload(data=data, datajson=datajson, file=file, json=json_payload, fileswrap=fileswrap,
+                               type=type)
+
+        query_lines = []
+        for key, values in self.query.items():
+            for value in values:
+                query_lines.append(Line(header=None, query=Query(key=key, value=value)))
+        auth_wrap = None
+        if self.auth:
+            if isinstance(self.auth, HTTPBasicAuth):
+                auth_wrap = AuthWrap(basic_auth=BasicAuth(self.auth.username, self.auth.password))
+            elif isinstance(self.auth, HTTPDigestAuth):
+                auth_wrap = AuthWrap(digest_auth=DigestAuth(self.auth.username, self.auth.password))
+        return Allhttp(allhttps=[Http(
+            namewrap=NameWrap(self.name),
+            urlwrap=UrlWrap(url=self.url, method=self.method),
+            lines=[
+                      Line(header=Header(key=key, value=value), query=None)
+                      for key, value in
+                      self.headers.items()] + query_lines
+            ,
+            payload=payload,
+            output=None, authwrap=auth_wrap
+        )])
 
 
 @dataclass
@@ -462,9 +514,15 @@ class HttpDefBase(BaseModelProcessor):
             return sys.stdout
 
     def load_auth(self):
-        if auth_wrap := self.http.basic_auth_wrap:
-            self.httpdef.auth = self.get_updated_content(auth_wrap.username), self.get_updated_content(
-                auth_wrap.password)
+        if auth_wrap := self.http.authwrap:
+            if basic_auth := auth_wrap.basic_auth:
+                self.httpdef.auth = HTTPBasicAuth(self.get_updated_content(basic_auth.username),
+                                                  self.get_updated_content(
+                                                      basic_auth.password))
+            elif digest_auth := auth_wrap.digest_auth:
+                self.httpdef.auth = HTTPDigestAuth(self.get_updated_content(basic_auth.username),
+                                                   self.get_updated_content(
+                                                       basic_auth.password))
 
     def load_def(self):
         if self._loaded:
