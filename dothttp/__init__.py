@@ -427,7 +427,8 @@ class HttpDefBase(BaseModelProcessor):
             f'url is {self.http.certificate}')
         certificate: Certificate = self.get_current_or_base("certificate")
         if certificate:
-            self.httpdef.certificate = [certificate.cert, certificate.key]
+            self.httpdef.certificate = [self.get_updated_content(certificate.cert),
+                                        self.get_updated_content(certificate.key)]
 
     def load_url(self):
         request_logger.debug(
