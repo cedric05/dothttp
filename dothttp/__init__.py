@@ -546,7 +546,7 @@ class HttpDefBase(BaseModelProcessor):
             return sys.stdout
 
     def load_auth(self):
-        auth_wrap = self.get_current_or_base("auth_wrap")
+        auth_wrap = self.get_current_or_base("authwrap")
         if auth_wrap:
             if basic_auth := auth_wrap.basic_auth:
                 self.httpdef.auth = HTTPBasicAuth(self.get_updated_content(basic_auth.username),
