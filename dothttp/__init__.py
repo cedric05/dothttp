@@ -6,7 +6,7 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from io import IOBase
-from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO
+from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO, Any
 from urllib.parse import urlencode
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
@@ -25,7 +25,7 @@ from textx import TextXSyntaxError, metamodel_from_file
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, Query, Http, NameWrap, UrlWrap, Header, \
-    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload
+    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -88,6 +88,7 @@ class HttpDef:
     query: dict = None
     auth: AuthBase = None
     payload: Optional[Payload] = None
+    certificate: Optional[List[str]] = None
     output: str = None
     test_script: str = ""
 
@@ -173,6 +174,7 @@ class HttpDef:
                 auth_wrap = AuthWrap(basic_auth=BasicAuth(self.auth.username, self.auth.password))
             elif isinstance(self.auth, HTTPDigestAuth):
                 auth_wrap = AuthWrap(digest_auth=DigestAuth(self.auth.username, self.auth.password))
+
         return Allhttp(allhttps=[Http(
             namewrap=NameWrap(self.name),
             urlwrap=UrlWrap(url=self.url, method=self.method),
@@ -182,6 +184,7 @@ class HttpDef:
                       self.headers.items()] + query_lines
             ,
             payload=payload,
+            certificate=Certificate(*self.certificate) if self.certificate else None,
             output=None, authwrap=auth_wrap
         )])
 
@@ -419,6 +422,13 @@ class HttpDefBase(BaseModelProcessor):
                 self.remove_quotes(header, '"')
                 headers[self.get_updated_content(header.key)] = self.get_updated_content(header.value)
 
+    def load_certificate(self):
+        request_logger.debug(
+            f'url is {self.http.certificate}')
+        certificate: Certificate = self.get_current_or_base("certificate")
+        if certificate:
+            self.httpdef.certificate = [certificate.cert, certificate.key]
+
     def load_url(self):
         request_logger.debug(
             f'url is {self.http.urlwrap.url}')
@@ -535,11 +545,7 @@ class HttpDefBase(BaseModelProcessor):
             return sys.stdout
 
     def load_auth(self):
-        auth_wrap = None
-        if self.http.authwrap:
-            auth_wrap = self.http.authwrap
-        elif self.base_http:
-            auth_wrap = self.base_http.authwrap
+        auth_wrap = self.get_current_or_base("auth_wrap")
         if auth_wrap:
             if basic_auth := auth_wrap.basic_auth:
                 self.httpdef.auth = HTTPBasicAuth(self.get_updated_content(basic_auth.username),
@@ -549,6 +555,12 @@ class HttpDefBase(BaseModelProcessor):
                 self.httpdef.auth = HTTPDigestAuth(self.get_updated_content(digest_auth.username),
                                                    self.get_updated_content(
                                                        digest_auth.password))
+
+    def get_current_or_base(self, attr_key) -> Any:
+        if getattr(self.http, attr_key):
+            return getattr(self.http, attr_key)
+        elif self.base_http:
+            return getattr(self.base_http, attr_key)
 
     def load_def(self):
         if self._loaded:
@@ -560,6 +572,7 @@ class HttpDefBase(BaseModelProcessor):
         self.load_query()
         self.load_payload()
         self.load_auth()
+        self.load_certificate()
         self.load_test_script()
         self._loaded = True
 

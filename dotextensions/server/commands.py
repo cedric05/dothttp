@@ -12,7 +12,7 @@ import requests
 
 from dothttp import DotHttpException, HttpDef
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
-    NameWrap, Line, TripleOrDouble, AuthWrap, DigestAuth
+    NameWrap, Line, TripleOrDouble, AuthWrap, DigestAuth, Certificate
 from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
     HttpFileFormatter
 from . import Command, Result, BaseHandler
@@ -221,7 +221,7 @@ def slashed_path_to_normal_path(path):
     return path
 
 
-class ParseHttpData():
+class ParseHttpData(BaseHandler):
     name = "/file/parse"
 
     def get_method(self):
@@ -358,8 +358,11 @@ class ImportPostmanCollection(BaseHandler):
                 pass
             payload = Payload(datajson=payload_datajson, data=payload_data, fileswrap=payload_fileswrap,
                               json=payload_json, file=payload_file, type=payload_type)
+        certificate = None
+        if req.certificate and req.certificate.cert:
+            certificate = Certificate(req.certificate.cert.src, req.certificate.key.src)
         http = Http(namewrap=namewrap, urlwrap=urlwrap, payload=payload, lines=lines, authwrap=auth_wrap,
-                    output=None)
+                    output=None, certificate=certificate)
         return http
 
     def run(self, command: Command) -> Result:

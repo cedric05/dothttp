@@ -96,10 +96,17 @@ class TestScript:
 
 
 @dataclass
+class Certificate:
+    cert: str
+    key: Optional[str]
+
+
+@dataclass
 class Http:
     namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
     authwrap: Optional[AuthWrap]
+    certificate: Optional[Certificate]
     lines: Optional[List[Line]]
     payload: Optional[Payload]
     output: Optional[ToFile]

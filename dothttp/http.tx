@@ -5,6 +5,7 @@ HTTP:((namewrap=NAMEWRAP)?
         "curl"?
         urlwrap=URL
         (authwrap=AUTHWRAP)?
+        (certificate = CERTAUTH)?
         (lines *= LINE)?
         (payload=PAYLOAD)?
         (output=TOFILE)?
@@ -41,6 +42,9 @@ AUTHWRAP:
     digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH
 ;
 
+CERTAUTH:
+    'certificate' '(' 'cert' '=' cert=DotString (',' 'key' '=' key=DotString ','?)? ')'
+;
 
 DIGESTAUTH:
     'digestauth' '(' username=DotString ',' password= DotString ')'
