@@ -7,7 +7,9 @@ from typing import Union
 import jstyleson as json
 from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests.status_codes import _codes as status_code
+from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
 from . import eprint, Config, HttpDefBase, js3py
@@ -87,6 +89,10 @@ class RequestBase(HttpDefBase):
         return self._cookie
 
     def get_session(self):
+        if self.httpdef.session_clear:
+            # calle should close session
+            # TODO
+            return Session()
         session = self.global_session
         if not self.args.no_cookie:
             if cookie := self.get_cookie():
@@ -137,6 +143,23 @@ class CurlCompiler(RequestBase):
         prep = self.get_request_notbody()
         parts = []
         payload = self.httpdef.payload
+        if auth := self.httpdef.auth:
+            if isinstance(auth, HTTPDigestAuth):
+                parts.append(("--digest", None))
+                parts.append(("--user", f"{auth.username}:{auth.password}"))
+            elif isinstance(auth, HTTPBasicAuth):
+                parts.append(("--user", f"{auth.username}:{auth.password}"))
+        if certificate := self.httpdef.certificate:
+            parts.append(("--cert", f"{certificate[0]}"))
+            if self.httpdef.certificate[1]:
+                parts.append(("--key", f"{certificate[1]}"))
+        elif p12 := self.httpdef.p12:
+            # --cert-type P12 --cert cert.p12:password
+            # https://stackoverflow.com/a/55890905
+            parts.append(("--cert", f"{p12[0]}:{p12[1]}"))
+            parts.append(("--cert-type", f"P12"))
+        if self.httpdef.allow_insecure:
+            parts.append(("-k", None))
         if self.http.payload:
             if self.http.payload.file:
                 parts.append(('--data', "@" + self.get_updated_content(self.http.payload.file)))
@@ -271,8 +294,14 @@ class RequestCompiler(RequestBase):
     def get_response(self):
         session = self.get_session()
         request = self.get_request()
+        adaptor = None
+        if self.httpdef.p12:
+            session.mount(request.url,
+                          Pkcs12Adapter(pkcs12_filename=self.httpdef.p12[0],
+                                        pkcs12_password=self.httpdef.p12[1]))
         try:
-            resp: Response = session.send(request)
+            resp: Response = session.send(request, cert=self.httpdef.certificate,
+                                          verify=not self.httpdef.allow_insecure)
         except UnicodeEncodeError:
             # for Chinese, smiley all other default encode converts into latin-1
             # as latin-1 didn't consist of those characters it will fail
@@ -280,9 +309,12 @@ class RequestCompiler(RequestBase):
             # as a last resort, it may not be correct solution. may be it is.
             # for now proceeding with this
             request.prepare_body(request.body.encode("utf-8"), files=None)
-            resp: Response = session.send(request)
+            resp: Response = session.send(request, cert=self.httpdef.certificate,
+                                          verify=not self.httpdef.allow_insecure)
         if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
             session.cookies.save()  # lwpCookie has .save method
+        if self.httpdef.session_clear:
+            session.close()
         return resp
 
     def execute_script(self, resp: Response):

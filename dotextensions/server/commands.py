@@ -9,10 +9,11 @@ from typing import List, Iterator, Union, Dict, Optional
 from urllib.parse import unquote
 
 import requests
+from requests import RequestException
 
 from dothttp import DotHttpException, HttpDef
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
-    NameWrap, Line, TripleOrDouble, AuthWrap, DigestAuth
+    NameWrap, Line, TripleOrDouble, AuthWrap, DigestAuth, Certificate
 from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
     HttpFileFormatter
 from . import Command, Result, BaseHandler
@@ -44,10 +45,22 @@ class RunHttpFileHandler(BaseHandler):
             else:
                 comp = self.get_request_comp(config)
                 result = self.get_request_result(command, comp)
-        except DotHttpException as ex:
+        except DotHttpException as exc:
+            logger.error(f'dothttp exception happened {exc}', exc_info=True)
             result = Result(id=command.id,
                             result={
-                                "error_message": ex.message, "error": True})
+                                "error_message": exc.message, "error": True})
+        except RequestException as exc:
+            logger.error(f'exception from requests {exc}', exc_info=True)
+            result = Result(id=command.id,
+                            result={
+                                "error_message": str(exc), "error": True})
+        except Exception as exc:
+            logger.error(f'unknown error happened {exc}', exc_info=True)
+            result = Result(id=command.id,
+                            result={
+                                "error_message": str(exc), "error": True})
+
         return result
 
     def get_curl_comp(self, config):
@@ -221,13 +234,16 @@ def slashed_path_to_normal_path(path):
     return path
 
 
-class ParseHttpData():
+class ParseHttpData(BaseHandler):
     name = "/file/parse"
 
     def get_method(self):
         return ParseHttpData.name
 
     def run(self, command: Command) -> Result:
+        # certificate is not supported by har format
+        # visit http://www.softwareishard.com/blog/har-12-spec/#request
+        # for more information
         params = command.params
         filename = params.get("file")
         content = params.get('content')
@@ -358,8 +374,11 @@ class ImportPostmanCollection(BaseHandler):
                 pass
             payload = Payload(datajson=payload_datajson, data=payload_data, fileswrap=payload_fileswrap,
                               json=payload_json, file=payload_file, type=payload_type)
+        certificate = None
+        if req.certificate and req.certificate.cert:
+            certificate = Certificate(req.certificate.cert.src, req.certificate.key.src)
         http = Http(namewrap=namewrap, urlwrap=urlwrap, payload=payload, lines=lines, authwrap=auth_wrap,
-                    output=None)
+                    output=None, certificate=certificate)
         return http
 
     def run(self, command: Command) -> Result:

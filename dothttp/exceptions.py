@@ -15,7 +15,7 @@ class DotHttpException(Exception):
 
 
 @exception_wrapper("http def with name `{base}` not defined for http  with name `{target}`")
-class UndefinedHttpToExtend(Exception):
+class UndefinedHttpToExtend(DotHttpException):
     pass
 
 

@@ -10,7 +10,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 fixtures_dir = f"{dir_path}/fixtures"
 
 
-class ToHar(TestBase):
+class ToHarTest(TestBase):
     def setUp(self) -> None:
         self.maxDiff = None
         self.execute_handler = ParseHttpData()

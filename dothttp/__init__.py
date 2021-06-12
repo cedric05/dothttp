@@ -6,8 +6,8 @@ import sys
 from collections import defaultdict
 from dataclasses import dataclass, field
 from io import IOBase
-from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO
-from urllib.parse import urlencode
+from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO, Any
+from urllib.parse import urlencode, urljoin
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 
@@ -25,7 +25,7 @@ from textx import TextXSyntaxError, metamodel_from_file
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, Query, Http, NameWrap, UrlWrap, Header, \
-    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload
+    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -88,7 +88,11 @@ class HttpDef:
     query: dict = None
     auth: AuthBase = None
     payload: Optional[Payload] = None
+    certificate: Optional[List[str]] = None
+    p12: Optional[List[str]] = None
     output: str = None
+    allow_insecure = False
+    session_clear = False
     test_script: str = ""
 
     def get_har(self):
@@ -173,8 +177,19 @@ class HttpDef:
                 auth_wrap = AuthWrap(basic_auth=BasicAuth(self.auth.username, self.auth.password))
             elif isinstance(self.auth, HTTPDigestAuth):
                 auth_wrap = AuthWrap(digest_auth=DigestAuth(self.auth.username, self.auth.password))
+        certificate = None
+        if self.certificate:
+            certificate = Certificate(*self.certificate)
+        elif self.p12:
+            certificate = P12Certificate(*self.p12)
+        extra_args = []
+        if self.session_clear:
+            extra_args.append(ExtraArg(clear="@clear"))
+        if self.allow_insecure:
+            extra_args.append(ExtraArg(insecure="@insecure"))
         return Allhttp(allhttps=[Http(
             namewrap=NameWrap(self.name),
+            extra_args=extra_args,
             urlwrap=UrlWrap(url=self.url, method=self.method),
             lines=[
                       Line(header=Header(key=key, value=value), query=None)
@@ -182,6 +197,7 @@ class HttpDef:
                       self.headers.items()] + query_lines
             ,
             payload=payload,
+            certificate=certificate,
             output=None, authwrap=auth_wrap
         )])
 
@@ -325,35 +341,40 @@ class BaseModelProcessor:
 
     def select_target(self):
         if target := self.args.target:
-            if not isinstance(target, str):
-                target = str(target)
-            if target.isdecimal():
-                if 1 <= int(target) <= len(self.model.allhttps):
-                    self.http = self.model.allhttps[int(target) - 1]
-                else:
-                    raise ParameterException(message="target startswith 1", key='target',
-                                             value=target)
-            else:
-                try:
-                    # if multiple names have same value, it will create confusion
-                    # if they want to go with that. then pass id
-                    self.http = next(filter(lambda http: http.namewrap.name == target,
-                                            (http for http in self.model.allhttps if http.namewrap)))
-                except StopIteration:
-                    raise ParameterException(message="target is not spelled correctly", key='target',
-                                             value=target)
+            self.http = self.get_target(target, self.model.allhttps)
         else:
             self.http = self.model.allhttps[0]
         self.base_http = None
         if self.http.namewrap and self.http.namewrap.base:
             base = self.http.namewrap.base
-            self.base_http = None
-            for http in self.model.allhttps:
-                if http.namewrap and http.namewrap.name == base:
-                    self.base_http = http
-                    break
-            if not self.base_http:
+            if base == self.http.namewrap.name:
+                raise ParameterException(message="target and base should not be equal", key=target,
+                                         value=base)
+            try:
+                self.base_http = self.get_target(base, self.model.allhttps)
+            except Exception:
                 raise UndefinedHttpToExtend(target=self.http.namewrap.name, base=base)
+
+    @staticmethod
+    def get_target(target: Union[str, int], http_def_list: List[Http]):
+        if not isinstance(target, str):
+            target = str(target)
+        if target.isdecimal():
+            if 1 <= int(target) <= len(http_def_list):
+                selected = http_def_list[int(target) - 1]
+            else:
+                raise ParameterException(message="target startswith 1", key='target',
+                                         value=target)
+        else:
+            try:
+                # if multiple names have same value, it will create confusion
+                # if they want to go with that. then pass id
+                selected = next(filter(lambda http: http.namewrap.name == target,
+                                       (http for http in http_def_list if http.namewrap)))
+            except StopIteration:
+                raise ParameterException(message="target is not spelled correctly", key='target',
+                                         value=target)
+        return selected
 
     def validate_names(self):
         names = []
@@ -414,10 +435,40 @@ class HttpDefBase(BaseModelProcessor):
                 self.remove_quotes(header, '"')
                 headers[self.get_updated_content(header.key)] = self.get_updated_content(header.value)
 
+    def load_certificate(self):
+        request_logger.debug(
+            f'url is {self.http.certificate}')
+        certificate: Union[Certificate, P12Certificate] = self.get_current_or_base("certificate")
+        if certificate:
+            if certificate.cert:
+                self.httpdef.certificate = [self.get_updated_content(certificate.cert),
+                                            self.get_updated_content(certificate.key) if certificate.key else None]
+            elif certificate.file:
+                self.httpdef.p12 = [self.get_updated_content(certificate.file),
+                                    self.get_updated_content(certificate.password)]
+
+    def load_extra_flags(self):
+        # flags are extendable
+        # once its marked as allow insecure
+        # user would want all child to have same effect
+        extra_args = self.http.extra_args
+        if self.base_http and self.base_http.extra_args:
+            extra_args += self.base_http.extra_args
+        if extra_args:
+            for flag in extra_args:
+                if flag.clear:
+                    self.httpdef.session_clear = True
+                elif flag.insecure:
+                    self.httpdef.allow_insecure = True
+
     def load_url(self):
         request_logger.debug(
             f'url is {self.http.urlwrap.url}')
-        self.httpdef.url = self.get_updated_content(self.http.urlwrap.url)
+        if base_http := self.base_http:
+            self.httpdef.url = urljoin(self.get_updated_content(base_http.urlwrap.url),
+                                       self.get_updated_content(self.http.urlwrap.url))
+        else:
+            self.httpdef.url = self.get_updated_content(self.http.urlwrap.url)
 
     def load_method(self):
         if method := self.http.urlwrap.method:
@@ -530,11 +581,7 @@ class HttpDefBase(BaseModelProcessor):
             return sys.stdout
 
     def load_auth(self):
-        auth_wrap = None
-        if self.http.authwrap:
-            auth_wrap = self.http.authwrap
-        elif self.base_http:
-            auth_wrap = self.base_http.authwrap
+        auth_wrap = self.get_current_or_base("authwrap")
         if auth_wrap:
             if basic_auth := auth_wrap.basic_auth:
                 self.httpdef.auth = HTTPBasicAuth(self.get_updated_content(basic_auth.username),
@@ -544,6 +591,12 @@ class HttpDefBase(BaseModelProcessor):
                 self.httpdef.auth = HTTPDigestAuth(self.get_updated_content(digest_auth.username),
                                                    self.get_updated_content(
                                                        digest_auth.password))
+
+    def get_current_or_base(self, attr_key) -> Any:
+        if getattr(self.http, attr_key):
+            return getattr(self.http, attr_key)
+        elif self.base_http:
+            return getattr(self.base_http, attr_key)
 
     def load_def(self):
         if self._loaded:
@@ -555,7 +608,9 @@ class HttpDefBase(BaseModelProcessor):
         self.load_query()
         self.load_payload()
         self.load_auth()
+        self.load_certificate()
         self.load_test_script()
+        self.load_extra_flags()
         self._loaded = True
 
     def load_test_script(self):

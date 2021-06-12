@@ -16,8 +16,8 @@ class TestRandoms(TestCase):
         self.assertTrue(property_util.get_random_int())
         self.assertTrue(property_util.get_random_int(0))
         self.assertTrue(property_util.get_random_int(10))
-        self.assertTrue(10 <= property_util.get_random_int(2) < 100)
-        self.assertTrue(100 <= property_util.get_random_int(3) < 1000)
+        self.assertTrue(10 <= property_util.get_random_int(2) <= 100)
+        self.assertTrue(100 <= property_util.get_random_int(3) <= 1000)
 
     def test_random_float(self):
         self.assertTrue(property_util.get_random_float())
