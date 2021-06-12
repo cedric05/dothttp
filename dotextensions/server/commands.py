@@ -9,6 +9,7 @@ from typing import List, Iterator, Union, Dict, Optional
 from urllib.parse import unquote
 
 import requests
+from requests import RequestException
 
 from dothttp import DotHttpException, HttpDef
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
@@ -44,10 +45,22 @@ class RunHttpFileHandler(BaseHandler):
             else:
                 comp = self.get_request_comp(config)
                 result = self.get_request_result(command, comp)
-        except DotHttpException as ex:
+        except DotHttpException as exc:
+            logger.error(f'dothttp exception happened {exc}', exc_info=True)
             result = Result(id=command.id,
                             result={
-                                "error_message": ex.message, "error": True})
+                                "error_message": exc.message, "error": True})
+        except RequestException as exc:
+            logger.error(f'exception from requests {exc}', exc_info=True)
+            result = Result(id=command.id,
+                            result={
+                                "error_message": str(exc), "error": True})
+        except Exception as exc:
+            logger.error(f'unknown error happened {exc}', exc_info=True)
+            result = Result(id=command.id,
+                            result={
+                                "error_message": str(exc), "error": True})
+
         return result
 
     def get_curl_comp(self, config):
