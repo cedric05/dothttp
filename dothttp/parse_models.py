@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, Union
 
 
 @dataclass
@@ -102,6 +102,20 @@ class Certificate:
 
 
 @dataclass
+class P12Certificate:
+    file: Optional[str] = None
+    password: Optional[str] = None
+
+
+@dataclass
+class ExtraArg:
+    # clears session after each
+    clear: Optional[str] = ''
+    # allows insecure
+    insecure: Optional[str] = ''
+
+
+@dataclass
 class Http:
     namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
@@ -110,6 +124,7 @@ class Http:
     lines: Optional[List[Line]]
     payload: Optional[Payload]
     output: Optional[ToFile]
+    extra_args: Optional[ExtraArg] = field(default_factory=lambda: [])
     script_wrap: Optional[TestScript] = field(default_factory=lambda: TestScript(''))
 
 

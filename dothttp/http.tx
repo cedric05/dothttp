@@ -2,6 +2,7 @@
 MULTISET: allhttps=HTTP+;
 
 HTTP:((namewrap=NAMEWRAP)?
+        (extra_args*=EXTRA_ARG)?
         "curl"?
         urlwrap=URL
         (authwrap=AUTHWRAP)?
@@ -43,8 +44,13 @@ AUTHWRAP:
 ;
 
 CERTAUTH:
-    'certificate' '(' 'cert' '=' cert=DotString (',' 'key' '=' key=DotString ','?)? ')'
+    (
+        'certificate' '(' 'cert' '=' cert=DotString (',' 'key' '=' key=DotString ','?)? ')'
+    ) | (
+        'p12' '(' 'file' '=' file=DotString ',' 'password' '=' password=DotString ','? ')'
+    )
 ;
+
 
 DIGESTAUTH:
     'digestauth' '(' username=DotString ',' password= DotString ')'
@@ -53,6 +59,19 @@ DIGESTAUTH:
 
 BASICAUTH:
     'basicauth' '(' username=DotString ',' password= DotString ')'
+;
+
+EXTRA_ARG:
+    // there can be more
+    clear=CLEAR_SESSION | insecure=INSECURE
+;
+
+CLEAR_SESSION:
+    '@clear'
+;
+
+INSECURE:
+    "@insecure"
 ;
 
 METHODTYPE2:

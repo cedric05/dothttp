@@ -29,13 +29,22 @@ POST "https://httpbin.org/digest-auth/20202/username/password/md5"
 
 
 @name(query)
-GET "https://httpbin.org/digest-auth/20202/username/password/md5"
+GET "https://httpbin.org/"
 ? ram = raju
 
 @name("query2"): query
-POST "https://httpbin.org/digest-auth/20202/username/password/md5"
+POST "digest-auth/20202/username/password/md5"
 
 
 @name("recursive"): recursive
 POST "https://httpbin.org/digest-auth/20202/username/password/md5"
 
+
+
+@name("args")
+@insecure
+@clear
+POST "https://httpbin.org/digest-auth/20202/username/password/md5"
+
+@name("argsextend") : "args"
+POST "https://httpbin.org/digest-auth/20202/username/password/md5"

@@ -7,7 +7,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from io import IOBase
 from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO, Any
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urljoin
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 
@@ -25,7 +25,7 @@ from textx import TextXSyntaxError, metamodel_from_file
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, Query, Http, NameWrap, UrlWrap, Header, \
-    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate
+    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -89,7 +89,10 @@ class HttpDef:
     auth: AuthBase = None
     payload: Optional[Payload] = None
     certificate: Optional[List[str]] = None
+    p12: Optional[List[str]] = None
     output: str = None
+    allow_insecure = False
+    session_clear = False
     test_script: str = ""
 
     def get_har(self):
@@ -174,9 +177,19 @@ class HttpDef:
                 auth_wrap = AuthWrap(basic_auth=BasicAuth(self.auth.username, self.auth.password))
             elif isinstance(self.auth, HTTPDigestAuth):
                 auth_wrap = AuthWrap(digest_auth=DigestAuth(self.auth.username, self.auth.password))
-
+        certificate = None
+        if self.certificate:
+            certificate = Certificate(*self.certificate)
+        elif self.p12:
+            certificate = P12Certificate(*self.p12)
+        extra_args = []
+        if self.session_clear:
+            extra_args.append(ExtraArg(clear="@clear"))
+        if self.allow_insecure:
+            extra_args.append(ExtraArg(insecure="@insecure"))
         return Allhttp(allhttps=[Http(
             namewrap=NameWrap(self.name),
+            extra_args=extra_args,
             urlwrap=UrlWrap(url=self.url, method=self.method),
             lines=[
                       Line(header=Header(key=key, value=value), query=None)
@@ -184,7 +197,7 @@ class HttpDef:
                       self.headers.items()] + query_lines
             ,
             payload=payload,
-            certificate=Certificate(*self.certificate) if self.certificate else None,
+            certificate=certificate,
             output=None, authwrap=auth_wrap
         )])
 
@@ -425,15 +438,37 @@ class HttpDefBase(BaseModelProcessor):
     def load_certificate(self):
         request_logger.debug(
             f'url is {self.http.certificate}')
-        certificate: Certificate = self.get_current_or_base("certificate")
+        certificate: Union[Certificate, P12Certificate] = self.get_current_or_base("certificate")
         if certificate:
-            self.httpdef.certificate = [self.get_updated_content(certificate.cert),
-                                        self.get_updated_content(certificate.key)]
+            if certificate.cert:
+                self.httpdef.certificate = [self.get_updated_content(certificate.cert),
+                                            self.get_updated_content(certificate.key) if certificate.key else None]
+            elif certificate.file:
+                self.httpdef.p12 = [self.get_updated_content(certificate.file),
+                                    self.get_updated_content(certificate.password)]
+
+    def load_extra_flags(self):
+        # flags are extendable
+        # once its marked as allow insecure
+        # user would want all child to have same effect
+        extra_args = self.http.extra_args
+        if self.base_http and self.base_http.extra_args:
+            extra_args += self.base_http.extra_args
+        if extra_args:
+            for flag in extra_args:
+                if flag.clear:
+                    self.httpdef.session_clear = True
+                elif flag.insecure:
+                    self.httpdef.allow_insecure = True
 
     def load_url(self):
         request_logger.debug(
             f'url is {self.http.urlwrap.url}')
-        self.httpdef.url = self.get_updated_content(self.http.urlwrap.url)
+        if base_http := self.base_http:
+            self.httpdef.url = urljoin(self.get_updated_content(base_http.urlwrap.url),
+                                       self.get_updated_content(self.http.urlwrap.url))
+        else:
+            self.httpdef.url = self.get_updated_content(self.http.urlwrap.url)
 
     def load_method(self):
         if method := self.http.urlwrap.method:
@@ -575,6 +610,7 @@ class HttpDefBase(BaseModelProcessor):
         self.load_auth()
         self.load_certificate()
         self.load_test_script()
+        self.load_extra_flags()
         self._loaded = True
 
     def load_test_script(self):

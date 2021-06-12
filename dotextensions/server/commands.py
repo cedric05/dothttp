@@ -228,6 +228,9 @@ class ParseHttpData(BaseHandler):
         return ParseHttpData.name
 
     def run(self, command: Command) -> Result:
+        # certificate is not supported by har format
+        # visit http://www.softwareishard.com/blog/har-12-spec/#request
+        # for more information
         params = command.params
         filename = params.get("file")
         content = params.get('content')
