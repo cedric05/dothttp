@@ -17,6 +17,7 @@ from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .json_utils import JSONEncoder
 from .parse_models import Allhttp
+from .utils import quote_or_unquote
 
 JSON_ENCODER = JSONEncoder(indent=4)
 
@@ -198,7 +199,8 @@ class HttpFileFormatter(RequestBase):
         for http in model.allhttps:
             new_line = "\n"
             if namewrap := http.namewrap:
-                output_str += f"@name(\"{namewrap.name}\"){new_line}"
+                quote_type, name = quote_or_unquote(namewrap.name)
+                output_str += f"@name({quote_type}{name}{quote_type}){new_line}"
             method = http.urlwrap.method if http.urlwrap.method else "GET"
             output_str += f'{method} "{http.urlwrap.url}"'
             if auth_wrap := http.authwrap:
@@ -212,10 +214,6 @@ class HttpFileFormatter(RequestBase):
                                                    line.header, lines)))
                 if headers:
                     output_str += f"\n{headers}"
-
-                def query_to_http(line):
-                    quote_type = '"' if '"' in line.query.key else '"'
-                    return f'? {quote_type}{line.query.key}{quote_type}= {quote_type}{line.query.value}{quote_type}'
 
                 query = new_line.join(map(query_to_http,
                                           filter(lambda line:
@@ -263,6 +261,11 @@ class HttpFileFormatter(RequestBase):
         else:
             with open(self.args.file, 'w') as f:
                 f.write(formatted)
+
+
+def query_to_http(line):
+    quote_type = quote_or_unquote(line.query.value)[0]
+    return f'? {quote_type}{line.query.key}{quote_type}= {quote_type}{line.query.value}{quote_type}'
 
 
 class RequestCompiler(RequestBase):

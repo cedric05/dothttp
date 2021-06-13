@@ -414,7 +414,8 @@ class ImportPostmanCollection(BaseHandler):
         # input validations
         if save:
             if not os.path.isdir(directory):
-                return Result(id=command.id, result={"error_message": "non existent directory", "error": True})
+                return Result(id=command.id,
+                              result={"error_message": f"non existent directory: {directory}", "error": True})
             if not os.access(directory, os.X_OK | os.W_OK):
                 return Result(id=command.id,
                               result={"error_message": "insufficient permissions", "error": True})
