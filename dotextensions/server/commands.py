@@ -278,9 +278,12 @@ class ImportPostmanCollection(BaseHandler):
     def import_requests_into_dire(items: Iterator[Items], directory: Path, auth: Optional[Auth], link: str):
         collection = Allhttp(allhttps=[])
         for leaf_item in items:
-            onehttp = ImportPostmanCollection.import_leaf_item(leaf_item, auth)
-            if onehttp:
-                collection.allhttps.append(onehttp)
+            try:
+                onehttp = ImportPostmanCollection.import_leaf_item(leaf_item, auth)
+                if onehttp:
+                    collection.allhttps.append(onehttp)
+            except:
+                logger.error("import postman api failed", exc_info=True)
         d = {}
         if len(collection.allhttps) != 0:
             data = HttpFileFormatter.format(collection)
@@ -314,7 +317,8 @@ class ImportPostmanCollection(BaseHandler):
             urlwrap.url = slashed_path_to_normal_path(url)
             if req.url.query:
                 for query in req.url.query:
-                    lines.append(Line(query=Query(query.key, unquote(query.value)), header=None))
+                    if query.key and query.value:
+                        lines.append(Line(query=Query(query.key, unquote(query.value)), header=None))
         else:
             urlwrap.url = slashed_path_to_normal_path(req.url)
         # if urlwrap.url == "":
