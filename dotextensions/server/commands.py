@@ -17,7 +17,8 @@ from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, Mul
 from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
     HttpFileFormatter
 from . import Command, Result, BaseHandler
-from .postman import postman_collection_from_dict, Items, URLClass, Auth
+from .postman import postman_collection_from_dict, Items, URLClass, Auth, POSTMAN_2
+from .postman2_1 import POSTMAN_2_1, postman_collection21_from_dict, ApikeyElement
 from .utils import clean_filename
 
 DEFAULT_URL = "https://req.dothttp.dev/"
@@ -311,7 +312,7 @@ class ImportPostmanCollection(BaseHandler):
 
         if isinstance(req.url, URLClass):
             host = ".".join(req.url.host)
-            proto = req.url.protocol
+            proto = req.url.protocol or "https"
             path = "/".join(req.url.path)
             url = f"{proto}://{host}/{path}"
             urlwrap.url = slashed_path_to_normal_path(url)
@@ -331,9 +332,17 @@ class ImportPostmanCollection(BaseHandler):
             # TODO don't add creds to http file directly
             # add .dothttp.json file
             if basic_auth := request_auth.basic:
+                if isinstance(request_auth.basic, list):
+                    # postman 2.1, it is a list of api_key_element have keys and values
+                    basic_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.basic)
+                # in postman 2.0, it is a dict
                 auth_wrap = AuthWrap(
                     basic_auth=BasicAuth(username=basic_auth['username'], password=basic_auth['password']))
             elif digest_auth := request_auth.digest:
+                if isinstance(request_auth.basic, list):
+                    # postman 2.1, it is a list of api_key_element have keys and values
+                    digest_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.digest)
+                # postman 2.0
                 auth_wrap = AuthWrap(
                     digest_auth=DigestAuth(username=digest_auth['username'], password=digest_auth['password']))
         if req.body:
@@ -386,6 +395,15 @@ class ImportPostmanCollection(BaseHandler):
                     output=None, certificate=certificate)
         return http
 
+    @staticmethod
+    def api_key_element_to_dict(api_key_elements: List[ApikeyElement]):
+        # transforms 2.1 postman to 2.0 postman
+        basic_auth = {}
+        for element in api_key_elements:
+            api_key_element: ApikeyElement = element
+            basic_auth[api_key_element.key] = api_key_element.value
+        return basic_auth
+
     def run(self, command: Command) -> Result:
         # params
         link: str = command.params.get("link")
@@ -410,16 +428,26 @@ class ImportPostmanCollection(BaseHandler):
 
         resp = requests.get(link)
         postman_data = resp.json()
-        if not ("info" in postman_data and 'schema' in postman_data['info'] and postman_data['info'][
-            'schema'] == 'https://schema.getpostman.com/json/collection/v2.0.0/collection.json'):
+        if "info" in postman_data and 'schema' in postman_data['info']:
+            if postman_data['info']['schema'] == POSTMAN_2:
+                collection = postman_collection_from_dict(postman_data)
+                d = self.import_items(collection.item,
+                                      Path(directory).joinpath(clean_filename(collection.info.name)),
+                                      collection.auth,
+                                      link,
+                                      )
+            elif postman_data['info']['schema'] == POSTMAN_2_1:
+                collection = postman_collection21_from_dict(postman_data)
+                d = self.import_items(collection.item,
+                                      Path(directory).joinpath(clean_filename(collection.info.name)),
+                                      collection.auth,
+                                      link,
+                                      )
+            else:
+                return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
+        else:
             return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
 
-        collection = postman_collection_from_dict(postman_data)
-        d = self.import_items(collection.item,
-                              Path(directory).joinpath(clean_filename(collection.info.name)),
-                              collection.auth,
-                              link,
-                              )
         if save:
             for path, fileout in d.items():
                 if os.path.exists(path) and not overwrite:

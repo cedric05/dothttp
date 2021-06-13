@@ -1,13 +1,30 @@
+# To use this code, make sure you
+#
+#     import json
+#
+# and then, to convert JSON from a string, do
+#
+#     result = postman21_collection_from_dict(json.loads(json_string))
+
+POSTMAN_2_1 = 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+# To use this code, make sure you
+#
+#     import json
+#
+# and then, to convert JSON from a string, do
+#
+#     result = postman_collection21_from_dict(json.loads(json_string))
+
 from enum import Enum
-from typing import Optional, Dict, Any, Union, List, TypeVar, Callable, Type, cast
+from typing import Optional, Any, List, Union, Dict, TypeVar, Callable, Type, cast
 
 T = TypeVar("T")
 EnumT = TypeVar("EnumT", bound=Enum)
 
 
-def from_dict(f: Callable[[Any], T], x: Any) -> Dict[str, T]:
-    assert isinstance(x, dict)
-    return {k: f(v) for (k, v) in x.items()}
+def from_str(x: Any) -> str:
+    assert isinstance(x, str)
+    return x
 
 
 def from_none(x: Any) -> Any:
@@ -24,19 +41,9 @@ def from_union(fs, x):
     assert False
 
 
-def to_enum(c: Type[EnumT], x: Any) -> EnumT:
-    assert isinstance(x, c)
-    return x.value
-
-
-def from_str(x: Any) -> str:
-    assert isinstance(x, str)
-    return x
-
-
-def from_bool(x: Any) -> bool:
-    assert isinstance(x, bool)
-    return x
+def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
+    assert isinstance(x, list)
+    return [f(y) for y in x]
 
 
 def to_class(c: Type[T], x: Any) -> dict:
@@ -44,14 +51,24 @@ def to_class(c: Type[T], x: Any) -> dict:
     return cast(Any, x).to_dict()
 
 
-def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
-    assert isinstance(x, list)
-    return [f(y) for y in x]
+def to_enum(c: Type[EnumT], x: Any) -> EnumT:
+    assert isinstance(x, c)
+    return x.value
+
+
+def from_bool(x: Any) -> bool:
+    assert isinstance(x, bool)
+    return x
 
 
 def from_int(x: Any) -> int:
     assert isinstance(x, int) and not isinstance(x, bool)
     return x
+
+
+def from_dict(f: Callable[[Any], T], x: Any) -> Dict[str, T]:
+    assert isinstance(x, dict)
+    return {k: f(v) for (k, v) in x.items()}
 
 
 def from_float(x: Any) -> float:
@@ -62,6 +79,35 @@ def from_float(x: Any) -> float:
 def to_float(x: Any) -> float:
     assert isinstance(x, float)
     return x
+
+
+class ApikeyElement:
+    """Represents an attribute for any authorization method provided by Postman. For example
+    `username` and `password` are set as auth attributes for Basic Authentication method.
+    """
+    key: str
+    type: Optional[str]
+    value: Any
+
+    def __init__(self, key: str, type: Optional[str], value: Any) -> None:
+        self.key = key
+        self.type = type
+        self.value = value
+
+    @staticmethod
+    def from_dict(obj: Any) -> 'ApikeyElement':
+        assert isinstance(obj, dict)
+        key = from_str(obj.get("key"))
+        type = from_union([from_str, from_none], obj.get("type"))
+        value = obj.get("value")
+        return ApikeyElement(key, type, value)
+
+    def to_dict(self) -> dict:
+        result: dict = {}
+        result["key"] = from_str(self.key)
+        result["type"] = from_union([from_str, from_none], self.type)
+        result["value"] = self.value
+        return result
 
 
 class AuthType(Enum):
@@ -76,60 +122,50 @@ class AuthType(Enum):
     NTLM = "ntlm"
     OAUTH1 = "oauth1"
     OAUTH2 = "oauth2"
-    INHERIT = "inherit"
 
 
 class Auth:
     """Represents authentication helpers provided by Postman"""
-    """The attributes for API Key Authentication. e.g. key, value, in."""
-    apikey: Optional[Dict[str, Any]]
+    """The attributes for API Key Authentication."""
+    apikey: Optional[List[ApikeyElement]]
     """The attributes for [AWS
-    Auth](http://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html). e.g.
-    accessKey, secretKey, region, service.
+    Auth](http://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html).
     """
-    awsv4: Optional[Dict[str, Any]]
+    awsv4: Optional[List[ApikeyElement]]
     """The attributes for [Basic
-    Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication). e.g.
-    username, password.
+    Authentication](https://en.wikipedia.org/wiki/Basic_access_authentication).
     """
-    basic: Optional[Dict[str, Any]]
-    """The attributes for [Bearer Token Authentication](https://tools.ietf.org/html/rfc6750).
-    e.g. token.
+    basic: Optional[List[ApikeyElement]]
+    """The helper attributes for [Bearer Token
+    Authentication](https://tools.ietf.org/html/rfc6750)
     """
-    bearer: Optional[Dict[str, Any]]
+    bearer: Optional[List[ApikeyElement]]
     """The attributes for [Digest
-    Authentication](https://en.wikipedia.org/wiki/Digest_access_authentication). e.g.
-    username, password, realm, nonce, nonceCount, algorithm, qop, opaque, clientNonce.
+    Authentication](https://en.wikipedia.org/wiki/Digest_access_authentication).
     """
-    digest: Optional[Dict[str, Any]]
+    digest: Optional[List[ApikeyElement]]
     """The attributes for [Akamai EdgeGrid
-    Authentication](https://developer.akamai.com/legacy/introduction/Client_Auth.html). e.g.
-    accessToken, clientToken, clientSecret, baseURL, nonce, timestamp, headersToSign.
+    Authentication](https://developer.akamai.com/legacy/introduction/Client_Auth.html).
     """
-    edgegrid: Optional[Dict[str, Any]]
-    """The attributes for [Hawk Authentication](https://github.com/hueniverse/hawk). e.g.
-    authId, authKey, algorith, user, nonce, extraData, appId, delegation, timestamp.
-    """
-    hawk: Optional[Dict[str, Any]]
+    edgegrid: Optional[List[ApikeyElement]]
+    """The attributes for [Hawk Authentication](https://github.com/hueniverse/hawk)"""
+    hawk: Optional[List[ApikeyElement]]
     noauth: Any
     """The attributes for [NTLM
-    Authentication](https://msdn.microsoft.com/en-us/library/cc237488.aspx). e.g. username,
-    password, domain, workstation.
+    Authentication](https://msdn.microsoft.com/en-us/library/cc237488.aspx)
     """
-    ntlm: Optional[Dict[str, Any]]
-    """The attributes for [OAuth1](https://oauth.net/1/). e.g. consumerKey, consumerSecret,
-    token, tokenSecret, signatureMethod, timestamp, nonce, version, realm, encodeOAuthSign.
-    """
-    oauth1: Optional[Dict[str, Any]]
-    """The attributes for [OAuth2](https://oauth.net/2/). e.g. accessToken, addTokenTo."""
-    oauth2: Optional[Dict[str, Any]]
+    ntlm: Optional[List[ApikeyElement]]
+    """The attributes for [OAuth2](https://oauth.net/1/)"""
+    oauth1: Optional[List[ApikeyElement]]
+    """Helper attributes for [OAuth2](https://oauth.net/2/)"""
+    oauth2: Optional[List[ApikeyElement]]
     type: AuthType
 
-    def __init__(self, apikey: Optional[Dict[str, Any]], awsv4: Optional[Dict[str, Any]],
-                 basic: Optional[Dict[str, Any]], bearer: Optional[Dict[str, Any]], digest: Optional[Dict[str, Any]],
-                 edgegrid: Optional[Dict[str, Any]], hawk: Optional[Dict[str, Any]], noauth: Any,
-                 ntlm: Optional[Dict[str, Any]], oauth1: Optional[Dict[str, Any]], oauth2: Optional[Dict[str, Any]],
-                 type: AuthType) -> None:
+    def __init__(self, apikey: Optional[List[ApikeyElement]], awsv4: Optional[List[ApikeyElement]],
+                 basic: Optional[List[ApikeyElement]], bearer: Optional[List[ApikeyElement]],
+                 digest: Optional[List[ApikeyElement]], edgegrid: Optional[List[ApikeyElement]],
+                 hawk: Optional[List[ApikeyElement]], noauth: Any, ntlm: Optional[List[ApikeyElement]],
+                 oauth1: Optional[List[ApikeyElement]], oauth2: Optional[List[ApikeyElement]], type: AuthType) -> None:
         self.apikey = apikey
         self.awsv4 = awsv4
         self.basic = basic
@@ -146,33 +182,43 @@ class Auth:
     @staticmethod
     def from_dict(obj: Any) -> 'Auth':
         assert isinstance(obj, dict)
-        apikey = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("apikey"))
-        awsv4 = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("awsv4"))
-        basic = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("basic"))
-        bearer = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("bearer"))
-        digest = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("digest"))
-        edgegrid = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("edgegrid"))
-        hawk = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("hawk"))
+        apikey = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("apikey"))
+        awsv4 = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("awsv4"))
+        basic = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("basic"))
+        bearer = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("bearer"))
+        digest = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("digest"))
+        edgegrid = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("edgegrid"))
+        hawk = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("hawk"))
         noauth = obj.get("noauth")
-        ntlm = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("ntlm"))
-        oauth1 = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("oauth1"))
-        oauth2 = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("oauth2"))
+        ntlm = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("ntlm"))
+        oauth1 = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("oauth1"))
+        oauth2 = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("oauth2"))
         type = AuthType(obj.get("type"))
         return Auth(apikey, awsv4, basic, bearer, digest, edgegrid, hawk, noauth, ntlm, oauth1, oauth2, type)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["apikey"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.apikey)
-        result["awsv4"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.awsv4)
-        result["basic"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.basic)
-        result["bearer"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.bearer)
-        result["digest"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.digest)
-        result["edgegrid"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.edgegrid)
-        result["hawk"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.hawk)
+        result["apikey"] = from_union([lambda x: from_list(lambda x: to_class(ApikeyElement, x), x), from_none],
+                                      self.apikey)
+        result["awsv4"] = from_union([lambda x: from_list(lambda x: to_class(ApikeyElement, x), x), from_none],
+                                     self.awsv4)
+        result["basic"] = from_union([lambda x: from_list(lambda x: to_class(ApikeyElement, x), x), from_none],
+                                     self.basic)
+        result["bearer"] = from_union([lambda x: from_list(lambda x: to_class(ApikeyElement, x), x), from_none],
+                                      self.bearer)
+        result["digest"] = from_union([lambda x: from_list(lambda x: to_class(ApikeyElement, x), x), from_none],
+                                      self.digest)
+        result["edgegrid"] = from_union([lambda x: from_list(lambda x: to_class(ApikeyElement, x), x), from_none],
+                                        self.edgegrid)
+        result["hawk"] = from_union([lambda x: from_list(lambda x: to_class(ApikeyElement, x), x), from_none],
+                                    self.hawk)
         result["noauth"] = self.noauth
-        result["ntlm"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.ntlm)
-        result["oauth1"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.oauth1)
-        result["oauth2"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.oauth2)
+        result["ntlm"] = from_union([lambda x: from_list(lambda x: to_class(ApikeyElement, x), x), from_none],
+                                    self.ntlm)
+        result["oauth1"] = from_union([lambda x: from_list(lambda x: to_class(ApikeyElement, x), x), from_none],
+                                      self.oauth1)
+        result["oauth2"] = from_union([lambda x: from_list(lambda x: to_class(ApikeyElement, x), x), from_none],
+                                      self.oauth2)
         result["type"] = to_enum(AuthType, self.type)
         return result
 
@@ -640,7 +686,7 @@ class FormParameter:
         key = from_str(obj.get("key"))
         type = from_union([FormParameterType, from_none], obj.get("type"))
         value = from_union([from_str, from_none], obj.get("value"))
-        src = from_union([lambda x: from_list(lambda x: x, x), from_none, from_str], obj.get("src"))
+        src = from_union([from_none, lambda x: from_list(lambda x: x, x), from_str], obj.get("src"))
         return FormParameter(content_type, description, disabled, key, type, value, src)
 
     def to_dict(self) -> dict:
@@ -651,7 +697,7 @@ class FormParameter:
         result["key"] = from_str(self.key)
         result["type"] = from_union([lambda x: to_enum(FormParameterType, x), from_none], self.type)
         result["value"] = from_union([from_str, from_none], self.value)
-        result["src"] = from_union([lambda x: from_list(lambda x: x, x), from_none, from_str], self.src)
+        result["src"] = from_union([from_none, lambda x: from_list(lambda x: x, x), from_str], self.src)
         return result
 
 
@@ -1191,7 +1237,7 @@ class Items:
         return result
 
 
-class PostmanCollection:
+class PostmanCollection21:
     auth: Optional[Auth]
     event: Optional[List[Event]]
     info: Information
@@ -1213,7 +1259,7 @@ class PostmanCollection:
         self.variable = variable
 
     @staticmethod
-    def from_dict(obj: Any) -> 'PostmanCollection':
+    def from_dict(obj: Any) -> 'PostmanCollection21':
         assert isinstance(obj, dict)
         auth = from_union([from_none, Auth.from_dict], obj.get("auth"))
         event = from_union([lambda x: from_list(Event.from_dict, x), from_none], obj.get("event"))
@@ -1222,7 +1268,7 @@ class PostmanCollection:
         protocol_profile_behavior = from_union([lambda x: from_dict(lambda x: x, x), from_none],
                                                obj.get("protocolProfileBehavior"))
         variable = from_union([lambda x: from_list(Variable.from_dict, x), from_none], obj.get("variable"))
-        return PostmanCollection(auth, event, info, item, protocol_profile_behavior, variable)
+        return PostmanCollection21(auth, event, info, item, protocol_profile_behavior, variable)
 
     def to_dict(self) -> dict:
         result: dict = {}
@@ -1237,12 +1283,9 @@ class PostmanCollection:
         return result
 
 
-def postman_collection_from_dict(s: Any) -> PostmanCollection:
-    return PostmanCollection.from_dict(s)
+def postman_collection21_from_dict(s: Any) -> PostmanCollection21:
+    return PostmanCollection21.from_dict(s)
 
 
-def postman_to_dict(x: PostmanCollection) -> Any:
-    return to_class(PostmanCollection, x)
-
-
-POSTMAN_2 = 'https://schema.getpostman.com/json/collection/v2.0.0/collection.json'
+def postman_collection21_to_dict(x: PostmanCollection21) -> Any:
+    return to_class(PostmanCollection21, x)
