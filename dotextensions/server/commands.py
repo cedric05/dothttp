@@ -18,7 +18,7 @@ from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCom
     HttpFileFormatter
 from . import Command, Result, BaseHandler
 from .postman import postman_collection_from_dict, Items, URLClass, Auth, POSTMAN_2
-from .postman2_1 import POSTMAN_2_1, postman_collection21_from_dict, ApikeyElement
+from .postman2_1 import POSTMAN_2_1, postman_collection21_from_dict, ApikeyElement, URLClass as URLClass_2_1
 from .utils import clean_filename
 
 DEFAULT_URL = "https://req.dothttp.dev/"
@@ -310,10 +310,10 @@ class ImportPostmanCollection(BaseHandler):
 
         request_auth = req.auth or auth
 
-        if isinstance(req.url, URLClass):
+        if isinstance(req.url, (URLClass, URLClass_2_1)):
             host = ".".join(req.url.host)
             proto = req.url.protocol or "https"
-            path = "/".join(req.url.path)
+            path = "/".join(req.url.path) if req.url.path else ""
             url = f"{proto}://{host}/{path}"
             urlwrap.url = slashed_path_to_normal_path(url)
             if req.url.query:
@@ -426,8 +426,11 @@ class ImportPostmanCollection(BaseHandler):
         #         "https://www.getpostman.com/collections")):
         #     return Result(id=command.id, result={"error_message": "not a postman link", "error": True})
 
-        resp = requests.get(link)
-        postman_data = resp.json()
+        if link.startswith("http"):
+            postman_data = requests.get(link).json()
+        else:
+            with open(link) as f:
+                postman_data = json.load(f)
         if "info" in postman_data and 'schema' in postman_data['info']:
             if postman_data['info']['schema'] == POSTMAN_2:
                 collection = postman_collection_from_dict(postman_data)

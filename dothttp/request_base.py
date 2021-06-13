@@ -212,7 +212,12 @@ class HttpFileFormatter(RequestBase):
                                                    line.header, lines)))
                 if headers:
                     output_str += f"\n{headers}"
-                query = new_line.join(map(lambda line: f'? "{line.query.key}"= "{line.query.value}"',
+
+                def query_to_http(line):
+                    quote_type = '"' if '"' in line.query.key else '"'
+                    return f'? {quote_type}{line.query.key}{quote_type}= {quote_type}{line.query.value}{quote_type}'
+
+                query = new_line.join(map(query_to_http,
                                           filter(lambda line:
                                                  line.query, lines)))
                 if query:
