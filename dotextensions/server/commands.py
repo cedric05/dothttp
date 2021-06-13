@@ -312,8 +312,9 @@ class ImportPostmanCollection(BaseHandler):
             path = "/".join(req.url.path)
             url = f"{proto}://{host}/{path}"
             urlwrap.url = slashed_path_to_normal_path(url)
-            for query in req.url.query:
-                lines.append(Line(query=Query(query.key, unquote(query.value)), header=None))
+            if req.url.query:
+                for query in req.url.query:
+                    lines.append(Line(query=Query(query.key, unquote(query.value)), header=None))
         else:
             urlwrap.url = slashed_path_to_normal_path(req.url)
         # if urlwrap.url == "":

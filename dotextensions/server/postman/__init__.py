@@ -76,6 +76,7 @@ class AuthType(Enum):
     NTLM = "ntlm"
     OAUTH1 = "oauth1"
     OAUTH2 = "oauth2"
+    INHERIT = "inherit"
 
 
 class Auth:
