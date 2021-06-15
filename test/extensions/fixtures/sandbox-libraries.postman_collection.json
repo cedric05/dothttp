@@ -1,1 +1,1 @@
-{"error_message": "unsupported postman collection", "error": true}
+{"files": {"sandbox-libraries\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/sandbox-libraries.postman_collection.json\n\n@name(\"AJV\")\nGET \"https://postman-echo.com/get\"\n\n\n@name(\"chai-postman\")\nGET \"https://postman-echo.com/get\"\n\n\n@name(\"pm api\")\nGET \"https://postman-echo.com/get\"\n\n\n\n"}}
