@@ -200,8 +200,8 @@ class HttpFileFormatter(RequestBase):
             new_line = "\n"
             if http.description:
                 for line in http.description.splitlines():
-                    output_str += "// " + line
-                output_str += "\n"
+                    output_str += "// " + line + new_line
+                output_str += new_line
             if namewrap := http.namewrap:
                 quote_type, name = quote_or_unquote(namewrap.name)
                 output_str += f"@name({quote_type}{name}{quote_type}){new_line}"
