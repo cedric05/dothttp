@@ -117,7 +117,6 @@ class ExtraArg:
 
 @dataclass
 class Http:
-    description: Optional[str]
     namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
     authwrap: Optional[AuthWrap]
@@ -125,6 +124,7 @@ class Http:
     lines: Optional[List[Line]]
     payload: Optional[Payload]
     output: Optional[ToFile]
+    description: Optional[str] = None
     extra_args: Optional[ExtraArg] = field(default_factory=lambda: [])
     script_wrap: Optional[TestScript] = field(default_factory=lambda: TestScript(''))
 

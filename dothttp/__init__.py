@@ -198,7 +198,7 @@ class HttpDef:
             ,
             payload=payload,
             certificate=certificate,
-            output=None, authwrap=auth_wrap
+            output=None, authwrap=auth_wrap, description=None
         )])
 
 
