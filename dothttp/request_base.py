@@ -198,6 +198,10 @@ class HttpFileFormatter(RequestBase):
         output_str = ""
         for http in model.allhttps:
             new_line = "\n"
+            if http.description:
+                for line in http.description.splitlines():
+                    output_str += "// " + line
+                output_str += "\n"
             if namewrap := http.namewrap:
                 quote_type, name = quote_or_unquote(namewrap.name)
                 output_str += f"@name({quote_type}{name}{quote_type}){new_line}"

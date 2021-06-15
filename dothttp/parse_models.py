@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import List, Optional, Union
+from typing import List, Optional
 
 
 @dataclass
@@ -117,6 +117,7 @@ class ExtraArg:
 
 @dataclass
 class Http:
+    description: Optional[str]
     namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
     authwrap: Optional[AuthWrap]

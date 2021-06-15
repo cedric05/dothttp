@@ -311,7 +311,7 @@ class ImportPostmanCollection(BaseHandler):
         request_auth = req.auth or auth
 
         if isinstance(req.url, (URLClass, URLClass_2_1)):
-            host = ".".join(req.url.host)
+            host = ".".join(req.url.host) if req.url.host else "{{host}}"
             proto = req.url.protocol or "https"
             path = "/".join(req.url.path) if req.url.path else ""
             url = f"{proto}://{host}/{path}"
@@ -337,14 +337,16 @@ class ImportPostmanCollection(BaseHandler):
                     basic_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.basic)
                 # in postman 2.0, it is a dict
                 auth_wrap = AuthWrap(
-                    basic_auth=BasicAuth(username=basic_auth['username'], password=basic_auth['password']))
+                    basic_auth=BasicAuth(username=basic_auth.get('username', ''),
+                                         password=basic_auth.get('password', '')))
             elif digest_auth := request_auth.digest:
-                if isinstance(request_auth.basic, list):
+                if isinstance(request_auth.digest, list):
                     # postman 2.1, it is a list of api_key_element have keys and values
                     digest_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.digest)
                 # postman 2.0
                 auth_wrap = AuthWrap(
-                    digest_auth=DigestAuth(username=digest_auth['username'], password=digest_auth['password']))
+                    digest_auth=DigestAuth(username=digest_auth.get('username', ''),
+                                           password=digest_auth.get('password', '')))
         if req.body:
             # use mode rather than None check
             mode = req.body.mode
@@ -392,7 +394,7 @@ class ImportPostmanCollection(BaseHandler):
         if req.certificate and req.certificate.cert:
             certificate = Certificate(req.certificate.cert.src, req.certificate.key.src)
         http = Http(namewrap=namewrap, urlwrap=urlwrap, payload=payload, lines=lines, authwrap=auth_wrap,
-                    output=None, certificate=certificate)
+                    output=None, certificate=certificate, description=req.description)
         return http
 
     @staticmethod
@@ -432,18 +434,21 @@ class ImportPostmanCollection(BaseHandler):
         else:
             with open(link) as f:
                 postman_data = json.load(f)
+        base_collection_dire = ""
         if "info" in postman_data and 'schema' in postman_data['info']:
             if postman_data['info']['schema'] == POSTMAN_2:
                 collection = postman_collection_from_dict(postman_data)
+                base_collection_dire = Path(directory).joinpath(clean_filename(collection.info.name))
                 d = self.import_items(collection.item,
-                                      Path(directory).joinpath(clean_filename(collection.info.name)),
+                                      base_collection_dire,
                                       collection.auth,
                                       link,
                                       )
             elif postman_data['info']['schema'] == POSTMAN_2_1:
                 collection = postman_collection21_from_dict(postman_data)
+                base_collection_dire = Path(directory).joinpath(clean_filename(collection.info.name))
                 d = self.import_items(collection.item,
-                                      Path(directory).joinpath(clean_filename(collection.info.name)),
+                                      base_collection_dire,
                                       collection.auth,
                                       link,
                                       )
@@ -453,6 +458,10 @@ class ImportPostmanCollection(BaseHandler):
             return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
 
         if save:
+            if collection.info.description:
+                base_collection_dire.mkdir(parents=True, exist_ok=True)
+                with open(base_collection_dire.joinpath("README.txt"), 'w') as f:
+                    f.write(collection.info.description)
             for path, fileout in d.items():
                 if os.path.exists(path) and not overwrite:
                     p = Path(path)
