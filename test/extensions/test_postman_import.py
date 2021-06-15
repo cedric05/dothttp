@@ -61,17 +61,17 @@ class FileExecute(TestBase):
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/multiple-form-values.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/newman-gzip-test.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/oauth1-var-in-url-params.postman_collection.json",
-            # "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/protocol-profile-behavior.postman_collection.json",
+            "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/protocol-profile-behavior.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/prototype-check.postman_collection.json",
-            # "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/request-body-with-get.postman_collection.json",
+            "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/request-body-with-get.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/request-chaining-test.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/request-name-in-script.postman_collection.json",
-            # "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/sandbox-libraries.postman_collection.json",
+            "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/sandbox-libraries.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/semicolon-tests.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/set-next-request.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/super-sandbox-test.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/var-replacement.postman_collection.json",
-            # "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/whatwg-url.postman_collection.json"
+            "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/whatwg-url.postman_collection.json"
         ]
         for link in links:
             self.compare(link, os.path.join(fixtures_dir, os.path.basename(link)))

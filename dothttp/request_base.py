@@ -198,7 +198,7 @@ class HttpFileFormatter(RequestBase):
         output_str = ""
         for http in model.allhttps:
             new_line = "\n"
-            if http.description:
+            if getattr(http, "description", None):
                 for line in http.description.splitlines():
                     output_str += "// " + line + new_line
                 output_str += new_line
