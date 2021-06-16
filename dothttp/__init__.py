@@ -443,8 +443,8 @@ class HttpDefBase(BaseModelProcessor):
             if certificate.cert:
                 self.httpdef.certificate = [self.get_updated_content(certificate.cert),
                                             self.get_updated_content(certificate.key) if certificate.key else None]
-            elif certificate.file:
-                self.httpdef.p12 = [self.get_updated_content(certificate.file),
+            elif certificate.p12_file:
+                self.httpdef.p12 = [self.get_updated_content(certificate.p12_file),
                                     self.get_updated_content(certificate.password)]
 
     def load_extra_flags(self):

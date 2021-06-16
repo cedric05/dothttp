@@ -6,13 +6,13 @@ from collections import defaultdict
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import List, Iterator, Union, Dict, Optional, Tuple
+from typing import List, Iterator, Union, Dict, Optional, Any
 from urllib.parse import unquote
 
 import requests
 from requests import RequestException
 
-from dothttp import DotHttpException, HttpDef
+from dothttp import DotHttpException, HttpDef, BaseModelProcessor
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
     NameWrap, Line, TripleOrDouble, AuthWrap, DigestAuth, Certificate
 from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
@@ -272,25 +272,19 @@ class ParseHttpData(BaseHandler):
 
 class DothttpTypes(Enum):
     NAME = "name"
-    BASE = "base"
     EXTRA_ARGS = "extra_args"
-    METHOD = "method"
     URL = "url"
-    BAISC_USERNAME = "basic_username"
-    BASIC_PASSWORD = "basic_password"
-    DIGEST_USERNAME = "digest_username"
-    DIGEST_PASSWORD = "digest_password"
-    CERT_FILE = "cert_file"
-    CERT_KEY = "cert_private_file"
-    P12_FILE = "p12_file"
-    P12_PASSWORD = "p12_password"
-    HEADER_KEY = "header_key"
-    HEADER_VALUE = "header_value"
+    BASIC_AUTH = "basic_auth"
+    DIGEST_AUTH = "digest_auth"
+    CERTIFICATE = "certificate"
+    HEADER = "header"
+    URL_PARAMS = "urlparams"
     PAYLOAD_DATA = "payload_data"
     PAYLOAD_ENCODED = "payload_urlencoded"
     PAYLOAD_FILE = "payload_file_input"
     PAYLOAD_JSON = "payload_json"
     PAYLOAD_MULTIPART = "payload_multipart"
+    OUTPUT = "output"
     SCRIPT = "script"
     COMMENT = "comment"
 
@@ -309,7 +303,7 @@ class TypeFromPos(BaseHandler):
             return Result(id=command.id,
                           result={"error_message": f"position should be int", "error": True})
         if filename:
-            if isinstance(filename, str):
+            if not isinstance(filename, str):
                 return Result(id=command.id,
                               result={"error_message": f"filename should be should be string", "error": True})
             if not os.path.isfile(filename):
@@ -326,17 +320,89 @@ class TypeFromPos(BaseHandler):
         else:
             model: Allhttp = dothttp_model.model_from_str(content)
         try:
-            (type, value) = self.figure_n_get(model, position)
-            return Result(id=command.id, result={"type": type, "value": value})
+            return Result(id=command.id, result=self.figure_n_get(model, position))
         except Exception as e:
             return Result(id=command.id, result={"error_message": f"unknown Exception {e}", "error": True})
 
-    def figure_n_get(self, model: Allhttp, position: int) -> Tuple[Union[str, None], Union[str, None]]:
-        if model._tx_position < position < model._tx_position_end:
-            for http in model.allhttps:
-                pass
-            return ("", "True")
-        return (DothttpTypes.COMMENT, None)
+    def figure_n_get(self, model: Allhttp, position: int) -> dict:
+        if self.is_in_between(model, position):
+            index = 0
+            for index, pick_http in enumerate(model.allhttps):
+                if self.is_in_between(pick_http, position):
+                    if dot_type := self.pick_in_http(pick_http, position):
+                        name = str(index + 1)
+                        base = None
+                        base_position = None
+                        if namewrap := pick_http.namewrap:
+                            name = namewrap.name
+                            base = namewrap.base
+                            if base:
+                                try:
+                                    base = BaseModelProcessor.get_target(base, model.allhttps)
+                                    base_position = base._tx_position
+                                except:
+                                    pass
+                        return {"type": dot_type.value, "target": name, "target_base": base,
+                                "base_start": base_position
+                                }
+        return {"type": DothttpTypes.COMMENT.value}
+
+    @staticmethod
+    def pick_in_http(pick_http: Http, position: int) -> DothttpTypes:
+        self = TypeFromPos
+        if pick_http:
+            # order
+            # name, extra args, url, basic/digest auth, certificate, query or headers, payload, output, script_wrap
+            if namewrap := pick_http.namewrap:
+                if self.is_in_between(namewrap, position):
+                    return DothttpTypes.NAME
+            if args := pick_http.extra_args:
+                for arg in args:
+                    if self.is_in_between(arg, position):
+                        return DothttpTypes.EXTRA_ARGS
+            if url_wrap := pick_http.urlwrap:
+                if self.is_in_between(url_wrap, position):
+                    return DothttpTypes.URL
+            if auth_wrap := pick_http.authwrap:
+                if auth_wrap.basic_auth:
+                    if self.is_in_between(auth_wrap.basic_auth, position):
+                        return DothttpTypes.BASIC_AUTH
+                # elif pick_http.authwrap.digest_auth:
+                #     if self.is_in_between(pick_http.authwrap.digest_auth, position):
+                #       return DothttpTypes.DIGEST_AUTH, None
+                return DothttpTypes.DIGEST_AUTH
+            if certificate := pick_http.certificate:
+                if self.is_in_between(certificate, position):
+                    return DothttpTypes.CERTIFICATE
+            if lines := pick_http.lines:
+                for line in lines:
+                    if self.is_in_between(line, position):
+                        if self.is_in_between(line.header, position):
+                            return DothttpTypes.HEADER
+                        return DothttpTypes.URL_PARAMS
+            if payload := pick_http.payload:
+                if self.is_in_between(payload, position):
+                    if payload.data:
+                        return DothttpTypes.PAYLOAD_DATA
+                    elif payload.datajson:
+                        return DothttpTypes.PAYLOAD_ENCODED
+                    elif payload.json:
+                        return DothttpTypes.PAYLOAD_JSON
+                    elif payload.file:
+                        return DothttpTypes.PAYLOAD_FILE
+                    elif payload.fileswrap:
+                        return DothttpTypes.PAYLOAD_MULTIPART
+                    return DothttpTypes.PAYLOAD_JSON
+            if output := pick_http.output:
+                if self.is_in_between(output, position):
+                    return DothttpTypes.OUTPUT
+            if script_wrap := pick_http.script_wrap:
+                if self.is_in_between(script_wrap, position):
+                    return DothttpTypes.SCRIPT
+
+    @staticmethod
+    def is_in_between(model: Any, position):
+        return model and model._tx_position < position < model._tx_position_end
 
 
 class ImportPostmanCollection(BaseHandler):

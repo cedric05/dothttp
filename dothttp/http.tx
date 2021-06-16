@@ -47,7 +47,7 @@ CERTAUTH:
     (
         'certificate' '(' 'cert' '=' cert=DotString (',' 'key' '=' key=DotString ','?)? ')'
     ) | (
-        'p12' '(' 'file' '=' file=DotString ',' 'password' '=' password=DotString ','? ')'
+        'p12' '(' 'file' '=' p12_file=DotString ',' 'password' '=' password=DotString ','? ')'
     )
 ;
 
