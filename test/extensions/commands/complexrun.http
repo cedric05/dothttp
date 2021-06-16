@@ -1,3 +1,5 @@
+// some comment
+// some comment2
 GET https://{{host=httpbin.org}}/get
 ? dothttp, rocks
 

@@ -4,8 +4,9 @@ import mimetypes
 import os
 from collections import defaultdict
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
-from typing import List, Iterator, Union, Dict, Optional
+from typing import List, Iterator, Union, Dict, Optional, Tuple
 from urllib.parse import unquote
 
 import requests
@@ -267,6 +268,75 @@ class ParseHttpData(BaseHandler):
             logger.error("unknown error happened", exc_info=True)
             result.result = {"error_message": str(e), "error": True}
             return result
+
+
+class DothttpTypes(Enum):
+    NAME = "name"
+    BASE = "base"
+    EXTRA_ARGS = "extra_args"
+    METHOD = "method"
+    URL = "url"
+    BAISC_USERNAME = "basic_username"
+    BASIC_PASSWORD = "basic_password"
+    DIGEST_USERNAME = "digest_username"
+    DIGEST_PASSWORD = "digest_password"
+    CERT_FILE = "cert_file"
+    CERT_KEY = "cert_private_file"
+    P12_FILE = "p12_file"
+    P12_PASSWORD = "p12_password"
+    HEADER_KEY = "header_key"
+    HEADER_VALUE = "header_value"
+    PAYLOAD_DATA = "payload_data"
+    PAYLOAD_ENCODED = "payload_urlencoded"
+    PAYLOAD_FILE = "payload_file_input"
+    PAYLOAD_JSON = "payload_json"
+    PAYLOAD_MULTIPART = "payload_multipart"
+    SCRIPT = "script"
+    COMMENT = "comment"
+
+
+class TypeFromPos(BaseHandler):
+    name = "/content/type"
+
+    def get_method(self):
+        return TypeFromPos.name
+
+    def run(self, command: Command) -> Result:
+        position: Union[None, int] = command.params.get("position", None)
+        filename: Union[str, None] = command.params.get('filename', None)
+        content: Union[str, None] = command.params.get('content', None)
+        if not isinstance(position, int):
+            return Result(id=command.id,
+                          result={"error_message": f"position should be int", "error": True})
+        if filename:
+            if isinstance(filename, str):
+                return Result(id=command.id,
+                              result={"error_message": f"filename should be should be string", "error": True})
+            if not os.path.isfile(filename):
+                return Result(id=command.id,
+                              result={"error_message": f"non existant file", "error": True})
+        if not filename and not content:
+            return Result(id=command.id,
+                          result={"error_message": f"filename or content should be available", "error": True})
+        if content and not isinstance(content, str):
+            return Result(id=command.id,
+                          result={"error_message": f"content should be string", "error": True})
+        if filename:
+            model: Allhttp = dothttp_model.model_from_file(filename)
+        else:
+            model: Allhttp = dothttp_model.model_from_str(content)
+        try:
+            (type, value) = self.figure_n_get(model, position)
+            return Result(id=command.id, result={"type": type, "value": value})
+        except Exception as e:
+            return Result(id=command.id, result={"error_message": f"unknown Exception {e}", "error": True})
+
+    def figure_n_get(self, model: Allhttp, position: int) -> Tuple[Union[str, None], Union[str, None]]:
+        if model._tx_position < position < model._tx_position_end:
+            for http in model.allhttps:
+                pass
+            return ("", "True")
+        return (DothttpTypes.COMMENT, None)
 
 
 class ImportPostmanCollection(BaseHandler):

@@ -125,7 +125,7 @@ class Http:
     payload: Optional[Payload]
     output: Optional[ToFile]
     description: Optional[str] = None
-    extra_args: Optional[ExtraArg] = field(default_factory=lambda: [])
+    extra_args: Optional[List[ExtraArg]] = field(default_factory=lambda: [])
     script_wrap: Optional[TestScript] = field(default_factory=lambda: TestScript(''))
 
 

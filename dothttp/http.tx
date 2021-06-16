@@ -103,13 +103,11 @@ QUERY:
 
 PAYLOAD: 
     (   'data' '(' data+=TRIPLE_OR_DOUBLE_STRING (',' type=STRING)? ','?  ')'
-        | 'data' '(' datajson=JSON (',' type=STRING)? ','? ')'
+        | ('data' | 'urlencoded') '(' datajson=JSON (',' type=STRING)? ','? ')'
         | /-d|--data/ data+=TRIPLE_OR_DOUBLE_STRING
-        | 'urlencoded' '(' datajson=JSON (',' type=STRING)? ','? ')'
         | 'fileinput' '(' file=STRING   (',' type=STRING)? ','?  ')'
         | ('json' '(' json=JSON  ')' )
         | (fileswrap=FILES)
-        | (form=FILES)
     )
 ;
 
@@ -119,7 +117,7 @@ TRIPLE_OR_DOUBLE_STRING:
 
 
 FILES:
-    "files" "(" files*=FILETYPE[','] ','? ")"
+    ("files" | "form") "(" files*=FILETYPE[','] ','? ")"
 ;
 
 FILETYPE:
