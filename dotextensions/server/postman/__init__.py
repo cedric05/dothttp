@@ -269,6 +269,7 @@ class VariableType(Enum):
     BOOLEAN = "boolean"
     NUMBER = "number"
     STRING = "string"
+    TEXT = "text"
 
 
 class Variable:
@@ -1081,7 +1082,7 @@ class ResponseClass:
     def from_dict(obj: Any) -> 'ResponseClass':
         assert isinstance(obj, dict)
         body = from_union([from_none, from_str], obj.get("body"))
-        code = from_union([from_int, from_none], obj.get("code"))
+        code = from_union([from_int, from_str, from_none], obj.get("code"))
         cookie = from_union([lambda x: from_list(Cookie.from_dict, x), from_none], obj.get("cookie"))
         header = from_union(
             [lambda x: from_list(lambda x: from_union([Header.from_dict, from_str], x), x), from_none, from_str],
