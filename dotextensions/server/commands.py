@@ -324,10 +324,14 @@ class ImportPostmanCollection(BaseHandler):
             urlwrap.url = slashed_path_to_normal_path(req.url)
         # if urlwrap.url == "":
         #     urlwrap.url = DEFAULT_URL
+        is_json_payload = False
         if req.header:
             for header in req.header:
                 lines.append(
                     Line(header=Header(key=header.key, value=slashed_path_to_normal_path(header.value)), query=None))
+                if header.key.lower() == "content-type" and header.value.lower().startswith("application/json"):
+                    is_json_payload = True
+
         if request_auth:
             # TODO don't add creds to http file directly
             # add .dothttp.json file
@@ -373,13 +377,17 @@ class ImportPostmanCollection(BaseHandler):
                 payload_file = slashed_path_to_normal_path(filebody.src)
             elif rawbody := req.body.raw:
                 payload_data = [TripleOrDouble(str=rawbody)]
-                if optins and 'raw' in optins and 'language' in optins.get('raw'):
-                    if optins['raw']['language'] == 'json':
-                        try:
-                            payload_json = json.loads(rawbody)
+                if is_json_payload or (optins and
+                                       optins.get('raw', None) and
+                                       optins.get('raw').get('language', None) and
+                                       optins.get('raw').get('language') == 'json'):
+                    try:
+                        json_payload_data = json.loads(rawbody)
+                        if isinstance(json_payload_data, (dict, list)):
+                            payload_json = json_payload_data
                             payload_data = None
-                        except:
-                            pass
+                    except:
+                        pass
             elif urlencoded_body := req.body.urlencoded:
                 encodedbody: Dict[str, list] = defaultdict(lambda: [])
                 for one_form_field in urlencoded_body:
