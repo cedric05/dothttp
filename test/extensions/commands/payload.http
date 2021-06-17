@@ -40,3 +40,12 @@ POST https://req.dothttp.dev
 files(
     ("file", "{{filename}}"),
 )
+
+@name('fileinput')
+@insecure
+POST https://req.dothttp.dev
+digestauth('username','password')
+certificate(cert="",key="")
+fileinput(
+    "{{filename}}"
+)
