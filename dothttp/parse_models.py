@@ -82,7 +82,6 @@ class Payload:
     json: Optional
     fileswrap: Optional[FilesWrap]
     type: Optional[str]
-    multi: Optional[str] = None
 
 
 @dataclass
@@ -103,7 +102,7 @@ class Certificate:
 
 @dataclass
 class P12Certificate:
-    file: Optional[str] = None
+    p12_file: Optional[str] = None
     password: Optional[str] = None
 
 
@@ -120,11 +119,12 @@ class Http:
     namewrap: Optional[NameWrap]
     urlwrap: UrlWrap
     authwrap: Optional[AuthWrap]
-    certificate: Optional[Certificate]
+    certificate: Optional[Union[Certificate, P12Certificate]]
     lines: Optional[List[Line]]
     payload: Optional[Payload]
     output: Optional[ToFile]
-    extra_args: Optional[ExtraArg] = field(default_factory=lambda: [])
+    description: Optional[str] = None
+    extra_args: Optional[List[ExtraArg]] = field(default_factory=lambda: [])
     script_wrap: Optional[TestScript] = field(default_factory=lambda: TestScript(''))
 
 

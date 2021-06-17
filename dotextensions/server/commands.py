@@ -4,20 +4,22 @@ import mimetypes
 import os
 from collections import defaultdict
 from datetime import datetime
+from enum import Enum
 from pathlib import Path
-from typing import List, Iterator, Union, Dict, Optional
+from typing import List, Iterator, Union, Dict, Optional, Any
 from urllib.parse import unquote
 
 import requests
 from requests import RequestException
 
-from dothttp import DotHttpException, HttpDef
+from dothttp import DotHttpException, HttpDef, BaseModelProcessor
 from dothttp.parse_models import Http, Allhttp, UrlWrap, BasicAuth, Payload, MultiPartFile, FilesWrap, Query, Header, \
     NameWrap, Line, TripleOrDouble, AuthWrap, DigestAuth, Certificate
 from dothttp.request_base import RequestCompiler, Config, dothttp_model, CurlCompiler, \
     HttpFileFormatter
 from . import Command, Result, BaseHandler
-from .postman import postman_collection_from_dict, Items, URLClass, Auth
+from .postman import postman_collection_from_dict, Items, URLClass, Auth, POSTMAN_2
+from .postman2_1 import POSTMAN_2_1, postman_collection21_from_dict, ApikeyElement, URLClass as URLClass_2_1
 from .utils import clean_filename
 
 DEFAULT_URL = "https://req.dothttp.dev/"
@@ -268,6 +270,139 @@ class ParseHttpData(BaseHandler):
             return result
 
 
+class DothttpTypes(Enum):
+    NAME = "name"
+    EXTRA_ARGS = "extra_args"
+    URL = "url"
+    BASIC_AUTH = "basic_auth"
+    DIGEST_AUTH = "digest_auth"
+    CERTIFICATE = "certificate"
+    HEADER = "header"
+    URL_PARAMS = "urlparams"
+    PAYLOAD_DATA = "payload_data"
+    PAYLOAD_ENCODED = "payload_urlencoded"
+    PAYLOAD_FILE = "payload_file_input"
+    PAYLOAD_JSON = "payload_json"
+    PAYLOAD_MULTIPART = "payload_multipart"
+    OUTPUT = "output"
+    SCRIPT = "script"
+    COMMENT = "comment"
+
+
+class TypeFromPos(BaseHandler):
+    name = "/content/type"
+
+    def get_method(self):
+        return TypeFromPos.name
+
+    def run(self, command: Command) -> Result:
+        position: Union[None, int] = command.params.get("position", None)
+        filename: Union[str, None] = command.params.get('filename', None)
+        content: Union[str, None] = command.params.get('content', None)
+        if not isinstance(position, int):
+            return Result(id=command.id,
+                          result={"error_message": f"position should be int", "error": True})
+        if filename:
+            if not isinstance(filename, str):
+                return Result(id=command.id,
+                              result={"error_message": f"filename should be should be string", "error": True})
+            if not os.path.isfile(filename):
+                return Result(id=command.id,
+                              result={"error_message": f"non existant file", "error": True})
+        if not filename and not content:
+            return Result(id=command.id,
+                          result={"error_message": f"filename or content should be available", "error": True})
+        if content and not isinstance(content, str):
+            return Result(id=command.id,
+                          result={"error_message": f"content should be string", "error": True})
+        if filename:
+            model: Allhttp = dothttp_model.model_from_file(filename)
+        else:
+            model: Allhttp = dothttp_model.model_from_str(content)
+        try:
+            return Result(id=command.id, result=self.figure_n_get(model, position))
+        except Exception as e:
+            return Result(id=command.id, result={"error_message": f"unknown Exception {e}", "error": True})
+
+    def figure_n_get(self, model: Allhttp, position: int) -> dict:
+        if self.is_in_between(model, position):
+            index = 0
+            for index, pick_http in enumerate(model.allhttps):
+                if self.is_in_between(pick_http, position):
+                    if dot_type := self.pick_in_http(pick_http, position):
+                        name = str(index + 1)
+                        base = None
+                        base_position = None
+                        if namewrap := pick_http.namewrap:
+                            name = namewrap.name
+                            base = namewrap.base
+                            if base:
+                                try:
+                                    base_position = BaseModelProcessor.get_target(base, model.allhttps)._tx_position
+                                except:
+                                    pass
+                        return {"type": dot_type.value, "target": name, "target_base": base,
+                                "base_start": base_position
+                                }
+        return {"type": DothttpTypes.COMMENT.value}
+
+    @staticmethod
+    def pick_in_http(pick_http: Http, position: int) -> DothttpTypes:
+        self = TypeFromPos
+        if pick_http:
+            # order
+            # name, extra args, url, basic/digest auth, certificate, query or headers, payload, output, script_wrap
+            if namewrap := pick_http.namewrap:
+                if self.is_in_between(namewrap, position):
+                    return DothttpTypes.NAME
+            if args := pick_http.extra_args:
+                for arg in args:
+                    if self.is_in_between(arg, position):
+                        return DothttpTypes.EXTRA_ARGS
+            if url_wrap := pick_http.urlwrap:
+                if self.is_in_between(url_wrap, position):
+                    return DothttpTypes.URL
+            if auth_wrap := pick_http.authwrap:
+                if auth_wrap.basic_auth:
+                    if self.is_in_between(auth_wrap.basic_auth, position):
+                        return DothttpTypes.BASIC_AUTH
+                elif pick_http.authwrap.digest_auth:
+                    if self.is_in_between(pick_http.authwrap.digest_auth, position):
+                        return DothttpTypes.DIGEST_AUTH
+            if certificate := pick_http.certificate:
+                if self.is_in_between(certificate, position):
+                    return DothttpTypes.CERTIFICATE
+            if lines := pick_http.lines:
+                for line in lines:
+                    if self.is_in_between(line, position):
+                        if self.is_in_between(line.header, position):
+                            return DothttpTypes.HEADER
+                        return DothttpTypes.URL_PARAMS
+            if payload := pick_http.payload:
+                if self.is_in_between(payload, position):
+                    if payload.data:
+                        return DothttpTypes.PAYLOAD_DATA
+                    elif payload.datajson:
+                        return DothttpTypes.PAYLOAD_ENCODED
+                    elif payload.json:
+                        return DothttpTypes.PAYLOAD_JSON
+                    elif payload.file:
+                        return DothttpTypes.PAYLOAD_FILE
+                    elif payload.fileswrap:
+                        return DothttpTypes.PAYLOAD_MULTIPART
+                    return DothttpTypes.PAYLOAD_JSON
+            if output := pick_http.output:
+                if self.is_in_between(output, position):
+                    return DothttpTypes.OUTPUT
+            if script_wrap := pick_http.script_wrap:
+                if self.is_in_between(script_wrap, position):
+                    return DothttpTypes.SCRIPT
+
+    @staticmethod
+    def is_in_between(model: Any, position):
+        return model and model._tx_position < position < model._tx_position_end
+
+
 class ImportPostmanCollection(BaseHandler):
     name = "/import/postman"
 
@@ -278,9 +413,12 @@ class ImportPostmanCollection(BaseHandler):
     def import_requests_into_dire(items: Iterator[Items], directory: Path, auth: Optional[Auth], link: str):
         collection = Allhttp(allhttps=[])
         for leaf_item in items:
-            onehttp = ImportPostmanCollection.import_leaf_item(leaf_item, auth)
-            if onehttp:
-                collection.allhttps.append(onehttp)
+            try:
+                onehttp = ImportPostmanCollection.import_leaf_item(leaf_item, auth)
+                if onehttp:
+                    collection.allhttps.append(onehttp)
+            except:
+                logger.error("import postman api failed", exc_info=True)
         d = {}
         if len(collection.allhttps) != 0:
             data = HttpFileFormatter.format(collection)
@@ -306,31 +444,47 @@ class ImportPostmanCollection(BaseHandler):
 
         request_auth = req.auth or auth
 
-        if isinstance(req.url, URLClass):
-            host = ".".join(req.url.host)
-            proto = req.url.protocol
-            path = "/".join(req.url.path)
+        if isinstance(req.url, (URLClass, URLClass_2_1)):
+            host = ".".join(req.url.host) if req.url.host else "{{host}}"
+            proto = req.url.protocol or "https"
+            path = "/".join(req.url.path) if req.url.path else ""
             url = f"{proto}://{host}/{path}"
             urlwrap.url = slashed_path_to_normal_path(url)
-            for query in req.url.query:
-                lines.append(Line(query=Query(query.key, unquote(query.value)), header=None))
+            if req.url.query:
+                for query in req.url.query:
+                    if query.key and query.value:
+                        lines.append(Line(query=Query(query.key, unquote(query.value)), header=None))
         else:
             urlwrap.url = slashed_path_to_normal_path(req.url)
         # if urlwrap.url == "":
         #     urlwrap.url = DEFAULT_URL
+        is_json_payload = False
         if req.header:
             for header in req.header:
                 lines.append(
                     Line(header=Header(key=header.key, value=slashed_path_to_normal_path(header.value)), query=None))
+                if header.key.lower() == "content-type" and header.value.lower().startswith("application/json"):
+                    is_json_payload = True
+
         if request_auth:
             # TODO don't add creds to http file directly
             # add .dothttp.json file
             if basic_auth := request_auth.basic:
+                if isinstance(request_auth.basic, list):
+                    # postman 2.1, it is a list of api_key_element have keys and values
+                    basic_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.basic)
+                # in postman 2.0, it is a dict
                 auth_wrap = AuthWrap(
-                    basic_auth=BasicAuth(username=basic_auth['username'], password=basic_auth['password']))
+                    basic_auth=BasicAuth(username=basic_auth.get('username', ''),
+                                         password=basic_auth.get('password', '')))
             elif digest_auth := request_auth.digest:
+                if isinstance(request_auth.digest, list):
+                    # postman 2.1, it is a list of api_key_element have keys and values
+                    digest_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.digest)
+                # postman 2.0
                 auth_wrap = AuthWrap(
-                    digest_auth=DigestAuth(username=digest_auth['username'], password=digest_auth['password']))
+                    digest_auth=DigestAuth(username=digest_auth.get('username', ''),
+                                           password=digest_auth.get('password', '')))
         if req.body:
             # use mode rather than None check
             mode = req.body.mode
@@ -357,13 +511,17 @@ class ImportPostmanCollection(BaseHandler):
                 payload_file = slashed_path_to_normal_path(filebody.src)
             elif rawbody := req.body.raw:
                 payload_data = [TripleOrDouble(str=rawbody)]
-                if optins and 'raw' in optins and 'language' in optins.get('raw'):
-                    if optins['raw']['language'] == 'json':
-                        try:
-                            payload_json = json.loads(rawbody)
+                if is_json_payload or (optins and
+                                       optins.get('raw', None) and
+                                       optins.get('raw').get('language', None) and
+                                       optins.get('raw').get('language') == 'json'):
+                    try:
+                        json_payload_data = json.loads(rawbody)
+                        if isinstance(json_payload_data, (dict, list)):
+                            payload_json = json_payload_data
                             payload_data = None
-                        except:
-                            pass
+                    except:
+                        pass
             elif urlencoded_body := req.body.urlencoded:
                 encodedbody: Dict[str, list] = defaultdict(lambda: [])
                 for one_form_field in urlencoded_body:
@@ -378,8 +536,17 @@ class ImportPostmanCollection(BaseHandler):
         if req.certificate and req.certificate.cert:
             certificate = Certificate(req.certificate.cert.src, req.certificate.key.src)
         http = Http(namewrap=namewrap, urlwrap=urlwrap, payload=payload, lines=lines, authwrap=auth_wrap,
-                    output=None, certificate=certificate)
+                    output=None, certificate=certificate, description=req.description)
         return http
+
+    @staticmethod
+    def api_key_element_to_dict(api_key_elements: List[ApikeyElement]):
+        # transforms 2.1 postman to 2.0 postman
+        basic_auth = {}
+        for element in api_key_elements:
+            api_key_element: ApikeyElement = element
+            basic_auth[api_key_element.key] = api_key_element.value
+        return basic_auth
 
     def run(self, command: Command) -> Result:
         # params
@@ -391,7 +558,8 @@ class ImportPostmanCollection(BaseHandler):
         # input validations
         if save:
             if not os.path.isdir(directory):
-                return Result(id=command.id, result={"error_message": "non existent directory", "error": True})
+                return Result(id=command.id,
+                              result={"error_message": f"non existent directory: {directory}", "error": True})
             if not os.access(directory, os.X_OK | os.W_OK):
                 return Result(id=command.id,
                               result={"error_message": "insufficient permissions", "error": True})
@@ -403,19 +571,39 @@ class ImportPostmanCollection(BaseHandler):
         #         "https://www.getpostman.com/collections")):
         #     return Result(id=command.id, result={"error_message": "not a postman link", "error": True})
 
-        resp = requests.get(link)
-        postman_data = resp.json()
-        if not ("info" in postman_data and 'schema' in postman_data['info'] and postman_data['info'][
-            'schema'] == 'https://schema.getpostman.com/json/collection/v2.0.0/collection.json'):
+        if link.startswith("http"):
+            postman_data = requests.get(link).json()
+        else:
+            with open(link) as f:
+                postman_data = json.load(f)
+        base_collection_dire = ""
+        if "info" in postman_data and 'schema' in postman_data['info']:
+            if postman_data['info']['schema'] == POSTMAN_2:
+                collection = postman_collection_from_dict(postman_data)
+                base_collection_dire = Path(directory).joinpath(clean_filename(collection.info.name))
+                d = self.import_items(collection.item,
+                                      base_collection_dire,
+                                      collection.auth,
+                                      link,
+                                      )
+            elif postman_data['info']['schema'] == POSTMAN_2_1:
+                collection = postman_collection21_from_dict(postman_data)
+                base_collection_dire = Path(directory).joinpath(clean_filename(collection.info.name))
+                d = self.import_items(collection.item,
+                                      base_collection_dire,
+                                      collection.auth,
+                                      link,
+                                      )
+            else:
+                return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
+        else:
             return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
 
-        collection = postman_collection_from_dict(postman_data)
-        d = self.import_items(collection.item,
-                              Path(directory).joinpath(clean_filename(collection.info.name)),
-                              collection.auth,
-                              link,
-                              )
         if save:
+            if collection.info.description:
+                base_collection_dire.mkdir(parents=True, exist_ok=True)
+                with open(base_collection_dire.joinpath("README.txt"), 'w') as f:
+                    f.write(collection.info.description)
             for path, fileout in d.items():
                 if os.path.exists(path) and not overwrite:
                     p = Path(path)

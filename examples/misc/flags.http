@@ -1,0 +1,11 @@
+@name('with-key-and-cert')
+@insecure
+https://client.badssl.com/
+certificate(cert="{{cert}}",key="{{key}}")
+
+
+
+@name('with-key-and-cert')
+@clear
+https://client.badssl.com/
+certificate(cert="{{cert}}",key="{{key}}")
