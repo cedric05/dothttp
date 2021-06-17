@@ -1,0 +1,4 @@
+@name('basic auth')
+GET http://httpbin.org/basic-auth/foo/bar
+basicauth('foo','bar')
+// basicauth('<username>', '<password>')

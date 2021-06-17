@@ -1,0 +1,9 @@
+POST https://httpbin.org/post
+content-type: application/json
+? key1 = value2
+? key2 = value2
+? key3 = "value2 with spaces"
+? key4 = 'value2 with single quotes'
+json({
+  "key": "value"
+})

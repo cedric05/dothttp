@@ -1,0 +1,8 @@
+@name(base)  # <-- base is used to identify
+GET "https://httpbin.org/"
+basicauth("username", "password")
+header1: headervalue1
+
+@name(sub): base # sub inherets base's auth and headers
+GET "/basic-auth/username/password"
+header2: headervalue2

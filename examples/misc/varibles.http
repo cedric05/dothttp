@@ -1,0 +1,15 @@
+//test.http
+GET https://httpbin.org/{{var=get}}
+? path = "{{var}}"
+// curl -X GET 'https://httpbin.org/get?path=get'
+
+
+
+POST https://httpbin.org/post
+json({
+  "firstname": "{{name=john}}",
+  "lastname": "{{lastname=doe}}",
+  "location": "hyderabad",
+// "location": "delhi",
+  "full name": "{{name}} {{lastname}}",
+})

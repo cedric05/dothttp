@@ -1,0 +1,2 @@
+POST https://req.dothttp.dev
+fileinput('C:\Users\john\documents\movie.mkv')
