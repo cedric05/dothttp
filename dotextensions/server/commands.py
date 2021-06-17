@@ -338,8 +338,7 @@ class TypeFromPos(BaseHandler):
                             base = namewrap.base
                             if base:
                                 try:
-                                    base = BaseModelProcessor.get_target(base, model.allhttps)
-                                    base_position = base._tx_position
+                                    base_position = BaseModelProcessor.get_target(base, model.allhttps)._tx_position
                                 except:
                                     pass
                         return {"type": dot_type.value, "target": name, "target_base": base,
