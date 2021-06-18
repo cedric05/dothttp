@@ -60,22 +60,20 @@ class Har2HttpHandler(BaseHandler):
     def run(self, command: Command) -> Result:
         params = command.params
         directory = params.get("save_directory", None)
-        link = params.get("link", None)
         filename = params.get("filename", None)
-        if link:
-            if not isinstance(link, str):
-                return Result.to_error(command, "link is not instance of string")
-            if not (link.startswith("http://") or link.startswith("https://")):
-                return Result.to_error(command, "link should start with http or https://")
+        har_data = params.get("har", None)
         if filename:
             if not isinstance(filename, str):
                 return Result.to_error(command, "filename is not instance of string")
-            if not os.path.isfile(filename):
-                return Result.to_error(command, "filename not existent")
-        if filename and link:
-            return Result.to_error(command, "confused on which to pick, link or string")
-        if not filename and not link:
-            return Result.to_error(command, "link or filename is must")
+            if not (os.path.isfile(filename) or (filename.startswith("http://") or filename.startswith("https://"))):
+                return Result.to_error(command, "filename not existent or invalid link")
+        if har_data:
+            if not isinstance(har_data, (dict, list)):
+                return Result.to_error(command, "har is not instance of dict")
+        if (filename and har_data):
+            return Result.to_error(command, "confused on which to pick filename or link")
+        if not filename and not har_data:
+            return Result.to_error(command, "link, har_data or filename is must")
 
         if directory:
             if not isinstance(directory, str):
@@ -83,25 +81,26 @@ class Har2HttpHandler(BaseHandler):
             if not os.path.isdir(directory):
                 return Result.to_error(command, "directory not existent")
 
-        if link:
-            response = requests.get(link)
-            if response.headers.get('content-type') != APPLICATION_JSON:
-                return Result.to_error(command, "content-type should be json")
-            data = response.json()
-        else:
-            with open(filename) as f:
-                try:
-                    data = json.load(f)
-                except:
-                    return Result.to_error(command, "har file should be of json format")
-        if isinstance(data, dict):
-            har = Harfromdict(data)
+        if filename:
+            if filename.startswith("http"):
+                response = requests.get(filename)
+                if response.headers.get('content-type') != APPLICATION_JSON:
+                    return Result.to_error(command, "content-type should be json")
+                har_data = response.json()
+            else:
+                with open(filename) as f:
+                    try:
+                        har_data = json.load(f)
+                    except:
+                        return Result.to_error(command, "har file should be of json format")
+        if isinstance(har_data, dict):
+            har = Harfromdict(har_data)
             if not har.log or not har.log.entries:
                 har_requests = []
             else:
                 har_requests = (entry.request for entry in har.log.entries)
         else:
-            har_requests = (HarRequest.from_dict(req) for req in data)
+            har_requests = (HarRequest.from_dict(req) for req in har_data)
         http_list = from_har(har_requests)
         with open(Path(directory).joinpath("imported.http"), 'w') as f:
             output = HttpFileFormatter.format(Allhttp(allhttps=http_list))

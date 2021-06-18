@@ -95,7 +95,7 @@ class RunHttpFileHandler(BaseHandler):
 
     @staticmethod
     def get_http_from_req(request: HttpDef):
-        http_def = Allhttp(request.get_http_from_req())
+        http_def = Allhttp([request.get_http_from_req()])
         return HttpFileFormatter.format(http_def)
 
 
