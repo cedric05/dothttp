@@ -1,8 +1,8 @@
 import os
 import sys
 
-from dotextensions.server import Command
-from dotextensions.server.commands import ParseHttpData
+from dotextensions.server.handlers.http2har import Http2Har
+from dotextensions.server.models import Command
 from test import TestBase
 from test.extensions.test_commands import command_dir
 
@@ -13,11 +13,11 @@ fixtures_dir = f"{dir_path}/fixtures"
 class ToHarTest(TestBase):
     def setUp(self) -> None:
         self.maxDiff = None
-        self.execute_handler = ParseHttpData()
+        self.execute_handler = Http2Har()
 
     def test_error(self):
         command = Command(
-            method=ParseHttpData.name,
+            method=Http2Har.name,
             params={
                 "file": f"{command_dir}/syntax.http",
                 "target": "3",
@@ -37,7 +37,7 @@ class ToHarTest(TestBase):
 
     def basic_test(self, **kwargs):
         command = Command(
-            method=ParseHttpData.name,
+            method=Http2Har.name,
             params={
                 "content": kwargs['content'],
                 "file": kwargs['file'],
@@ -65,7 +65,7 @@ class ToHarTest(TestBase):
 
     def complex_test(self, **kwargs):
         command = Command(
-            method=ParseHttpData.name,
+            method=Http2Har.name,
             params={
                 "file": f"{command_dir}/complexrun.http",
                 "target": "1",
@@ -169,7 +169,7 @@ class ToHarTest(TestBase):
     def execute_payload(self, **kwargs):
         kwargs["properties"] = {"filename": os.path.join(dir_path, f"{command_dir}/payload.http")}
         command = Command(
-            method=ParseHttpData.name,
+            method=Http2Har.name,
             params=kwargs,
             id=1)
         result = self.execute_handler.run(command=command)

@@ -11,7 +11,7 @@ from urllib.parse import urlencode, urljoin
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 
-from .utils import get_real_file_path, triple_or_double_tostring
+from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON
 
 try:
     import jstyleson as json
@@ -147,30 +147,33 @@ class HttpDef:
         json_payload = None
         fileswrap = None
         type = None
-        if self.payload.filename:
-            file = self.payload.filename
-        elif isinstance(self.payload.data, str):
-            data = [TripleOrDouble(str=self.payload.data)]
-        elif isinstance(self.payload.data, dict):
-            datajson = None
-        elif self.payload.json:
-            json_payload = self.payload.json
-        elif self.payload.files:
-            fileswrap = FilesWrap([])
-            for filekey, multipartdata in self.payload.files:
-                fileswrap.files.append(
-                    MultiPartFile(name=filekey,
-                                  path=multipartdata[1].name if multipartdata[0] else multipartdata[1],
-                                  type=multipartdata[2] if len(multipartdata) > 2 else None)
-                )
+        payload = None
+        if self.payload:
+            if self.payload.filename:
+                file = self.payload.filename
+            elif isinstance(self.payload.data, str):
+                data = [TripleOrDouble(str=self.payload.data)]
+            elif isinstance(self.payload.data, dict):
+                datajson = None
+            elif self.payload.json:
+                json_payload = self.payload.json
+            elif self.payload.files:
+                fileswrap = FilesWrap([])
+                for filekey, multipartdata in self.payload.files:
+                    fileswrap.files.append(
+                        MultiPartFile(name=filekey,
+                                      path=multipartdata[1].name if multipartdata[0] else multipartdata[1],
+                                      type=multipartdata[2] if len(multipartdata) > 2 else None)
+                    )
 
-        payload = ParsePayload(data=data, datajson=datajson, file=file, json=json_payload, fileswrap=fileswrap,
-                               type=type)
+            payload = ParsePayload(data=data, datajson=datajson, file=file, json=json_payload, fileswrap=fileswrap,
+                                   type=type)
 
         query_lines = []
-        for key, values in self.query.items():
-            for value in values:
-                query_lines.append(Line(header=None, query=Query(key=key, value=value)))
+        if self.query:
+            for key, values in self.query.items():
+                for value in values:
+                    query_lines.append(Line(header=None, query=Query(key=key, value=value)))
         auth_wrap = None
         if self.auth:
             if isinstance(self.auth, HTTPBasicAuth):
@@ -187,19 +190,19 @@ class HttpDef:
             extra_args.append(ExtraArg(clear="@clear"))
         if self.allow_insecure:
             extra_args.append(ExtraArg(insecure="@insecure"))
-        return Allhttp(allhttps=[Http(
+        header_lines = []
+        if self.headers:
+            for key, value in self.headers.items():
+                header_lines.append(Line(header=Header(key=key, value=value), query=None))
+        return Http(
             namewrap=NameWrap(self.name),
             extra_args=extra_args,
             urlwrap=UrlWrap(url=self.url, method=self.method),
-            lines=[
-                      Line(header=Header(key=key, value=value), query=None)
-                      for key, value in
-                      self.headers.items()] + query_lines
-            ,
+            lines=header_lines + query_lines,
             payload=payload,
             certificate=certificate,
             output=None, authwrap=auth_wrap, description=None
-        )])
+        )
 
 
 @dataclass

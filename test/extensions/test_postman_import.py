@@ -2,8 +2,8 @@ import json
 import os
 import sys
 
-from dotextensions.server import Command
-from dotextensions.server.commands import ImportPostmanCollection
+from dotextensions.server.handlers.postman_import import ImportPostmanCollection
+from dotextensions.server.models import Command
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

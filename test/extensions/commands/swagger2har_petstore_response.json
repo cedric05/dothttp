@@ -1,0 +1,521 @@
+{
+  "log": {
+    "entries": [
+      {
+        "request": {
+          "method": "POST",
+          "url": "http://petstore.swagger.io/v2/pet",
+          "headers": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "accept",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0,
+          "postData": {
+            "mimeType": "application/json",
+            "text": "{\"id\":0,\"category\":{\"id\":0,\"name\":\"\"},\"name\":\"\",\"photoUrls\":[],\"tags\":[],\"status\":\"available\"}"
+          }
+        }
+      },
+      {
+        "request": {
+          "method": "PUT",
+          "url": "http://petstore.swagger.io/v2/pet",
+          "headers": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "accept",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0,
+          "postData": {
+            "mimeType": "application/json",
+            "text": "{\"id\":0,\"category\":{\"id\":0,\"name\":\"\"},\"name\":\"\",\"photoUrls\":[],\"tags\":[],\"status\":\"available\"}"
+          }
+        }
+      },
+      {
+        "request": {
+          "method": "GET",
+          "url": "http://petstore.swagger.io/v2/pet/findByStatus",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "queryString": [
+            {
+              "name": "status",
+              "value": "<SOME_ARRAY_VALUE>"
+            }
+          ],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "GET",
+          "url": "http://petstore.swagger.io/v2/pet/findByTags",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "queryString": [
+            {
+              "name": "tags",
+              "value": "<SOME_ARRAY_VALUE>"
+            }
+          ],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "GET",
+          "url": "http://petstore.swagger.io/v2/pet/{petId}",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "POST",
+          "url": "http://petstore.swagger.io/v2/pet/{petId}",
+          "headers": [
+            {
+              "name": "accept",
+              "value": "application/x-www-form-urlencoded"
+            },
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "DELETE",
+          "url": "http://petstore.swagger.io/v2/pet/{petId}",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "api_key",
+              "value": "<SOME_STRING_VALUE>"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "POST",
+          "url": "http://petstore.swagger.io/v2/pet/{petId}/uploadImage",
+          "headers": [
+            {
+              "name": "accept",
+              "value": "multipart/form-data"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            },
+            {
+              "name": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "GET",
+          "url": "http://petstore.swagger.io/v2/store/inventory",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "POST",
+          "url": "http://petstore.swagger.io/v2/store/order",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0,
+          "postData": {
+            "mimeType": "application/json",
+            "text": "{\"id\":0,\"petId\":0,\"quantity\":0,\"shipDate\":\"\",\"status\":\"placed\",\"complete\":false}"
+          }
+        }
+      },
+      {
+        "request": {
+          "method": "GET",
+          "url": "http://petstore.swagger.io/v2/store/order/{orderId}",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "DELETE",
+          "url": "http://petstore.swagger.io/v2/store/order/{orderId}",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "POST",
+          "url": "http://petstore.swagger.io/v2/user",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0,
+          "postData": {
+            "mimeType": "application/json",
+            "text": "{\"id\":0,\"username\":\"\",\"firstName\":\"\",\"lastName\":\"\",\"email\":\"\",\"password\":\"\",\"phone\":\"\",\"userStatus\":0}"
+          }
+        }
+      },
+      {
+        "request": {
+          "method": "POST",
+          "url": "http://petstore.swagger.io/v2/user/createWithArray",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0,
+          "postData": {
+            "mimeType": "application/json",
+            "text": "[]"
+          }
+        }
+      },
+      {
+        "request": {
+          "method": "POST",
+          "url": "http://petstore.swagger.io/v2/user/createWithList",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0,
+          "postData": {
+            "mimeType": "application/json",
+            "text": "[]"
+          }
+        }
+      },
+      {
+        "request": {
+          "method": "GET",
+          "url": "http://petstore.swagger.io/v2/user/login",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [
+            {
+              "name": "username",
+              "value": "<SOME_STRING_VALUE>"
+            },
+            {
+              "name": "password",
+              "value": "<SOME_STRING_VALUE>"
+            }
+          ],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "GET",
+          "url": "http://petstore.swagger.io/v2/user/logout",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "GET",
+          "url": "http://petstore.swagger.io/v2/user/{username}",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      },
+      {
+        "request": {
+          "method": "PUT",
+          "url": "http://petstore.swagger.io/v2/user/{username}",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0,
+          "postData": {
+            "mimeType": "application/json",
+            "text": "{\"id\":0,\"username\":\"\",\"firstName\":\"\",\"lastName\":\"\",\"email\":\"\",\"password\":\"\",\"phone\":\"\",\"userStatus\":0}"
+          }
+        }
+      },
+      {
+        "request": {
+          "method": "DELETE",
+          "url": "http://petstore.swagger.io/v2/user/{username}",
+          "headers": [
+            {
+              "name": "content-type",
+              "value": "application/xml"
+            },
+            {
+              "name": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "queryString": [],
+          "httpVersion": "HTTP/1.1",
+          "cookies": [],
+          "headersSize": 0,
+          "bodySize": 0
+        }
+      }
+    ]
+  }
+}

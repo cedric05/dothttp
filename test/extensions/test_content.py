@@ -1,7 +1,7 @@
 import json
 
-from dotextensions.server import Command
-from dotextensions.server.commands import ContentExecuteHandler
+from dotextensions.server.handlers.basic_handlers import ContentExecuteHandler
+from dotextensions.server.models import Command
 from test import TestBase
 
 

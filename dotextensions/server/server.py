@@ -5,9 +5,13 @@ import sys
 from json import JSONDecodeError
 from typing import Dict
 
-from . import Command, BaseHandler
-from .commands import RunHttpFileHandler, FormatHttpFileHandler, GetNameReferencesHandler, ImportPostmanCollection, \
-    ContentExecuteHandler, ParseHttpData, ContentNameReferencesHandler, TypeFromPos
+from .handlers.basic_handlers import RunHttpFileHandler, ContentExecuteHandler, FormatHttpFileHandler, \
+    GetNameReferencesHandler, ContentNameReferencesHandler
+from .handlers.gohandler import TypeFromPos
+from .handlers.har2httphandler import Har2HttpHandler
+from .handlers.http2har import Http2Har
+from .handlers.postman_import import ImportPostmanCollection
+from .models import Command, BaseHandler
 
 logger = logging.getLogger('handler')
 
@@ -15,9 +19,10 @@ handlers: Dict[str, BaseHandler] = {handler.get_method(): handler for handler in
                                     (FormatHttpFileHandler(), RunHttpFileHandler(), GetNameReferencesHandler(),
                                      ImportPostmanCollection(),
                                      ContentExecuteHandler(),
-                                     ParseHttpData(),
+                                     Http2Har(),
                                      ContentNameReferencesHandler(),
-                                     TypeFromPos()
+                                     TypeFromPos(),
+                                     Har2HttpHandler()
                                      )}
 
 

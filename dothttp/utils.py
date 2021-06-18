@@ -22,3 +22,6 @@ def quote_or_unquote(line: str):
         return "'", line
     else:
         return '"', line
+
+
+APPLICATION_JSON = "application/json"

@@ -202,7 +202,7 @@ class HttpFileFormatter(RequestBase):
                 for line in http.description.splitlines():
                     output_str += "// " + line + new_line
                 output_str += new_line
-            if namewrap := http.namewrap:
+            if namewrap := http.namewrap and http.namewrap.name:
                 quote_type, name = quote_or_unquote(namewrap.name)
                 output_str += f"@name({quote_type}{name}{quote_type}){new_line}"
             method = http.urlwrap.method if http.urlwrap.method else "GET"
