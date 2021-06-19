@@ -56,5 +56,5 @@ class ScriptExecutionTest(TestBase):
             self.assertTrue(response.result.get('error'))
 
     def test_should_error_out2(self):
-        with execute_with_params(2, expected_output="req.har.http") as (expected, response):
+        with execute_with_params("2", expected_output="req.har.http") as (expected, response):
             self.assertTrue(response.result.get('error'))

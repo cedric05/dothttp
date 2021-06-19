@@ -5,7 +5,7 @@
     "info": {
       "_postman_id": null,
       "description": null,
-      "name": "/home/prasanth/cedric05/dothttp/test/extensions/commands/swagger2har_petstore_response.http",
+      "name": "swagger2har_petstore_response.http",
       "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
       "version": null
     },

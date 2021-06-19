@@ -43,7 +43,7 @@ class Http2Postman(BaseHandler):
         collection.item = item_list
         collection.info = Information.from_dict({})
         collection.info.schema = POSTMAN_2_1
-        collection.info.name = filename
+        collection.info.name = os.path.basename(filename)
         return Result.get_result(command, result={"collection": collection.to_dict()})
 
     def get_http_to_postman_request(self, http: Http) -> RequestClass:
