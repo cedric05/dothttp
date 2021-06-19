@@ -1,0 +1,758 @@
+{
+  "collection": {
+    "auth": null,
+    "event": null,
+    "info": {
+      "_postman_id": null,
+      "description": null,
+      "name": "/home/prasanth/cedric05/dothttp/test/extensions/commands/swagger2har_petstore_response.http",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "version": null
+    },
+    "item": [
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": {
+              "language": "json"
+            },
+            "raw": "{\"id\": 0, \"category\": {\"id\": 0, \"name\": \"\"}, \"name\": \"\", \"photoUrls\": [], \"tags\": [], \"status\": \"available\"}",
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "accept",
+              "value": "application/xml"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "method": "POST",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/pet"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": {
+              "language": "json"
+            },
+            "raw": "{\"id\": 0, \"category\": {\"id\": 0, \"name\": \"\"}, \"name\": \"\", \"photoUrls\": [], \"tags\": [], \"status\": \"available\"}",
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "accept",
+              "value": "application/xml"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "method": "PUT",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/pet"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "method": "GET",
+          "proxy": null,
+          "url": {
+            "hash": null,
+            "host": "petstore.swagger.io",
+            "path": "/v2/pet/findByStatus",
+            "port": null,
+            "protocol": "http",
+            "query": [
+              {
+                "description": null,
+                "disabled": false,
+                "key": "status",
+                "value": "<SOME_ARRAY_VALUE>"
+              }
+            ],
+            "raw": "http://petstore.swagger.io/v2/pet/findByStatus",
+            "variable": null
+          }
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "method": "GET",
+          "proxy": null,
+          "url": {
+            "hash": null,
+            "host": "petstore.swagger.io",
+            "path": "/v2/pet/findByTags",
+            "port": null,
+            "protocol": "http",
+            "query": [
+              {
+                "description": null,
+                "disabled": false,
+                "key": "tags",
+                "value": "<SOME_ARRAY_VALUE>"
+              }
+            ],
+            "raw": "http://petstore.swagger.io/v2/pet/findByTags",
+            "variable": null
+          }
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "GET",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/pet/{petId}"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "accept",
+              "value": "application/x-www-form-urlencoded"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "method": "POST",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/pet/{petId}"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "api_key",
+              "value": "<SOME_STRING_VALUE>"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "method": "DELETE",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/pet/{petId}"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "accept",
+              "value": "multipart/form-data"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "Authorization",
+              "value": "Bearer <BEARER_TOKEN>"
+            }
+          ],
+          "method": "POST",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/pet/{petId}/uploadImage"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "GET",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/store/inventory"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": {
+              "language": "json"
+            },
+            "raw": "{\"id\": 0, \"petId\": 0, \"quantity\": 0, \"shipDate\": \"\", \"status\": \"placed\", \"complete\": false}",
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/store/order"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "GET",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/store/order/{orderId}"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "DELETE",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/store/order/{orderId}"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": {
+              "language": "json"
+            },
+            "raw": "{\"id\": 0, \"username\": \"\", \"firstName\": \"\", \"lastName\": \"\", \"email\": \"\", \"password\": \"\", \"phone\": \"\", \"userStatus\": 0}",
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/user"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/user/createWithArray"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "POST",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/user/createWithList"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "GET",
+          "proxy": null,
+          "url": {
+            "hash": null,
+            "host": "petstore.swagger.io",
+            "path": "/v2/user/login",
+            "port": null,
+            "protocol": "http",
+            "query": [
+              {
+                "description": null,
+                "disabled": false,
+                "key": "username",
+                "value": "<SOME_STRING_VALUE>"
+              },
+              {
+                "description": null,
+                "disabled": false,
+                "key": "password",
+                "value": "<SOME_STRING_VALUE>"
+              }
+            ],
+            "raw": "http://petstore.swagger.io/v2/user/login",
+            "variable": null
+          }
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "GET",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/user/logout"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "GET",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/user/{username}"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": {
+              "language": "json"
+            },
+            "raw": "{\"id\": 0, \"username\": \"\", \"firstName\": \"\", \"lastName\": \"\", \"email\": \"\", \"password\": \"\", \"phone\": \"\", \"userStatus\": 0}",
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "PUT",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/user/{username}"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
+          "method": "DELETE",
+          "proxy": null,
+          "url": "http://petstore.swagger.io/v2/user/{username}"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      }
+    ],
+    "protocolProfileBehavior": null,
+    "variable": null
+  }
+}

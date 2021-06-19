@@ -554,8 +554,8 @@ class Information:
         assert isinstance(obj, dict)
         postman_id = from_union([from_str, from_none], obj.get("_postman_id"))
         description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
-        name = from_str(obj.get("name"))
-        schema = from_str(obj.get("schema"))
+        name = from_union([from_str, from_none], obj.get("name"))
+        schema = from_union([from_str, from_none], obj.get("schema"))
         version = from_union([CollectionVersionClass.from_dict, from_str, from_none], obj.get("version"))
         return Information(postman_id, description, name, schema, version)
 
@@ -1205,8 +1205,8 @@ class PostmanCollection21:
         assert isinstance(obj, dict)
         auth = from_union([from_none, Auth.from_dict], obj.get("auth"))
         event = from_union([lambda x: from_list(Event.from_dict, x), from_none], obj.get("event"))
-        info = Information.from_dict(obj.get("info"))
-        item = from_list(Items.from_dict, obj.get("item"))
+        info = from_union([from_none, Information.from_dict], obj.get("info"))
+        item = from_union([lambda x: from_list(Items.from_dict, x), from_none], obj.get("item"))
         protocol_profile_behavior = from_union([lambda x: from_dict(lambda x: x, x), from_none],
                                                obj.get("protocolProfileBehavior"))
         variable = from_union([lambda x: from_list(Variable.from_dict, x), from_none], obj.get("variable"))

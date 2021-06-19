@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-from dotextensions.server.handlers.postman_import import ImportPostmanCollection
+from dotextensions.server.handlers.postman2http import ImportPostmanCollection
 from dotextensions.server.models import Command
 from test import TestBase
 

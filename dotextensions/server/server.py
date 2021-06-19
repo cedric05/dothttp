@@ -10,7 +10,8 @@ from .handlers.basic_handlers import RunHttpFileHandler, ContentExecuteHandler, 
 from .handlers.gohandler import TypeFromPos
 from .handlers.har2httphandler import Har2HttpHandler
 from .handlers.http2har import Http2Har
-from .handlers.postman_import import ImportPostmanCollection
+from .handlers.http2postman import Http2Postman
+from .handlers.postman2http import ImportPostmanCollection
 from .models import Command, BaseHandler
 
 logger = logging.getLogger('handler')
@@ -22,7 +23,8 @@ handlers: Dict[str, BaseHandler] = {handler.get_method(): handler for handler in
                                      Http2Har(),
                                      ContentNameReferencesHandler(),
                                      TypeFromPos(),
-                                     Har2HttpHandler()
+                                     Har2HttpHandler(),
+                                     Http2Postman(),
                                      )}
 
 

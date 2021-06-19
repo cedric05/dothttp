@@ -1159,8 +1159,8 @@ class PostmanCollection:
         assert isinstance(obj, dict)
         auth = from_union([from_none, Auth.from_dict], obj.get("auth"))
         event = from_union([lambda x: from_list(Event.from_dict, x), from_none], obj.get("event"))
-        info = Information.from_dict(obj.get("info"))
-        item = from_list(Items.from_dict, obj.get("item"))
+        info = from_union([from_none, Information.from_dict], obj.get("info"))
+        item = from_union([lambda x: from_list(Items.from_dict, x), from_none], obj.get("item"))
         protocol_profile_behavior = from_union([lambda x: from_dict(lambda x: x, x), from_none],
                                                obj.get("protocolProfileBehavior"))
         variable = from_union([lambda x: from_list(Variable.from_dict, x), from_none], obj.get("variable"))

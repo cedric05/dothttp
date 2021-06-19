@@ -57,6 +57,9 @@ def from_har(har_format: Iterator[HarRequest]) -> List[Http]:
 class Har2HttpHandler(BaseHandler):
     name = "/export/har2http"
 
+    def get_method(self):
+        return Har2HttpHandler.name
+
     def run(self, command: Command) -> Result:
         params = command.params
         directory = params.get("save_directory", None)
