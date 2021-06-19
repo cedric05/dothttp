@@ -31,7 +31,7 @@ def execute_with_params(input_file_or_json, expected_output):
             yield f.read(), response
 
 
-class ScriptExecutionTest(TestBase):
+class Har2HttpTest(TestBase):
 
     def test_simple(self):
         with execute_with_params(input_file_or_json="swagger2har_petstore_response.json",
@@ -49,6 +49,11 @@ class ScriptExecutionTest(TestBase):
         har_requests = [entry['request'] for entry in har_data['log']['entries']]
         with execute_with_params(input_file_or_json=har_requests, expected_output="req.har.http") as (
                 expected, response):
+            self.assertEqual(expected, response.result.get('http'))
+
+    def test_har_simple3(self):
+        with execute_with_params(input_file_or_json="payload.har.json",
+                                 expected_output="payload.from.har.http") as (expected, response):
             self.assertEqual(expected, response.result.get('http'))
 
     def test_should_error_out(self):

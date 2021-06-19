@@ -1,11 +1,12 @@
 import json
 import os
+import urllib.parse
 from pathlib import Path
 from typing import List, Iterator
 
 import requests
 
-from dothttp import HttpDef, APPLICATION_JSON, FORM_URLENCODED, Allhttp, Payload, Http
+from dothttp import HttpDef, APPLICATION_JSON, FORM_URLENCODED, Allhttp, Payload, Http, MULTIPART_FORM_INPUT
 from dothttp.request_base import HttpFileFormatter
 from . import logger
 from ..models import Command, Result, BaseHandler
@@ -33,20 +34,25 @@ def from_har(har_format: Iterator[HarRequest]) -> List[Http]:
                     else:
                         http_def.query[query.name] = [query.value]
             if postData := request.postData:
-                is_json = False
-                if postData.mimeType and postData.mimeType.lower() == APPLICATION_JSON:
-                    is_json = True
                 payload = http_def.payload = Payload()
                 if postData.text:
-                    if is_json:
-                        payload.header = APPLICATION_JSON
+                    if postData.mimeType == APPLICATION_JSON:
                         payload.json = json.loads(postData.text)
+                    elif postData.mimeType == FORM_URLENCODED:
+                        payload.data = urllib.parse.parse_qs(postData.text)
                     else:
                         payload.data = postData.text
-                        payload.header = "text/plain"
+                    payload.header = postData.mimeType
                 elif postData.params:
-                    payload.header = FORM_URLENCODED
-                    payload.data = postData.params
+                    payload.header = MULTIPART_FORM_INPUT
+                    payload.files = []
+                    for param in postData.params:
+                        value = param.fileName or param.value
+                        if param.contentType:
+                            payload.files.append((param.name, (None, value, param.contentType)))
+                        else:
+                            payload.files.append((param.name, (None, value, None)))
+                        payload.data = postData.params
             http_def.name = request.comment
         except Exception as e:
             logger.error("import har failed", exc_info=True)

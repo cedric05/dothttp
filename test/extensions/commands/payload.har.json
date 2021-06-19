@@ -1,0 +1,104 @@
+{
+  "log": {
+    "version": "1.2",
+    "creator": {
+      "name": "WebInspector",
+      "version": "537.36"
+    },
+    "pages": [],
+    "entries": [
+      {
+        "request": {
+          "url": "https://req.dothttp.dev",
+          "method": "POST",
+          "queryString": [],
+          "headers": [],
+          "postData": {
+            "mimeType": "application/json",
+            "text": "{\"paylaod\": \"json\"}"
+          }
+        }
+      },
+      {
+        "request": {
+          "url": "https://req.dothttp.dev",
+          "method": "POST",
+          "queryString": [],
+          "headers": [],
+          "postData": {
+            "mimeType": "application/x-www-form-urlencoded",
+            "text": "paylaod=json"
+          }
+        }
+      },
+      {
+        "request": {
+          "url": "https://req.dothttp.dev",
+          "method": "POST",
+          "queryString": [],
+          "headers": [],
+          "postData": {
+            "mimeType": "other-content-type",
+            "text": "raw data"
+          }
+        }
+      },
+      {
+        "request": {
+          "url": "https://req.dothttp.dev",
+          "method": "POST",
+          "queryString": [],
+          "headers": [],
+          "postData": {
+            "mimeType": "multipart/form-data",
+            "params": [
+              {
+                "name": "raw data",
+                "fileName": null,
+                "value": "other-content-type",
+                "contentType": "text/plain"
+              },
+              {
+                "name": "raw data",
+                "fileName": null,
+                "value": "other-content-type",
+                "contentType": "text/plain"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "request": {
+          "url": "https://req.dothttp.dev",
+          "method": "POST",
+          "queryString": [],
+          "headers": [],
+          "postData": {
+            "mimeType": "text/plain",
+            "text": "raw data"
+          }
+        }
+      },
+      {
+        "request": {
+          "url": "https://req.dothttp.dev",
+          "method": "POST",
+          "queryString": [],
+          "headers": [],
+          "postData": {
+            "mimeType": "multipart/form-data",
+            "params": [
+              {
+                "name": "file",
+                "fileName": "/home/prasanth/cedric05/dothttp/test/extensions/commands/payload.http",
+                "value": null,
+                "contentType": "text/plain"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

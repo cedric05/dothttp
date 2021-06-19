@@ -109,15 +109,19 @@ class HttpDef:
         if not self.payload:
             return None
         payload = self.payload
-        return_data = {"mimeType": self.payload.header}
+        return_data = {}
         if payload.data:
             if isinstance(payload.data, dict):
+                return_data["mimeType"] = FORM_URLENCODED
                 return_data["text"] = urlencode(payload.data)
             else:
+                return_data["mimeType"] = payload.header or "text/plain"
                 return_data["text"] = payload.data
         elif payload.json:
+            return_data["mimeType"] = APPLICATION_JSON
             return_data["text"] = json.dumps(payload.json)
         elif payload.files:
+            return_data["mimeType"] = MULTIPART_FORM_INPUT
             params = []
             for (name, (multipart_filename, multipart_content, mimetype)) in payload.files:
                 content = multipart_content
@@ -154,7 +158,7 @@ class HttpDef:
             elif isinstance(self.payload.data, str):
                 data = [TripleOrDouble(str=self.payload.data)]
             elif isinstance(self.payload.data, dict):
-                datajson = None
+                datajson = self.payload.data
             elif self.payload.json:
                 json_payload = self.payload.json
             elif self.payload.files:
