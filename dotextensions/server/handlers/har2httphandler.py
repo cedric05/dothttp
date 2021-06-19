@@ -11,6 +11,7 @@ from dothttp.request_base import HttpFileFormatter
 from . import logger
 from ..models import Command, Result, BaseHandler
 from ..models.har import Harfromdict, HarRequest
+from ..utils import get_alternate_filename
 
 
 def from_har(har_format: Iterator[HarRequest]) -> List[Http]:
@@ -69,6 +70,7 @@ class Har2HttpHandler(BaseHandler):
     def run(self, command: Command) -> Result:
         params = command.params
         directory = params.get("save_directory", None)
+        save_filename = params.get("save_filename", None)
         filename = params.get("filename", None)
         har_data = params.get("har", None)
         if filename:
@@ -111,8 +113,12 @@ class Har2HttpHandler(BaseHandler):
         else:
             har_requests = (HarRequest.from_dict(req) for req in har_data)
         http_list = from_har(har_requests)
-        with open(Path(directory).joinpath("imported.http"), 'w') as f:
+        save_filename = Path(directory).joinpath("imported.http" if not save_filename else save_filename)
+        if os.path.exists(save_filename):
+            save_filename = get_alternate_filename(save_filename)
+        save_filename.parent.mkdir(parents=True, exist_ok=True)
+        with open(save_filename, 'w') as f:
             output = HttpFileFormatter.format(Allhttp(allhttps=http_list))
             f.write(output)
-        return Result.get_result(command, {"http": output})
+        return Result.get_result(command, {"http": output, "filename": str(save_filename)})
         # return Result.to_error(command, "har file has not requests")

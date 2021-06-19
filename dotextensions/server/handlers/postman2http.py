@@ -1,7 +1,6 @@
 import json
 import os
 from collections import defaultdict
-from datetime import datetime
 from pathlib import Path
 from typing import Iterator, Optional, Union, Dict, List
 from urllib.parse import unquote
@@ -18,7 +17,7 @@ from ..models import Command, Result, BaseHandler
 from ..postman import Items, Auth, URLClass, POSTMAN_2, postman_collection_from_dict
 from ..postman2_1 import URLClass as URLClass_2_1, ApikeyElement, POSTMAN_2_1, \
     postman_collection21_from_dict
-from ..utils import clean_filename, slashed_path_to_normal_path
+from ..utils import clean_filename, slashed_path_to_normal_path, get_alternate_filename
 
 
 class ImportPostmanCollection(BaseHandler):
@@ -224,8 +223,7 @@ class ImportPostmanCollection(BaseHandler):
                     f.write(collection.info.description)
             for path, fileout in d.items():
                 if os.path.exists(path) and not overwrite:
-                    p = Path(path)
-                    path = p.with_stem(clean_filename(p.stem + '-' + datetime.now().ctime()))
+                    path = get_alternate_filename(path)
                 Path(path).parent.mkdir(parents=True, exist_ok=True)
                 with open(path, 'w') as f:
                     f.write(fileout)

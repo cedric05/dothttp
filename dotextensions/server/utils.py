@@ -1,7 +1,9 @@
 # src: https://gist.github.com/wassname/1393c4a57cfcbf03641dbc31886123b8
 import string
 import unicodedata
+from datetime import datetime
 from enum import Enum
+from pathlib import Path
 from typing import TypeVar, Any, Callable, List, Type, cast, Dict
 
 valid_filename_chars = "-_.() %s%s" % (string.ascii_letters, string.digits)
@@ -89,3 +91,9 @@ def from_float(x: Any) -> float:
 def to_float(x: Any) -> float:
     assert isinstance(x, float)
     return x
+
+
+def get_alternate_filename(path):
+    p = Path(path)
+    path = p.with_stem(clean_filename(p.stem + '-' + datetime.now().ctime()))
+    return path
