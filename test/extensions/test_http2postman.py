@@ -71,9 +71,7 @@ class Testhttp2postman(TestBase):
     def test_negative(self):
         self.assertEquals({'error': True, 'error_message': 'filename not existent or invalid link'},
                           self.error_scenario("ram.http"))
-        self.assertEquals(
-            {'error': True,
-             'error_message': "unable to parse bacause of parsing issues None:2:2: error: "
-                              "Expected '(' or STRING or '\\w+' at position "
-                              '/home/prasanth/cedric05/dothttp/test/extensions/commands/names_fail.http:(2, '
-                              "2) => 'http.dev ?*'."}, self.error_scenario("names_fail.http"))
+        second = self.error_scenario("names_fail.http")
+        self.assertTrue(second.get("error"))
+        self.assertTrue(second.get("error_message").startswith(
+            "unable to parse because of parsing issues None:2:2: error: Expected '(' or STRING or '\w+' at position"))

@@ -34,7 +34,7 @@ class Http2Postman(BaseHandler):
                     return Result.to_error(command, "filename not existent or invalid link")
                 http_list = dothttp_model.model_from_file(filename)
         except Exception as e:
-            return Result.to_error(command, f"unable to parse bacause of parsing issues {e}")
+            return Result.to_error(command, f"unable to parse because of parsing issues {e}")
         item_list = []
         for http in http_list.allhttps:
             item = Items.from_dict({})
