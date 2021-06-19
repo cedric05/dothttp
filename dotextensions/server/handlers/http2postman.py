@@ -3,11 +3,10 @@ import os
 import urllib.parse
 
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode
-from dothttp import dothttp_model, Http, json_or_array_to_json
+from dothttp import dothttp_model, Http, json_or_array_to_json, triple_or_double_tostring
 from ..models import BaseHandler, Command, Result
-from ..postman import URLEncodedParameter
 from ..postman2_1 import RequestClass, Items, Auth, ApikeyElement, Header, QueryParam, URLClass, \
-    Information, POSTMAN_2_1, PostmanCollection21, Body, FormParameter
+    Information, POSTMAN_2_1, PostmanCollection21, Body, FormParameter, URLEncodedParameter
 
 
 class Http2Postman(BaseHandler):
@@ -21,16 +20,19 @@ class Http2Postman(BaseHandler):
         filename = params.get("filename", None)
         content = params.get("content", None)
         try:
-            if filename:
+            if filename and content:
+                # for content and filename
+                # scenario, we need both
+                # for export
+                if not isinstance(content, str):
+                    return Result.to_error(command, "content is not instance of string")
+                http_list = dothttp_model.model_from_str(content)
+            else:
                 if not isinstance(filename, str):
                     return Result.to_error(command, "filename is not instance of string")
                 if not (os.path.isfile(filename)):
                     return Result.to_error(command, "filename not existent or invalid link")
                 http_list = dothttp_model.model_from_file(filename)
-            else:
-                if not content(content, str):
-                    return Result.to_error(command, "content is not instance of string")
-                http_list = dothttp_model.model_from_str(content)
         except Exception as e:
             return Result.to_error(command, f"unable to parse bacause of parsing issues {e}")
         item_list = []
@@ -43,7 +45,7 @@ class Http2Postman(BaseHandler):
         collection.item = item_list
         collection.info = Information.from_dict({})
         collection.info.schema = POSTMAN_2_1
-        collection.info.name = os.path.basename(filename)
+        collection.info.name = os.path.basename(filename) if filename else "export_from_http"
         return Result.get_result(command, result={"collection": collection.to_dict()})
 
     def get_http_to_postman_request(self, http: Http) -> RequestClass:
@@ -80,24 +82,30 @@ class Http2Postman(BaseHandler):
                 request.url = URLClass.from_dict({})
                 parsed_url = urllib.parse.urlparse(http.urlwrap.url)
                 # query not from url will be placed in query
-                request.url.path = parsed_url.path + parsed_url.query
+                request.url.path = parsed_url.path
                 request.url.host = parsed_url.hostname
                 request.url.port = parsed_url.port
                 request.url.protocol = parsed_url.scheme
+                request.url.query = query
+                for key, value in urllib.parse.parse_qsl(parsed_url.query):
+                    query.append(QueryParam(description=None, disabled=None, value=value, key=key))
                 request.url.query = query
                 request.url.raw = http.urlwrap.url
         if payload := http.payload:
             request.body = Body.from_dict({})
             if datajson := payload.datajson:
                 request.body.mode = Mode.URLENCODED
-                request.body.urlencoded = [URLEncodedParameter(key, datajson.get(key)) for key in datajson]
+                data = json_or_array_to_json(datajson, lambda k: k)
+                request.body.urlencoded = [URLEncodedParameter(description=None, disabled=None, key=key, value=val) for
+                                           key, val in
+                                           data.items()]
             elif json_payload := payload.json:
                 request.body.mode = Mode.RAW
                 request.body.options = {"language": "json"}
                 request.body.raw = json.dumps(json_or_array_to_json(json_payload, lambda x: x))
-            elif data := payload.json:
+            elif data := payload.data:
                 request.body.mode = Mode.RAW
-                request.body.raw = data
+                request.body.raw = triple_or_double_tostring(data, lambda k: k)
             elif form := payload.fileswrap:
                 request.body.mode = Mode.FORMDATA
                 request.body.formdata = []

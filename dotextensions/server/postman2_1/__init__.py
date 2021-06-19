@@ -134,7 +134,7 @@ class Auth:
         ntlm = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("ntlm"))
         oauth1 = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("oauth1"))
         oauth2 = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("oauth2"))
-        type = AuthType(obj.get("type"))
+        type = AuthType(obj.get("type", AuthType.NOAUTH))
         return Auth(apikey, awsv4, basic, bearer, digest, edgegrid, hawk, noauth, ntlm, oauth1, oauth2, type)
 
     def to_dict(self) -> dict:
@@ -625,7 +625,7 @@ class FormParameter:
         content_type = from_union([from_str, from_none], obj.get("contentType"))
         description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
         disabled = from_union([from_bool, from_none], obj.get("disabled"))
-        key = from_str(obj.get("key"))
+        key = from_union([from_str, from_none], obj.get("key"))
         type = from_union([FormParameterType, from_none], obj.get("type"))
         value = from_union([from_str, from_none], obj.get("value"))
         src = from_union([from_none, lambda x: from_list(lambda x: x, x), from_str], obj.get("src"))
