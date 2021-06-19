@@ -215,7 +215,7 @@ class HttpFileFormatter(RequestBase):
             if lines := http.lines:
                 def check_for_quotes(line):
                     quote_type, value = quote_or_unquote(line.header.value)
-                    return f'"{line.header.key}": "{quote_type}{value}{quote_type}"'
+                    return f'"{line.header.key}": {quote_type}{value}{quote_type}'
 
                 headers = new_line.join(map(check_for_quotes, filter(lambda line: line.header, lines)))
                 if headers:
