@@ -202,8 +202,8 @@ class HttpFileFormatter(RequestBase):
                 for line in http.description.splitlines():
                     output_str += "// " + line + new_line
                 output_str += new_line
-            if namewrap := http.namewrap:
-                quote_type, name = quote_or_unquote(namewrap.name)
+            if http.namewrap and http.namewrap.name:
+                quote_type, name = quote_or_unquote(http.namewrap.name)
                 output_str += f"@name({quote_type}{name}{quote_type}){new_line}"
             method = http.urlwrap.method if http.urlwrap.method else "GET"
             output_str += f'{method} "{http.urlwrap.url}"'
@@ -213,9 +213,11 @@ class HttpFileFormatter(RequestBase):
                 elif digest_auth := auth_wrap.digest_auth:
                     output_str += f'{new_line}digestauth("{digest_auth.username}", "{digest_auth.password}")'
             if lines := http.lines:
-                headers = new_line.join(map(lambda line: f'"{line.header.key}": "{line.header.value}"',
-                                            filter(lambda line:
-                                                   line.header, lines)))
+                def check_for_quotes(line):
+                    quote_type, value = quote_or_unquote(line.header.value)
+                    return f'"{line.header.key}": {quote_type}{value}{quote_type}'
+
+                headers = new_line.join(map(check_for_quotes, filter(lambda line: line.header, lines)))
                 if headers:
                     output_str += f"\n{headers}"
 

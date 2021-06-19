@@ -1,0 +1,36 @@
+[
+  {
+    "method": "GET",
+    "url": "https://api.github.com/_private/browser/stats",
+    "httpVersion": "HTTP/1.1",
+    "queryString": [],
+    "headers": [
+      {
+        "name": "sec-ch-ua",
+        "value": "\"Chromium\";v=\"92\", \" Not A;Brand\";v=\"99\", \"Microsoft Edge\";v=\"92\""
+      },
+      {
+        "name": "user-agent",
+        "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4501.0 Safari/537.36 Edg/92.0.891.1"
+      },
+      {
+        "name": "accept",
+        "value": "*/*"
+      },
+      {
+        "name": "sec-fetch-site",
+        "value": "same-site"
+      },
+      {
+        "name": "sec-fetch-dest",
+        "value": "empty"
+      },
+      {
+        "name": "accept-language",
+        "value": "en-GB,en;q=0.9,en-US;q=0.8"
+      }
+    ],
+    "cookies": [],
+    "postData": {}
+  }
+]

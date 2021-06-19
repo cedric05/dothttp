@@ -1,8 +1,10 @@
+import json
 import os
 import sys
 
-from dotextensions.server import Command
-from dotextensions.server.commands import ParseHttpData
+from dotextensions.server.handlers.http2har import Http2Har
+from dotextensions.server.models import Command
+from dothttp import eprint
 from test import TestBase
 from test.extensions.test_commands import command_dir
 
@@ -13,11 +15,11 @@ fixtures_dir = f"{dir_path}/fixtures"
 class ToHarTest(TestBase):
     def setUp(self) -> None:
         self.maxDiff = None
-        self.execute_handler = ParseHttpData()
+        self.execute_handler = Http2Har()
 
     def test_error(self):
         command = Command(
-            method=ParseHttpData.name,
+            method=Http2Har.name,
             params={
                 "file": f"{command_dir}/syntax.http",
                 "target": "3",
@@ -37,7 +39,7 @@ class ToHarTest(TestBase):
 
     def basic_test(self, **kwargs):
         command = Command(
-            method=ParseHttpData.name,
+            method=Http2Har.name,
             params={
                 "content": kwargs['content'],
                 "file": kwargs['file'],
@@ -51,7 +53,7 @@ class ToHarTest(TestBase):
         self.assertFalse(result.result.get("error", False))
         self.assertEqual({'target': {'1': {'headers': [],
                                            'method': 'GET',
-                                           'payload': {'mimeType': None},
+                                           'payload': {},
                                            'query': [],
                                            'url': 'https://httpbin.org/get'}}}, result.result)
 
@@ -65,7 +67,7 @@ class ToHarTest(TestBase):
 
     def complex_test(self, **kwargs):
         command = Command(
-            method=ParseHttpData.name,
+            method=Http2Har.name,
             params={
                 "file": f"{command_dir}/complexrun.http",
                 "target": "1",
@@ -78,7 +80,7 @@ class ToHarTest(TestBase):
         self.assertFalse(result1.result.get("error", False))
         self.assertEqual({'target': {'1': {'headers': [],
                                            'method': 'GET',
-                                           'payload': {'mimeType': None},
+                                           'payload': {},
                                            'query': [{'name': 'dothttp', 'value': 'rocks'}],
                                            'url': 'https://httpbin.org/get'}}}, result1.result)
         command.params['target'] = "2"
@@ -86,7 +88,7 @@ class ToHarTest(TestBase):
         self.assertFalse(result2.result.get("error", False))
         self.assertEqual({'target': {'2': {'headers': [],
                                            'method': 'POST',
-                                           'payload': {'mimeType': None},
+                                           'payload': {},
                                            'query': [{'name': 'startusing', 'value': 'dothttp'}],
                                            'url': 'https://httpbin.org/post'}}}, result2.result)
 
@@ -161,7 +163,7 @@ class ToHarTest(TestBase):
         self.assertEqual({'target': {'headers': {'headers': [{'name': 'key', 'value': 'value'},
                                                              {'name': 'key2', 'value': 'value'}],
                                                  'method': 'POST',
-                                                 'payload': {'mimeType': None},
+                                                 'payload': {},
                                                  'query': [],
                                                  'url': 'https://req.dothttp.dev'}}},
                          self.execute_payload(target='headers', file=filename).result)
@@ -169,9 +171,10 @@ class ToHarTest(TestBase):
     def execute_payload(self, **kwargs):
         kwargs["properties"] = {"filename": os.path.join(dir_path, f"{command_dir}/payload.http")}
         command = Command(
-            method=ParseHttpData.name,
+            method=Http2Har.name,
             params=kwargs,
             id=1)
         result = self.execute_handler.run(command=command)
+        eprint("{\"" + "request" + "\":", json.dumps(result.result['target'][kwargs['target']]), "},")
         self.assertFalse(result.result.get("error", False))
         return result

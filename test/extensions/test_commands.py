@@ -1,6 +1,10 @@
+import json
+import os
 import unittest
 
-from dotextensions.server.commands import *
+from dotextensions.server.handlers.basic_handlers import RunHttpFileHandler, GetNameReferencesHandler, \
+    ContentNameReferencesHandler
+from dotextensions.server.models import Command
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -171,7 +175,7 @@ basicauth("username", "password")
 
 
 
-""", result4.result['http']);
+""", result4.result['http'])
 
     def test_non_existant_file(self):
         result = self.execute_file(f"{command_dir}/syntax2.http")

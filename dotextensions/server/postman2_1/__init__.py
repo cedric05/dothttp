@@ -5,6 +5,8 @@
 # and then, to convert JSON from a string, do
 #
 #     result = postman21_collection_from_dict(json.loads(json_string))
+from ..utils import from_str, from_none, from_union, from_list, to_class, to_enum, from_bool, \
+    from_int, from_dict, from_float, to_float
 
 POSTMAN_2_1 = 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
 # To use this code, make sure you
@@ -16,69 +18,7 @@ POSTMAN_2_1 = 'https://schema.getpostman.com/json/collection/v2.1.0/collection.j
 #     result = postman_collection21_from_dict(json.loads(json_string))
 
 from enum import Enum
-from typing import Optional, Any, List, Union, Dict, TypeVar, Callable, Type, cast
-
-T = TypeVar("T")
-EnumT = TypeVar("EnumT", bound=Enum)
-
-
-def from_str(x: Any) -> str:
-    assert isinstance(x, str)
-    return x
-
-
-def from_none(x: Any) -> Any:
-    assert x is None
-    return x
-
-
-def from_union(fs, x):
-    for f in fs:
-        try:
-            return f(x)
-        except:
-            pass
-    assert False
-
-
-def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
-    assert isinstance(x, list)
-    return [f(y) for y in x]
-
-
-def to_class(c: Type[T], x: Any) -> dict:
-    assert isinstance(x, c)
-    return cast(Any, x).to_dict()
-
-
-def to_enum(c: Type[EnumT], x: Any) -> EnumT:
-    assert isinstance(x, c)
-    return x.value
-
-
-def from_bool(x: Any) -> bool:
-    assert isinstance(x, bool)
-    return x
-
-
-def from_int(x: Any) -> int:
-    assert isinstance(x, int) and not isinstance(x, bool)
-    return x
-
-
-def from_dict(f: Callable[[Any], T], x: Any) -> Dict[str, T]:
-    assert isinstance(x, dict)
-    return {k: f(v) for (k, v) in x.items()}
-
-
-def from_float(x: Any) -> float:
-    assert isinstance(x, (float, int)) and not isinstance(x, bool)
-    return float(x)
-
-
-def to_float(x: Any) -> float:
-    assert isinstance(x, float)
-    return x
+from typing import Optional, Any, List, Union, Dict
 
 
 class ApikeyElement:
@@ -194,7 +134,7 @@ class Auth:
         ntlm = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("ntlm"))
         oauth1 = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("oauth1"))
         oauth2 = from_union([lambda x: from_list(ApikeyElement.from_dict, x), from_none], obj.get("oauth2"))
-        type = AuthType(obj.get("type"))
+        type = AuthType(obj.get("type", AuthType.NOAUTH))
         return Auth(apikey, awsv4, basic, bearer, digest, edgegrid, hawk, noauth, ntlm, oauth1, oauth2, type)
 
     def to_dict(self) -> dict:
@@ -614,8 +554,8 @@ class Information:
         assert isinstance(obj, dict)
         postman_id = from_union([from_str, from_none], obj.get("_postman_id"))
         description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
-        name = from_str(obj.get("name"))
-        schema = from_str(obj.get("schema"))
+        name = from_union([from_str, from_none], obj.get("name"))
+        schema = from_union([from_str, from_none], obj.get("schema"))
         version = from_union([CollectionVersionClass.from_dict, from_str, from_none], obj.get("version"))
         return Information(postman_id, description, name, schema, version)
 
@@ -685,7 +625,7 @@ class FormParameter:
         content_type = from_union([from_str, from_none], obj.get("contentType"))
         description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
         disabled = from_union([from_bool, from_none], obj.get("disabled"))
-        key = from_str(obj.get("key"))
+        key = from_union([from_str, from_none], obj.get("key"))
         type = from_union([FormParameterType, from_none], obj.get("type"))
         value = from_union([from_str, from_none], obj.get("value"))
         src = from_union([from_none, lambda x: from_list(lambda x: x, x), from_str], obj.get("src"))
@@ -1265,8 +1205,8 @@ class PostmanCollection21:
         assert isinstance(obj, dict)
         auth = from_union([from_none, Auth.from_dict], obj.get("auth"))
         event = from_union([lambda x: from_list(Event.from_dict, x), from_none], obj.get("event"))
-        info = Information.from_dict(obj.get("info"))
-        item = from_list(Items.from_dict, obj.get("item"))
+        info = from_union([from_none, Information.from_dict], obj.get("info"))
+        item = from_union([lambda x: from_list(Items.from_dict, x), from_none], obj.get("item"))
         protocol_profile_behavior = from_union([lambda x: from_dict(lambda x: x, x), from_none],
                                                obj.get("protocolProfileBehavior"))
         variable = from_union([lambda x: from_list(Variable.from_dict, x), from_none], obj.get("variable"))

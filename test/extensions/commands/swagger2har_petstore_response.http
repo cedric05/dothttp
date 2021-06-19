@@ -1,0 +1,148 @@
+POST "http://petstore.swagger.io/v2/pet"
+"accept": "application/xml"
+"content-type": "application/json"
+"Authorization": "Bearer <BEARER_TOKEN>"
+json({
+    "id": 0,
+    "category": {
+        "id": 0,
+        "name": ""
+    },
+    "name": "",
+    "photoUrls": [],
+    "tags": [],
+    "status": "available"
+})
+
+
+PUT "http://petstore.swagger.io/v2/pet"
+"accept": "application/xml"
+"content-type": "application/json"
+"Authorization": "Bearer <BEARER_TOKEN>"
+json({
+    "id": 0,
+    "category": {
+        "id": 0,
+        "name": ""
+    },
+    "name": "",
+    "photoUrls": [],
+    "tags": [],
+    "status": "available"
+})
+
+
+GET "http://petstore.swagger.io/v2/pet/findByStatus"
+"content-type": "application/json"
+"Authorization": "Bearer <BEARER_TOKEN>"
+? "status"= "<SOME_ARRAY_VALUE>"
+
+
+GET "http://petstore.swagger.io/v2/pet/findByTags"
+"content-type": "application/json"
+"Authorization": "Bearer <BEARER_TOKEN>"
+? "tags"= "<SOME_ARRAY_VALUE>"
+
+
+GET "http://petstore.swagger.io/v2/pet/{petId}"
+"content-type": "application/json"
+
+
+POST "http://petstore.swagger.io/v2/pet/{petId}"
+"accept": "application/x-www-form-urlencoded"
+"content-type": "application/json"
+"Authorization": "Bearer <BEARER_TOKEN>"
+
+
+DELETE "http://petstore.swagger.io/v2/pet/{petId}"
+"content-type": "application/json"
+"api_key": "<SOME_STRING_VALUE>"
+"Authorization": "Bearer <BEARER_TOKEN>"
+
+
+POST "http://petstore.swagger.io/v2/pet/{petId}/uploadImage"
+"accept": "multipart/form-data"
+"content-type": "application/json"
+"Authorization": "Bearer <BEARER_TOKEN>"
+
+
+GET "http://petstore.swagger.io/v2/store/inventory"
+"content-type": "application/json"
+
+
+POST "http://petstore.swagger.io/v2/store/order"
+"content-type": "application/json"
+json({
+    "id": 0,
+    "petId": 0,
+    "quantity": 0,
+    "shipDate": "",
+    "status": "placed",
+    "complete": false
+})
+
+
+GET "http://petstore.swagger.io/v2/store/order/{orderId}"
+"content-type": "application/json"
+
+
+DELETE "http://petstore.swagger.io/v2/store/order/{orderId}"
+"content-type": "application/json"
+
+
+POST "http://petstore.swagger.io/v2/user"
+"content-type": "application/json"
+json({
+    "id": 0,
+    "username": "",
+    "firstName": "",
+    "lastName": "",
+    "email": "",
+    "password": "",
+    "phone": "",
+    "userStatus": 0
+})
+
+
+POST "http://petstore.swagger.io/v2/user/createWithArray"
+"content-type": "application/json"
+
+
+
+POST "http://petstore.swagger.io/v2/user/createWithList"
+"content-type": "application/json"
+
+
+
+GET "http://petstore.swagger.io/v2/user/login"
+"content-type": "application/json"
+? "username"= "<SOME_STRING_VALUE>"
+? "password"= "<SOME_STRING_VALUE>"
+
+
+GET "http://petstore.swagger.io/v2/user/logout"
+"content-type": "application/json"
+
+
+GET "http://petstore.swagger.io/v2/user/{username}"
+"content-type": "application/json"
+
+
+PUT "http://petstore.swagger.io/v2/user/{username}"
+"content-type": "application/json"
+json({
+    "id": 0,
+    "username": "",
+    "firstName": "",
+    "lastName": "",
+    "email": "",
+    "password": "",
+    "phone": "",
+    "userStatus": 0
+})
+
+
+DELETE "http://petstore.swagger.io/v2/user/{username}"
+"content-type": "application/json"
+
+

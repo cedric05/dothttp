@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
 
-from dotextensions.server import Command
-from dotextensions.server.commands import TypeFromPos
+from dotextensions.server.handlers.gohandler import TypeFromPos
+from dotextensions.server.models import Command
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

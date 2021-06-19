@@ -1,0 +1,263 @@
+{
+  "collection": {
+    "auth": null,
+    "event": null,
+    "info": {
+      "_postman_id": null,
+      "description": null,
+      "name": "urlquery.http",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "version": null
+    },
+    "item": [
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "urlquery",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "urlquery",
+          "header": [],
+          "method": "GET",
+          "proxy": null,
+          "url": {
+            "hash": null,
+            "host": "req.dothttp.dev",
+            "path": "",
+            "port": null,
+            "protocol": "https",
+            "query": [
+              {
+                "description": null,
+                "disabled": false,
+                "key": "works",
+                "value": "dothttp"
+              },
+              {
+                "description": null,
+                "disabled": null,
+                "key": "user",
+                "value": "ram"
+              }
+            ],
+            "raw": "https://req.dothttp.dev?user=ram",
+            "variable": null
+          }
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "urlquery2",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "urlquery2",
+          "header": [],
+          "method": "GET",
+          "proxy": null,
+          "url": {
+            "hash": null,
+            "host": "req.dothttp.dev",
+            "path": "",
+            "port": null,
+            "protocol": "https",
+            "query": [
+              {
+                "description": null,
+                "disabled": false,
+                "key": "works",
+                "value": "dothttp"
+              },
+              {
+                "description": null,
+                "disabled": false,
+                "key": "user",
+                "value": "ram"
+              }
+            ],
+            "raw": "https://req.dothttp.dev",
+            "variable": null
+          }
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "headers",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "headers",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "headerkey",
+              "value": "headervalue"
+            }
+          ],
+          "method": "GET",
+          "proxy": null,
+          "url": "https://req.dothttp.dev?user=ram"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "basic auth",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": {
+            "apikey": null,
+            "awsv4": null,
+            "basic": [
+              {
+                "key": "username",
+                "type": "string",
+                "value": "foo"
+              },
+              {
+                "key": "password",
+                "type": "string",
+                "value": "bar"
+              }
+            ],
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "noauth"
+          },
+          "body": null,
+          "certificate": null,
+          "description": "basic auth",
+          "header": null,
+          "method": "GET",
+          "proxy": null,
+          "url": "http://httpbin.org/basic-auth/foo/bar"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "digest",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": {
+            "apikey": null,
+            "awsv4": null,
+            "basic": null,
+            "bearer": null,
+            "digest": [
+              {
+                "key": "username",
+                "type": "string",
+                "value": "username"
+              },
+              {
+                "key": "password",
+                "type": "string",
+                "value": "password"
+              }
+            ],
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "noauth"
+          },
+          "body": null,
+          "certificate": null,
+          "description": "digest",
+          "header": null,
+          "method": "GET",
+          "proxy": null,
+          "url": "https://httpbin.org/digest-auth/20202/username/password/md5"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "with-p12",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "with-p12",
+          "header": null,
+          "method": "GET",
+          "proxy": null,
+          "url": "https://client.badssl.com/"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "public and private",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "public and private",
+          "header": null,
+          "method": "GET",
+          "proxy": null,
+          "url": "https://client.badssl.com/"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      }
+    ],
+    "protocolProfileBehavior": null,
+    "variable": null
+  }
+}

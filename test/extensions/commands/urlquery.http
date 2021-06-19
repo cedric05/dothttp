@@ -1,0 +1,31 @@
+@name(urlquery)
+https://req.dothttp.dev?user=ram
+? works = dothttp
+
+
+@name(urlquery2)
+https://req.dothttp.dev
+? works = dothttp
+? user=ram
+
+@name(headers)
+https://req.dothttp.dev?user=ram
+headerkey: headervalue
+
+@name('basic auth')
+GET http://httpbin.org/basic-auth/foo/bar
+basicauth('foo','bar')
+
+@name(digest)
+GET "https://httpbin.org/digest-auth/20202/username/password/md5"
+digestauth("username", "password")
+
+
+@name('with-p12')
+@clear
+https://client.badssl.com/
+p12(file="path/to/p12/file",password="badssl.com")
+
+@name('public and private')
+https://client.badssl.com/
+certificate(cert="/path/to/cert", key="/path/to/key")

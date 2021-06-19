@@ -1,0 +1,326 @@
+{
+  "collection": {
+    "auth": null,
+    "event": null,
+    "info": {
+      "_postman_id": null,
+      "description": null,
+      "name": "payload.http",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "version": null
+    },
+    "item": [
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "json",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": {
+              "language": "json"
+            },
+            "raw": "{\"paylaod\": \"json\"}",
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "json",
+          "header": null,
+          "method": "POST",
+          "proxy": null,
+          "url": "https://req.dothttp.dev"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "urlencode",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "urlencoded",
+            "options": null,
+            "raw": null,
+            "urlencoded": [
+              {
+                "description": null,
+                "disabled": null,
+                "key": "paylaod",
+                "value": "json"
+              }
+            ]
+          },
+          "certificate": null,
+          "description": "urlencode",
+          "header": null,
+          "method": "POST",
+          "proxy": null,
+          "url": "https://req.dothttp.dev"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "text",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": null,
+            "raw": "raw data",
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "text",
+          "header": null,
+          "method": "POST",
+          "proxy": null,
+          "url": "https://req.dothttp.dev"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "text-other-content",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": null,
+            "raw": "raw data",
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "text-other-content",
+          "header": null,
+          "method": "POST",
+          "proxy": null,
+          "url": "https://req.dothttp.dev"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "files",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": [
+              {
+                "contentType": "",
+                "description": null,
+                "disabled": null,
+                "key": "raw data",
+                "type": "text",
+                "value": "other-content-type",
+                "src": null
+              },
+              {
+                "contentType": "",
+                "description": null,
+                "disabled": null,
+                "key": "raw data",
+                "type": "text",
+                "value": "other-content-type",
+                "src": null
+              }
+            ],
+            "graphql": null,
+            "mode": "formdata",
+            "options": null,
+            "raw": null,
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "files",
+          "header": null,
+          "method": "POST",
+          "proxy": null,
+          "url": "https://req.dothttp.dev"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "headers",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "headers",
+          "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "key",
+              "value": "value"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "key2",
+              "value": "value"
+            }
+          ],
+          "method": "POST",
+          "proxy": null,
+          "url": "https://req.dothttp.dev"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "files2",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": [
+              {
+                "contentType": "",
+                "description": null,
+                "disabled": null,
+                "key": "file",
+                "type": "text",
+                "value": "{{filename}}",
+                "src": null
+              }
+            ],
+            "graphql": null,
+            "mode": "formdata",
+            "options": null,
+            "raw": null,
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "files2",
+          "header": null,
+          "method": "POST",
+          "proxy": null,
+          "url": "https://req.dothttp.dev"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      },
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "fileinput",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": {
+            "apikey": null,
+            "awsv4": null,
+            "basic": null,
+            "bearer": null,
+            "digest": [
+              {
+                "key": "username",
+                "type": "string",
+                "value": "username"
+              },
+              {
+                "key": "password",
+                "type": "string",
+                "value": "password"
+              }
+            ],
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "noauth"
+          },
+          "body": {
+            "disabled": null,
+            "file": {
+              "content": "",
+              "src": "{{filename}}"
+            },
+            "formdata": null,
+            "graphql": null,
+            "mode": "file",
+            "options": null,
+            "raw": null,
+            "urlencoded": null
+          },
+          "certificate": null,
+          "description": "fileinput",
+          "header": null,
+          "method": "POST",
+          "proxy": null,
+          "url": "https://req.dothttp.dev"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      }
+    ],
+    "protocolProfileBehavior": null,
+    "variable": null
+  }
+}

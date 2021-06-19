@@ -1,0 +1,35 @@
+POST "https://req.dothttp.dev"
+json({
+    "paylaod": "json"
+})
+
+
+POST "https://req.dothttp.dev"
+data({
+    "paylaod": [
+        "json"
+    ]
+})
+
+
+POST "https://req.dothttp.dev"
+data('raw data')
+
+
+POST "https://req.dothttp.dev"
+files(
+	("raw data", "other-content-type" , "text/plain"),
+	("raw data", "other-content-type" , "text/plain")
+)
+
+
+POST "https://req.dothttp.dev"
+data('raw data')
+
+
+POST "https://req.dothttp.dev"
+files(
+	("file", "/home/prasanth/cedric05/dothttp/test/extensions/commands/payload.http" , "text/plain")
+)
+
+

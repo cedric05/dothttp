@@ -1,4 +1,7 @@
-from dotextensions.server.commands import *
+import os
+
+from dotextensions.server.handlers.basic_handlers import RunHttpFileHandler
+from dotextensions.server.models import Command
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
