@@ -10,7 +10,7 @@ from ..postman2_1 import RequestClass, Items, Auth, ApikeyElement, Header, Query
 
 
 class Http2Postman(BaseHandler):
-    name = "/export/har2http"
+    name = "/export/http2postman"
 
     def get_method(self):
         return Http2Postman.name
