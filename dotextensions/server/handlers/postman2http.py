@@ -102,6 +102,19 @@ class ImportPostmanCollection(BaseHandler):
                 auth_wrap = AuthWrap(
                     digest_auth=DigestAuth(username=digest_auth.get('username', ''),
                                            password=digest_auth.get('password', '')))
+            elif apikey := request_auth.apikey:
+                d = request_auth.apikey
+                if isinstance(apikey, list):
+                    for api_key_element in request_auth.apikey:
+                        d[api_key_element.key] = d[api_key_element.value]
+                key = d['key']
+                value = d['value']
+
+                in_context = d['in']
+                if in_context == "header":
+                    lines.append(Line(header=Header(key, value), query=None))
+                else:
+                    lines.append(Line(header=None, query=Query(key, value)))
         if req.body:
             # use mode rather than None check
             mode = req.body.mode
