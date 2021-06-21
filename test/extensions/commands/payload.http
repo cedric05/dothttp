@@ -7,7 +7,7 @@ json({
 @name('urlencode')
 POST https://req.dothttp.dev
 data({
-   "paylaod": "json"
+   "paylaod": ["json"]
 })
 
 

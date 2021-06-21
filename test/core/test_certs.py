@@ -60,7 +60,7 @@ class CertUnitTest(TestBase):
         p12 = f"{quote}{cert_base}/badssl.com-client.p12{quote}"
         curl_comp: CurlCompiler = self.get_req_comp(filename, target="with-p12",
                                                     properties=[f"p12={p12}", f"password=badssl.com"], curl=True)
-        self.assertEqual(f"""curl -X GET https://client.badssl.com/ \\
+        self.assertEqual(f"""curl -X GET --url https://client.badssl.com/ \\
 --cert {p12}:badssl.com \\
 --cert-type P12""", curl_comp.get_curl_output())
 
@@ -71,7 +71,7 @@ class CertUnitTest(TestBase):
         key_file = f"{quote}{cert_base}/key.key{quote}"
         curl_comp = self.get_req_comp(filename, target="with-key-and-cert",
                                       properties=[f"cert={cert_file}", f"key={key_file}"], curl=True)
-        self.assertEqual(f"""curl -X GET https://client.badssl.com/ \\
+        self.assertEqual(f"""curl -X GET --url https://client.badssl.com/ \\
 --cert {cert_file} \\
 --key {key_file} \\
 -k""", curl_comp.get_curl_output(), "curl output with cert is not same as expected")

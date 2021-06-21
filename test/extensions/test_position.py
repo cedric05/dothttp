@@ -64,7 +64,7 @@ class TypePositionTest(TestBase):
             ((682, 'payload.http'),
              {'type': 'digest_auth', 'target': 'fileinput', 'target_base': None,
               'base_start': None}),
-            ((629, 'payload.http'),
+            ((637, 'payload.http'),
              {'type': 'extra_args', 'target': 'fileinput', 'target_base': None,
               'base_start': None}),
             ((705, 'payload.http'),

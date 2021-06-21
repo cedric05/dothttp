@@ -67,7 +67,7 @@ class RequestTest(TestBase):
     def test_curl_print(self):
         req: CurlCompiler = self.get_req_comp(f"{base_dir}/redirect.http", info=True, curl=True)
         output = req.get_curl_output()
-        self.assertEqual("""curl -X GET http://endeavour.today/ \\
+        self.assertEqual("""curl -X GET --url http://endeavour.today/ \\
 """, output)
 
     def test_format_print(self):
@@ -132,23 +132,23 @@ output(test)
     def test_multiline_curl_linux(self):
         with tempfile.NamedTemporaryFile(delete=False) as f:
             # with files
-            self.assertEqual(f'''curl -X POST https://httpbin.org/post \\
+            self.assertEqual(f'''curl -X POST --url https://httpbin.org/post \\
 --form test=@{f.name} \\
 --form hi=hi2''', self.get_curl_out(f))
 
             # with file input
-            self.assertEqual(f'''curl -X POST https://httpbin.org/post \\
+            self.assertEqual(f'''curl -X POST --url https://httpbin.org/post \\
 --data @{f.name}''', self.get_curl_out(f, 2))
 
             # with json out
-            self.assertEqual("""curl -X POST https://httpbin.org/post \\
+            self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
 -H 'Content-Length: 19' \\
 -H 'content-type: application/json' \\
 -d '{
     "hi": "hi2"
 }'""", self.get_curl_out(f, 3))
 
-            self.assertEqual("""curl -X POST https://httpbin.org/post \\
+            self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
 -H 'Content-Length: 52' \\
 -H 'content-type: text/xml' \\
 -d '<xml>

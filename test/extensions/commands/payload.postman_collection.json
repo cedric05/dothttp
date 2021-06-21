@@ -32,7 +32,14 @@
           },
           "certificate": null,
           "description": "json",
-          "header": null,
+          "header": [
+            {
+              "description": null,
+              "disabled": null,
+              "key": "content-type",
+              "value": "application/json"
+            }
+          ],
           "method": "POST",
           "proxy": null,
           "url": "https://req.dothttp.dev"

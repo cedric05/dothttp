@@ -2,10 +2,9 @@ import json
 import os
 import urllib.parse
 
-from requests.models import to_key_val_list
-
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode
 from dothttp import dothttp_model, Http, json_or_array_to_json, triple_or_double_tostring
+from dothttp.utils import json_to_urlencoded_array, CONTENT_TYPE, APPLICATION_JSON
 from ..models import BaseHandler, Command, Result
 from ..postman2_1 import RequestClass, Items, Auth, ApikeyElement, Header, QueryParam, URLClass, \
     Information, POSTMAN_2_1, PostmanCollection21, Body, FormParameter, URLEncodedParameter
@@ -106,6 +105,11 @@ class Http2Postman(BaseHandler):
             elif json_payload := payload.json:
                 request.body.mode = Mode.RAW
                 request.body.options = {"language": "json"}
+                json_header = Header(description=None, disabled=None, key=CONTENT_TYPE, value=APPLICATION_JSON)
+                if request.header:
+                    request.header.append(json_header)
+                else:
+                    request.header = [json_header]
                 request.body.raw = json.dumps(json_or_array_to_json(json_payload, lambda x: x))
             elif data := payload.data:
                 request.body.mode = Mode.RAW
@@ -125,18 +129,3 @@ class Http2Postman(BaseHandler):
                 request.body.file = File(content="", src=file_path)
         request.description = '' if not http.namewrap else http.namewrap.name
         return request
-
-
-# copied from
-# https://github.com/psf/requests/blob/1466ad713cf84738cd28f1224a7ab4a19e50e361/requests/models.py#L97-L105
-# although i don't want to copy this function
-# but by doing encoding and decoding is not approach
-def json_to_urlencoded_array(data):
-    result = []
-    for k, vs in to_key_val_list(data):
-        if isinstance(vs, (str, bytes)) or not hasattr(vs, '__iter__'):
-            vs = [vs]
-        for v in vs:
-            if v is not None:
-                result.append((k, v))
-    return result

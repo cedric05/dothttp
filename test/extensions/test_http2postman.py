@@ -75,3 +75,7 @@ class Testhttp2postman(TestBase):
         self.assertTrue(second.get("error"))
         self.assertTrue(second.get("error_message").startswith(
             "unable to parse because of parsing issues None:2:2: error: Expected '(' or STRING or '\w+' at position"))
+
+    def test_extend(self):
+        # TODO
+        pass

@@ -11,7 +11,7 @@ from urllib.parse import urlencode, urljoin
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 
-from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON
+from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
 
 try:
     import jstyleson as json
@@ -113,7 +113,7 @@ class HttpDef:
         if payload.data:
             if isinstance(payload.data, dict):
                 return_data["mimeType"] = FORM_URLENCODED
-                return_data["text"] = urlencode(payload.data)
+                return_data["text"] = urlencode(json_to_urlencoded_array(payload.data))
             else:
                 return_data["mimeType"] = payload.header or "text/plain"
                 return_data["text"] = payload.data
