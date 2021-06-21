@@ -138,7 +138,7 @@ class PayLoadTest(TestBase):
         loadfile.write(test)
         loadfile.flush()
         req = self.get_request(f"{base_dir}/filepayload.http", properties=[f"filename={loadfile.name}"])
-        self.assertEqual(test, req.body)
+        self.assertEqual(test, req.body.read())
         loadfile.close()
         os.unlink(loadfile.name)
 
