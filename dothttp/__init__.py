@@ -68,7 +68,7 @@ class Config:
 
 @dataclass
 class Payload:
-    data: Optional[Union[str, bytes, Dict]] = None
+    data: Optional[Union[str, bytes, Dict, BinaryIO]] = None
     json: Optional[Dict] = None
     header: Optional[str] = None
     filename: str = None
@@ -522,16 +522,7 @@ class HttpDefBase(BaseModelProcessor):
             # varstring hanlding
             return Payload(data=d, header=FORM_URLENCODED)
         elif upload_filename := self.http.payload.file:
-            upload_filename = self.get_updated_content(upload_filename)
-            request_logger.debug(
-                f'payload will be loaded from `{upload_filename}`')
-            if not os.path.exists(upload_filename):
-                request_logger.debug(
-                    f'payload file `{upload_filename}` Not found. ')
-                raise DataFileNotFoundException(datafile=upload_filename)
-            mimetype = self.get_mimetype_from_file(upload_filename, self.http.payload.type)
-            with open(upload_filename, 'rb') as f:
-                return Payload(data=f.read(), header=mimetype, filename=upload_filename)
+            return self.load_payload_fileinput(upload_filename)
         elif json_data := self.http.payload.json:
             d = json_or_array_to_json(json_data, self.get_updated_content)
             return Payload(json=d, header=MIME_TYPE_JSON)
@@ -551,6 +542,18 @@ class HttpDefBase(BaseModelProcessor):
                     files.append((multipart_key, (None, multipart_content, mimetype)))
             return Payload(files=files, header=MULTIPART_FORM_INPUT)
         return Payload()
+
+    def load_payload_fileinput(self, upload_filename):
+        upload_filename = self.get_updated_content(upload_filename)
+        request_logger.debug(
+            f'payload will be loaded from `{upload_filename}`')
+        if not os.path.exists(upload_filename):
+            request_logger.debug(
+                f'payload file `{upload_filename}` Not found. ')
+            raise DataFileNotFoundException(datafile=upload_filename)
+        mimetype = self.get_mimetype_from_file(upload_filename, self.http.payload.type)
+        f = open(upload_filename, 'rb')
+        return Payload(data=f, header=mimetype, filename=upload_filename)
 
     @staticmethod
     def get_mimetype_from_file(filename, mimetype: Optional[str]) -> Optional[str]:

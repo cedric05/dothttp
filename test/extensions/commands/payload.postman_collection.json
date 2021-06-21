@@ -32,14 +32,7 @@
           },
           "certificate": null,
           "description": "json",
-          "header": [
-            {
-              "description": null,
-              "disabled": null,
-              "key": "content-type",
-              "value": "application/json"
-            }
-          ],
+          "header": null,
           "method": "POST",
           "proxy": null,
           "url": "https://req.dothttp.dev"
@@ -159,7 +152,7 @@
             "file": null,
             "formdata": [
               {
-                "contentType": "",
+                "contentType": "text/plain",
                 "description": null,
                 "disabled": null,
                 "key": "raw data",
@@ -168,7 +161,7 @@
                 "src": null
               },
               {
-                "contentType": "",
+                "contentType": "text/plain",
                 "description": null,
                 "disabled": null,
                 "key": "raw data",
@@ -242,7 +235,7 @@
             "file": null,
             "formdata": [
               {
-                "contentType": "",
+                "contentType": "text/plain",
                 "description": null,
                 "disabled": null,
                 "key": "file",

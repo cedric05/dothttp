@@ -21,7 +21,7 @@
           "body": null,
           "certificate": null,
           "description": "urlquery",
-          "header": [],
+          "header": null,
           "method": "GET",
           "proxy": null,
           "url": {
@@ -64,7 +64,7 @@
           "body": null,
           "certificate": null,
           "description": "urlquery2",
-          "header": [],
+          "header": null,
           "method": "GET",
           "proxy": null,
           "url": {
