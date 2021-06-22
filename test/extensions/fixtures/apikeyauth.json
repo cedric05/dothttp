@@ -1,5 +1,1 @@
-{
-  "files": {
-    "apikeyAuthTest/imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from /home/prasanth/cedric05/dothttp/test/extensions/postman/apikeyauth.json\n\n@name(\"test apikey auth success\")\nGET \"https://postman-echo.com/get\"\n\"x-api-key\": \"ABC123\"\n\"x-api-key\": \"ABC123\"\n\n\n\n"
-  }
-}
+{"files": {"apikeyAuthTest\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from apikeyauth.json\n\n@name(\"test apikey auth success\")\nGET \"https://postman-echo.com/get\"\n\"x-api-key\": \"ABC123\"\n\"x-api-key\": \"ABC123\"\n\n\n\n"}}

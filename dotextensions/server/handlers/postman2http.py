@@ -19,6 +19,10 @@ from ..postman2_1 import URLClass as URLClass_2_1, ApikeyElement, POSTMAN_2_1, \
     postman_collection21_from_dict
 from ..utils import clean_filename, slashed_path_to_normal_path, get_alternate_filename
 
+BEARER = 'Bearer'
+
+AUTHORIZATION = 'Authorization'
+
 
 class ImportPostmanCollection(BaseHandler):
     name = "/import/postman"
@@ -87,34 +91,34 @@ class ImportPostmanCollection(BaseHandler):
             # TODO don't add creds to http file directly
             # add .dothttp.json file
             if basic_auth := request_auth.basic:
-                if isinstance(request_auth.basic, list):
-                    # postman 2.1, it is a list of api_key_element have keys and values
-                    basic_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.basic)
+                # postman 2.1, it is a list of api_key_element have keys and values
+                basic_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.basic)
                 # in postman 2.0, it is a dict
                 auth_wrap = AuthWrap(
                     basic_auth=BasicAuth(username=basic_auth.get('username', ''),
                                          password=basic_auth.get('password', '')))
             elif digest_auth := request_auth.digest:
-                if isinstance(request_auth.digest, list):
-                    # postman 2.1, it is a list of api_key_element have keys and values
-                    digest_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.digest)
+                # postman 2.1, it is a list of api_key_element have keys and values
+                digest_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.digest)
                 # postman 2.0
                 auth_wrap = AuthWrap(
                     digest_auth=DigestAuth(username=digest_auth.get('username', ''),
                                            password=digest_auth.get('password', '')))
-            elif apikey := request_auth.apikey:
-                d = request_auth.apikey
-                if isinstance(apikey, list):
-                    for api_key_element in request_auth.apikey:
-                        d[api_key_element.key] = d[api_key_element.value]
-                key = d['key']
-                value = d['value']
-
-                in_context = d['in']
+            elif request_auth.apikey:
+                d = ImportPostmanCollection.api_key_element_to_dict(request_auth.apikey)
+                key = d.get('key', '<key>')
+                value = d.get('value', '<value>')
+                in_context = d.get('in', 'header')
                 if in_context == "header":
                     lines.append(Line(header=Header(key, value), query=None))
                 else:
                     lines.append(Line(header=None, query=Query(key, value)))
+            elif request_auth.bearer:
+                d = ImportPostmanCollection.api_key_element_to_dict(request_auth.bearer)
+                apikey = BEARER + " " + d.get('token', '{{apikey}}')
+                header = Header(key=AUTHORIZATION, value=apikey)
+                lines.append(
+                    Line(header=header, query=None))
         if req.body:
             # use mode rather than None check
             mode = req.body.mode
@@ -170,7 +174,9 @@ class ImportPostmanCollection(BaseHandler):
         return http
 
     @staticmethod
-    def api_key_element_to_dict(api_key_elements: List[ApikeyElement]):
+    def api_key_element_to_dict(api_key_elements: Union[List[ApikeyElement], Dict]):
+        if isinstance(api_key_elements, dict):
+            return api_key_elements
         # transforms 2.1 postman to 2.0 postman
         basic_auth = {}
         for element in api_key_elements:
@@ -206,6 +212,7 @@ class ImportPostmanCollection(BaseHandler):
         else:
             with open(link) as f:
                 postman_data = json.load(f)
+            link = os.path.basename(link)
         base_collection_dire = ""
         if "info" in postman_data and 'schema' in postman_data['info']:
             if postman_data['info']['schema'] == POSTMAN_2:

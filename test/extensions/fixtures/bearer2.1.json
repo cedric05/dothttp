@@ -1,0 +1,1 @@
+{"files": {"bearerAuthTest\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from bearer2.1.json\n\n@name(\"test bearer auth success\")\nGET \"http://echo.getpostman.com/auth/bearer\"\n\"Authorization\": \"Bearer wkjehbxoqnunc2k3\"\n\"Authorization\": \"Bearer wkjehbxoqnunc2k3\"\n\n\n\n"}}
