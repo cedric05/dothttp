@@ -22,5 +22,22 @@ jobs:
         run: |
           pip install python-magic
           pip install -r requirements.txt
-      - name: Run tests with pytest
+          pip install -r benchmarks/requirements.txt
+      - name: Run tests
         run: python -m unittest
+      - name: Run benchmark
+        run: pytest benchmarks/__main__.py --benchmark-json output.json
+      - name: Download previous benchmark data
+        uses: actions/cache@v1
+        with:
+          path: ./cache
+          key: ${{ runner.os }}-benchmark
+      - name: Store benchmark result
+        uses: rhysd/github-action-benchmark@v1
+        with:
+          name: Python Benchmark with pytest-benchmark
+          tool: 'pytest'
+          output-file-path: output.json
+          alert-threshold: '200%'
+          comment-on-alert: true
+          fail-on-alert: true
