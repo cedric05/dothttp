@@ -38,6 +38,7 @@ jobs:
           name: Python Benchmark with pytest-benchmark
           tool: 'pytest'
           output-file-path: output.json
-          alert-threshold: '200%'
-          comment-on-alert: true
+          alert-threshold: '150%'
           fail-on-alert: true
+          github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+          comment-on-alert: true
