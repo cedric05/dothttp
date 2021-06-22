@@ -4,7 +4,7 @@ import urllib.parse
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
-from dotextensions.server.postman2_1 import FormParameterType, File, Mode
+from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType
 from dothttp import dothttp_model, json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
     request_logger, Payload
 from dothttp.request_base import RequestCompiler
@@ -94,8 +94,10 @@ class Http2Postman(RunHttpFileHandler):
             request.auth = Auth.from_dict({})
             if isinstance(auth, HTTPBasicAuth):
                 request_auth = request.auth.basic = []
+                request.auth.type = AuthType.BASIC
             else:
                 request_auth = request.auth.digest = []
+                request.auth.type = AuthType.DIGEST
             if isinstance(auth, (HTTPBasicAuth, HTTPDigestAuth)):
                 request_auth += [ApikeyElement(
                     key="username",

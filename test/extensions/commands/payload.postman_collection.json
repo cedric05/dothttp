@@ -292,7 +292,7 @@
             "ntlm": null,
             "oauth1": null,
             "oauth2": null,
-            "type": "noauth"
+            "type": "digest"
           },
           "body": {
             "disabled": null,

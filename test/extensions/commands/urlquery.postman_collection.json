@@ -154,7 +154,7 @@
             "ntlm": null,
             "oauth1": null,
             "oauth2": null,
-            "type": "noauth"
+            "type": "basic"
           },
           "body": null,
           "certificate": null,
@@ -199,7 +199,7 @@
             "ntlm": null,
             "oauth1": null,
             "oauth2": null,
-            "type": "noauth"
+            "type": "digest"
           },
           "body": null,
           "certificate": null,
