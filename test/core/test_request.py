@@ -122,7 +122,6 @@ output(test)
 
             # with json out
             self.assertEqual("""curl -X POST https://httpbin.org/post \\
--H 'Content-Length: 19' \\
 -H 'content-type: application/json' \\
 -d '{
     "hi": "hi2"
@@ -142,14 +141,12 @@ output(test)
 
             # with json out
             self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
--H 'Content-Length: 19' \\
 -H 'content-type: application/json' \\
 -d '{
     "hi": "hi2"
 }'""", self.get_curl_out(f, 3))
 
             self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
--H 'Content-Length: 52' \\
 -H 'content-type: text/xml' \\
 -d '<xml>
     <body> hi this is test body</body>

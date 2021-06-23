@@ -10,6 +10,7 @@ from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO, An
 from urllib.parse import urlencode, urljoin
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
+from requests.structures import CaseInsensitiveDict
 
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
 
@@ -425,7 +426,9 @@ class HttpDefBase(BaseModelProcessor):
                 4. dev can define in data/file/files's type attribute section for ('content-type')
         :return:
         """
-        headers = {}
+        ## headers are case insensitive
+        ## having duplicate headers creates problem while exporting to curl,postman import..
+        headers = CaseInsensitiveDict()
         headers.update(self.default_headers)
         self.load_headers_to_dict(self.base_http, headers)
         self.load_headers_to_dict(self.http, headers)
