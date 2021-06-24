@@ -2,10 +2,13 @@ import json
 import logging
 import re
 import string
+import uuid
 from dataclasses import dataclass, field
+from datetime import datetime
 from functools import lru_cache
 from json import JSONDecodeError
 from random import Random
+from types import FunctionType
 from typing import Dict, Union, List
 
 from .exceptions import HttpFileException, PropertyNotFoundException
@@ -18,6 +21,18 @@ class Property:
     text: List = field(default_factory=list())
     key: Union[str, None] = None
     value: Union[str, None] = None
+
+
+def random_string_generator(size=4, chars=string.ascii_lowercase + string.digits):
+    """
+    Args:
+        size: size of string
+        chars: list of chars allowed
+
+    Returns:
+        str: randomString with length and allowed chars
+    """
+    return ''.join(PropertyProvider.random.choice(chars) for _ in range(size))
 
 
 def get_random_str(length=None):
@@ -33,7 +48,7 @@ def get_random_str(length=None):
     if not length:
         length = random.randint(1, 10)
     initial = random.choice(string.ascii_letters)
-    return initial + ''.join(random.choices(string.ascii_letters + string.digits, k=length - 1))
+    return initial + random_string_generator(length - 1, string.ascii_letters + string.digits)
 
 
 def get_random_int(length=None):
@@ -55,6 +70,20 @@ def get_random_bool(*_args):
     return random.choice(['true', 'false'])
 
 
+def get_uuid(*_args):
+    return str(uuid.uuid4())
+
+
+def get_random_slug(length):
+    if not length or length <= 1:
+        length = 4
+    return '-'.join(random_string_generator(size=get_random_int(1)) for _i in range(length))
+
+
+def get_timestamp(*_args):
+    return int(datetime.timestamp(datetime.now()))
+
+
 class PropertyProvider:
     """
         1. properties defined in file itself ({{a=10}})
@@ -70,15 +99,22 @@ class PropertyProvider:
     """
     random = Random()
     var_regex = re.compile(r'{{(?P<var>.*?)}}', re.DOTALL)
-    random_string_regex = re.compile(
-        r'.*?(?P<category>\$randomStr|\$randomInt|\$randomBool|\$randomFloat)(?P<length>:\d*)?')
-
-    rand_map = {
+    rand_map: Dict[str, FunctionType] = {
         '$randomStr': get_random_str,
         '$randomInt': get_random_int,
         '$randomFloat': get_random_float,
-        '$randomBool': get_random_bool
+        '$randomBool': get_random_bool,
+        '$guid': get_uuid,
+        '$uuid': get_uuid,
+        '$timestamp': get_timestamp,
+        '$randomLoremSlug': get_random_slug,
+        '$randomSlug': get_random_slug,
     }
+
+    # random_string_regex = re.compile(
+    #     r'.*?(?P<category>\$randomStr|\$randomInt|\$randomBool|\$randomFloat|\$guid)(?P<length>:\d*)?')
+    random_string_regex = re.compile(
+        r'.*?(?P<category>' + "|".join("\\" + key for key in rand_map) + ')(?P<length>:\d*)?')
 
     def __init__(self, property_file=""):
         self.command_properties = {}
