@@ -338,7 +338,7 @@ class BaseModelProcessor:
     def load_content(self):
         if not os.path.exists(self.file):
             raise HttpFileNotFoundException(file=self.file)
-        with open(self.file, 'r') as f:
+        with open(self.file, 'r', encoding="utf-8") as f:
             self.original_content = self.content = f.read()
 
     def get_updated_content(self, content) -> str:

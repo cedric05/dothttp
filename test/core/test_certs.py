@@ -57,23 +57,23 @@ class CertUnitTest(TestBase):
 
     def test_p12_curl(self):
         filename = f"{http_base}/no-password.http"
-        p12 = f"{quote}{cert_base}/badssl.com-client.p12{quote}"
+        p12 = f"{cert_base}/badssl.com-client.p12"
         curl_comp: CurlCompiler = self.get_req_comp(filename, target="with-p12",
                                                     properties=[f"p12={p12}", f"password=badssl.com"], curl=True)
         self.assertEqual(f"""curl -X GET --url https://client.badssl.com/ \\
---cert {p12}:badssl.com \\
+--cert {quote}{p12}:badssl.com{quote} \\
 --cert-type P12""", curl_comp.get_curl_output())
 
     def test_cert_curl(self):
         # insecure is added just to test curl output
         filename = f"{http_base}/no-password.http"
-        cert_file = f"{quote}{cert_base}/cert.crt{quote}"
-        key_file = f"{quote}{cert_base}/key.key{quote}"
+        cert_file = f"{cert_base}/cert.crt"
+        key_file = f"{cert_base}/key.key"
         curl_comp = self.get_req_comp(filename, target="with-key-and-cert",
                                       properties=[f"cert={cert_file}", f"key={key_file}"], curl=True)
         self.assertEqual(f"""curl -X GET --url https://client.badssl.com/ \\
---cert {cert_file} \\
---key {key_file} \\
+--cert {quote}{cert_file}{quote} \\
+--key {quote}{key_file}{quote} \\
 -k""", curl_comp.get_curl_output(), "curl output with cert is not same as expected")
 
     def test_curl_extend(self):

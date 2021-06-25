@@ -1,6 +1,8 @@
 import json
 import os
+import sys
 import tempfile
+import unittest
 from pathlib import Path
 
 from dotextensions.server.handlers.http2postman import Http2Postman
@@ -40,6 +42,9 @@ class Testhttp2postman(TestBase):
         self.execute_n_get(expected_output="export1.postman.json",
                            input_file=os.path.join(command_dir, "swagger2har_petstore_response.http"))
 
+    # current
+    # in windows content-type is set to application/bytestream
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires linux")
     def test_payload(self):
         """
         This test case consists of various payload formats

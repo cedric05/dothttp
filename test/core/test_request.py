@@ -45,6 +45,7 @@ class RequestTest(TestBase):
         with self.assertRaises(HttpFileException):
             req = self.get_request(f"{base_dir}/fail2.http")
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires linux")
     def test_output(self):
         with tempfile.NamedTemporaryFile() as f:
             req = self.get_req_comp(f"{base_dir}/output.http",
@@ -112,16 +113,16 @@ output(test)
     def test_multiline_curl(self):
         with tempfile.NamedTemporaryFile(delete=False) as f:
             # with files
-            self.assertEqual(f'''curl -X POST https://httpbin.org/post \\
+            self.assertEqual(f'''curl -X POST --url https://httpbin.org/post \\
 --form 'test=@{f.name}' \\
 --form hi=hi2''', self.get_curl_out(f))
 
             # with file input
-            self.assertEqual(f"""curl -X POST https://httpbin.org/post \\
+            self.assertEqual(f"""curl -X POST --url https://httpbin.org/post \\
 --data '@{f.name}'""", self.get_curl_out(f, 2))
 
             # with json out
-            self.assertEqual("""curl -X POST https://httpbin.org/post \\
+            self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
 -H 'content-type: application/json' \\
 -d '{
     "hi": "hi2"

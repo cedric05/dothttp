@@ -1,4 +1,6 @@
 import os
+import sys
+import unittest
 from pathlib import Path
 
 from dotextensions.server.handlers.gohandler import TypeFromPos
@@ -9,6 +11,10 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 command_dir = Path(f"{dir_path}/commands")
 
 
+# current offset is for linux
+# in windows it changes
+# need separate asserts for windows
+@unittest.skipUnless(sys.platform.startswith("linux"), "requires linux")
 class TypePositionTest(TestBase):
     def setUp(self) -> None:
         self.execute_handler = TypeFromPos()
