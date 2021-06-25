@@ -13,11 +13,17 @@ GET https://req.dothttp.dev/
 ? "bool" = "{{bool=$randomBool:3}}"
 ? "str" ="{{str=$randomStr:3}}"
 ? "float" ="{{float=$randomFloat}}"
+// ? "timestamp" = "{{time=$timestamp}}"
+// ? "uuid" = "{{uuid=$uuid}}"
+// ? "slug" = "{{slug=$randomSlug}}"
 json({
    "int": {{int}},
    "bool": {{bool}},
    "str": {{str}},
-   "float": {{float}}
+   "float": {{float}},
+   "time": {{time}},
+   "slug": {{slug}},
+   "uuid": {{uuid}}
 })
 
 

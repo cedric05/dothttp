@@ -12,6 +12,7 @@ from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
+from dothttp import APPLICATION_JSON
 from . import eprint, Config, HttpDefBase, js3py
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
@@ -161,25 +162,31 @@ class CurlCompiler(RequestBase):
             parts.append(("--cert-type", f"P12"))
         if self.httpdef.allow_insecure:
             parts.append(("-k", None))
+        payload_parts = []
         if self.http.payload:
             if self.http.payload.file:
-                parts.append(('--data', "@" + self.get_updated_content(self.http.payload.file)))
+                payload_parts += [('--data', "@" + self.get_updated_content(self.http.payload.file))]
             elif self.http.payload.fileswrap:
                 if payload.files:
                     for file in payload.files:
                         if isinstance(file[1][1], str):
-                            parts.append(('--form', file[0] + "=" + file[1][1]))
+                            payload_parts.append(('--form', file[0] + "=" + file[1][1]))
                         else:
-                            parts.append(('--form', file[0] + "=@" + file[1][1].name))
+                            payload_parts.append(('--form', file[0] + "=@" + file[1][1].name))
             elif self.http.payload.json:
                 dumps = json.dumps(payload.json, indent=4)
-                prep.headers["content-type"] = "application/json"
-                prep.prepare_body(data=dumps, files=None)
-            else:
+                self.httpdef.headers['content-type'] = APPLICATION_JSON
+                payload_parts += [('-d', dumps)]
+            elif self.http.payload.data:
                 if payload.header:
-                    prep.headers['content-type'] = payload.header
-                prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
-        curl_req = to_curl(prep, parts)
+                    self.httpdef.headers['content-type'] = payload.header
+                payload_parts += [('-d', payload.data)]
+        # there few headers set dynamically
+        # so set headers in the end
+        for k, v in sorted(self.httpdef.headers.items()):
+            parts += [('-H', '{0}: {1}'.format(k, v))]
+        parts += payload_parts
+        curl_req = to_curl(self.httpdef, parts)
         return curl_req
 
 

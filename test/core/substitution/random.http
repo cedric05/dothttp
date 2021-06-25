@@ -32,3 +32,22 @@ json({
  "test4":"{{hai}}",
  "test5":"{{hai}}",
 })
+
+@name('uuid')
+GET https://req.dothttp.dev
+json({
+ "uuid":{{$uuid}},
+})
+
+@name('slug')
+GET https://req.dothttp.dev
+json({
+ "slug":{{$randomSlug}},
+})
+
+
+@name('timestamp')
+GET https://req.dothttp.dev
+json({
+ "timestamp":{{$timestamp}},
+})

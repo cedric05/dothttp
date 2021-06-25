@@ -1,5 +1,10 @@
 import os
 
+from requests.models import to_key_val_list
+
+APPLICATION_JSON = "application/json"
+CONTENT_TYPE = "content-type"
+
 
 def get_real_file_path(path='http.tx', current_file=__file__, ):
     if os.path.exists(current_file):
@@ -24,4 +29,16 @@ def quote_or_unquote(line: str):
         return '"', line
 
 
-APPLICATION_JSON = "application/json"
+def json_to_urlencoded_array(data):
+    # copied from
+    # https://github.com/psf/requests/blob/1466ad713cf84738cd28f1224a7ab4a19e50e361/requests/models.py#L97-L105
+    # although i don't want to copy this function
+    # but by doing encoding and decoding is not approach
+    result = []
+    for k, vs in to_key_val_list(data):
+        if isinstance(vs, (str, bytes)) or not hasattr(vs, '__iter__'):
+            vs = [vs]
+        for v in vs:
+            if v is not None:
+                result.append((k, v))
+    return result

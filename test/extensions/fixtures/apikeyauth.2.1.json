@@ -1,0 +1,1 @@
+{"files": {"apikeyAuthTest\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from apikeyauth.2.1.json\n\n@name(\"test apikey auth success\")\nGET \"https://postman-echo.com/get\"\n\"token\": \"wkjehbxoqnunc2k3\"\n\"token\": \"wkjehbxoqnunc2k3\"\n\n\n\n"}}

@@ -10,8 +10,9 @@ from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO, An
 from urllib.parse import urlencode, urljoin
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
+from requests.structures import CaseInsensitiveDict
 
-from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON
+from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
 
 try:
     import jstyleson as json
@@ -68,7 +69,7 @@ class Config:
 
 @dataclass
 class Payload:
-    data: Optional[Union[str, bytes, Dict]] = None
+    data: Optional[Union[str, bytes, Dict, BinaryIO]] = None
     json: Optional[Dict] = None
     header: Optional[str] = None
     filename: str = None
@@ -113,7 +114,7 @@ class HttpDef:
         if payload.data:
             if isinstance(payload.data, dict):
                 return_data["mimeType"] = FORM_URLENCODED
-                return_data["text"] = urlencode(payload.data)
+                return_data["text"] = urlencode(json_to_urlencoded_array(payload.data))
             else:
                 return_data["mimeType"] = payload.header or "text/plain"
                 return_data["text"] = payload.data
@@ -337,7 +338,7 @@ class BaseModelProcessor:
     def load_content(self):
         if not os.path.exists(self.file):
             raise HttpFileNotFoundException(file=self.file)
-        with open(self.file, 'r') as f:
+        with open(self.file, 'r', encoding="utf-8") as f:
             self.original_content = self.content = f.read()
 
     def get_updated_content(self, content) -> str:
@@ -425,7 +426,9 @@ class HttpDefBase(BaseModelProcessor):
                 4. dev can define in data/file/files's type attribute section for ('content-type')
         :return:
         """
-        headers = {}
+        ## headers are case insensitive
+        ## having duplicate headers creates problem while exporting to curl,postman import..
+        headers = CaseInsensitiveDict()
         headers.update(self.default_headers)
         self.load_headers_to_dict(self.base_http, headers)
         self.load_headers_to_dict(self.http, headers)
@@ -522,16 +525,7 @@ class HttpDefBase(BaseModelProcessor):
             # varstring hanlding
             return Payload(data=d, header=FORM_URLENCODED)
         elif upload_filename := self.http.payload.file:
-            upload_filename = self.get_updated_content(upload_filename)
-            request_logger.debug(
-                f'payload will be loaded from `{upload_filename}`')
-            if not os.path.exists(upload_filename):
-                request_logger.debug(
-                    f'payload file `{upload_filename}` Not found. ')
-                raise DataFileNotFoundException(datafile=upload_filename)
-            mimetype = self.get_mimetype_from_file(upload_filename, self.http.payload.type)
-            with open(upload_filename, 'rb') as f:
-                return Payload(data=f.read(), header=mimetype, filename=upload_filename)
+            return self.load_payload_fileinput(upload_filename)
         elif json_data := self.http.payload.json:
             d = json_or_array_to_json(json_data, self.get_updated_content)
             return Payload(json=d, header=MIME_TYPE_JSON)
@@ -551,6 +545,18 @@ class HttpDefBase(BaseModelProcessor):
                     files.append((multipart_key, (None, multipart_content, mimetype)))
             return Payload(files=files, header=MULTIPART_FORM_INPUT)
         return Payload()
+
+    def load_payload_fileinput(self, upload_filename):
+        upload_filename = self.get_updated_content(upload_filename)
+        request_logger.debug(
+            f'payload will be loaded from `{upload_filename}`')
+        if not os.path.exists(upload_filename):
+            request_logger.debug(
+                f'payload file `{upload_filename}` Not found. ')
+            raise DataFileNotFoundException(datafile=upload_filename)
+        mimetype = self.get_mimetype_from_file(upload_filename, self.http.payload.type)
+        f = open(upload_filename, 'rb')
+        return Payload(data=f, header=mimetype, filename=upload_filename)
 
     @staticmethod
     def get_mimetype_from_file(filename, mimetype: Optional[str]) -> Optional[str]:

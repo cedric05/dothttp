@@ -3,19 +3,12 @@
 
 from shlex import quote
 
-
 # for file input and multipart, rather than converting them to body, we use curl's actual syntax
-def to_curl(request, bodydata=None):
+from dothttp import HttpDef
+
+
+def to_curl(request: HttpDef, bodydata=None):
     parts = []
-
-    for k, v in sorted(request.headers.items()):
-        parts += [('-H', '{0}: {1}'.format(k, v))]
-
-    if request.body:
-        body = request.body
-        if isinstance(body, bytes):
-            body = body.decode('utf-8')
-        parts += [('-d', body)]
     if isinstance(bodydata, list):
         for p in bodydata:
             parts.append(p)
@@ -29,4 +22,4 @@ def to_curl(request, bodydata=None):
         elif v:
             flat_parts.append(quote(v))
 
-    return f'curl -X {request.method} {request.url} \\\n' + ' \\\n'.join(flat_parts)
+    return f'curl -X {request.method} --url {request.url} \\\n' + ' \\\n'.join(flat_parts)

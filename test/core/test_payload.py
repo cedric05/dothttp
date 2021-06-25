@@ -138,9 +138,12 @@ class PayLoadTest(TestBase):
         loadfile.write(test)
         loadfile.flush()
         req = self.get_request(f"{base_dir}/filepayload.http", properties=[f"filename={loadfile.name}"])
-        self.assertEqual(test, req.body)
+        self.assertEqual(test, req.body.read())
         loadfile.close()
-        os.unlink(loadfile.name)
+        try:
+            os.unlink(loadfile.name)
+        except:
+            pass
 
     def test_data_json_payload(self):
         req = self.get_request(f"{base_dir}/dataasformpayload.http")
@@ -172,7 +175,10 @@ class PayLoadTest(TestBase):
         self.assertEqual(resp['form'], {'content2': 'this is text part'})
 
         loadfile.close()
-        os.unlink(loadfile.name)
+        try:
+            os.unlink(loadfile.name)
+        except:
+            pass
 
     def test_data_multi_payload(self):
         req = self.get_request(f"{base_dir}/quoted.http")

@@ -1,6 +1,8 @@
 import json
 import os
+import sys
 import tempfile
+import unittest
 from pathlib import Path
 
 from dotextensions.server.handlers.http2postman import Http2Postman
@@ -9,6 +11,7 @@ from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 command_dir = Path(f"{dir_path}/commands")
+requests_dir = Path(f"{dir_path}/../core/requests")
 
 
 class Testhttp2postman(TestBase):
@@ -21,7 +24,7 @@ class Testhttp2postman(TestBase):
             with open(os.path.join(command_dir, expected_output)) as f2:
                 data = json.load(f2)
             for contentOrFile in [True, False]:
-                fullpath = os.path.join(command_dir, input_file)
+                fullpath = input_file
                 content = None
                 if contentOrFile:
                     with open(fullpath) as f:
@@ -29,12 +32,19 @@ class Testhttp2postman(TestBase):
                 result = self.execute_handler.run(command=Command(
                     method=self.execute_handler.name,
                     id=92,
-                    params={"filename": fullpath, "content": content, "directory": f}))
-                self.assertEqual(data, result.result)
+                    params={"filename": fullpath, "content": content, "directory": f,
+                            "properties": {"filename": input_file}}))
+                self.assertDictEqual(data, result.result)
+            # with open(os.path.join(command_dir, expected_output), 'w') as f2:
+            #     json.dump(result.result, f2)
 
     def test_simple(self):
-        self.execute_n_get(expected_output="export1.postman.json", input_file="swagger2har_petstore_response.http")
+        self.execute_n_get(expected_output="export1.postman.json",
+                           input_file=os.path.join(command_dir, "swagger2har_petstore_response.http"))
 
+    # current
+    # in windows content-type is set to application/bytestream
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires linux")
     def test_payload(self):
         """
         This test case consists of various payload formats
@@ -44,7 +54,7 @@ class Testhttp2postman(TestBase):
          4. payload with form
          5. payload with binary
         """
-        self.execute_n_get("payload.postman_collection.json", "payload.http")
+        self.execute_n_get("payload.postman_collection.json", os.path.join(command_dir, "payload.http"))
 
     def test_url_query(self):
         """
@@ -55,7 +65,7 @@ class Testhttp2postman(TestBase):
              4. auth
              5. ~~certificate~~
         """
-        self.execute_n_get("urlquery.postman_collection.json", "urlquery.http")
+        self.execute_n_get("urlquery.postman_collection.json", os.path.join(command_dir, "urlquery.http"))
 
     def error_scenario(self, input_file):
         self.maxDiff = None
@@ -75,3 +85,6 @@ class Testhttp2postman(TestBase):
         self.assertTrue(second.get("error"))
         self.assertTrue(second.get("error_message").startswith(
             "unable to parse because of parsing issues None:2:2: error: Expected '(' or STRING or '\w+' at position"))
+
+    def test_extend(self):
+        self.execute_n_get("auth_extend.postman_collection.json", os.path.join(requests_dir, "auth_extend.http"))

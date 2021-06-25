@@ -7,6 +7,7 @@ from dotextensions.server.models import Command
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
+postman_dir = f"{dir_path}/postman"
 fixtures_dir = f"{dir_path}/fixtures"
 
 
@@ -25,8 +26,21 @@ class FileExecute(TestBase):
             },
             id=1)
         )
+        # -------------------------------------------------------------------------------------
+        ## For Linux
+        # with open(os.path.join(fixtures_dir, file_to_compare), 'w') as f:
+        #     result_normalize = {}
+        #     if 'files' in response.result:
+        #         for file in response.result["files"]:
+        #             result_normalize[file.replace('/', "\\")] = response.result["files"][file]
+        #         json.dump({"files": result_normalize}, f)
+        #     else:
+        #         json.dump(response.result, f)
+        # -------------------------------------------------------------------------------------
+        # For Windows
         # with open(os.path.join(fixtures_dir, file_to_compare), 'w') as f:
         #     json.dump(response.result, f)
+        # -------------------------------------------------------------------------------------
         with open(os.path.join(fixtures_dir, file_to_compare), 'r') as f:
             if sys.platform.startswith("windows"):
                 self.assertEqual(json.load(f), response.result)
@@ -71,7 +85,11 @@ class FileExecute(TestBase):
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/set-next-request.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/super-sandbox-test.postman_collection.json",
             "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/var-replacement.postman_collection.json",
-            "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/whatwg-url.postman_collection.json"
+            "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/whatwg-url.postman_collection.json",
+            f"{postman_dir}/apikeyauth.json",
+            f"{postman_dir}/apikeyauth.2.1.json",
+            f"{postman_dir}/bearer.json",
+            f"{postman_dir}/bearer2.1.json"
         ]
         for link in links:
             self.compare(link, os.path.join(fixtures_dir, os.path.basename(link)))

@@ -1,4 +1,6 @@
 import os
+import sys
+import unittest
 from pathlib import Path
 
 from dotextensions.server.handlers.gohandler import TypeFromPos
@@ -9,6 +11,10 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 command_dir = Path(f"{dir_path}/commands")
 
 
+# current offset is for linux
+# in windows it changes
+# need separate asserts for windows
+@unittest.skipUnless(sys.platform.startswith("linux"), "requires linux")
 class TypePositionTest(TestBase):
     def setUp(self) -> None:
         self.execute_handler = TypeFromPos()
@@ -64,7 +70,7 @@ class TypePositionTest(TestBase):
             ((682, 'payload.http'),
              {'type': 'digest_auth', 'target': 'fileinput', 'target_base': None,
               'base_start': None}),
-            ((629, 'payload.http'),
+            ((637, 'payload.http'),
              {'type': 'extra_args', 'target': 'fileinput', 'target_base': None,
               'base_start': None}),
             ((705, 'payload.http'),

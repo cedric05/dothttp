@@ -152,7 +152,7 @@
             "file": null,
             "formdata": [
               {
-                "contentType": "",
+                "contentType": "text/plain",
                 "description": null,
                 "disabled": null,
                 "key": "raw data",
@@ -161,7 +161,7 @@
                 "src": null
               },
               {
-                "contentType": "",
+                "contentType": "text/plain",
                 "description": null,
                 "disabled": null,
                 "key": "raw data",
@@ -235,7 +235,7 @@
             "file": null,
             "formdata": [
               {
-                "contentType": "",
+                "contentType": "text/plain",
                 "description": null,
                 "disabled": null,
                 "key": "file",
@@ -292,7 +292,7 @@
             "ntlm": null,
             "oauth1": null,
             "oauth2": null,
-            "type": "noauth"
+            "type": "digest"
           },
           "body": {
             "disabled": null,

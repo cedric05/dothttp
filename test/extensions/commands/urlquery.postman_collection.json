@@ -21,7 +21,7 @@
           "body": null,
           "certificate": null,
           "description": "urlquery",
-          "header": [],
+          "header": null,
           "method": "GET",
           "proxy": null,
           "url": {
@@ -64,7 +64,7 @@
           "body": null,
           "certificate": null,
           "description": "urlquery2",
-          "header": [],
+          "header": null,
           "method": "GET",
           "proxy": null,
           "url": {
@@ -154,7 +154,7 @@
             "ntlm": null,
             "oauth1": null,
             "oauth2": null,
-            "type": "noauth"
+            "type": "basic"
           },
           "body": null,
           "certificate": null,
@@ -199,7 +199,7 @@
             "ntlm": null,
             "oauth1": null,
             "oauth2": null,
-            "type": "noauth"
+            "type": "digest"
           },
           "body": null,
           "certificate": null,
