@@ -334,3 +334,16 @@ format:
 ```
 
 checkout [examples]('./examples/dothttpazure.http')
+
+
+-----------
+### Vscode alternatives
+
+- [rest-client](https://marketplace.visualstudio.com/items?itemName=humao.rest-client) written in typescript
+- [httpYac](https://marketplace.visualstudio.com/items?itemName=anweber.vscode-httpyac)  written in typescript
+- [Thunder Client](https://marketplace.visualstudio.com/items?itemName=rangav.vscode-thunder-client) closed source
+
+---------
+### Non Vscode alternatives
+- [http-client](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)  closed source
+- [dothttp](https://github.com/tonsV2/dothttp)  written in python
