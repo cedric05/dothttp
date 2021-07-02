@@ -93,8 +93,21 @@ output(test)
 
 """, output)
 
+    def test_curl_query(self):
+        req = self.get_req_comp(f"{sub_dir}/query.http", stdout=True, curl=True)
+        self.assertEqual("""curl -X POST --url https://dothttp.azurewebsites.net/ram?key1=value1&key2=value2 \\
+-H 'content-type: application/json' \\
+-d '{
+    "key1": "value2"
+}'""", req.get_curl_output())
+
+    def test_curl_query2(self):
+        req = self.get_req_comp(f"{base_dir}/query.http", stdout=True, curl=True)
+        self.assertEqual("""curl -X GET --url https://dothttp.azurewebsites.net/?key3=value3&key1=value1&key2=value2 \\
+""", req.get_curl_output())
+
     def test_quoted3_format_print(self):
-        req = self.get_req_comp(f"{sub_dir}/quoted.http", format=True, stdout=True, target=2)
+        req = self.get_req_comp(f"{sub_dir}/quoted.http", format=True, stdout=True)
         req.load()
         output = req.format(req.model)
         self.assertEqual("""POST "https://{{host1}}/ram"

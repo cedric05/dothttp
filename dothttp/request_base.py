@@ -186,7 +186,7 @@ class CurlCompiler(RequestBase):
         for k, v in sorted(self.httpdef.headers.items()):
             parts += [('-H', '{0}: {1}'.format(k, v))]
         parts += payload_parts
-        curl_req = to_curl(self.httpdef, parts)
+        curl_req = to_curl(url=prep.url, method=prep.method, bodydata=parts)
         return curl_req
 
 
