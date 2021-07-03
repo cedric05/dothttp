@@ -160,8 +160,12 @@ class HttpDef:
                 if isinstance(payload.data, (str, bytes)):
                     return_data["text"] = payload.data
                 else:
-                    return_data["text"] = payload.data.read()
-                    payload.data.close()
+                    try:
+                        data_read = payload.data.read()
+                        return_data["text"] = data_read.decode("utf-8")
+                    finally:
+                        return_data["text"] = "file conversion to uft-8 ran into error"
+                        payload.data.close()
         elif payload.json:
             return_data["mimeType"] = APPLICATION_JSON
             return_data["text"] = json.dumps(payload.json)
