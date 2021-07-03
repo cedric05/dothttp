@@ -20,7 +20,7 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-          apt install tar
+          sudo apt-get install tar
           pip install python-magic
           pip install -r requirements.txt
           pip install -r benchmarks/requirements.txt

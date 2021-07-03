@@ -184,7 +184,7 @@ class ToHarTest(TestBase):
             f.flush()
             self.assertEqual({'target': {'fileinput': {'headers': [],
                                                        'method': 'POST',
-                                                       'payload': {'mimeType': 'text/plain', 'text': b'hai'},
+                                                       'payload': {'mimeType': 'text/plain', 'text': 'hai'},
                                                        'query': [],
                                                        'url': 'https://req.dothttp.dev'}}},
                              self.execute_payload(target='fileinput', file=filename, fileinputarg=f.name).result)
