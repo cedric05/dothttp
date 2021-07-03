@@ -12,7 +12,7 @@ from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
-from dothttp import APPLICATION_JSON
+from dothttp import APPLICATION_JSON, MIME_TYPE_JSON
 from . import eprint, Config, HttpDefBase, js3py
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
@@ -32,14 +32,7 @@ try:
 except ImportError:
     magic = None
 
-FORM_URLENCODED = "application/x-www-form-urlencoded"
-
 DOTHTTP_COOKIEJAR = os.path.expanduser('~/.dothttp.cookiejar')
-
-MIME_TYPE_JSON = "application/json"
-
-CONTENT_TYPE = 'content-type'
-
 base_logger = logging.getLogger("dothttp")
 request_logger = logging.getLogger("request")
 curl_logger = logging.getLogger("curl")
@@ -104,25 +97,12 @@ class RequestBase(HttpDefBase):
 
     @functools.lru_cache
     def get_request(self):
-        prep = self.get_request_notbody()
-        payload = self.httpdef.payload
-        prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
-        # prep.prepare_hooks({"response": self.save_cookie_call_back})
-        if payload.header and CONTENT_TYPE not in prep.headers:
-            # if content-type is provided by header
-            # we will not wish to update it
-            prep.headers[CONTENT_TYPE] = payload.header
-        request_logger.debug(f'request prepared completely {prep}')
-        return prep
-
-    def get_request_notbody(self):
+        # httpdef has to be loaded
+        # according to httpdef, prepared_request is built
         self.load_def()
-        prep = PreparedRequest()
-        prep.prepare_url(self.httpdef.url, self.httpdef.query)
-        prep.prepare_method(self.httpdef.method)
-        prep.prepare_headers(self.httpdef.headers)
+        prep = self.httpdef.get_prepared_request()
+        # cookie is separately prepared
         prep.prepare_cookies(self.get_cookie())
-        prep.prepare_auth(self.httpdef.auth, prep.url)
         return prep
 
     def run(self):
@@ -142,7 +122,7 @@ class CurlCompiler(RequestBase):
         curl_logger.debug(f'curl request generation completed successfully')
 
     def get_curl_output(self):
-        prep = self.get_request_notbody()
+        prep = self.get_request()
         parts = []
         payload = self.httpdef.payload
         if auth := self.httpdef.auth:

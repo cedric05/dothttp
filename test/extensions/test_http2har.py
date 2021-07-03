@@ -1,10 +1,9 @@
-import json
 import os
 import sys
+import tempfile
 
 from dotextensions.server.handlers.http2har import Http2Har
 from dotextensions.server.models import Command
-from dothttp import eprint
 from test import TestBase
 from test.extensions.test_commands import command_dir
 
@@ -168,13 +167,49 @@ class ToHarTest(TestBase):
                                                  'url': 'https://req.dothttp.dev'}}},
                          self.execute_payload(target='headers', file=filename).result)
 
-    def execute_payload(self, **kwargs):
-        kwargs["properties"] = {"filename": os.path.join(dir_path, f"{command_dir}/payload.http")}
+    def test_basicauth(self):
+        filename = f"{command_dir}/payload.http"
+        self.assertEqual({'target': {'basicauth': {'headers': [{'name': 'Authorization',
+                                                                'value': 'Basic '
+                                                                         'dXNlcm5hbWU6cGFzc3dvcmQ='}],
+                                                   'method': 'GET',
+                                                   'payload': {},
+                                                   'query': [],
+                                                   'url': 'https://req.dothttp.dev'}}},
+                         self.execute_payload(target='basicauth', file=filename).result)
+
+    def test_payloadfileinput(self):
+        filename = f"{command_dir}/payload.http"
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            f.write(b"hai")
+            f.flush()
+            self.assertEqual({'target': {'fileinput': {'headers': [],
+                                                       'method': 'POST',
+                                                       'payload': {'mimeType': 'text/plain', 'text': b'hai'},
+                                                       'query': [],
+                                                       'url': 'https://req.dothttp.dev'}}},
+                             self.execute_payload(target='fileinput', file=filename, fileinputarg=f.name).result)
+
+    # def test_digestauth(self):
+    #     filename = f"{command_dir}/payload.http"
+    #     self.assertEqual({'target': {'basicauth': {'headers': [{'name': 'Authorization',
+    #                                                             'value': 'Basic '
+    #                                                                      'dXNlcm5hbWU6cGFzc3dvcmQ='}],
+    #                                                'method': 'GET',
+    #                                                'payload': {},
+    #                                                'query': [],
+    #                                                'url': 'https://req.dothttp.dev'}}},
+    #                      self.execute_payload(target='digestauth', file=filename).result)
+
+    def execute_payload(self, fileinputarg="", **kwargs):
+        kwargs["properties"] = {"filename":
+                                    os.path.join(dir_path, f"{command_dir}/payload.http"),
+                                "fileinput": fileinputarg}
         command = Command(
             method=Http2Har.name,
             params=kwargs,
             id=1)
         result = self.execute_handler.run(command=command)
-        eprint("{\"" + "request" + "\":", json.dumps(result.result['target'][kwargs['target']]), "},")
+        # eprint("{\"" + "request" + "\":", json.dumps(result.result['target'][kwargs['target']]), "},")
         self.assertFalse(result.result.get("error", False))
         return result
