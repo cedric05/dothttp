@@ -168,18 +168,17 @@ class ToHarTest(TestBase):
                          self.execute_payload(target='headers', file=filename).result)
 
     def test_basicauth(self):
-        filename = f"{command_dir}/payload.http"
-        self.assertEqual({'target': {'basicauth': {'headers': [{'name': 'Authorization',
-                                                                'value': 'Basic '
-                                                                         'dXNlcm5hbWU6cGFzc3dvcmQ='}],
-                                                   'method': 'GET',
-                                                   'payload': {},
-                                                   'query': [],
-                                                   'url': 'https://req.dothttp.dev'}}},
-                         self.execute_payload(target='basicauth', file=filename).result)
+        filename = f"{command_dir}/urlquery.http"
+        self.assertEqual({'target': {'basic auth': {'headers': [{'name': 'Authorization',
+                                                                 'value': 'Basic Zm9vOmJhcg=='}],
+                                                    'method': 'GET',
+                                                    'payload': {},
+                                                    'query': [],
+                                                    'url': 'http://httpbin.org/basic-auth/foo/bar'}}},
+                         self.execute_payload(target='basic auth', file=filename).result)
 
     def test_payloadfileinput(self):
-        filename = f"{command_dir}/payload.http"
+        filename = f"{command_dir}/fileinput.http"
         with tempfile.NamedTemporaryFile(delete=False) as f:
             f.write(b"hai")
             f.flush()
@@ -204,7 +203,7 @@ class ToHarTest(TestBase):
     def execute_payload(self, fileinputarg="", **kwargs):
         kwargs["properties"] = {"filename":
                                     os.path.join(dir_path, f"{command_dir}/payload.http"),
-                                "fileinput": fileinputarg}
+                                "fileinput2": fileinputarg}
         command = Command(
             method=Http2Har.name,
             params=kwargs,

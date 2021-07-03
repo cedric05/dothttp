@@ -1,0 +1,5 @@
+@name('fileinput')
+POST https://req.dothttp.dev
+fileinput(
+    "{{fileinput2}}"
+)

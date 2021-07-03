@@ -47,9 +47,5 @@ POST https://req.dothttp.dev
 digestauth('username','password')
 certificate(cert="",key="")
 fileinput(
-    "{{fileinput}}"
+    "{{filename}}"
 )
-
-@name('basicauth')
-GET https://req.dothttp.dev
-basicauth('username','password')
