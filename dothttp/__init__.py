@@ -12,7 +12,10 @@ from urllib.parse import urlencode, urljoin
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
 
+from .request_base import CONTENT_TYPE
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
+
+APPLICATION_XML = "application/xml"
 
 try:
     import jstyleson as json
@@ -26,7 +29,7 @@ from textx import TextXSyntaxError, metamodel_from_file
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, Query, Http, NameWrap, UrlWrap, Header, \
-    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg
+    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, SoapAuth
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -604,6 +607,11 @@ class HttpDefBase(BaseModelProcessor):
                 self.httpdef.auth = HTTPDigestAuth(self.get_updated_content(digest_auth.username),
                                                    self.get_updated_content(
                                                        digest_auth.password))
+            elif soap_auth := auth_wrap.soap_auth:
+                self.httpdef.auth = SoapAuth(self.get_updated_content(soap_auth.username),
+                                             self.get_updated_content(
+                                                 soap_auth.password))
+                self.httpdef.headers[CONTENT_TYPE] = APPLICATION_XML
 
     def get_current_or_base(self, attr_key) -> Any:
         if getattr(self.http, attr_key):

@@ -40,7 +40,7 @@ HEADER:
 ;
 
 AUTHWRAP:
-    digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH
+    digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH | soap_auth = SOAPAUTH
 ;
 
 CERTAUTH:
@@ -53,12 +53,16 @@ CERTAUTH:
 
 
 DIGESTAUTH:
-    'digestauth' '(' username=DotString ',' password= DotString ')'
+    'digestauth' '(' username=DotString ',' password=DotString ')'
 
 ;
 
 BASICAUTH:
-    'basicauth' '(' username=DotString ',' password= DotString ')'
+    'basicauth' '(' username=DotString ',' password=DotString ')'
+;
+
+SOAPAUTH:
+    'soapauth' '(' username=DotString ',' password=DotString ')'
 ;
 
 EXTRA_ARG:

@@ -20,15 +20,21 @@ class UrlWrap:
 
 
 @dataclass
-class BasicAuth:
+class UserNameAndPassword:
     username: str
     password: str
 
 
-@dataclass
-class DigestAuth:
-    username: str
-    password: str
+class BasicAuth(UserNameAndPassword):
+    pass
+
+
+class DigestAuth(UserNameAndPassword):
+    pass
+
+
+class SoapAuth(UserNameAndPassword):
+    pass
 
 
 @dataclass
@@ -36,6 +42,7 @@ class AuthWrap:
     # digest = DIGESTAUTH | basicauth = BASICAUTH
     digest_auth: Optional[DigestAuth] = None
     basic_auth: Optional[BasicAuth] = None
+    soap_auth: Optional[SoapAuth] = None
 
 
 @dataclass

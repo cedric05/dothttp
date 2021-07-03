@@ -1,6 +1,9 @@
 import os
+import xml.etree.ElementTree as ET
 
-from requests.models import to_key_val_list
+from requests.auth import AuthBase
+from requests.models import to_key_val_list, PreparedRequest
+from suds.wsse import *
 
 APPLICATION_JSON = "application/json"
 CONTENT_TYPE = "content-type"
@@ -18,6 +21,20 @@ def triple_or_double_tostring(list_of_triple_or_double, update_content_func):
     return "".join(
         [update_content_func(i.triple[3:-3]) if i.triple else update_content_func(i.str) for i in
          list_of_triple_or_double])
+
+
+class SoapAuthRequests(AuthBase):
+
+    def __init__(self, username, password):
+        self.username = username
+        self.password = password
+
+    def __call__(self, r: PreparedRequest):
+        security = Security()
+        token = UsernameToken(self.username, self.password)
+        security.tokens.append(token)
+        soap_security_header = security.xml()
+        tree = ET.fromstring(r.body)
 
 
 def quote_or_unquote(line: str):
