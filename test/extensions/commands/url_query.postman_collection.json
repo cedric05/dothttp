@@ -1,0 +1,54 @@
+{
+  "collection": {
+    "auth": null,
+    "event": null,
+    "info": {
+      "_postman_id": null,
+      "description": null,
+      "name": "urlquerywithport.http",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "version": null
+    },
+    "item": [
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": null,
+          "method": "GET",
+          "proxy": null,
+          "url": {
+            "hash": null,
+            "host": "localhost",
+            "path": "/everyone",
+            "port": "8000",
+            "protocol": "http",
+            "query": [
+              {
+                "description": null,
+                "disabled": false,
+                "key": "rama",
+                "value": "krishna"
+              }
+            ],
+            "raw": "http://localhost:8000/everyone",
+            "variable": null
+          }
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      }
+    ],
+    "protocolProfileBehavior": null,
+    "variable": null
+  }
+}
