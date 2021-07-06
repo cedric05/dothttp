@@ -6,7 +6,7 @@ from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType
 from dothttp import dothttp_model, json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
-    request_logger, Payload
+    request_logger, Payload, APPLICATION_JSON, CONTENT_TYPE
 from dothttp.request_base import RequestCompiler
 from dothttp.utils import json_to_urlencoded_array
 from . import logger
@@ -142,6 +142,9 @@ class Http2Postman(RunHttpFileHandler):
                 body.mode = Mode.RAW
                 body.options = {"language": "json"}
                 body.raw = json.dumps(json_or_array_to_json(json_payload, lambda x: x))
+                if request.header:
+                    request.header.append(Header(description=None, disabled=False, key=CONTENT_TYPE,
+                                                 value=APPLICATION_JSON))
                 request.body = body
             elif file_path := payload.filename:
                 body.mode = Mode.FILE

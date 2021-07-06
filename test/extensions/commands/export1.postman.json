@@ -50,6 +50,12 @@
               "disabled": false,
               "key": "Authorization",
               "value": "Bearer <BEARER_TOKEN>"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
             }
           ],
           "method": "POST",
@@ -101,6 +107,12 @@
               "disabled": false,
               "key": "Authorization",
               "value": "Bearer <BEARER_TOKEN>"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
             }
           ],
           "method": "PUT",
@@ -416,6 +428,12 @@
               "disabled": false,
               "key": "content-type",
               "value": "application/json"
+            },
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
             }
           ],
           "method": "POST",
@@ -506,6 +524,12 @@
           "certificate": null,
           "description": "",
           "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            },
             {
               "description": null,
               "disabled": false,
@@ -707,6 +731,12 @@
           "certificate": null,
           "description": "",
           "header": [
+            {
+              "description": null,
+              "disabled": false,
+              "key": "content-type",
+              "value": "application/json"
+            },
             {
               "description": null,
               "disabled": false,
