@@ -9,10 +9,13 @@ from io import IOBase
 from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO, Any
 from urllib.parse import urlencode, urljoin
 
+from requests import PreparedRequest
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
 
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
+
+BASEIC_AUTHORIZATION_HEADER = "Authorization"
 
 try:
     import jstyleson as json
@@ -42,6 +45,8 @@ curl_logger = logging.getLogger("curl")
 MIME_TYPE_JSON = "application/json"
 FORM_URLENCODED = "application/x-www-form-urlencoded"
 MULTIPART_FORM_INPUT = "multipart/form-data"
+
+CONTENT_TYPE = 'content-type'
 
 dothttp_model = metamodel_from_file(get_real_file_path(path="http.tx", current_file=__file__))
 
@@ -97,6 +102,25 @@ class HttpDef:
     test_script: str = ""
 
     def get_har(self):
+        if self.auth:
+            request = self.get_prepared_request()
+            # till now url and headers are enough
+            # in future according that,
+            # include all params
+            # not giving inaccurate results
+            self.auth(request)
+            # For any other auth, it is bad
+            if isinstance(self.auth, HTTPBasicAuth):
+                self.headers[BASEIC_AUTHORIZATION_HEADER] = request.headers.get(BASEIC_AUTHORIZATION_HEADER)
+            # # har with httpdigest is not possible
+            # # as auth is set once, request is redirected to 401
+            # # for now, ignoring
+            # # also for har, certificate also has to be ignored
+            # # har does't support this
+            # # --------------------------
+            # elif isinstance(self.auth, HTTPDigestAuth):
+            #     self.headers[BASEIC_AUTHORIZATION_HEADER] = self.auth.build_digest_header(self.method, self.url)
+
         target = {
             "url": self.url,
             "method": self.method,
@@ -105,6 +129,22 @@ class HttpDef:
             "payload": self.get_payload(),
         }
         return target
+
+    def get_prepared_request(self):
+        prep = PreparedRequest()
+        prep.prepare_url(self.url, self.query)
+        prep.prepare_method(self.method)
+        prep.prepare_headers(self.headers)
+        prep.prepare_auth(self.auth, self.url)
+        payload = self.payload
+        prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
+        # prep.prepare_hooks({"response": self.save_cookie_call_back})
+        if payload.header and CONTENT_TYPE not in prep.headers:
+            # if content-type is provided by header
+            # we will not wish to update it
+            prep.headers[CONTENT_TYPE] = payload.header
+        request_logger.debug(f'request prepared completely {prep}')
+        return prep
 
     def get_payload(self):
         if not self.payload:
@@ -117,7 +157,16 @@ class HttpDef:
                 return_data["text"] = urlencode(json_to_urlencoded_array(payload.data))
             else:
                 return_data["mimeType"] = payload.header or "text/plain"
-                return_data["text"] = payload.data
+                if isinstance(payload.data, (str, bytes)):
+                    return_data["text"] = payload.data
+                else:
+                    try:
+                        data_read = payload.data.read()
+                        return_data["text"] = data_read.decode("utf-8")
+                    except:
+                        return_data["text"] = "file conversion to uft-8 ran into error"
+                    finally:
+                        payload.data.close()
         elif payload.json:
             return_data["mimeType"] = APPLICATION_JSON
             return_data["text"] = json.dumps(payload.json)

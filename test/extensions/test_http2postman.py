@@ -88,3 +88,6 @@ class Testhttp2postman(TestBase):
 
     def test_extend(self):
         self.execute_n_get("auth_extend.postman_collection.json", os.path.join(requests_dir, "auth_extend.http"))
+
+    def test_url_with_port(self):
+        self.execute_n_get("url_query.postman_collection.json", os.path.join(command_dir, "urlquerywithport.http"))
