@@ -3,7 +3,7 @@
 GET https://req.dothttp.dev/user
 
 @name(child_sub) :"child"
-GET "/profile"
+GET /profile
 /*
     https://req.dothttp.dev/user/profile
 */
@@ -67,7 +67,7 @@ GET "profile"
 GET https://req.dothttp.dev/user/
 ?ramu=ranga
 
-@name(parenturlparamsext_sub):"parenturlparamsext_sub"
+@name(parenturlparamsext_sub):"parenturlparamsext"
 GET "profile"
 
 /*
@@ -156,5 +156,40 @@ GET "profile?ramu=ranga"
 
 /*
     https://req.dothttp.dev/user/profile?ramu=ranga
+*/
+
+
+
+@name(childwithonlyparams)
+GET https://req.dothttp.dev/user/
+
+@name(childwithonlyparams_sub) :"childwithonlyparams"
+GET ""
+?rajesh=ranga
+
+/*
+    https://req.dothttp.dev/user/?rajesh=ranga
+*/
+
+
+@name(childwithonlyparamsinurl)
+GET https://req.dothttp.dev/user/
+
+@name(childwithonlyparamsinurl_sub) :"childwithonlyparamsinurl"
+GET "?rajesh=ranga"
+
+/*
+    https://req.dothttp.dev/user/?rajesh=ranga
+*/
+
+
+@name(childwithonlyparamsinurl2)
+GET https://req.dothttp.dev/user
+
+@name(childwithonlyparamsinurl2_sub) :"childwithonlyparamsinurl2"
+GET "?rajesh=ranga"
+
+/*
+    https://req.dothttp.dev/user/?rajesh=ranga
 */
 

@@ -523,11 +523,19 @@ class HttpDefBase(BaseModelProcessor):
     def load_url(self):
         request_logger.debug(
             f'url is {self.http.urlwrap.url}')
+        url_path = self.get_updated_content(self.http.urlwrap.url)
         if base_http := self.base_http:
-            self.httpdef.url = urljoin(self.get_updated_content(base_http.urlwrap.url),
-                                       self.get_updated_content(self.http.urlwrap.url))
+            base_url = self.get_updated_content(base_http.urlwrap.url)
+            if base_url.endswith("/") and url_path.startswith("/"):
+                self.httpdef.url = urljoin(base_url, url_path[1:])
+            elif url_path.startswith("/"):
+                self.httpdef.url = urljoin(base_url + "/", url_path[1:])
+            elif not base_url.endswith("/") and not url_path.startswith("/"):
+                self.httpdef.url = urljoin(base_url + "/", url_path)
+            else:
+                self.httpdef.url = urljoin(base_url, url_path)
         else:
-            self.httpdef.url = self.get_updated_content(self.http.urlwrap.url)
+            self.httpdef.url = url_path
 
     def load_method(self):
         if method := self.http.urlwrap.method:

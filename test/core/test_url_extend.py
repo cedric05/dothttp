@@ -57,6 +57,18 @@ class UrlExtend(TestBase):
         request = self.get_request(filename, target="childurlparentext_sub")
         self.assertEqual("https://req.dothttp.dev/user/profile?ramu=ranga", request.url)
 
+    def test_childwithonlyparams(self):
+        request = self.get_request(filename, target="childwithonlyparams_sub")
+        self.assertEqual("https://req.dothttp.dev/user/?rajesh=ranga", request.url)
+
+    def test_childwithonlyparamsinurl(self):
+        request = self.get_request(filename, target="childwithonlyparamsinurl_sub")
+        self.assertEqual("https://req.dothttp.dev/user/?rajesh=ranga", request.url)
+
+    def test_childwithonlyparamsinurl2(self):
+        request = self.get_request(filename, target="childwithonlyparamsinurl2_sub")
+        self.assertEqual("https://req.dothttp.dev/user/?rajesh=ranga", request.url)
+
 
 if __name__ == '__main__':
     unittest.main()
