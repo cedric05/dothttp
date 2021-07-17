@@ -1,0 +1,160 @@
+
+@name("child")
+GET https://req.dothttp.dev/user
+
+@name(child_sub) :"child"
+GET "/profile"
+/*
+    https://req.dothttp.dev/user/profile
+*/
+
+
+@name(none)
+GET https://req.dothttp.dev/user
+
+@name(none_sub) :"none"
+GET "profile"
+
+/*
+    https://req.dothttp.dev/user/profile
+*/
+
+
+
+@name(both)
+GET https://req.dothttp.dev/user/
+
+@name(both_sub):"both"
+GET "/profile"
+
+/*
+    https://req.dothttp.dev/user/profile
+*/
+
+
+
+
+
+@name(parent)
+GET https://req.dothttp.dev/user/
+
+@name(parent_sub):"parent"
+GET "profile"
+
+/*
+    https://req.dothttp.dev/user/profile
+*/
+
+
+
+
+@name(parenturlparamsinurl)
+GET https://req.dothttp.dev/user/?ramu=ranga
+
+@name(parenturlparamsinurl_sub):"parenturlparamsinurl"
+GET "profile"
+
+/*
+    https://req.dothttp.dev/user/profile
+*/
+
+
+
+
+
+
+@name(parenturlparamsext)
+GET https://req.dothttp.dev/user/
+?ramu=ranga
+
+@name(parenturlparamsext_sub):"parenturlparamsext_sub"
+GET "profile"
+
+/*
+    https://req.dothttp.dev/user/profile
+*/
+
+
+
+
+
+@name(childurlparamsinurl)
+GET https://req.dothttp.dev/user/
+
+@name(childurlparamsinurl_sub):"childurlparamsinurl"
+GET "profile?ramu=ranga"
+
+
+/*
+    https://req.dothttp.dev/user/profile?ramu=ranga
+*/
+
+
+
+
+@name(childurlparamsext)
+GET https://req.dothttp.dev/user/
+
+@name(childurlparamsext_sub) :"childurlparamsext"
+GET "profile"
+?ramu=ranga
+
+/*
+    https://req.dothttp.dev/user/profile?ramu=ranga
+*/
+
+
+
+@name(bothurlparamsext)
+GET https://req.dothttp.dev/user/
+?rajesh=ranga
+
+@name(bothurlparamsext_sub) :"bothurlparamsext"
+GET "profile"
+?ramu=ranga
+
+/*
+    https://req.dothttp.dev/user/profile?ramu=ranga
+*/
+
+
+
+@name(bothurlparamsinurl)
+GET https://req.dothttp.dev/user/?rajesh=ranga
+
+@name(bothurlparamsinurl_sub) :"bothurlparamsinurl"
+GET "profile?ramu=ranga"
+
+/*
+    https://req.dothttp.dev/user/profile?ramu=ranga
+*/
+
+
+
+
+
+@name(parenturlchildext)
+GET https://req.dothttp.dev/user/?rajesh=ranga
+
+@name(parenturlchildext_sub) :"parenturlchildext"
+GET "profile"
+?ramu=ranga
+/*
+    https://req.dothttp.dev/user/profile?ramu=ranga
+*/
+
+
+
+
+
+@name(childurlparentext)
+GET https://req.dothttp.dev/user/
+?rajesh=ranga
+
+@name(childurlparentext_sub) :"childurlparentext"
+GET "profile?ramu=ranga"
+
+/*
+    https://req.dothttp.dev/user/profile?ramu=ranga
+*/
+
