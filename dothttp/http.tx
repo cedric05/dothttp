@@ -196,6 +196,7 @@ TRIPLE_QUOTE_STRING:
 URLString:
     STRING | /https\:\/\/(\S)+/
     | /http\:\/\/(\S)+/
+    | /\/(\S)+/
 ;
 // allows http or https till space otherwise go for
 
