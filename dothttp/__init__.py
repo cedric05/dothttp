@@ -526,7 +526,11 @@ class HttpDefBase(BaseModelProcessor):
         url_path = self.get_updated_content(self.http.urlwrap.url)
         if base_http := self.base_http:
             base_url = self.get_updated_content(base_http.urlwrap.url)
-            if base_url.endswith("/") and url_path.startswith("/"):
+            if not url_path:
+                self.httpdef.url = base_url
+            elif url_path.startswith("http://") or url_path.startswith("https://"):
+                self.httpdef.url = url_path
+            elif base_url.endswith("/") and url_path.startswith("/"):
                 self.httpdef.url = urljoin(base_url, url_path[1:])
             elif url_path.startswith("/"):
                 self.httpdef.url = urljoin(base_url + "/", url_path[1:])
