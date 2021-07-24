@@ -540,6 +540,11 @@ class HttpDefBase(BaseModelProcessor):
                 self.httpdef.url = urljoin(base_url, url_path)
         else:
             self.httpdef.url = url_path
+        if self.httpdef.url and not (
+                self.httpdef.url.startswith("https://")
+                or
+                self.httpdef.url.startswith("http://")):
+            self.httpdef.url = "http://" + self.httpdef.url
 
     def load_method(self):
         if method := self.http.urlwrap.method:

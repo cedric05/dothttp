@@ -11,6 +11,7 @@ from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 command_dir = Path(f"{dir_path}/commands")
+http2postman_dir = Path(f"{command_dir}/http2postman")
 requests_dir = Path(f"{dir_path}/../core/requests")
 
 
@@ -91,3 +92,7 @@ class Testhttp2postman(TestBase):
 
     def test_url_with_port(self):
         self.execute_n_get("url_query.postman_collection.json", os.path.join(command_dir, "urlquerywithport.http"))
+
+    def test_unparseble_port(self):
+        self.execute_n_get(http2postman_dir.joinpath("test_unparseble_port.postman_collection.json"),
+                           os.path.join(http2postman_dir, "test_unparseble_port.http"))
