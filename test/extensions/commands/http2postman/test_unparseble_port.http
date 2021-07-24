@@ -1,0 +1,2 @@
+GET http://{{url=req.dothttp.dev:80}}/
+? ram = ranga

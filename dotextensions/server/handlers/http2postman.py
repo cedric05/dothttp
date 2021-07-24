@@ -77,8 +77,9 @@ class Http2Postman(RunHttpFileHandler):
                 item_list.append(item)
                 item.request = self.get_http_to_postman_request(req_comp.httpdef, item.name if item.name else "")
             except (UndefinedHttpToExtend, ParameterException):
-                logger.info("happens when wrongly configured")
-                logger.info("ignoring")
+                logger.warning("happens when wrongly configured, ignoring")
+            except Exception:
+                logger.warning("unknown errors happened, will export rest", exc_info=True)
         collection = PostmanCollection21.from_dict({})
         collection.item = item_list
         collection.info = Information.from_dict({})
@@ -120,8 +121,11 @@ class Http2Postman(RunHttpFileHandler):
             # query not from url will be placed in query
             request.url.path = parsed_url.path
             request.url.host = parsed_url.hostname
-            if isinstance(parsed_url.port, int):
-                request.url.port = str(parsed_url.port)
+            try:
+                if isinstance(parsed_url.port, int):
+                    request.url.port = str(parsed_url.port)
+            except ValueError:
+                request.url.port = None
             request.url.protocol = parsed_url.scheme
             request.url.query = query
             for key, value in urllib.parse.parse_qsl(parsed_url.query):
