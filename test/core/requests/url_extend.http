@@ -193,3 +193,39 @@ GET "?rajesh=ranga"
     https://req.dothttp.dev/user/?rajesh=ranga
 */
 
+
+@name(reuseurl)
+GET https://req.dothttp.dev/user
+
+@name(reuseurl_sub) :"reuseurl"
+GET ""
+
+/*
+    https://req.dothttp.dev/user
+*/
+
+
+@name(reuseurl2)
+GET https://req.dothttp.dev/user
+
+@name(reuseurl2_sub) :"reuseurl"
+GET "/"
+
+/*
+    https://req.dothttp.dev/user/
+*/
+
+
+
+
+@name(dontuseurl)
+GET https://req.dothttp.dev/user
+
+@name(dontuseurl_sub) :"dontuseurl"
+GET https://req2.dothttp.dev/user
+
+/*
+    https://req2.dothttp.dev/user
+*/
+
+

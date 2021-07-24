@@ -10,64 +10,62 @@ filename = f"{base_dir}/url_extend.http"
 
 class UrlExtend(TestBase):
     def test_parent(self):
-        request = self.get_request(filename, target="parent_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile", "parent_sub")
 
     def test_child(self):
-        request = self.get_request(filename, target="child_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile", "child_sub")
 
     def test_none(self):
-        request = self.get_request(filename, target="none_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile", "none_sub")
 
     def test_both(self):
-        request = self.get_request(filename, target="both_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile", "both_sub")
 
     def test_parenturlparamsinurl(self):
-        request = self.get_request(filename, target="parenturlparamsinurl_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile", "parenturlparamsinurl_sub")
 
     def test_parenturlparamsext(self):
-        request = self.get_request(filename, target="parenturlparamsext_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile", "parenturlparamsext_sub")
 
     def test_childurlparamsinurl(self):
-        request = self.get_request(filename, target="childurlparamsinurl_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile?ramu=ranga", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "childurlparamsinurl_sub")
 
     def test_childurlparamsext(self):
-        request = self.get_request(filename, target="childurlparamsext_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile?ramu=ranga", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "childurlparamsext_sub")
 
     def test_bothurlparamsext(self):
-        request = self.get_request(filename, target="bothurlparamsext_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile?ramu=ranga", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "bothurlparamsext_sub")
 
     def test_bothurlparamsinurl(self):
-        request = self.get_request(filename, target="bothurlparamsinurl_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile?ramu=ranga", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "bothurlparamsinurl_sub")
 
     def test_parenturlchildext(self):
-        request = self.get_request(filename, target="parenturlchildext_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile?ramu=ranga", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "parenturlchildext_sub")
 
     def test_childurlparentext(self):
-        request = self.get_request(filename, target="childurlparentext_sub")
-        self.assertEqual("https://req.dothttp.dev/user/profile?ramu=ranga", request.url)
+        self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "childurlparentext_sub")
 
     def test_childwithonlyparams(self):
-        request = self.get_request(filename, target="childwithonlyparams_sub")
-        self.assertEqual("https://req.dothttp.dev/user/?rajesh=ranga", request.url)
+        self.check_url("https://req.dothttp.dev/user/?rajesh=ranga", "childwithonlyparams_sub")
 
     def test_childwithonlyparamsinurl(self):
-        request = self.get_request(filename, target="childwithonlyparamsinurl_sub")
-        self.assertEqual("https://req.dothttp.dev/user/?rajesh=ranga", request.url)
+        self.check_url("https://req.dothttp.dev/user/?rajesh=ranga", "childwithonlyparamsinurl_sub")
 
     def test_childwithonlyparamsinurl2(self):
-        request = self.get_request(filename, target="childwithonlyparamsinurl2_sub")
-        self.assertEqual("https://req.dothttp.dev/user/?rajesh=ranga", request.url)
+        self.check_url("https://req.dothttp.dev/user/?rajesh=ranga", "childwithonlyparamsinurl2_sub")
+
+    def test_reuseurl(self):
+        self.check_url("https://req.dothttp.dev/user", "reuseurl_sub")
+
+    def test_reuseurl2(self):
+        self.check_url("https://req.dothttp.dev/user/", "reuseurl2_sub")
+
+    def test_dontuseurl(self, assert_url="https://req2.dothttp.dev/user", target="dontuseurl_sub"):
+        self.check_url(assert_url, target)
+
+    def check_url(self, assert_url, target):
+        request = self.get_request(filename, target=target)
+        self.assertEqual(assert_url, request.url)
 
 
 if __name__ == '__main__':
