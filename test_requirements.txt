@@ -3,9 +3,9 @@ appdirs==1.4.0
 execnet==1.4.1
 packaging==16.8
 pep8==1.7.0
-py==1.8.2
+py==1.10.0
 pyparsing==2.1.10
 pytest==6.2.3
 pytest-cache==1.0
 pytest-pep8==1.0.2
-waitress==0.9.0
+waitress==1.4.3
