@@ -1,0 +1,14 @@
+@name("simple")
+# this should be loadable
+GET "http+unix://%2Fvar%2Frun%2Fdocker.sock/info"
+
+
+@name("simple integration")
+# this should be loadable
+GET "{{base_url}}"
+
+
+@name("sub path") : "simple integration"
+# url extend should work
+GET "/containers/nginx/logs/{{urlpath}}"
+?timestamp=true
