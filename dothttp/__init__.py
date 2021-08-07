@@ -7,15 +7,13 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from io import IOBase
 from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO, Any
-from urllib.parse import urlencode, urljoin
+from urllib.parse import urlencode, urljoin, uses_relative, uses_netloc, uses_params, uses_query, uses_fragment
 
 from requests import PreparedRequest
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
 
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
-
-BASEIC_AUTHORIZATION_HEADER = "Authorization"
 
 try:
     import jstyleson as json
@@ -47,6 +45,21 @@ FORM_URLENCODED = "application/x-www-form-urlencoded"
 MULTIPART_FORM_INPUT = "multipart/form-data"
 
 CONTENT_TYPE = 'content-type'
+
+UNIX_SOCKET_SCHEME = "http+unix"
+
+BASEIC_AUTHORIZATION_HEADER = "Authorization"
+
+
+def install_unix_socket_scheme():
+    uses_relative.append(UNIX_SOCKET_SCHEME)
+    uses_netloc.append(UNIX_SOCKET_SCHEME)
+    uses_params.append(UNIX_SOCKET_SCHEME)
+    uses_query.append(UNIX_SOCKET_SCHEME)
+    uses_fragment.append(UNIX_SOCKET_SCHEME)
+
+
+install_unix_socket_scheme()
 
 dothttp_model = metamodel_from_file(get_real_file_path(path="http.tx", current_file=__file__))
 
@@ -528,7 +541,8 @@ class HttpDefBase(BaseModelProcessor):
             base_url = self.get_updated_content(base_http.urlwrap.url)
             if not url_path:
                 self.httpdef.url = base_url
-            elif url_path.startswith("http://") or url_path.startswith("https://"):
+            elif url_path.startswith("http://") or url_path.startswith("https://") or url_path.startswith(
+                    "http+unix://"):
                 self.httpdef.url = url_path
             elif base_url.endswith("/") and url_path.startswith("/"):
                 self.httpdef.url = urljoin(base_url, url_path[1:])
@@ -543,7 +557,11 @@ class HttpDefBase(BaseModelProcessor):
         if self.httpdef.url and not (
                 self.httpdef.url.startswith("https://")
                 or
-                self.httpdef.url.startswith("http://")):
+                self.httpdef.url.startswith("http://")
+                or
+                self.httpdef.url.startswith("http+unix://")
+
+        ):
             self.httpdef.url = "http://" + self.httpdef.url
 
     def load_method(self):

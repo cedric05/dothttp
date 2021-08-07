@@ -3,6 +3,7 @@ import logging
 import os
 from http.cookiejar import LWPCookieJar
 from typing import Union
+from urllib.parse import urlparse, unquote, urlunparse
 
 import jstyleson as json
 from requests import PreparedRequest, Session, Response
@@ -12,7 +13,7 @@ from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
-from dothttp import APPLICATION_JSON, MIME_TYPE_JSON
+from dothttp import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME
 from . import eprint, Config, HttpDefBase, js3py
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
@@ -26,11 +27,14 @@ try:
     import magic
 except ImportError:
     magic = None
-
 try:
-    import magic
+    import requests_unixsocket
+
+    # will be able to make unix socket apis
+    requests_unixsocket.monkeypatch()
 except ImportError:
-    magic = None
+    # in wasm phase, it will not be available, and can be ignored
+    pass
 
 DOTHTTP_COOKIEJAR = os.path.expanduser('~/.dothttp.cookiejar')
 base_logger = logging.getLogger("dothttp")
@@ -47,8 +51,16 @@ dothttp_model = metamodel_from_file(dir_path)
 # noinspection PyPackageRequirements
 
 
+def get_new_session():
+    session = Session()
+    if requests_unixsocket:
+        from requests_unixsocket.adapters import UnixAdapter
+        session.mount('http+unix://', UnixAdapter())
+    return session
+
+
 class RequestBase(HttpDefBase):
-    global_session = Session()
+    global_session = get_new_session()
 
     def __init__(self, args: Config):
         super().__init__(args)
@@ -87,7 +99,7 @@ class RequestBase(HttpDefBase):
         if self.httpdef.session_clear:
             # calle should close session
             # TODO
-            return Session()
+            return get_new_session()
         session = self.global_session
         if not self.args.no_cookie:
             if cookie := self.get_cookie():
@@ -165,8 +177,23 @@ class CurlCompiler(RequestBase):
         # so set headers in the end
         for k, v in sorted(self.httpdef.headers.items()):
             parts += [('-H', '{0}: {1}'.format(k, v))]
+        url = prep.url
+
+        if url.startswith(UNIX_SOCKET_SCHEME):
+            scheme, netloc, path, params, query, fragment = urlparse(url)
+            unix_domain_socket_path = unquote(netloc)
+            parts.append(("--unix-socket", unix_domain_socket_path))
+            """
+                >>urlparse.urlparse("http://some.page.pl/nothing.py;someparam=some;otherparam=other?query1=val1&query2=val2#frag")
+                ParseResult(scheme='http', netloc='some.page.pl', path='/nothing.py', params='someparam=some;otherparam=other', query='query1=val1&query2=val2', fragment='frag')
+            """
+            # scheme will be changed to 'http:/'
+            # netlock will be added by '--unix-socket /var/run/docker.sock'
+            #
+            url = urlunparse(["http", "localhost", path, params, query, fragment])
+
         parts += payload_parts
-        curl_req = to_curl(url=prep.url, method=prep.method, bodydata=parts)
+        curl_req = to_curl(url=url, method=prep.method, bodydata=parts)
         return curl_req
 
 
@@ -295,7 +322,6 @@ class RequestCompiler(RequestBase):
     def get_response(self):
         session = self.get_session()
         request = self.get_request()
-        adaptor = None
         if self.httpdef.p12:
             session.mount(request.url,
                           Pkcs12Adapter(pkcs12_filename=self.httpdef.p12[0],

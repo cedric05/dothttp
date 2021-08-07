@@ -1,0 +1,4 @@
+@name("simple")
+# example docker info from
+# unix socket
+GET "http+unix://%2Fvar%2Frun%2Fdocker.sock/info"
