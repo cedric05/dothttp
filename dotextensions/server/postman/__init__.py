@@ -581,7 +581,7 @@ class FormParameter:
         disabled = from_union([from_bool, from_none], obj.get("disabled"))
         key = from_str(obj.get("key"))
         type = from_union([FormParameterType, from_none], obj.get("type"))
-        value = from_union([from_str, from_none], obj.get("value"))
+        value = from_union([from_str, from_int, from_none], obj.get("value"))
         src = from_union([lambda x: from_list(lambda x: x, x), from_none, from_str], obj.get("src"))
         return FormParameter(content_type, description, disabled, key, type, value, src)
 
