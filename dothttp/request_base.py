@@ -10,6 +10,7 @@ from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests.status_codes import _codes as status_code
+from requests_aws4auth import AWS4Auth
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
@@ -19,7 +20,7 @@ from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .json_utils import JSONEncoder
 from .parse_models import Allhttp
-from .utils import quote_or_unquote
+from .utils import quote_or_unquote, apply_quote_or_unquote
 
 JSON_ENCODER = JSONEncoder(indent=4)
 
@@ -143,6 +144,12 @@ class CurlCompiler(RequestBase):
                 parts.append(("--user", f"{auth.username}:{auth.password}"))
             elif isinstance(auth, HTTPBasicAuth):
                 parts.append(("--user", f"{auth.username}:{auth.password}"))
+            elif isinstance(auth, AWS4Auth):
+                for header_key, header_value in prep.headers.items():
+                    # include only aws headers
+                    if header_key.startswith("x-amz") or header_key.lower().startswith("authorization"):
+                        parts += [('-H', '{0}: {1}'.format(header_key, header_value))]
+
         if certificate := self.httpdef.certificate:
             parts.append(("--cert", f"{certificate[0]}"))
             if self.httpdef.certificate[1]:
@@ -173,7 +180,7 @@ class CurlCompiler(RequestBase):
                 if payload.header:
                     self.httpdef.headers['content-type'] = payload.header
                 payload_parts += [('-d', payload.data)]
-        # there few headers set dynamically
+        # there few headers which set dynamically (basically auth)
         # so set headers in the end
         for k, v in sorted(self.httpdef.headers.items()):
             parts += [('-H', '{0}: {1}'.format(k, v))]
@@ -218,26 +225,54 @@ class HttpFileFormatter(RequestBase):
                 output_str += new_line
             if http.namewrap and http.namewrap.name:
                 quote_type, name = quote_or_unquote(http.namewrap.name)
-                output_str += f"@name({quote_type}{name}{quote_type}){new_line}"
+                output_str += f"@name({quote_type}{name}{quote_type})"
+                if http.namewrap.base:
+                    output_str += " : " + http.namewrap.base
+            if http.extra_args:
+                for extra_arg in http.extra_args:
+                    if extra_arg.clear:
+                        output_str += f"{new_line}@clear"
+                    if extra_arg.insecure:
+                        output_str += f"{new_line}@insecure"
             method = http.urlwrap.method if http.urlwrap.method else "GET"
-            output_str += f'{method} "{http.urlwrap.url}"'
+            output_str += f'{new_line}{method} "{http.urlwrap.url}"'
+            if certificate := http.certificate:
+                if certificate.cert and certificate.key:
+                    output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)}, key={apply_quote_or_unquote(certificate.key)})'
+                elif certificate.cert:
+                    output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)})'
+                elif certificate.p12_file and certificate.password:
+                    output_str += f'{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)}, password={apply_quote_or_unquote(certificate.password)})'
+                else:
+                    output_str += f'{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)})'
             if auth_wrap := http.authwrap:
                 if basic_auth := auth_wrap.basic_auth:
                     output_str += f'{new_line}basicauth("{basic_auth.username}", "{basic_auth.password}")'
                 elif digest_auth := auth_wrap.digest_auth:
                     output_str += f'{new_line}digestauth("{digest_auth.username}", "{digest_auth.password}")'
+                elif aws_auth := auth_wrap.aws_auth:
+                    if aws_auth.service and aws_auth.region:
+                        output_str += f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}", service="{aws_auth.service}", region="{aws_auth.region}")'
+                    elif aws_auth.service:
+                        output_str += f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}", service="{aws_auth.service}")'
+                    else:
+                        output_str += f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}" )'
             if lines := http.lines:
                 def check_for_quotes(line):
                     quote_type, value = quote_or_unquote(line.header.value)
                     return f'"{line.header.key}": {quote_type}{value}{quote_type}'
 
-                headers = new_line.join(map(check_for_quotes, filter(lambda line: line.header, lines)))
+                headers = new_line.join(map(check_for_quotes,
+                                            filter(lambda
+                                                       line: line.header and line.header.value and line.header.key and type(
+                                                line.header.value) == str,
+                                                   lines)))
                 if headers:
                     output_str += f"\n{headers}"
 
                 query = new_line.join(map(query_to_http,
                                           filter(lambda line:
-                                                 line.query, lines)))
+                                                 line.query and type(line.query.value) == str, lines)))
                 if query:
                     output_str += f'\n{query}'
             if payload := http.payload:

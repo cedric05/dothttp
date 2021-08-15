@@ -1,0 +1,5 @@
+{
+  "files": {
+    "dothttp-test\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from aws.2.0.json\n\n@name(\"simple import test\")\nGET \"https://s3.eu-west-1.amazonaws.com\"\nawsauth(access_id=\"dummy\", secret_key=\"dummy\", service=\"s3\", region=\"eu-west-1\")\n\n\n\n"
+  }
+}

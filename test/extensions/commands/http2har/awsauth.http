@@ -1,0 +1,2 @@
+https://s3.amazonaws.com
+awsauth('dummy', 'dummy', 's3', 'eu-east-1')

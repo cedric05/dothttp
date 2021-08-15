@@ -9,7 +9,7 @@ import requests
 
 from dothttp import Allhttp, Http, NameWrap, UrlWrap, Line, Query, Header, AuthWrap, BasicAuth, DigestAuth, \
     MultiPartFile, FilesWrap, TripleOrDouble, Certificate
-from dothttp.parse_models import Payload
+from dothttp.parse_models import Payload, AwsAuthWrap
 from dothttp.request_base import HttpFileFormatter
 from dothttp.utils import APPLICATION_JSON
 from . import logger
@@ -92,14 +92,14 @@ class ImportPostmanCollection(BaseHandler):
             # add .dothttp.json file
             if basic_auth := request_auth.basic:
                 # postman 2.1, it is a list of api_key_element have keys and values
-                basic_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.basic)
+                basic_auth = ImportPostmanCollection.api_key_element_to_dict(basic_auth)
                 # in postman 2.0, it is a dict
                 auth_wrap = AuthWrap(
                     basic_auth=BasicAuth(username=basic_auth.get('username', ''),
                                          password=basic_auth.get('password', '')))
             elif digest_auth := request_auth.digest:
                 # postman 2.1, it is a list of api_key_element have keys and values
-                digest_auth = ImportPostmanCollection.api_key_element_to_dict(request_auth.digest)
+                digest_auth = ImportPostmanCollection.api_key_element_to_dict(digest_auth)
                 # postman 2.0
                 auth_wrap = AuthWrap(
                     digest_auth=DigestAuth(username=digest_auth.get('username', ''),
@@ -119,6 +119,14 @@ class ImportPostmanCollection(BaseHandler):
                 header = Header(key=AUTHORIZATION, value=apikey)
                 lines.append(
                     Line(header=header, query=None))
+            elif aws_auth := request_auth.awsv4:
+                aws_auth = ImportPostmanCollection.api_key_element_to_dict(aws_auth)
+                accessKey = aws_auth.get("accessKey")
+                secretKey = aws_auth.get("secretKey")
+                region = aws_auth.get("region", 'us-east-1')
+                service = aws_auth.get("service", '')
+                auth_wrap = AuthWrap(
+                    aws_auth=AwsAuthWrap(access_id=accessKey, secret_token=secretKey, region=region, service=service))
         if req.body:
             # use mode rather than None check
             mode = req.body.mode

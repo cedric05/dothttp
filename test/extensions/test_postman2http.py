@@ -89,7 +89,9 @@ class FileExecute(TestBase):
             f"{postman_dir}/apikeyauth.json",
             f"{postman_dir}/apikeyauth.2.1.json",
             f"{postman_dir}/bearer.json",
-            f"{postman_dir}/bearer2.1.json"
+            f"{postman_dir}/bearer2.1.json",
+            f"{postman_dir}/aws.2.0.json",
+            f"{postman_dir}/aws.2.1.json"
         ]
         for link in links:
             self.compare(link, os.path.join(fixtures_dir, os.path.basename(link)))

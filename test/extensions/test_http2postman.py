@@ -96,3 +96,7 @@ class Testhttp2postman(TestBase):
     def test_unparseble_port(self):
         self.execute_n_get(http2postman_dir.joinpath("test_unparseble_port.postman_collection.json"),
                            os.path.join(http2postman_dir, "test_unparseble_port.http"))
+
+    def test_aws_auth(self):
+        self.execute_n_get(http2postman_dir.joinpath("awsauth.postman_collection.json"),
+                           os.path.join(http2postman_dir, "awsauth.http"))
