@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 from dothttp.exceptions import *
-from dothttp.request_base import CurlCompiler
+from dothttp.request_base import CurlCompiler, HttpFileFormatter
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -167,11 +167,38 @@ output(test)
 </xml>
 '""", self.get_curl_out(f, 4))
 
+    def test_awsauth_linux(self):
+        comp2 = self.get_req_comp(f'{base_dir}/awsauth.http', curl=True,
+                                  target='1')
+        curl_out = comp2.get_curl_output()
+        #         self.assertEqual("curl -X GET --url http://s3.amazonaws.com/ \
+        # -H 'x-amz-date: 20210815T170418Z' \
+        # -H 'x-amz-content-sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855' \
+        # -H 'Authorization: AWS4-HMAC-SHA256 Credential=dummy/20210815/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=9fef2c230112a434be3b38d6979b95db71b58fbe60e3e20cbf70116c07f8eaa5'", curl_out)
+        self.assertTrue("curl -X GET --url http://s3.amazonaws.com/" in curl_out)
+        self.assertTrue("-H 'x-amz-date:" in curl_out)
+        self.assertTrue("-H 'x-amz-content-sha256:" in curl_out)
+        self.assertTrue("-H 'Authorization: AWS4-HMAC-SHA256 Credential=dummy/" in curl_out)
+        self.assertTrue(
+            "/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=" in curl_out)
+
     def get_curl_out(self, f, target=1):
         comp2 = self.get_req_comp(f'{base_dir}/curlgen.http', curl=True, properties=[f"filename={f.name}"],
                                   target=target)
         out2 = comp2.get_curl_output()
         return out2
+
+    def test_aws_format_check(self):
+        comp2: HttpFileFormatter = self.get_req_comp(f'{base_dir}/awsauth.http', curl=True,
+                                                     target='1', format=True)
+        with open(f"{base_dir}/awsauth_format.http") as f:
+            self.assertEqual(f.read(), comp2.format(comp2.model))
+
+    def test_aws_format_check2(self):
+        comp2: HttpFileFormatter = self.get_req_comp(f'{base_dir}/../root_cert/http/no-password.http', curl=True,
+                                                     target='1', format=True)
+        with open(f"{base_dir}/no-password_format.http") as f:
+            self.assertEqual(f.read(), comp2.format(comp2.model))
 
     def test_trailing_commas_are_ok(self):
         filename = f"{base_dir}/trailingcomma.http"

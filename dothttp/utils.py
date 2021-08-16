@@ -29,6 +29,11 @@ def quote_or_unquote(line: str):
         return '"', line
 
 
+def apply_quote_or_unquote(line):
+    quote, value = quote_or_unquote(line)
+    return f"{quote}value{quote}"
+
+
 def json_to_urlencoded_array(data):
     # copied from
     # https://github.com/psf/requests/blob/1466ad713cf84738cd28f1224a7ab4a19e50e361/requests/models.py#L97-L105

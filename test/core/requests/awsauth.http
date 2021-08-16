@@ -1,0 +1,50 @@
+@name('simple')
+GET 'http://s3.amazonaws.com'
+awsauth('dummy' , 'dummy' , 's3', 'us-east-1')
+
+@name('resolve properties')
+GET 'http://s3.amazonaws.com'
+awsauth('{{access_id}}' , '{{secret_key}}' , '{{service}}', '{{region}}')
+
+@name('resolve properties with default')
+GET 'http://s3.amazonaws.com'
+awsauth('{{access_id=dummy}}' , '{{secret_key=dummy}}' , '{{service=s3}}', '{{region=us-east-1}}')
+
+@name('extend') : "resolve properties with default"
+GET '/'
+
+@name('extend2') : "simple"
+GET '/some'
+
+@name('extend3') : "resolve properties"
+GET '/some2'
+
+
+@name('default us-east-1 region optional')
+GET "http://s3.amazonaws.com/some3"
+awsauth('dummy', 'dummy', 's3')
+
+@name('region from url and s3')
+GET "http://s3.eu-west-1.amazonaws.com/some3"
+# gave wrong service in auth info
+awsauth('dummy', 'dummy', 'ec2')
+
+@name('service from url and region defaulted to us-east-1')
+GET "http://s3.amazonaws.com/"
+awsauth('dummy', 'dummy')
+
+@name('region and service from url with bucket id')
+GET "http://bucketid.s3.us-east-1.amazonaws.com/"
+awsauth('dummy', 'dummy')
+
+@name('region and service with legacy url')
+GET "http://s3-us-east-1.amazonaws.com/"
+awsauth('dummy', 'dummy')
+
+@name('fix region and service from url')
+GET "http://s3-us-east-1.amazonaws.com/"
+awsauth('dummy', 'dummy', 'ec2', 'us-west-1')
+
+@name('fix region and service from url2')
+GET "http://s3.us-east-1.amazonaws.com/"
+awsauth('dummy', 'dummy', 'ec2', 'us-west-1')

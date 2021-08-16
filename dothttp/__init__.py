@@ -7,11 +7,13 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from io import IOBase
 from typing import Union, List, Optional, Dict, DefaultDict, Tuple, BinaryIO, Any
-from urllib.parse import urlencode, urljoin, uses_relative, uses_netloc, uses_params, uses_query, uses_fragment
+from urllib.parse import urlencode, urljoin, uses_relative, uses_netloc, uses_params, uses_query, uses_fragment, \
+    urlparse
 
 from requests import PreparedRequest
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
+from requests_aws4auth import AWS4Auth
 
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
 
@@ -27,7 +29,8 @@ from textx import TextXSyntaxError, metamodel_from_file
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, Query, Http, NameWrap, UrlWrap, Header, \
-    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg
+    MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, \
+    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -125,6 +128,9 @@ class HttpDef:
             # For any other auth, it is bad
             if isinstance(self.auth, HTTPBasicAuth):
                 self.headers[BASEIC_AUTHORIZATION_HEADER] = request.headers.get(BASEIC_AUTHORIZATION_HEADER)
+            elif isinstance(self.auth, AWS4Auth):
+                for header_key, header_value in request.headers.items():
+                    self.headers[header_key] = header_value
             # # har with httpdigest is not possible
             # # as auth is set once, request is redirected to 401
             # # for now, ignoring
@@ -247,6 +253,11 @@ class HttpDef:
                 auth_wrap = AuthWrap(basic_auth=BasicAuth(self.auth.username, self.auth.password))
             elif isinstance(self.auth, HTTPDigestAuth):
                 auth_wrap = AuthWrap(digest_auth=DigestAuth(self.auth.username, self.auth.password))
+            elif isinstance(self.auth, AWS4Auth):
+                aws_auth: AWS4Auth = self.auth
+                auth_wrap = AuthWrap(
+                    aws_auth=AwsAuthWrap(aws_auth.access_id, aws_auth.signing_key.secret_key, aws_auth.service,
+                                         aws_auth.region))
         certificate = None
         if self.certificate:
             certificate = Certificate(*self.certificate)
@@ -688,6 +699,99 @@ class HttpDefBase(BaseModelProcessor):
                 self.httpdef.auth = HTTPDigestAuth(self.get_updated_content(digest_auth.username),
                                                    self.get_updated_content(
                                                        digest_auth.password))
+            elif aws_auth_wrap := auth_wrap.aws_auth:
+                access_id = self.get_updated_content(aws_auth_wrap.access_id)
+                secret_token = self.get_updated_content(aws_auth_wrap.secret_token)
+                aws_service = None
+                aws_region = None
+                if aws_auth_wrap.service:
+                    aws_service = self.get_updated_content(aws_auth_wrap.service)
+                if aws_auth_wrap.region:
+                    aws_region = self.get_updated_content(aws_auth_wrap.region)
+                parsed_url = urlparse(self.httpdef.url)
+                hostname = parsed_url.hostname
+                if hostname.endswith(".amazonaws.com"):
+                    # s3.amazonaws.com
+                    # ec2.amazonaws.com
+                    hosts = hostname.split('.')
+                    if len(hosts) == 3:
+                        if aws_region is None:
+                            # if region is not defined,
+                            # us-east-1 is considered as region
+                            aws_region = "us-east-1"
+                            base_logger.warning(f"region not defined, so defaulting with {aws_region}")
+                        if aws_service:
+                            if (hosts[-3] in AWS_SERVICES_LIST and aws_service != hosts[-3]):
+                                # host is in predefiend aws_service list
+                                # and is not equals to given values
+                                # which clearly indicates
+                                # that user is mistaken
+                                # we will currect it here
+                                base_logger.warning(
+                                    f"aws_service = {aws_service} and service from url is {hosts[0]}. incorrectly defined")
+                                aws_service = hosts[-3]
+                        else:
+                            # user has not specified aws service
+                            # we can check with predefiend aws_service_list but
+                            # aws_service_list may not be complete.
+                            # so we are blicdly going with user given url
+                            aws_service = hosts[-3]
+                        # aws also supports
+                        # legacy https://s3-us-east-1.amazonaws.com
+                        # https://ec2-us-east-1.amazonaws.com
+                        index = hosts[-3].find('-')
+                        if index != -1:
+                            base_logger.info("figuring out service and region host via legacy")
+                            _aws_service = hosts[-3][:index]
+                            _aws_region = hosts[-3][index + 1:]
+                            # aws_region is not figured till now
+                            # according to above definition
+                            # we can consider aws_region and aws_service like below
+                            if (not aws_region) or (_aws_region in AWS_REGION_LIST and aws_region != _aws_region):
+                                aws_region = _aws_region
+                            if (not aws_service) or (_aws_service in AWS_SERVICES_LIST and aws_service != _aws_service):
+                                aws_service = _aws_service
+                    elif len(hosts) >= 4:
+                        if hosts[-4] in AWS_SERVICES_LIST:
+                            if aws_service:
+                                if hosts[-4] != aws_service:
+                                    base_logger.warning(
+                                        f"aws_service = {aws_service} and service from url is {hosts[0]}. incorrectly defined")
+                                    aws_service = hosts[-4]
+                            else:
+                                # user has not provided service
+                                # from url, service can be deduced
+                                aws_service = hosts[-4]
+                            base_logger.info(f"default with url service defined in url (`{aws_service}`)")
+                        if hosts[-3] in AWS_REGION_LIST:
+                            # host is in predefined region list
+                            if aws_region:
+                                if hosts[-3] != aws_region:
+                                    base_logger.warning(
+                                        f"aws_service = {aws_region} and service from url is {hosts[1]}. incorrectly defined")
+                                    aws_region = hosts[-3]
+                                    base_logger.info(f"default with url service defined in url (`{aws_region}`)")
+                            else:
+                                # user has not provided service
+                                # from url, service can be deduced
+                                aws_region = hosts[-3]
+                if not aws_region:
+                    aws_region = 'us-east-1'
+                if access_id and secret_token and aws_service and aws_region:
+                    base_logger.info(f"aws request with region aws_service: {aws_service} region: {aws_region}")
+                    self.httpdef.auth = AWS4Auth(
+                        access_id,
+                        secret_token,
+                        aws_region,
+                        aws_service
+                    )
+                else:
+                    ## region and aws_service can be extracted from url
+                    ## somehow library is not supporting those
+                    ## with current state, we are not support this use case
+                    ## we may come back
+                    ## all four parameters are required and are to be non empty
+                    raise DothttpAwsAuthException()
 
     def get_current_or_base(self, attr_key) -> Any:
         if getattr(self.http, attr_key):

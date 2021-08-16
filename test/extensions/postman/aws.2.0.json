@@ -1,0 +1,27 @@
+{
+  "info": {
+    "_postman_id": "eba33414-e3af-4f60-b302-23e3343f1259",
+    "name": "dothttp-test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "simple import test",
+      "request": {
+        "auth": {
+          "type": "awsv4",
+          "awsv4": {
+            "region": "eu-west-1",
+            "secretKey": "dummy",
+            "accessKey": "dummy",
+            "service": "s3"
+          }
+        },
+        "method": "GET",
+        "header": [],
+        "url": "https://s3.eu-west-1.amazonaws.com"
+      },
+      "response": []
+    }
+  ]
+}

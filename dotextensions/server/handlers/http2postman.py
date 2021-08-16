@@ -3,6 +3,7 @@ import os
 import urllib.parse
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+from requests_aws4auth import AWS4Auth
 
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType
 from dothttp import dothttp_model, json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
@@ -93,18 +94,42 @@ class Http2Postman(RunHttpFileHandler):
         request.method = http.method
         if auth := http.auth:
             request.auth = Auth.from_dict({})
-            if isinstance(auth, HTTPBasicAuth):
-                request_auth = request.auth.basic = []
-                request.auth.type = AuthType.BASIC
-            else:
-                request_auth = request.auth.digest = []
-                request.auth.type = AuthType.DIGEST
             if isinstance(auth, (HTTPBasicAuth, HTTPDigestAuth)):
+                if isinstance(auth, HTTPBasicAuth):
+                    request_auth = request.auth.basic = []
+                    request.auth.type = AuthType.BASIC
+                elif isinstance(auth, HTTPDigestAuth):
+                    request_auth = request.auth.digest = []
+                    request.auth.type = AuthType.DIGEST
                 request_auth += [ApikeyElement(
                     key="username",
                     value=auth.username,
                     type="string"
                 ), ApikeyElement(key="password", value=auth.password, type="string")]
+            elif isinstance(auth, AWS4Auth):
+                request.auth.type = AuthType.AWSV4
+                request.auth.awsv4 = [
+                    ApikeyElement(
+                        key="accessKey",
+                        value=auth.access_id,
+                        type="string"
+                    ),
+                    ApikeyElement(
+                        key="secretKey",
+                        value=auth.signing_key.secret_key,
+                        type="string"
+                    ),
+                    ApikeyElement(
+                        key="region",
+                        value=auth.region,
+                        type="string"
+                    ),
+                    ApikeyElement(
+                        key="service",
+                        value=auth.service,
+                        type="string"
+                    ),
+                ]
         if http.headers:
             request.header = list(map(lambda key:
                                       Header(description=None, disabled=False, key=key[0],

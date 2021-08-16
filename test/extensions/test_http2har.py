@@ -189,7 +189,25 @@ class ToHarTest(TestBase):
                                                        'url': 'https://req.dothttp.dev'}}},
                              self.execute_payload(target='fileinput', file=filename, fileinputarg=f.name).result)
 
-    # def test_digestauth(self):
+    def test_aws_auth(self):
+        filename = f"{command_dir}/http2har/awsauth.http"
+        with tempfile.NamedTemporaryFile(delete=False) as f:
+            f.write(b"hai")
+            f.flush()
+            result = self.execute_payload(target='1', file=filename, fileinputarg=f.name).result
+            self.assertEqual("GET", result['target']['1']['method'], )
+            self.assertEqual("https://s3.amazonaws.com", result['target']['1']['url'], )
+            for headerData in result['target']['1']['headers']:
+                name = headerData['name']
+                self.assertTrue(name.startswith('x-amz') or name.lower().startswith('authorization'),
+                                'header should be x-amz or authorization')
+                if headerData['name'].lower() == "authorization":
+                    self.assertTrue(
+                        "/eu-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=" in
+                        headerData['value'])
+
+                # def test_digestauth(self):
+
     #     filename = f"{command_dir}/payload.http"
     #     self.assertEqual({'target': {'basicauth': {'headers': [{'name': 'Authorization',
     #                                                             'value': 'Basic '

@@ -40,7 +40,7 @@ HEADER:
 ;
 
 AUTHWRAP:
-    digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH
+    digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH | aws_auth = AWSAUTH
 ;
 
 CERTAUTH:
@@ -59,6 +59,11 @@ DIGESTAUTH:
 
 BASICAUTH:
     'basicauth' '(' username=DotString ',' password= DotString ')'
+;
+
+AWSAUTH:
+    'awsauth' '(' ('access_id' '=' ) ? access_id=DotString ',' ('secret_key' '=')? secret_token=DotString   ( ',' ('service'  '=')? service=DotString )? ','? ')'
+    | 'awsauth' '(' ('access_id' '=' ) ? access_id=DotString ',' ('secret_key' '=')? secret_token=DotString ','  ('service'  '=')? service=DotString (',' ('region' '=')? region=DotString)? ')'
 ;
 
 EXTRA_ARG:
