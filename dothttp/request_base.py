@@ -235,12 +235,12 @@ class HttpFileFormatter(RequestBase):
             method = http.urlwrap.method if http.urlwrap.method else "GET"
             output_str += f'{method} "{http.urlwrap.url}"'
             if certificate := http.certificate:
-                if hasattr(certificate, "cert"):
+                if hasattr(certificate, "cert") and certificate.cert:
                     if certificate.cert and certificate.key:
                         output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)}, key={apply_quote_or_unquote(certificate.key)})'
                     elif certificate.cert:
                         output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)})'
-                if hasattr(certificate, "p12_file"):
+                if hasattr(certificate, "p12_file") and certificate.p12_file:
                     if certificate.p12_file and certificate.password:
                         output_str += f'{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)}, password={apply_quote_or_unquote(certificate.password)})'
                     else:
