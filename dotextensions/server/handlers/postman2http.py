@@ -73,7 +73,7 @@ class ImportPostmanCollection(BaseHandler):
             urlwrap.url = slashed_path_to_normal_path(url)
             if req.url.query:
                 for query in req.url.query:
-                    if query.key and query.value:
+                    if query.key is not None and query.value is not None:
                         lines.append(Line(query=Query(query.key, unquote(query.value)), header=None))
         else:
             urlwrap.url = slashed_path_to_normal_path(req.url)

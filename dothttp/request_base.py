@@ -8,7 +8,7 @@ from urllib.parse import urlparse, unquote, urlunparse
 import jstyleson as json
 from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth, CONTENT_TYPE_FORM_URLENCODED
 from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
@@ -175,10 +175,13 @@ class CurlCompiler(RequestBase):
                 dumps = json.dumps(payload.json, indent=4)
                 self.httpdef.headers['content-type'] = APPLICATION_JSON
                 payload_parts += [('-d', dumps)]
-            elif self.http.payload.data:
+            elif self.http.payload.datajson:
+                payload_parts += [('-d', prep.body)]
+                self.httpdef.headers['content-type'] = CONTENT_TYPE_FORM_URLENCODED
+            else:
+                payload_parts += [('-d', payload.data)]
                 if payload.header:
                     self.httpdef.headers['content-type'] = payload.header
-                payload_parts += [('-d', payload.data)]
         # there few headers which set dynamically (basically auth)
         # so set headers in the end
         for k, v in sorted(self.httpdef.headers.items()):

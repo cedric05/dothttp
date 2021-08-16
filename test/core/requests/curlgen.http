@@ -23,3 +23,10 @@ data('<xml>
     <body> hi this is test body</body>
 </xml>
 ', "text/xml")
+
+@name('urlencoded')
+POST https://httpbin.org/post
+data({
+    "test" : ["hai", "bye"],
+    "test2": "ram"
+})

@@ -188,6 +188,15 @@ output(test)
         out2 = comp2.get_curl_output()
         return out2
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires linux")
+    def test_curl_urlencoded_payload(self):
+        comp2 = self.get_req_comp(f'{base_dir}/curlgen.http', curl=True,
+                                  target="urlencoded")
+        out = comp2.get_curl_output()
+        self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
+-H 'content-type: application/x-www-form-urlencoded' \\
+-d 'test=hai&test=bye&test2=ram'""", out)
+
     def test_aws_format_check(self):
         comp2: HttpFileFormatter = self.get_req_comp(f'{base_dir}/awsauth.http', curl=True,
                                                      target='1', format=True)
