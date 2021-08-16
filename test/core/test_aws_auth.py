@@ -1,8 +1,7 @@
 import os
 import unittest
 
-from requests_aws4auth import AWS4Auth
-
+from dothttp import AWS4Auth
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

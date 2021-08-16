@@ -3,11 +3,10 @@ import os
 import urllib.parse
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
-from requests_aws4auth import AWS4Auth
 
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType
 from dothttp import dothttp_model, json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
-    request_logger, Payload, APPLICATION_JSON, CONTENT_TYPE
+    request_logger, Payload, APPLICATION_JSON, CONTENT_TYPE, AWS4Auth
 from dothttp.request_base import RequestCompiler
 from dothttp.utils import json_to_urlencoded_array
 from . import logger
@@ -79,8 +78,8 @@ class Http2Postman(RunHttpFileHandler):
                 item.request = self.get_http_to_postman_request(req_comp.httpdef, item.name if item.name else "")
             except (UndefinedHttpToExtend, ParameterException):
                 logger.warning("happens when wrongly configured, ignoring")
-            except Exception:
-                logger.warning("unknown errors happened, will export rest", exc_info=True)
+            except Exception as e:
+                logger.warning(f"unknown errors happened, will export rest {e}", exc_info=True)
         collection = PostmanCollection21.from_dict({})
         collection.item = item_list
         collection.info = Information.from_dict({})
