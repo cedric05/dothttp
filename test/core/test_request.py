@@ -194,7 +194,7 @@ output(test)
         with open(f"{base_dir}/awsauth_format.http") as f:
             self.assertEqual(f.read(), comp2.format(comp2.model))
 
-    def test_aws_format_check2(self):
+    def test_p12_certificate_format(self):
         comp2: HttpFileFormatter = self.get_req_comp(f'{base_dir}/../root_cert/http/no-password.http', curl=True,
                                                      target='1', format=True)
         with open(f"{base_dir}/no-password_format.http") as f:

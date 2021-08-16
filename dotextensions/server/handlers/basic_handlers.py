@@ -85,7 +85,11 @@ class RunHttpFileHandler(BaseHandler):
         data = {}
         data.update(response_data['response'])  # deprecated
         data.update(response_data)
-        data.update({"http": self.get_http_from_req(comp.httpdef)})
+        try:
+            data.update({"http": self.get_http_from_req(comp.httpdef)})
+        except Exception as e:
+            logger.error("ran into error regenerating http def from parsed object")
+            data.update({"http": f"ran into error \n Exception: `{e}` message:{e.args}"})
         result = Result(id=command.id,
                         result=data)
         return result

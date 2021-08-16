@@ -10,12 +10,11 @@ from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests.status_codes import _codes as status_code
-from requests_aws4auth import AWS4Auth
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
 from dothttp import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME
-from . import eprint, Config, HttpDefBase, js3py
+from . import eprint, Config, HttpDefBase, js3py, AWS4Auth
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .json_utils import JSONEncoder
@@ -236,14 +235,16 @@ class HttpFileFormatter(RequestBase):
             method = http.urlwrap.method if http.urlwrap.method else "GET"
             output_str += f'{method} "{http.urlwrap.url}"'
             if certificate := http.certificate:
-                if certificate.cert and certificate.key:
-                    output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)}, key={apply_quote_or_unquote(certificate.key)})'
-                elif certificate.cert:
-                    output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)})'
-                elif certificate.p12_file and certificate.password:
-                    output_str += f'{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)}, password={apply_quote_or_unquote(certificate.password)})'
-                else:
-                    output_str += f'{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)})'
+                if hasattr(certificate, "cert") and certificate.cert:
+                    if certificate.cert and certificate.key:
+                        output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)}, key={apply_quote_or_unquote(certificate.key)})'
+                    elif certificate.cert:
+                        output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)})'
+                if hasattr(certificate, "p12_file") and certificate.p12_file:
+                    if certificate.p12_file and certificate.password:
+                        output_str += f'{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)}, password={apply_quote_or_unquote(certificate.password)})'
+                    else:
+                        output_str += f'{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)})'
             if auth_wrap := http.authwrap:
                 if basic_auth := auth_wrap.basic_auth:
                     output_str += f'{new_line}basicauth("{basic_auth.username}", "{basic_auth.password}")'

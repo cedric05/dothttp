@@ -13,10 +13,13 @@ from urllib.parse import urlencode, urljoin, uses_relative, uses_netloc, uses_pa
 from requests import PreparedRequest
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
-from requests_aws4auth import AWS4Auth
 
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
 
+try:
+    from requests_aws4auth import AWS4Auth
+except:
+    AWS4Auth = None
 try:
     import jstyleson as json
     from jsonschema import validate

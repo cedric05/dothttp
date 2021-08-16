@@ -6,6 +6,7 @@ from dotextensions.server.handlers.basic_handlers import RunHttpFileHandler, Get
     ContentNameReferencesHandler
 from dotextensions.server.models import Command
 from test import TestBase
+from test.core.test_certs import http_base, cert_base
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 command_dir = f"{dir_path}/commands"
@@ -185,18 +186,21 @@ basicauth("username", "password")
         result = self.execute_file(f"{command_dir}/syntax.http")
         self.assertEqual(True, result.result['error'])
 
-    def execute_file(self, filename, env=None, properties=None):
+    def execute_file(self, filename, env=None, properties=None, target=None):
         if properties is None:
             properties = {}
         if env is None:
             env = []
+        params = {
+            "file": filename,
+            "env": env,
+            "properties": properties
+        }
+        if target:
+            params['target'] = target
         result = self.execute_handler.run(Command(
             method=RunHttpFileHandler.name,
-            params={
-                "file": filename,
-                "env": env,
-                "properties": properties
-            },
+            params=params,
             id=1)
         )
         return result
@@ -212,6 +216,63 @@ basicauth("username", "password")
     def test_property(self):
         result = self.execute_file(f"{command_dir}/env.http", properties={"path": "get"})
         self.assertEqual(200, result.result['status'])
+
+    def test_cert_with_no_key(self):
+        filename = f"{http_base}/no-password.http"
+        cert_file = f"{cert_base}/no-password.pem"
+        req_comp_success = self.execute_file(filename, target="no-password", properties={"cert": cert_file, "file": ""})
+        self.assertEqual(200, req_comp_success.result['status'])
+        self.assertEqual("""@name("no-password")
+GET "https://client.badssl.com/"
+certificate(cert="value")
+
+
+
+""", req_comp_success.result['http'])
+
+    def test_cert_key(self):
+        filename = f"{http_base}/no-password.http"
+        cert_file = f"{cert_base}/cert.crt"
+        key_file = f"{cert_base}/key.key"
+        req_comp2 = self.execute_file(filename, target="with-key-and-cert",
+                                      properties={"cert": cert_file, "key": key_file})
+        self.assertEqual(200, req_comp2.result['status'])
+        self.assertEqual("""@name("with-key-and-cert")
+@clear
+@insecure
+GET "https://client.badssl.com/"
+certificate(cert="value", key="value")
+
+
+
+""", req_comp2.result['http'])
+
+    def test_p12(self):
+        filename = f"{http_base}/no-password.http"
+        p12 = f"{cert_base}/badssl.com-client.p12"
+        result = self.execute_file(filename, properties={"p12": p12, "password": "badssl.com"}, target="with-p12")
+        self.assertEqual(200, result.result['status'])
+        self.assertEqual("""@name("with-p12")
+@clear
+GET "https://client.badssl.com/"
+p12(file="value", password="value")
+
+
+
+""", result.result["http"])
+
+    def test_awsauth(self):
+        result = self.execute_file(f"{command_dir}/http2har/awsauth.http")
+        # this is expected
+        # as we don't have valid access_id and valid secret_key
+        self.assertEqual(400, result.result['status'])
+        self.assertEqual("""@name("1")
+GET "https://s3.amazonaws.com"
+awsauth(access_id="dummy", secret_key="dummy", service="s3", region="eu-east-1")
+
+
+
+""", result.result['http'])
 
 
 if __name__ == '__main__':
