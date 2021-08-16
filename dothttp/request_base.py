@@ -226,16 +226,15 @@ class HttpFileFormatter(RequestBase):
             if http.namewrap and http.namewrap.name:
                 quote_type, name = quote_or_unquote(http.namewrap.name)
                 output_str += f"@name({quote_type}{name}{quote_type})"
-                if http.namewrap.base:
-                    output_str += " : " + http.namewrap.base
+                output_str += f" : {http.namewrap.base}{new_line}" if http.namewrap.base else new_line
             if http.extra_args:
                 for extra_arg in http.extra_args:
                     if extra_arg.clear:
-                        output_str += f"{new_line}@clear"
+                        output_str += f"@clear{new_line}"
                     if extra_arg.insecure:
-                        output_str += f"{new_line}@insecure"
+                        output_str += f"@insecure{new_line}"
             method = http.urlwrap.method if http.urlwrap.method else "GET"
-            output_str += f'{new_line}{method} "{http.urlwrap.url}"'
+            output_str += f'{method} "{http.urlwrap.url}"'
             if certificate := http.certificate:
                 if certificate.cert and certificate.key:
                     output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)}, key={apply_quote_or_unquote(certificate.key)})'
