@@ -198,6 +198,10 @@ output(test)
 -d 'test=hai&test=bye&test2=ram'""", out)
 
     def test_aws_format_check(self):
+        # awsauth is used for unit test cases
+        # and for format check
+        # changing here or there makes test fails
+        # going forward, seperate files will have to be used
         comp2: HttpFileFormatter = self.get_req_comp(f'{base_dir}/awsauth.http', curl=True,
                                                      target='1', format=True)
         with open(f"{base_dir}/awsauth_format.http") as f:

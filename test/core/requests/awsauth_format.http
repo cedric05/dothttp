@@ -60,3 +60,18 @@ GET "http://s3.us-east-1.amazonaws.com/"
 awsauth(access_id="dummy", secret_key="dummy", service="ec2", region="us-west-1")
 
 
+@name("with-x-amz-date header")
+GET "http://s3.us-east-1.amazonaws.com/"
+awsauth(access_id="dummy", secret_key="dummy", service="ec2", region="us-west-1")
+"x-amz-date": "20210817T103121Z"
+
+
+@name("with-x-amz-date header with post data")
+POST "https://api.ecr.us-east-1.amazonaws.com/"
+awsauth(access_id="dummy", secret_key="dummy", service="ec2", region="us-west-1")
+"X-Amz-Target": "AmazonEC2ContainerRegistry_V20150921.DescribeRegistry"
+"Content-Type": "application/x-amz-json-1.1"
+"x-amz-date": "20210817T103121Z"
+data('{}')
+
+
