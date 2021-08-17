@@ -49,6 +49,7 @@ curl_logger = logging.getLogger("curl")
 MIME_TYPE_JSON = "application/json"
 FORM_URLENCODED = "application/x-www-form-urlencoded"
 MULTIPART_FORM_INPUT = "multipart/form-data"
+TEXT_PLAIN = "text/plain"
 
 CONTENT_TYPE = 'content-type'
 
@@ -157,9 +158,9 @@ class HttpDef:
         prep.prepare_url(self.url, self.query)
         prep.prepare_method(self.method)
         prep.prepare_headers(self.headers)
-        prep.prepare_auth(self.auth, self.url)
         payload = self.payload
         prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
+        prep.prepare_auth(self.auth, self.url)
         # prep.prepare_hooks({"response": self.save_cookie_call_back})
         if payload.header and CONTENT_TYPE not in prep.headers:
             # if content-type is provided by header

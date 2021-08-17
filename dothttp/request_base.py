@@ -13,7 +13,7 @@ from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
-from dothttp import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME
+from dothttp import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME, TEXT_PLAIN, CONTENT_TYPE
 from . import eprint, Config, HttpDefBase, js3py, AWS4Auth
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
@@ -162,6 +162,7 @@ class CurlCompiler(RequestBase):
             parts.append(("-k", None))
         payload_parts = []
         if self.http.payload:
+            contenttype = None
             if self.http.payload.file:
                 payload_parts += [('--data', "@" + self.get_updated_content(self.http.payload.file))]
             elif self.http.payload.fileswrap:
@@ -173,17 +174,19 @@ class CurlCompiler(RequestBase):
                             payload_parts.append(('--form', file[0] + "=@" + file[1][1].name))
             elif self.http.payload.json:
                 dumps = json.dumps(payload.json, indent=4)
-                self.httpdef.headers['content-type'] = APPLICATION_JSON
+                contenttype = APPLICATION_JSON
                 payload_parts += [('-d', dumps)]
             elif self.http.payload.datajson:
                 payload_parts += [('-d', prep.body)]
-                self.httpdef.headers['content-type'] = CONTENT_TYPE_FORM_URLENCODED
+                contenttype = CONTENT_TYPE_FORM_URLENCODED
             else:
                 payload_parts += [('-d', payload.data)]
-                if payload.header:
-                    self.httpdef.headers['content-type'] = payload.header
+                contenttype = TEXT_PLAIN
+            if contenttype and CONTENT_TYPE not in self.httpdef.headers:
+                self.httpdef.headers['content-type'] = payload.header
         # there few headers which set dynamically (basically auth)
         # so set headers in the end
+        # if isinstance(self.httpdef.headers, AWS4Auth):
         for k, v in sorted(self.httpdef.headers.items()):
             parts += [('-H', '{0}: {1}'.format(k, v))]
         url = prep.url
