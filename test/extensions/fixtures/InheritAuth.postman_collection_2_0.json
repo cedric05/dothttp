@@ -1,0 +1,9 @@
+{
+  "files": {
+    "InheritAuth\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from InheritAuth.postman_collection_2_0.json\n\n// base-inherit-auth\n\n@name(\"base-inherit-auth\")\nGET \"https://\"\nbasicauth(\"username\", \"password\")\n\n\n\n",
+    "InheritAuth\\Folder\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from InheritAuth.postman_collection_2_0.json\n\n// base-inherit-auth\n\n@name(\"base-inherit-auth\")\nGET \"https://\"\nbasicauth(\"username\", \"password\")\n\n\n@name(\"hasinhertiauth\") : \"base-inherit-auth\"\nGET \"https://httpbin.org/basic-auth/username/password\"\n\n\n@name(\"noheriit\")\nGET \"https://httpbin.org/basic-auth/username/password\"\n\n\n\n",
+    "InheritAuth\\nested\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from InheritAuth.postman_collection_2_0.json\n\n// base-inherit-auth\n\n@name(\"base-inherit-auth\")\nGET \"https://\"\nbasicauth(\"username\", \"password\")\n\n\n\n",
+    "InheritAuth\\nested\\parent\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from InheritAuth.postman_collection_2_0.json\n\n// base-inherit-auth\n\n@name(\"base-inherit-auth\")\nGET \"https://\"\nbasicauth(\"username\", \"password\")\n\n\n\n",
+    "InheritAuth\\nested\\parent\\subparent\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from InheritAuth.postman_collection_2_0.json\n\n// base-inherit-auth\n\n@name(\"base-inherit-auth\")\nGET \"https://\"\nbasicauth(\"username\", \"password\")\n\n\n@name(\"hasinhertiauth\") : \"base-inherit-auth\"\nGET \"https://httpbin.org/basic-auth/username/password\"\n\n\n@name(\"noheriit\")\nGET \"https://httpbin.org/basic-auth/username/password\"\n\n\n\n"
+  }
+}

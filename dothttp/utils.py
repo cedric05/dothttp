@@ -31,7 +31,7 @@ def quote_or_unquote(line: str):
 
 def apply_quote_or_unquote(line):
     quote, value = quote_or_unquote(line)
-    return f"{quote}value{quote}"
+    return f"{quote}{value}{quote}"
 
 
 def json_to_urlencoded_array(data):

@@ -1,0 +1,154 @@
+{
+  "info": {
+    "_postman_id": "7210c735-ac61-4746-9562-ac6858e9e77f",
+    "name": "InheritAuth",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Folder",
+      "item": [
+        {
+          "name": "hasinhertiauth",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/basic-auth/username/password",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "basic-auth",
+                "username",
+                "password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "noheriit",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://httpbin.org/basic-auth/username/password",
+              "protocol": "https",
+              "host": [
+                "httpbin",
+                "org"
+              ],
+              "path": [
+                "basic-auth",
+                "username",
+                "password"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "nested",
+      "item": [
+        {
+          "name": "parent",
+          "item": [
+            {
+              "name": "subparent",
+              "item": [
+                {
+                  "name": "hasinhertiauth",
+                  "request": {
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "https://httpbin.org/basic-auth/username/password",
+                      "protocol": "https",
+                      "host": [
+                        "httpbin",
+                        "org"
+                      ],
+                      "path": [
+                        "basic-auth",
+                        "username",
+                        "password"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "noheriit",
+                  "request": {
+                    "auth": {
+                      "type": "noauth"
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "https://httpbin.org/basic-auth/username/password",
+                      "protocol": "https",
+                      "host": [
+                        "httpbin",
+                        "org"
+                      ],
+                      "path": [
+                        "basic-auth",
+                        "username",
+                        "password"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "basic",
+    "basic": [
+      {
+        "key": "password",
+        "value": "password",
+        "type": "string"
+      },
+      {
+        "key": "username",
+        "value": "username",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ]
+}

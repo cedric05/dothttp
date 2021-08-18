@@ -231,7 +231,7 @@ class HttpFileFormatter(RequestBase):
             if http.namewrap and http.namewrap.name:
                 quote_type, name = quote_or_unquote(http.namewrap.name)
                 output_str += f"@name({quote_type}{name}{quote_type})"
-                output_str += f" : {http.namewrap.base}{new_line}" if http.namewrap.base else new_line
+                output_str += f" : {apply_quote_or_unquote(http.namewrap.base)}{new_line}" if http.namewrap.base else new_line
             if http.extra_args:
                 for extra_arg in http.extra_args:
                     if extra_arg.clear:
