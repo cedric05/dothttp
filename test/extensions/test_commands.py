@@ -210,11 +210,11 @@ basicauth("username", "password")
         self.assertEqual(True, result.result['error'])
 
     def test_env(self):
-        result = self.execute_file(f"{command_dir}/env.http", env=["simple"])
+        result = self.execute_file(f"{command_dir}/isolated/env.http", env=["simple"])
         self.assertEqual(200, result.result['status'])
 
     def test_property(self):
-        result = self.execute_file(f"{command_dir}/env.http", properties={"path": "get"})
+        result = self.execute_file(f"{command_dir}/isolated/env.http", properties={"path": "get"})
         self.assertEqual(200, result.result['status'])
 
     def test_cert_with_no_key(self):

@@ -69,26 +69,26 @@ class Http2Postman(RunHttpFileHandler):
                     return Result.to_error(command, "filename is not instance of string")
                 if not (os.path.isfile(filename)):
                     return Result.to_error(command, "filename not existent or invalid link")
-                dothttpenvjson = pathlib.Path(filename).parent.joinpath('.dothttp.json')
-                if dothttpenvjson.exists():
-                    with open(dothttpenvjson, 'r') as f:
-                        try:
-                            # will export all variables from .dothttp.json
-                            # and will enable only "*" environment
-                            # variables from rest environments will be in disabled state
-                            dothttpenv = json.load(f)
-                            if dothttpenv:
-                                for environment in dothttpenv.keys():
-                                    for key, value in dothttpenv[environment].items():
-                                        variables.append(
-                                            Variable.from_dict(
-                                                {"key": key, "value": value, "disabled": environment != "*"}))
-                        except:
-                            pass
                 http_list = dothttp_model.model_from_file(filename)
         except Exception as e:
             return Result.to_error(command, f"unable to parse because of parsing issues {e}")
+        dothttpenvjson = pathlib.Path(filename).parent.joinpath('.dothttp.json')
         item_list = []
+        if dothttpenvjson.exists():
+            with open(dothttpenvjson, 'r') as f:
+                try:
+                    # will export all variables from .dothttp.json
+                    # and will enable only "*" environment
+                    # variables from rest environments will be in disabled state
+                    dothttpenv = json.load(f)
+                    if dothttpenv:
+                        for environment in dothttpenv.keys():
+                            for key, value in dothttpenv[environment].items():
+                                variables.append(
+                                    Variable.from_dict(
+                                        {"key": key, "value": value, "disabled": environment != "*"}))
+                except:
+                    pass
         for index, http in enumerate(http_list.allhttps):
             try:
                 item = Items.from_dict({})
