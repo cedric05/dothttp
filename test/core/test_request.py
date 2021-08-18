@@ -188,7 +188,20 @@ output(test)
         out2 = comp2.get_curl_output()
         return out2
 
+    @unittest.skipUnless(sys.platform.startswith("linux"), "requires linux")
+    def test_curl_urlencoded_payload(self):
+        comp2 = self.get_req_comp(f'{base_dir}/curlgen.http', curl=True,
+                                  target="urlencoded")
+        out = comp2.get_curl_output()
+        self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
+-H 'content-type: application/x-www-form-urlencoded' \\
+-d 'test=hai&test=bye&test2=ram'""", out)
+
     def test_aws_format_check(self):
+        # awsauth is used for unit test cases
+        # and for format check
+        # changing here or there makes test fails
+        # going forward, seperate files will have to be used
         comp2: HttpFileFormatter = self.get_req_comp(f'{base_dir}/awsauth.http', curl=True,
                                                      target='1', format=True)
         with open(f"{base_dir}/awsauth_format.http") as f:
@@ -199,6 +212,24 @@ output(test)
                                                      target='1', format=True)
         with open(f"{base_dir}/no-password_format.http") as f:
             self.assertEqual(f.read(), comp2.format(comp2.model))
+
+    def test_aws_auth_curl_output_with_post_data_and_content_type(self):
+        """
+            This use-case works for both curl with content-type defined in http
+            and, aws auth with post data working one
+        Returns:
+
+        """
+        comp2: CurlCompiler = self.get_req_comp(f'{base_dir}/awsauth.http', curl=True,
+                                                target='with-x-amz-date header with post data')
+        self.assertEqual("""curl -X POST --url https://api.ecr.us-east-1.amazonaws.com/ \\
+-H 'x-amz-date: 20210817T103121Z' \\
+-H 'x-amz-content-sha256: 44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a' \\
+-H 'Authorization: AWS4-HMAC-SHA256 Credential=dummy/20210817/us-east-1/ecr/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date;x-amz-target, Signature=1d236ae264049a0b7e6c8374d053d824f6f5ccf6b183677d15791b3b98f663ee' \\
+-H 'Content-Type: application/x-amz-json-1.1' \\
+-H 'X-Amz-Target: AmazonEC2ContainerRegistry_V20150921.DescribeRegistry' \\
+-H 'x-amz-date: 20210817T103121Z' \\
+-d '{}'""", comp2.get_curl_output())
 
     def test_trailing_commas_are_ok(self):
         filename = f"{base_dir}/trailingcomma.http"

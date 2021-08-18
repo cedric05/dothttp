@@ -210,11 +210,11 @@ basicauth("username", "password")
         self.assertEqual(True, result.result['error'])
 
     def test_env(self):
-        result = self.execute_file(f"{command_dir}/env.http", env=["simple"])
+        result = self.execute_file(f"{command_dir}/isolated/env.http", env=["simple"])
         self.assertEqual(200, result.result['status'])
 
     def test_property(self):
-        result = self.execute_file(f"{command_dir}/env.http", properties={"path": "get"})
+        result = self.execute_file(f"{command_dir}/isolated/env.http", properties={"path": "get"})
         self.assertEqual(200, result.result['status'])
 
     def test_cert_with_no_key(self):
@@ -222,9 +222,9 @@ basicauth("username", "password")
         cert_file = f"{cert_base}/no-password.pem"
         req_comp_success = self.execute_file(filename, target="no-password", properties={"cert": cert_file, "file": ""})
         self.assertEqual(200, req_comp_success.result['status'])
-        self.assertEqual("""@name("no-password")
+        self.assertEqual(f"""@name("no-password")
 GET "https://client.badssl.com/"
-certificate(cert="value")
+certificate(cert="{cert_file}")
 
 
 
@@ -237,11 +237,11 @@ certificate(cert="value")
         req_comp2 = self.execute_file(filename, target="with-key-and-cert",
                                       properties={"cert": cert_file, "key": key_file})
         self.assertEqual(200, req_comp2.result['status'])
-        self.assertEqual("""@name("with-key-and-cert")
+        self.assertEqual(f"""@name("with-key-and-cert")
 @clear
 @insecure
 GET "https://client.badssl.com/"
-certificate(cert="value", key="value")
+certificate(cert="{cert_file}", key="{key_file}")
 
 
 
@@ -252,10 +252,10 @@ certificate(cert="value", key="value")
         p12 = f"{cert_base}/badssl.com-client.p12"
         result = self.execute_file(filename, properties={"p12": p12, "password": "badssl.com"}, target="with-p12")
         self.assertEqual(200, result.result['status'])
-        self.assertEqual("""@name("with-p12")
+        self.assertEqual(f"""@name("with-p12")
 @clear
 GET "https://client.badssl.com/"
-p12(file="value", password="value")
+p12(file="{p12}", password="badssl.com")
 
 
 

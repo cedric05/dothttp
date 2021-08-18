@@ -13,15 +13,15 @@ GET "http://s3.amazonaws.com"
 awsauth(access_id="{{access_id=dummy}}", secret_key="{{secret_key=dummy}}", service="{{service=s3}}", region="{{region=us-east-1}}")
 
 
-@name("extend") : resolve properties with default
+@name("extend") : "resolve properties with default"
 GET "/"
 
 
-@name("extend2") : simple
+@name("extend2") : "simple"
 GET "/some"
 
 
-@name("extend3") : resolve properties
+@name("extend3") : "resolve properties"
 GET "/some2"
 
 
@@ -58,5 +58,20 @@ awsauth(access_id="dummy", secret_key="dummy", service="ec2", region="us-west-1"
 @name("fix region and service from url2")
 GET "http://s3.us-east-1.amazonaws.com/"
 awsauth(access_id="dummy", secret_key="dummy", service="ec2", region="us-west-1")
+
+
+@name("with-x-amz-date header")
+GET "http://s3.us-east-1.amazonaws.com/"
+awsauth(access_id="dummy", secret_key="dummy", service="ec2", region="us-west-1")
+"x-amz-date": "20210817T103121Z"
+
+
+@name("with-x-amz-date header with post data")
+POST "https://api.ecr.us-east-1.amazonaws.com/"
+awsauth(access_id="dummy", secret_key="dummy", service="ec2", region="us-west-1")
+"X-Amz-Target": "AmazonEC2ContainerRegistry_V20150921.DescribeRegistry"
+"Content-Type": "application/x-amz-json-1.1"
+"x-amz-date": "20210817T103121Z"
+data('{}')
 
 

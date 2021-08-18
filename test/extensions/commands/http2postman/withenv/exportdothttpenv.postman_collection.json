@@ -1,0 +1,111 @@
+{
+  "collection": {
+    "auth": null,
+    "event": null,
+    "info": {
+      "_postman_id": null,
+      "description": null,
+      "name": "exportdothttpenv.http",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "version": null
+    },
+    "item": [
+      {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "",
+        "protocolProfileBehavior": null,
+        "request": {
+          "auth": null,
+          "body": null,
+          "certificate": null,
+          "description": "",
+          "header": null,
+          "method": "GET",
+          "proxy": null,
+          "url": "https://req.dothttp.dev"
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+      }
+    ],
+    "protocolProfileBehavior": null,
+    "variable": [
+      {
+        "description": null,
+        "disabled": false,
+        "id": null,
+        "key": "string",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": "value"
+      },
+      {
+        "description": null,
+        "disabled": false,
+        "id": null,
+        "key": "int",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": 3
+      },
+      {
+        "description": null,
+        "disabled": false,
+        "id": null,
+        "key": "dict",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": {
+          "some": "value"
+        }
+      },
+      {
+        "description": null,
+        "disabled": true,
+        "id": null,
+        "key": "var1",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": "env1value1"
+      },
+      {
+        "description": null,
+        "disabled": true,
+        "id": null,
+        "key": "var2",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": "env1value2"
+      },
+      {
+        "description": null,
+        "disabled": true,
+        "id": null,
+        "key": "var1",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": "env2value1"
+      },
+      {
+        "description": null,
+        "disabled": true,
+        "id": null,
+        "key": "var2",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": "env2value2"
+      }
+    ]
+  }
+}

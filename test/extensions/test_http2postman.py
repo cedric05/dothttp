@@ -100,3 +100,9 @@ class Testhttp2postman(TestBase):
     def test_aws_auth(self):
         self.execute_n_get(http2postman_dir.joinpath("awsauth.postman_collection.json"),
                            os.path.join(http2postman_dir, "awsauth.http"))
+
+    def test_export_varibles(self):
+        self.execute_n_get(
+            http2postman_dir.joinpath("withenv", "exportdothttpenv.postman_collection.json"),
+            str(http2postman_dir.joinpath("withenv", "exportdothttpenv.http")),
+        )

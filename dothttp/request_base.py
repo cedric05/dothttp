@@ -8,12 +8,12 @@ from urllib.parse import urlparse, unquote, urlunparse
 import jstyleson as json
 from requests import PreparedRequest, Session, Response
 # this is bad, loading private stuff. find a better way
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+from requests.auth import HTTPBasicAuth, HTTPDigestAuth, CONTENT_TYPE_FORM_URLENCODED
 from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
-from dothttp import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME
+from dothttp import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME, TEXT_PLAIN, CONTENT_TYPE
 from . import eprint, Config, HttpDefBase, js3py, AWS4Auth
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
@@ -162,6 +162,7 @@ class CurlCompiler(RequestBase):
             parts.append(("-k", None))
         payload_parts = []
         if self.http.payload:
+            contenttype = None
             if self.http.payload.file:
                 payload_parts += [('--data', "@" + self.get_updated_content(self.http.payload.file))]
             elif self.http.payload.fileswrap:
@@ -173,14 +174,19 @@ class CurlCompiler(RequestBase):
                             payload_parts.append(('--form', file[0] + "=@" + file[1][1].name))
             elif self.http.payload.json:
                 dumps = json.dumps(payload.json, indent=4)
-                self.httpdef.headers['content-type'] = APPLICATION_JSON
+                contenttype = APPLICATION_JSON
                 payload_parts += [('-d', dumps)]
-            elif self.http.payload.data:
-                if payload.header:
-                    self.httpdef.headers['content-type'] = payload.header
+            elif self.http.payload.datajson:
+                payload_parts += [('-d', prep.body)]
+                contenttype = CONTENT_TYPE_FORM_URLENCODED
+            else:
                 payload_parts += [('-d', payload.data)]
+                contenttype = TEXT_PLAIN
+            if contenttype and CONTENT_TYPE not in self.httpdef.headers:
+                self.httpdef.headers['content-type'] = payload.header
         # there few headers which set dynamically (basically auth)
         # so set headers in the end
+        # if isinstance(self.httpdef.headers, AWS4Auth):
         for k, v in sorted(self.httpdef.headers.items()):
             parts += [('-H', '{0}: {1}'.format(k, v))]
         url = prep.url
@@ -225,7 +231,7 @@ class HttpFileFormatter(RequestBase):
             if http.namewrap and http.namewrap.name:
                 quote_type, name = quote_or_unquote(http.namewrap.name)
                 output_str += f"@name({quote_type}{name}{quote_type})"
-                output_str += f" : {http.namewrap.base}{new_line}" if http.namewrap.base else new_line
+                output_str += f" : {apply_quote_or_unquote(http.namewrap.base)}{new_line}" if http.namewrap.base else new_line
             if http.extra_args:
                 for extra_arg in http.extra_args:
                     if extra_arg.clear:

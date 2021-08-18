@@ -80,6 +80,24 @@ class AwsAuthUnit(TestBase):
     def test_fix_region_and_service_from_url2(self):
         self.base(params=dict(target="fix region and service from url2"))
 
+    def test_auth_headers_get(self):
+        reqcomp = self.base(params=dict(target="with-x-amz-date header"))
+        request = reqcomp.get_request()
+        self.assertEqual({'x-amz-date': '20210817T103121Z',
+                          'x-amz-content-sha256': 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+                          'Authorization': 'AWS4-HMAC-SHA256 Credential=dummy/20210817/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=bb4e6ae21b8667877f23b0f2b08bb54209ee6c5f120965f96398e45caf83fa23'},
+                         request.headers)
+
+    def test_auth_headers_post(self):
+        reqcomp = self.base(params=dict(target="with-x-amz-date header with post data"), service="ecr")
+        request = reqcomp.get_request()
+        self.assertEqual({'X-Amz-Target': 'AmazonEC2ContainerRegistry_V20150921.DescribeRegistry',
+                          'Content-Type': 'application/x-amz-json-1.1', 'x-amz-date': '20210817T103121Z',
+                          'Content-Length': '2',
+                          'x-amz-content-sha256': '44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a',
+                          'Authorization': 'AWS4-HMAC-SHA256 Credential=dummy/20210817/us-east-1/ecr/aws4_request, SignedHeaders=content-type;host;x-amz-content-sha256;x-amz-date;x-amz-target, Signature=1d236ae264049a0b7e6c8374d053d824f6f5ccf6b183677d15791b3b98f663ee'},
+                         request.headers)
+
 
 if __name__ == '__main__':
     unittest.main()

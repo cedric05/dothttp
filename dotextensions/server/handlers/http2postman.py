@@ -1,10 +1,10 @@
-import json
 import os
+import pathlib
 import urllib.parse
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
-from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType
+from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType, Variable
 from dothttp import dothttp_model, json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
     request_logger, Payload, APPLICATION_JSON, CONTENT_TYPE, AWS4Auth
 from dothttp.request_base import RequestCompiler
@@ -14,6 +14,12 @@ from .basic_handlers import RunHttpFileHandler
 from ..models import Command, Result
 from ..postman2_1 import RequestClass, Items, Auth, ApikeyElement, Header, QueryParam, URLClass, \
     Information, POSTMAN_2_1, PostmanCollection21, Body, FormParameter, URLEncodedParameter
+
+try:
+    import jstyleson as json
+    from jsonschema import validate
+except:
+    import json
 
 
 class PostManCompiler(RequestCompiler):
@@ -49,6 +55,7 @@ class Http2Postman(RunHttpFileHandler):
         content = params.get("content", None)
         params['file'] = filename
         config = self.get_config(command)
+        variables = []
         try:
             if filename and content:
                 # for content and filename
@@ -65,7 +72,23 @@ class Http2Postman(RunHttpFileHandler):
                 http_list = dothttp_model.model_from_file(filename)
         except Exception as e:
             return Result.to_error(command, f"unable to parse because of parsing issues {e}")
+        dothttpenvjson = pathlib.Path(filename).parent.joinpath('.dothttp.json')
         item_list = []
+        if dothttpenvjson.exists():
+            with open(dothttpenvjson, 'r') as f:
+                try:
+                    # will export all variables from .dothttp.json
+                    # and will enable only "*" environment
+                    # variables from rest environments will be in disabled state
+                    dothttpenv = json.load(f)
+                    if dothttpenv:
+                        for environment in dothttpenv.keys():
+                            for key, value in dothttpenv[environment].items():
+                                variables.append(
+                                    Variable.from_dict(
+                                        {"key": key, "value": value, "disabled": environment != "*"}))
+                except:
+                    pass
         for index, http in enumerate(http_list.allhttps):
             try:
                 item = Items.from_dict({})
@@ -84,6 +107,7 @@ class Http2Postman(RunHttpFileHandler):
         collection.item = item_list
         collection.info = Information.from_dict({})
         collection.info.schema = POSTMAN_2_1
+        collection.variable = variables if len(variables) > 0 else None
         collection.info.name = os.path.basename(filename) if filename else "export_from_http"
         return Result.get_result(command, result={"collection": collection.to_dict()})
 
