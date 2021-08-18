@@ -13,15 +13,15 @@ GET "http://s3.amazonaws.com"
 awsauth(access_id="{{access_id=dummy}}", secret_key="{{secret_key=dummy}}", service="{{service=s3}}", region="{{region=us-east-1}}")
 
 
-@name("extend") : resolve properties with default
+@name("extend") : "resolve properties with default"
 GET "/"
 
 
-@name("extend2") : simple
+@name("extend2") : "simple"
 GET "/some"
 
 
-@name("extend3") : resolve properties
+@name("extend3") : "resolve properties"
 GET "/some2"
 
 
