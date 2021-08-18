@@ -14,7 +14,7 @@ from dothttp.request_base import HttpFileFormatter
 from dothttp.utils import APPLICATION_JSON
 from . import logger
 from ..models import Command, Result, BaseHandler
-from ..postman import Items, Auth, URLClass, POSTMAN_2, postman_collection_from_dict, AuthType
+from ..postman import Items, Auth, URLClass, POSTMAN_2, postman_collection_from_dict, AuthType, Variable
 from ..postman2_1 import URLClass as URLClass_2_1, ApikeyElement, POSTMAN_2_1, \
     postman_collection21_from_dict, AuthType as AuthType_2_1
 from ..utils import clean_filename, slashed_path_to_normal_path, get_alternate_filename
@@ -33,8 +33,11 @@ class ImportPostmanCollection(BaseHandler):
         return ImportPostmanCollection.name
 
     @staticmethod
-    def import_requests_into_dire(items: Iterator[Items], directory: Path, auth: Optional[Auth], link: str):
+    def import_requests_into_dire(items: Iterator[Items], directory: Path, auth: Optional[Auth],
+                                  variable: Union[None, List[Variable]],
+                                  link: str):
         collection = Allhttp(allhttps=[])
+        base_auth_http = None
         if auth:
             base_inherit_auth_wrap, lines = ImportPostmanCollection.get_auth_wrap(auth)
             base_auth_http = Http(namewrap=NameWrap(INHERIT_AUTH), urlwrap=UrlWrap(method="GET", url="https://"),
@@ -50,13 +53,19 @@ class ImportPostmanCollection(BaseHandler):
             except:
                 logger.error("import postman api failed", exc_info=True)
         d = {}
-        if len(collection.allhttps) != 0:
+        # create file only if one or more valid collections availabile
+        if not (len(collection.allhttps) == 0 or (len(collection.allhttps) == 1 and base_auth_http)):
             data = HttpFileFormatter.format(collection)
             name = str(directory.joinpath("imported_from_collection.http"))
             newline = "\n"
             d[name] = f"#!/usr/bin/env dothttp{newline}{newline}" \
                       f"# imported from {link}{newline}{newline}" \
                       f"{data}\n"
+        if variable is not None:
+            dothttp_json_environment = {}
+            for i in variable:
+                dothttp_json_environment[i.key] = i.value
+            d[str(directory.joinpath(".dothttp.json"))] = json.dumps({"*": dothttp_json_environment})
         return d
 
     @staticmethod
@@ -241,19 +250,15 @@ class ImportPostmanCollection(BaseHandler):
             if postman_data['info']['schema'] == POSTMAN_2:
                 collection = postman_collection_from_dict(postman_data)
                 base_collection_dire = Path(directory).joinpath(clean_filename(collection.info.name))
-                d = self.import_items(collection.item,
-                                      base_collection_dire,
-                                      collection.auth,
-                                      link,
-                                      )
+                d = self.import_items(collection.item, base_collection_dire, collection.auth, collection.variable, link)
             elif postman_data['info']['schema'] == POSTMAN_2_1:
                 collection = postman_collection21_from_dict(postman_data)
                 base_collection_dire = Path(directory).joinpath(clean_filename(collection.info.name))
                 d = self.import_items(collection.item,
                                       base_collection_dire,
                                       collection.auth,
-                                      link,
-                                      )
+                                      collection.variable,
+                                      link)
             else:
                 return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
         else:
@@ -273,15 +278,13 @@ class ImportPostmanCollection(BaseHandler):
         return Result(id=command.id, result={"files": d})
 
     @staticmethod
-    def import_items(items: List[Items], directory: Path, auth: Optional[Auth], link: str = ""):
+    def import_items(items: List[Items], directory: Path, auth: Optional[Auth], variable, link: str = ""):
         leaf_folder = filter(lambda item: item.request, items)
         d = dict()
-        d.update(ImportPostmanCollection.import_requests_into_dire(leaf_folder, directory, auth, link))
+        d.update(ImportPostmanCollection.import_requests_into_dire(leaf_folder, directory, auth, variable, link))
         folder = map(lambda item: (item.name, item.item, item.auth), filter(lambda item: item.item, items))
         for sub_folder, subitem, item_auth in folder:
             d.update(
-                ImportPostmanCollection.import_items(subitem,
-                                                     directory.joinpath(clean_filename(sub_folder)),
-                                                     item_auth or auth,
-                                                     link))
+                ImportPostmanCollection.import_items(subitem, directory.joinpath(clean_filename(sub_folder)),
+                                                     item_auth or auth, variable, link))
         return d
