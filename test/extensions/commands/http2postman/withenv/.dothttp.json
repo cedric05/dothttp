@@ -1,0 +1,19 @@
+{
+  "*": {
+    "string": "value",
+    "int": 3,
+    // although postman will not support dict
+    // we are proceeding with this
+    "dict": {
+      "some": "value"
+    }
+  },
+  "env1": {
+    "var1": "env1value1",
+    "var2": "env1value2"
+  },
+  "env2": {
+    "var1": "env2value1",
+    "var2": "env2value2"
+  }
+}
