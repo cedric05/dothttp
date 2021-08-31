@@ -182,7 +182,7 @@ class CurlCompiler(RequestBase):
             else:
                 payload_parts += [('-d', payload.data)]
                 contenttype = TEXT_PLAIN
-            if contenttype and CONTENT_TYPE not in self.httpdef.headers:
+            if payload.header and contenttype and CONTENT_TYPE not in self.httpdef.headers :
                 self.httpdef.headers['content-type'] = payload.header
         # there few headers which set dynamically (basically auth)
         # so set headers in the end
