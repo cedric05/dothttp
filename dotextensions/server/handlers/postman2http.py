@@ -61,11 +61,11 @@ class ImportPostmanCollection(BaseHandler):
             d[name] = f"#!/usr/bin/env dothttp{newline}{newline}" \
                       f"# imported from {link}{newline}{newline}" \
                       f"{data}\n"
-        if variable is not None:
-            dothttp_json_environment = {}
-            for i in variable:
-                dothttp_json_environment[i.key] = i.value
-            d[str(directory.joinpath(".dothttp.json"))] = json.dumps({"*": dothttp_json_environment})
+            if variable is not None:
+                dothttp_json_environment = {}
+                for i in variable:
+                    dothttp_json_environment[i.key] = i.value
+                d[str(directory.joinpath(".dothttp.json"))] = json.dumps({"*": dothttp_json_environment})
         return d
 
     @staticmethod

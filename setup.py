@@ -33,7 +33,7 @@ setup(
     description=("DotHttp recommended tool for making http requests."),
     license="MIT",
     package_data={
-        "": ["*.tx", "*.md"]
+        "": ["*.tx", "*.md","*.js"]
     },
     include_package_data=True,
     entry_points={

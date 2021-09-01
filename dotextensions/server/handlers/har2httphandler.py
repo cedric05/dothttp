@@ -37,9 +37,9 @@ def from_har(har_format: Iterator[HarRequest]) -> List[Http]:
             if postData := request.postData:
                 payload = http_def.payload = Payload()
                 if postData.text:
-                    if postData.mimeType == APPLICATION_JSON:
+                    if APPLICATION_JSON in postData.mimeType:
                         payload.json = json.loads(postData.text)
-                    elif postData.mimeType == FORM_URLENCODED:
+                    elif FORM_URLENCODED in postData.mimeType:
                         payload.data = urllib.parse.parse_qs(postData.text)
                     else:
                         payload.data = postData.text
