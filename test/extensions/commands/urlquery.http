@@ -1,15 +1,15 @@
 @name(urlquery)
-https://req.dothttp.dev?user=ram
+GET https://req.dothttp.dev?user=ram
 ? works = dothttp
 
 
 @name(urlquery2)
-https://req.dothttp.dev
+GET https://req.dothttp.dev
 ? works = dothttp
 ? user=ram
 
 @name(headers)
-https://req.dothttp.dev?user=ram
+GET https://req.dothttp.dev?user=ram
 headerkey: headervalue
 
 @name('basic auth')
@@ -23,9 +23,9 @@ digestauth("username", "password")
 
 @name('with-p12')
 @clear
-https://client.badssl.com/
+GET https://client.badssl.com/
 p12(file="path/to/p12/file",password="badssl.com")
 
 @name('public and private')
-https://client.badssl.com/
+GET https://client.badssl.com/
 certificate(cert="/path/to/cert", key="/path/to/key")

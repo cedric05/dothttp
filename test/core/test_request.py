@@ -29,9 +29,10 @@ class RequestTest(TestBase):
                          "incorrect url computed")
         self.assertEqual("GET", req.method, "incorrect method")
 
-    def test_default_get(self):
-        req = self.get_request(f"{base_dir}/defaultget.http")
-        self.assertEqual("GET", req.method)
+    # remove default method
+    # def test_default_get(self):
+    #     req = self.get_request(f"{base_dir}/defaultget.http")
+    #     self.assertEqual("GET", req.method)
 
     def test_headers(self):
         req = self.get_request(f"{base_dir}/defaultget.http")

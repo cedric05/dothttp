@@ -1,2 +1,2 @@
-"https://dothttp.azurewebsites.net"
+GET "https://dothttp.azurewebsites.net"
 "headerkey": "headervalue"

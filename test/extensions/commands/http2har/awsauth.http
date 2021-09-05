@@ -1,2 +1,2 @@
-https://s3.amazonaws.com
+GET https://s3.amazonaws.com
 awsauth('dummy', 'dummy', 's3', 'eu-east-1')
