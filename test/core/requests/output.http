@@ -1,2 +1,2 @@
-"https://req.dothttp.dev"
+GET "https://req.dothttp.dev"
 output("{{file}}")

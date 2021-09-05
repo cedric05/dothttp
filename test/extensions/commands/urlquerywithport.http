@@ -1,2 +1,2 @@
-http://localhost:8000/everyone
+GET http://localhost:8000/everyone
 ? rama = krishna

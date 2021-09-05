@@ -1,7 +1,9 @@
 //HTTP: ram=HTTP2
 MULTISET: allhttps=HTTP+;
 
-HTTP:((namewrap=NAMEWRAP)?
+HTTP:
+    (
+        (namewrap=NAMEWRAP)?
         (extra_args*=EXTRA_ARG)?
         "curl"?
         urlwrap=URL
@@ -15,7 +17,7 @@ HTTP:((namewrap=NAMEWRAP)?
 ;
 
 URL:
-    ('-X'? method=METHODTYPE)? url=URLString SLASH?
+    '-X'? method=METHODTYPE url=URLString SLASH?
 ;
 
 NAMEWRAP:
@@ -78,16 +80,6 @@ CLEAR_SESSION:
 INSECURE:
     "@insecure"
 ;
-
-METHODTYPE2:
-    "get" | "post" | "options"
-    | "delete" | "connect" | "put"
-    | "head" | "trace" | "patch"
-    | "copy" | "link" | "unlink"
-    | "purge" | "lock" | "unlock"
-    | "propfind" | "view"
-;
-
 
 METHODTYPE: 
     "GET" | "POST" | "OPTIONS"
