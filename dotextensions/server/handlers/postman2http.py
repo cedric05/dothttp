@@ -156,8 +156,18 @@ class ImportPostmanCollection(BaseHandler):
         if req.certificate and req.certificate.cert:
             certificate = Certificate(req.certificate.cert.src, req.certificate.key.src)
         http = Http(namewrap=namewrap, urlwrap=urlwrap, payload=payload, lines=lines, authwrap=auth_wrap,
-                    output=None, certificate=certificate, description=req.description)
+                    output=None, certificate=certificate,
+                    description=ImportPostmanCollection.extract_description(req.description))
         return http
+
+    @staticmethod
+    def extract_description(description):
+        if isinstance(description, str):
+            return description
+        else:
+            if hasattr(description, 'content'):
+                return description.content
+        return None
 
     @staticmethod
     def get_auth_wrap(request_auth):
@@ -268,7 +278,7 @@ class ImportPostmanCollection(BaseHandler):
             if collection.info.description:
                 base_collection_dire.mkdir(parents=True, exist_ok=True)
                 with open(base_collection_dire.joinpath("README.txt"), 'w') as f:
-                    f.write(collection.info.description)
+                    f.write(ImportPostmanCollection.extract_description(collection.info.description))
             for path, fileout in d.items():
                 if os.path.exists(path) and not overwrite:
                     path = get_alternate_filename(path)
