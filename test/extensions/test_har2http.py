@@ -67,3 +67,8 @@ class Har2HttpTest(TestBase):
     def test_should_import(self):
         with execute_with_params("harwithquotes.json", "harwithquotesimport.http") as (expected, response):
             self.assertEqual(expected, response.result.get('http'))
+
+    def test_har_2_http_with_json(self):
+        with execute_with_params(os.path.join("har2http", "postjsontypenotjson.json"),
+                                 os.path.join("har2http", "postjsontypenotjson.http")) as (expected, response):
+            self.assertEqual(expected, response.result.get('http'))
