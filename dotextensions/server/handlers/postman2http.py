@@ -229,6 +229,7 @@ class ImportPostmanCollection(BaseHandler):
     def run(self, command: Command) -> Result:
         # params
         link: str = command.params.get("link")
+        data: str = command.params.get("postman-collection", "")
         directory: str = command.params.get("directory", "")
         save = command.params.get("save", False)
         overwrite = command.params.get("overwrite", False)
@@ -249,12 +250,19 @@ class ImportPostmanCollection(BaseHandler):
         #         "https://www.getpostman.com/collections")):
         #     return Result(id=command.id, result={"error_message": "not a postman link", "error": True})
 
-        if link.startswith("http"):
-            postman_data = requests.get(link).json()
+        if data:
+            if isinstance(data, dict):
+                postman_data = data
+            else:
+                postman_data = json.loads(data)
+            link = "dothttp_postman_import"
         else:
-            with open(link) as f:
-                postman_data = json.load(f)
-            link = os.path.basename(link)
+            if link.startswith("http"):
+                postman_data = requests.get(link).json()
+            else:
+                with open(link) as f:
+                    postman_data = json.load(f)
+                link = os.path.basename(link)
         base_collection_dire = ""
         if "info" in postman_data and 'schema' in postman_data['info']:
             if postman_data['info']['schema'] == POSTMAN_2:
