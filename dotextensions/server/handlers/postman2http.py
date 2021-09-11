@@ -156,8 +156,18 @@ class ImportPostmanCollection(BaseHandler):
         if req.certificate and req.certificate.cert:
             certificate = Certificate(req.certificate.cert.src, req.certificate.key.src)
         http = Http(namewrap=namewrap, urlwrap=urlwrap, payload=payload, lines=lines, authwrap=auth_wrap,
-                    output=None, certificate=certificate, description=req.description)
+                    output=None, certificate=certificate,
+                    description=ImportPostmanCollection.extract_description(req.description))
         return http
+
+    @staticmethod
+    def extract_description(description):
+        if isinstance(description, str):
+            return description
+        else:
+            if hasattr(description, 'content'):
+                return description.content
+        return None
 
     @staticmethod
     def get_auth_wrap(request_auth):
@@ -219,6 +229,7 @@ class ImportPostmanCollection(BaseHandler):
     def run(self, command: Command) -> Result:
         # params
         link: str = command.params.get("link")
+        data: str = command.params.get("postman-collection", "")
         directory: str = command.params.get("directory", "")
         save = command.params.get("save", False)
         overwrite = command.params.get("overwrite", False)
@@ -239,12 +250,19 @@ class ImportPostmanCollection(BaseHandler):
         #         "https://www.getpostman.com/collections")):
         #     return Result(id=command.id, result={"error_message": "not a postman link", "error": True})
 
-        if link.startswith("http"):
-            postman_data = requests.get(link).json()
+        if data:
+            if isinstance(data, dict):
+                postman_data = data
+            else:
+                postman_data = json.loads(data)
+            link = "dothttp_postman_import"
         else:
-            with open(link) as f:
-                postman_data = json.load(f)
-            link = os.path.basename(link)
+            if link.startswith("http"):
+                postman_data = requests.get(link).json()
+            else:
+                with open(link) as f:
+                    postman_data = json.load(f)
+                link = os.path.basename(link)
         base_collection_dire = ""
         if "info" in postman_data and 'schema' in postman_data['info']:
             if postman_data['info']['schema'] == POSTMAN_2:
@@ -268,7 +286,7 @@ class ImportPostmanCollection(BaseHandler):
             if collection.info.description:
                 base_collection_dire.mkdir(parents=True, exist_ok=True)
                 with open(base_collection_dire.joinpath("README.txt"), 'w') as f:
-                    f.write(collection.info.description)
+                    f.write(ImportPostmanCollection.extract_description(collection.info.description))
             for path, fileout in d.items():
                 if os.path.exists(path) and not overwrite:
                     path = get_alternate_filename(path)

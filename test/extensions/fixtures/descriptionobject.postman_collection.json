@@ -1,0 +1,5 @@
+{
+  "files": {
+    "Google_Maps_Platform\\Directions_API\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from descriptionobject.postman_collection.json\n\n// The Directions API is a web service that uses an HTTP request to return JSON or XML-formatted directions between locations. You can receive directions for several modes of transportation, such as transit, driving, walking, or cycling.\n\n@name(\"directions\")\nGET \"https://maps.googleapis.com/maps/api/directions/json\"\n? \"arrival_time\"= \"<number>\"\n? \"departure_time\"= \"<number>\"\n? \"alternatives\"= \"<boolean>\"\n? \"avoid\"= \"<string>\"\n? \"destination\"= \"<string>\"\n? \"origin\"= \"<string>\"\n? \"waypoints\"= \"<string>\"\n? \"language\"= \"en\"\n? \"mode\"= \"<string>\"\n? \"region\"= \"en\"\n? \"traffic_model\"= \"best_guess\"\n? \"transit_mode\"= \"<string>\"\n? \"transit_routing_preference\"= \"<string>\"\n? \"units\"= \"<string>\"\n\n\n\n"
+  }
+}

@@ -1,0 +1,31 @@
+[
+  {
+    "method": "PUT",
+    "url": "http://req.dothttp.dev/data",
+    "headers": [
+      {
+        "name": "accept",
+        "value": "application/json"
+      },
+      {
+        "name": "accept"
+      },
+      {
+        "name": "content-type",
+        "value": "application/json"
+      },
+      {
+        "name": "content-type"
+      }
+    ],
+    "queryString": [],
+    "httpVersion": "HTTP/1.1",
+    "cookies": [],
+    "headersSize": 0,
+    "bodySize": 0,
+    "postData": {
+      "mimeType": "application/json",
+      "text": "\"string\""
+    }
+  }
+]
