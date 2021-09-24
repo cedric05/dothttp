@@ -72,3 +72,8 @@ class Har2HttpTest(TestBase):
         with execute_with_params(os.path.join("har2http", "postjsontypenotjson.json"),
                                  os.path.join("har2http", "postjsontypenotjson.http")) as (expected, response):
             self.assertEqual(expected, response.result.get('http'))
+
+    def test_har_import_ingore_colon_headers_name(self):
+        with execute_with_params(os.path.join("har2http", "chromecolonheaders.json"),
+                                 os.path.join("har2http", "chromecolonheaders.http")) as (expected, response):
+            self.assertEqual(expected, response.result.get('http'))

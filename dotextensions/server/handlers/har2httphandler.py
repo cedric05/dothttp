@@ -26,7 +26,15 @@ def from_har(har_format: Iterator[HarRequest]) -> List[Http]:
             http_def.url = request.url
             http_def.method = request.method or "GET"
             if headers := request.headers:
-                http_def.headers = dict(map(lambda header: (header.name, header.value), headers))
+                http_def.headers = dict(
+                    map(lambda header: (header.name, header.value),
+                        # chrome har export
+                        # is generating
+                        # headers with name
+                        # ":method" : "GET"
+                        # ":path": "/get"
+                        # don't know why
+                        filter(lambda header: not header.name.startswith(":"), headers)))
             if queryString := request.queryString:
                 http_def.query = {}
                 for query in queryString:
