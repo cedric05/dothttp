@@ -1,0 +1,32 @@
+[
+  {
+    "method": "GET",
+    "url": "https://github.com/cedric05/dothttp-runner",
+    "httpVersion": "http/2.0",
+    "headers": [
+      {
+        "name": ":method",
+        "value": "GET"
+      },
+      {
+        "name": ":authority",
+        "value": "github.com"
+      },
+      {
+        "name": ":scheme",
+        "value": "https"
+      },
+      {
+        "name": ":path",
+        "value": "/cedric05/dothttp-runner"
+      },
+      {
+        "name": "haha",
+        "value": "havavalue"
+      }
+    ],
+    "queryString": [],
+    "headersSize": -1,
+    "bodySize": 0
+  }
+]
