@@ -1,11 +1,16 @@
 import mimetypes
+from typing import List
 
 from requests import RequestException
 
-from dothttp import DotHttpException, Config, HttpDef, Allhttp
+from dothttp import DotHttpException, Config, HttpDef, Allhttp, BaseModelProcessor, UndefinedHttpToExtend
 from dothttp.request_base import CurlCompiler, RequestCompiler, HttpFileFormatter, dothttp_model
 from . import logger
 from ..models import Command, Result, BaseHandler
+
+
+class ContextConfig(Config):
+    contexts: List[str] = None
 
 
 class RunHttpFileHandler(BaseHandler):
@@ -51,21 +56,26 @@ class RunHttpFileHandler(BaseHandler):
         return CurlCompiler(config)
 
     def get_config(self, command):
-        filename = command.params.get("file")
-        envs = command.params.get("env", [])
-        target = command.params.get("target", '1')
-        nocookie = command.params.get("nocookie", False)
-        curl = command.params.get("curl", False)
-        props = command.params.get('properties', {})
-        properties = [f"{i}={j}" for i, j in props.items()]
-        content = command.params.get("content")
+        params = command.params
+        filename = params.get("file")
+        envs = params.get("env", [])
+        target = params.get("target", '1')
+        nocookie = params.get("nocookie", False)
+        curl = params.get("curl", False)
+        properties = [f"{i}={j}" for i, j in params.get('properties', {}).items()]
+        content = params.get("content", None)
+        contexts = params.get("contexts")
+        if contexts is None:
+            contexts = []
         if content:
             try:
                 content = "\n".join(content.splitlines())
             except:
                 content = None
-        config = Config(file=filename, env=envs, properties=properties, curl=curl, property_file=None, debug=True,
-                        no_cookie=nocookie, format=False, info=False, target=target, content=content)
+        config = ContextConfig(file=filename, env=envs, properties=properties, curl=curl, property_file=None,
+                               debug=True,
+                               no_cookie=nocookie, format=False, info=False, target=target, content=content)
+        config.contexts = contexts
         return config
 
     def get_request_result(self, command, comp: RequestCompiler):
@@ -103,12 +113,49 @@ class RunHttpFileHandler(BaseHandler):
         return HttpFileFormatter.format(http_def)
 
 
-class ContentBase:
-    def __init__(self, config: Config):
+CONTEXT_SEP = """
+# include contexts from context, to resolve properties
+"""
+
+
+class ContentBase(BaseModelProcessor):
+    def __init__(self, config: ContextConfig):
         super().__init__(config)
+        self.args = config
 
     def load_content(self):
+        # joining contexts to content is not correct approach
+        # as any error in one of context could bring down main usecase
         self.original_content = self.content = self.args.content
+
+    def load_model(self):
+        # reqcomp will try to resolve properties right after model is generated
+        super(ContentBase, self).load_model()
+        ##
+        ## context has varibles defined
+        ## for resolving purpose, including them into content
+        self.content = self.content + CONTEXT_SEP + CONTEXT_SEP.join(
+            self.args.contexts)
+
+    def select_target(self):
+        try:
+            # first try to resolve target from current context
+            super().select_target()
+        except UndefinedHttpToExtend as ex:
+            # if it weren't able to figure out context, try to resolve from contexts
+            for context in self.args.contexts:
+                try:
+                    # if model is generated, try to figure out target
+                    model: Allhttp = dothttp_model.model_from_str(context)
+                    # by including targets in to model
+                    self.model.allhttps = self.model.allhttps + model.allhttps
+                    self.content += context + "\n\n" + context
+                    return super(ContentBase, self).select_target()
+                except Exception as e:
+                    # contexts, can not always be correct syntax
+                    # in such scenarios, don't complain, try to resolve with next contexts
+                    logger.info("ignoring exception, context is not looking good")
+            raise ex
 
 
 class ContentRequestCompiler(ContentBase, RequestCompiler):
