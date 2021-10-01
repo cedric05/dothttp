@@ -1,3 +1,4 @@
+import glob
 import os
 import pathlib
 import urllib.parse
@@ -27,6 +28,9 @@ class PostManCompiler(RequestCompiler):
         self.model = model
         super(PostManCompiler, self).__init__(config)
 
+    def load_content(self):
+        return
+
     def get_updated_content_object(self, content) -> str:
         return content
 
@@ -43,11 +47,23 @@ class PostManCompiler(RequestCompiler):
         return Payload(data=None, header=None, filename=upload_filename)
 
 
+def has_file_type(root_path, file_type):
+    it = glob.iglob(os.path.join(root_path, file_type), recursive=True)
+    if next(it, None):
+        it.close()
+        return True
+    return False
+
+
 class Http2Postman(RunHttpFileHandler):
     name = "/export/http2postman"
 
     def get_method(self):
         return Http2Postman.name
+
+    @staticmethod
+    def contains_http_files(path):
+        return has_file_type(path, "**/*.http") or has_file_type(path, "**/*.dhttp")
 
     def run(self, command: Command) -> Result:
         params = command.params
@@ -55,25 +71,82 @@ class Http2Postman(RunHttpFileHandler):
         content = params.get("content", None)
         params['file'] = filename
         config = self.get_config(command)
-        variables = []
         try:
-            if filename and content:
+            if content:
                 # for content and filename
                 # scenario, we need both
                 # for export
                 if not isinstance(content, str):
                     return Result.to_error(command, "content is not instance of string")
-                http_list = dothttp_model.model_from_str(content)
-            else:
+            elif filename:
                 if not isinstance(filename, str):
                     return Result.to_error(command, "filename is not instance of string")
-                if not (os.path.isfile(filename)):
+                if not (os.path.isfile(filename) or os.path.isdir(filename)):
                     return Result.to_error(command, "filename not existent or invalid link")
-                http_list = dothttp_model.model_from_file(filename)
+            else:
+                raise Result.to_error(command, "filename is not sent")
         except Exception as e:
             return Result.to_error(command, f"unable to parse because of parsing issues {e}")
+        if content:
+            item = self.get_collection_item_for_file(config, filename, content)
+            collection = self.get_default_collection(filename)
+            collection.item = item.item
+            collection.variable = item.variable or None
+        elif os.path.isfile(filename):
+            try:
+                with open(filename) as f:
+                    item = self.get_collection_item_for_file(config,
+                                                             filename,
+                                                             f.read()
+                                                             )
+                    collection = self.get_default_collection(filename)
+                    collection.item = item.item
+                    collection.variable = item.variable or None
+            except Exception as e:
+                logger.warning("not able to retrieve collections", exc_info=True)
+                return Result.to_error(command, f"unable to parse because of parsing issues {e}")
+        else:
+            root_path_to_item_dict = dict()
+            for root, dirs, files in os.walk(filename):
+                if not Http2Postman.contains_http_files(root):
+                    continue
+                root_collection = root_path_to_item_dict.get(root, None)
+                if not root_collection:
+                    root_path_to_item_dict[root] = root_collection = Items.from_dict(
+                        {"item": [],
+                         "name": os.path.basename(root)
+                         })
+                for dir_name in dirs:
+                    dir_full_path = os.path.join(root, dir_name)
+                    if Http2Postman.contains_http_files(dir_full_path):
+                        root_collection.item.append(Items.from_dict({"item": [], "name": dir_name}))
+                        root_path_to_item_dict[dir_full_path] = root_collection.item[-1]
+                for one_file in files:
+                    if one_file.endswith(".http") or one_file.endswith(".dhttp"):
+                        try:
+                            with open(os.path.join(root, one_file)) as f:
+                                file_collection = self.get_collection_item_for_file(config,
+                                                                                    os.path.join(root, one_file),
+                                                                                    f.read())
+                                root_collection.item.append(file_collection)
+                        except:
+                            logger.warning("not able to retrieve collections", exc_info=True)
+            collection = self.get_default_collection(filename)
+            collection.item = [root_path_to_item_dict.get(filename)]
+        return Result.get_result(command, result={"collection": collection.to_dict()})
+
+    @staticmethod
+    def get_default_collection(filename):
+        collection = PostmanCollection21.from_dict({})
+        collection.info = Information.from_dict({})
+        collection.info.schema = POSTMAN_2_1
+        collection.info.name = os.path.basename(filename) if filename else "export_from_http"
+        return collection
+
+    def get_collection_item_for_file(self, config, filename, content):
+        http_list = dothttp_model.model_from_str(content)
         dothttpenvjson = pathlib.Path(filename).parent.joinpath('.dothttp.json')
-        item_list = []
+        item_list = Items.from_dict({"item": [], "variable": [], "name": os.path.basename(filename)})
         if dothttpenvjson.exists():
             with open(dothttpenvjson, 'r') as f:
                 try:
@@ -84,32 +157,28 @@ class Http2Postman(RunHttpFileHandler):
                     if dothttpenv:
                         for environment in dothttpenv.keys():
                             for key, value in dothttpenv[environment].items():
-                                variables.append(
+                                item_list.variable.append(
                                     Variable.from_dict(
                                         {"key": key, "value": value, "disabled": environment != "*"}))
+
                 except:
                     pass
         for index, http in enumerate(http_list.allhttps):
             try:
-                item = Items.from_dict({})
-                item.name = http.namewrap.name if http.namewrap else ""
-                config.target = item.name if item.name else str(index + 1)
+                name = http.namewrap.name if http.namewrap else str(index + 1)
+                config.target = name
                 req_comp = PostManCompiler(config, http_list)
                 req_comp.load()
                 req_comp.load_def()
-                item_list.append(item)
-                item.request = self.get_http_to_postman_request(req_comp.httpdef, item.name if item.name else "")
-            except (UndefinedHttpToExtend, ParameterException):
-                logger.warning("happens when wrongly configured, ignoring")
+                item = Items.from_dict({})
+                item.name = name
+                item_list.item.append(item)
+                item.request = self.get_http_to_postman_request(req_comp.httpdef, name)
+            except (UndefinedHttpToExtend, ParameterException) as e:
+                logger.warning(f"happens when wrongly configured, ignoring with {e}", exc_info=True)
             except Exception as e:
                 logger.warning(f"unknown errors happened, will export rest {e}", exc_info=True)
-        collection = PostmanCollection21.from_dict({})
-        collection.item = item_list
-        collection.info = Information.from_dict({})
-        collection.info.schema = POSTMAN_2_1
-        collection.variable = variables if len(variables) > 0 else None
-        collection.info.name = os.path.basename(filename) if filename else "export_from_http"
-        return Result.get_result(command, result={"collection": collection.to_dict()})
+        return item_list
 
     def get_http_to_postman_request(self, http: HttpDef, description="") -> RequestClass:
         request = RequestClass.from_dict({})

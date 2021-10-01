@@ -1,0 +1,8 @@
+POST https://httpbin.org/post
+? key1 = value2
+? key2 = value2
+data(
+     "this is text"
+     // has a comment in between
+     " payload"
+)

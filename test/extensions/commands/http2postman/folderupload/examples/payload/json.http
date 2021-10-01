@@ -1,0 +1,5 @@
+POST https://httpbin.org/post
+json({
+     "name": "john don",
+     "age" : 20
+})

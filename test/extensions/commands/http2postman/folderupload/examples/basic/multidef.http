@@ -1,0 +1,8 @@
+// first one
+@name('get')
+GET https://httpbin.org/get
+
+
+// second one
+@name('second')
+POST https://httpbin.org/post

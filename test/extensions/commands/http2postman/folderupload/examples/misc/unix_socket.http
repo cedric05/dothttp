@@ -1,0 +1,14 @@
+@name("docker base")
+# docker base
+GET "http+unix://%2Fvar%2Frun%2Fdocker.sock"
+
+
+@name("docker info"): "simple"
+# info
+GET "info"
+
+
+@name("list images") : "simple"
+# url extend should work
+GET "/images/json"
+?timestamp=true

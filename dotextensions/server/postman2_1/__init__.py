@@ -671,7 +671,7 @@ class URLEncodedParameter:
         description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
         disabled = from_union([from_bool, from_none], obj.get("disabled"))
         key = from_str(obj.get("key"))
-        value = from_union([from_str, from_none], obj.get("value"))
+        value = from_union([from_str, from_int, from_none], obj.get("value"))
         return URLEncodedParameter(description, disabled, key, value)
 
     def to_dict(self) -> dict:
@@ -679,7 +679,7 @@ class URLEncodedParameter:
         result["description"] = from_union([lambda x: to_class(Description, x), from_none, from_str], self.description)
         result["disabled"] = from_union([from_bool, from_none], self.disabled)
         result["key"] = from_str(self.key)
-        result["value"] = from_union([from_str, from_none], self.value)
+        result["value"] = from_union([from_str, from_int, from_none], self.value)
         return result
 
 

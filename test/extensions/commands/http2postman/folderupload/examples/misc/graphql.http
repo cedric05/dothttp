@@ -1,0 +1,25 @@
+POST 'https://api.spacex.land/graphql'
+json({
+    "query":
+        """{
+          company {
+            ceo
+            coo
+            cto_propulsion
+            cto
+            """
+            // "employees"
+            """
+            founded
+            founder
+            launch_sites
+            name
+            summary
+            test_sites
+            valuation
+            vehicles
+          }
+        }
+  """,
+  "variables":null}
+)
