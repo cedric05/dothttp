@@ -1,6 +1,7 @@
 import glob
 import os
 import pathlib
+from typing import Dict
 import urllib.parse
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
@@ -106,16 +107,18 @@ class Http2Postman(RunHttpFileHandler):
                 logger.warning("not able to retrieve collections", exc_info=True)
                 return Result.to_error(command, f"unable to parse because of parsing issues {e}")
         else:
-            root_path_to_item_dict = dict()
+            root_path_to_item_dict:Dict[str, Items] = dict()
             for root, dirs, files in os.walk(filename):
                 if not Http2Postman.contains_http_files(root):
                     continue
-                root_collection = root_path_to_item_dict.get(root, None)
+                root_collection:Items = root_path_to_item_dict.get(root, None)
                 if not root_collection:
                     root_path_to_item_dict[root] = root_collection = Items.from_dict(
                         {"item": [],
                          "name": os.path.basename(root)
                          })
+                dirs.sort()
+                files.sort()
                 for dir_name in dirs:
                     dir_full_path = os.path.join(root, dir_name)
                     if Http2Postman.contains_http_files(dir_full_path):
