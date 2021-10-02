@@ -24,10 +24,10 @@ class Testhttp2postman(TestBase):
         with tempfile.TemporaryDirectory() as f:
             with open(os.path.join(command_dir, expected_output)) as f2:
                 data = json.load(f2)
-            for contentOrFile in [True, False]:
+            for contentOrFile in [False, True, ]:
                 fullpath = input_file
                 content = None
-                if contentOrFile:
+                if contentOrFile and os.path.isfile(fullpath):
                     with open(fullpath) as f:
                         content = f.read()
                 result = self.execute_handler.run(command=Command(
@@ -37,7 +37,7 @@ class Testhttp2postman(TestBase):
                             "properties": {"filename": input_file}}))
                 self.assertDictEqual(data, result.result)
             # with open(os.path.join(command_dir, expected_output), 'w') as f2:
-            #     json.dump(result.result, f2)
+            #     json.dump(result.result, f2, indent=True)
 
     def test_simple(self):
         self.execute_n_get(expected_output="export1.postman.json",
@@ -105,4 +105,10 @@ class Testhttp2postman(TestBase):
         self.execute_n_get(
             http2postman_dir.joinpath("withenv", "exportdothttpenv.postman_collection.json"),
             str(http2postman_dir.joinpath("withenv", "exportdothttpenv.http")),
+        )
+
+    def test_folder(self):
+        self.execute_n_get(
+            http2postman_dir.joinpath("folderupload", "examples.postman_collection.json"),
+            str(http2postman_dir.joinpath("folderupload", "examples")),
         )

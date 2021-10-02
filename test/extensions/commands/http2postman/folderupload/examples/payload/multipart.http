@@ -1,0 +1,6 @@
+POST https://req.dothttp.dev
+files(
+    ('name', 'value'),
+    ('name2', 'test.md'),
+    ('name3', '{"jsondata" : "jsonvalue"}', 'application/json')
+)

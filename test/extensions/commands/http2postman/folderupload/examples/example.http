@@ -1,0 +1,13 @@
+@name("fetch 100 users, skip first 50")
+GET https://req.dothttp.dev/user
+"Authorization": "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
+"content-type": "hai"
+? ("fetch", "100") #
+? ("skip", "50")
+? projection, name
+? projection, org
+? projection, location
+data("hai")
+> {%
+    client.global.set("hai", response.headers.valueOf("hai"));
+%}

@@ -1,0 +1,13 @@
+{
+    "*": {
+        "username": "username",
+        "password": "password"
+    },
+    "headers": {
+        "x-requested-by": "dothttp"
+    },
+    "diff": {
+        // instead of adam
+        "name": "prasanth"
+    }
+}

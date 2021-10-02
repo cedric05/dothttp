@@ -1,0 +1,3 @@
+@name(digest)
+GET "https://httpbin.org/digest-auth/20202/username/password/md5"
+digestauth("username", "password")

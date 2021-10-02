@@ -1,0 +1,7 @@
+POST https://httpbin.org/post
+urlencoded({
+     "name": "john",
+     "age" : 20,
+     "lastname": 'doe',
+// single quotes
+})
