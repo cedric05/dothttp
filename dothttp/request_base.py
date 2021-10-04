@@ -182,7 +182,7 @@ class CurlCompiler(RequestBase):
             else:
                 payload_parts += [('-d', payload.data)]
                 contenttype = TEXT_PLAIN
-            if payload.header and contenttype and CONTENT_TYPE not in self.httpdef.headers :
+            if payload.header and contenttype and CONTENT_TYPE not in self.httpdef.headers:
                 self.httpdef.headers['content-type'] = payload.header
         # there few headers which set dynamically (basically auth)
         # so set headers in the end
@@ -312,7 +312,10 @@ class HttpFileFormatter(RequestBase):
                 output_str += f'{new_line}{p}'
             if output := http.output:
                 output_str += f'{new_line}output({output.output})'
-            output_str += new_line * 3
+            if http.script_wrap and http.script_wrap.script:
+                output_str += new_line * 2 + "> {%" + new_line + http.script_wrap.script + new_line + "%}" + new_line
+            else:
+                output_str += new_line * 3
         return output_str
 
     def run(self):
