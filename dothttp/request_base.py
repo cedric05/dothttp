@@ -313,7 +313,7 @@ class HttpFileFormatter(RequestBase):
             if output := http.output:
                 output_str += f'{new_line}output({output.output})'
             if http.script_wrap and http.script_wrap.script:
-                output_str += new_line * 2 + "> {%" + new_line + http.script_wrap.script + new_line + "%}" + new_line
+                output_str += new_line * 2 + "> {%" + new_line * 2 + http.script_wrap.script + new_line * 2 + "%}" + new_line * 3
             else:
                 output_str += new_line * 3
         return output_str

@@ -33,7 +33,7 @@ from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, Query, Http, NameWrap, UrlWrap, Header, \
     MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, \
-    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap
+    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -283,7 +283,7 @@ class HttpDef:
             lines=header_lines + query_lines,
             payload=payload,
             certificate=certificate,
-            output=None, authwrap=auth_wrap, description=None
+            output=None, authwrap=auth_wrap, description=None, script_wrap=TestScript(self.test_script)
         )
 
 

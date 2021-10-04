@@ -64,7 +64,8 @@ class Http2Postman(RunHttpFileHandler):
 
     @staticmethod
     def contains_http_files(path):
-        return has_file_type(path, "**/*.http") or has_file_type(path, "**/*.dhttp")
+        # return has_file_type(path, f"**{os.path.sep}*.{{http,dhttp}}")
+        return has_file_type(path, f"**{os.path.sep}*.http") or has_file_type(path, f"**{os.path.sep}*.dhttp")
 
     def run(self, command: Command) -> Result:
         params = command.params
@@ -107,11 +108,11 @@ class Http2Postman(RunHttpFileHandler):
                 logger.warning("not able to retrieve collections", exc_info=True)
                 return Result.to_error(command, f"unable to parse because of parsing issues {e}")
         else:
-            root_path_to_item_dict:Dict[str, Items] = dict()
+            root_path_to_item_dict: Dict[str, Items] = dict()
             for root, dirs, files in os.walk(filename):
                 if not Http2Postman.contains_http_files(root):
                     continue
-                root_collection:Items = root_path_to_item_dict.get(root, None)
+                root_collection: Items = root_path_to_item_dict.get(root, None)
                 if not root_collection:
                     root_path_to_item_dict[root] = root_collection = Items.from_dict(
                         {"item": [],
