@@ -64,3 +64,30 @@ client.test("checks payload output recursive",  function(){
 });
 
 %}
+
+
+@name("delete property")
+GET http://httpbin.org/robots.txt
+// {{setPropertyByfile=sample}}
+> {%
+
+const value = client.global.get("setPropertyByfile");
+client.log("value is `" + value+"`");
+client.global.clear("setPropertyByfile");
+
+%}
+
+
+
+@name("require check")
+GET http://httpbin.org/robots.txt
+// {{setPropertyByfile=sample}}
+> {%
+
+const atob = require('atob');
+var b64 = "SGVsbG8sIFdvcmxkIQ==";
+var bin = atob(b64);
+
+client.log("value is `" + bin+"`");
+
+%}

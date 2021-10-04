@@ -1,4 +1,6 @@
 import os
+from typing import Dict
+from unittest import skip
 
 from dotextensions.server.handlers.basic_handlers import RunHttpFileHandler
 from dotextensions.server.models import Command
@@ -45,12 +47,33 @@ class ScriptExecutionTest(TestBase):
                                      'success': True}]},
                          result.result['script_result'])
 
-    def execute_target(self, target):
+    def test_execute_delete_property_script(self):
+        value = "this is before"
+        result = self.execute_target("delete property", properties={"setPropertyByfile": value})
+        self.assertEqual({'compiled': True,
+                          'error': '',
+                          'properties': {'setPropertyByfile': ''},
+                          'stdout': f'value is `{value}`\n',
+                          'tests': []},
+                         result.result['script_result'])
+
+    @skip("nodejs has to be setup before testing this")
+    def test_execute_require_check(self):
+        result = self.execute_target("require check", )
+        self.assertEqual({'compiled': True,
+                          'error': '',
+                          'properties': {},
+                          'stdout': 'value is `Hello, World!`\n',
+                          'tests': []},
+                         result.result['script_result'])
+
+    def execute_target(self, target, properties: Dict[str, str] = {}):
         result = self.execute_handler.run(Command(
             method=RunHttpFileHandler.name,
             params={
                 "file": f"{command_dir}/script.http",
-                "target": target
+                "target": target,
+                "properties": properties,
             },
             id=1)
         )
