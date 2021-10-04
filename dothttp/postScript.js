@@ -108,28 +108,41 @@ function isEqual() {
 
 function Properties(global) {
     this.vars = {}
+    this.updated = [];
 
-    for (var key in global) {
+    for (const key in global) {
         this.vars[key] = global[key]
     }
 
     this.set = function (varName, varValue) {
         this.vars[varName] = varValue;
+        this.propsUpdated(varName);
     };
+
+    this.propsUpdated = function (key) {
+        if (this.updated.indexOf(key) === -1) {
+            this.updated.push(key);
+        }
+    }
 
     this.get = function (varName) {
         return this.vars[varName];
     };
 
     this.isEmpty = function () {
-        return Object.keys(this.vars).length == 0;
+        return Object.keys(this.vars).length === 0;
     };
 
     this.clear = function (varName) {
         delete this.vars[varName];
+        this.propsUpdated(varName);
     };
 
     this.clearAll = function () {
+        const _this = this;
+        Object.keys(this.vars).forEach(function (key) {
+            _this.propsUpdated(key)
+        });
         this.vars = {};
     };
 }

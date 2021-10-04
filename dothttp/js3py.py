@@ -8,8 +8,10 @@ from js2py.internals.simplex import JsException
 from . import request_logger
 from .utils import get_real_file_path
 
+
+
 # disable python imports
-js2py.disable_pyimport()
+# js2py.disable_pyimport() # so that few libraries can be imported
 
 with open(get_real_file_path("postScript.js", __file__)) as f:
     js_template = f.read()
@@ -40,11 +42,14 @@ class ScriptResult:
 def execute_script(is_json: bool, properties: typing.Dict[str, object],
                    response_body_text: str, status_code: int,
                    headers: typing.Dict[str, str], script: str) -> ScriptResult:
-    script_result = ScriptResult(stdout="", error="", properties=properties, tests=[])
+    script_result = ScriptResult(stdout="", error="", properties={}, tests=[])
     try:
         if not script:
             return script_result
-        context = js2py.EvalJs()
+        # enable require will only be used for
+        # those who want to use require in dothttp scripts
+        # i will write up a document on how to do it
+        context = js2py.EvalJs(enable_require=True)
         context.execute(js_template.replace("JS_CODE_REPLACE", script))
         client = context.jsHandler(is_json, properties, response_body_text, status_code, headers)
     except JsException as e:
@@ -63,8 +68,8 @@ def execute_script(is_json: bool, properties: typing.Dict[str, object],
             request_logger.error(f"test execution failed {e}")
         script_result.tests.append(test_result)
 
-    for i in client.properties.vars:
+    for i in client.properties.updated:
         if type(client.properties.vars[i]) != JsObjectWrapper:
-            script_result.properties[i] = client.properties.vars[i]
+            script_result.properties[i] = client.properties.vars[i] or ""
     script_result.stdout = "\n".join(client.stdout)
     return script_result
