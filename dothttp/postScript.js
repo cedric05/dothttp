@@ -231,8 +231,17 @@ var jsHandler = function (isJson, global, responseBody, statusCode, headers) {
         "hai": statusCode
     };
 
-    // don't edit this or modify this
-    JS_CODE_REPLACE
-    // don't edit this or modify this
+    // bind
+    console.log = function (msg) {
+        client.log(msg);
+    }
+    try {
+        // don't edit this or modify this
+        JS_CODE_REPLACE
+        // don't edit this or modify this
+    } catch (error) {
+        client.log('error ' + error)
+    }
+
     return client;
 };

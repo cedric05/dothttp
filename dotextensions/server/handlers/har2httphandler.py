@@ -7,6 +7,7 @@ from typing import List, Iterator
 import requests
 
 from dothttp import HttpDef, APPLICATION_JSON, FORM_URLENCODED, Allhttp, Payload, Http, MULTIPART_FORM_INPUT
+from dothttp.parse_models import HttpFileType
 from dothttp.request_base import HttpFileFormatter
 from . import logger
 from ..models import Command, Result, BaseHandler
@@ -85,6 +86,7 @@ class Har2HttpHandler(BaseHandler):
         save_filename = params.get("save_filename", None)
         filename = params.get("filename", None)
         har_data = params.get("har", None)
+        filetype = HttpFileType.get_from_filetype(params.get("filetype", None))
         if filename:
             if not isinstance(filename, str):
                 return Result.to_error(command, "filename is not instance of string")
@@ -125,12 +127,13 @@ class Har2HttpHandler(BaseHandler):
         else:
             har_requests = (HarRequest.from_dict(req) for req in har_data)
         http_list = from_har(har_requests)
-        save_filename = Path(directory).joinpath("imported.http" if not save_filename else save_filename)
+        save_filename = Path(directory).joinpath(
+            f"imported.{filetype.file_exts[0]}" if not save_filename else save_filename)
         if os.path.exists(save_filename):
             save_filename = get_alternate_filename(save_filename)
         save_filename.parent.mkdir(parents=True, exist_ok=True)
         with open(save_filename, 'w') as f:
-            output = HttpFileFormatter.format(Allhttp(allhttps=http_list))
+            output = HttpFileFormatter.format(Allhttp(allhttps=http_list), filetype=filetype)
             f.write(output)
         return Result.get_result(command, {"http": output, "filename": str(save_filename)})
         # return Result.to_error(command, "har file has not requests")

@@ -18,7 +18,7 @@ from . import eprint, Config, HttpDefBase, js3py, AWS4Auth
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .json_utils import JSONEncoder
-from .parse_models import Allhttp
+from .parse_models import Allhttp, Http, HttpFileType
 from .utils import quote_or_unquote, apply_quote_or_unquote
 
 JSON_ENCODER = JSONEncoder(indent=4)
@@ -61,6 +61,7 @@ def get_new_session():
 
 class RequestBase(HttpDefBase):
     global_session = get_new_session()
+    global_cookie_jar = None
 
     def __init__(self, args: Config):
         super().__init__(args)
@@ -76,6 +77,8 @@ class RequestBase(HttpDefBase):
             cookie = None
             request_logger.debug(f'cookies set to `{self.args.no_cookie}`')
         else:
+            if RequestBase.global_cookie_jar:
+                return RequestBase.global_cookie_jar
             cookie = LWPCookieJar(DOTHTTP_COOKIEJAR)
             request_logger.debug(f'cookie {cookie} loaded from {DOTHTTP_COOKIEJAR}')
             try:
@@ -92,7 +95,7 @@ class RequestBase(HttpDefBase):
                 # FUTURE
                 # instead of saving (short curiting here, could lead to bad logic error)
                 self.args.no_cookie = True
-        self._cookie = cookie
+        RequestBase.global_cookie_jar = self._cookie = cookie
         return self._cookie
 
     def get_session(self):
@@ -101,9 +104,8 @@ class RequestBase(HttpDefBase):
             # TODO
             return get_new_session()
         session = self.global_session
-        if not self.args.no_cookie:
-            if cookie := self.get_cookie():
-                session.cookies = cookie
+        # if not self.args.no_cookie:
+        #     session.cookies = self.get_cookie()
         # session.hooks['response'] = self.save_cookie_call_back
         return session
 
@@ -220,9 +222,8 @@ class HttpFileFormatter(RequestBase):
         self.prop_cache = {}
 
     @staticmethod
-    def format(model: Allhttp):
-        output_str = ""
-        for http in model.allhttps:
+    def format_http(http: Http):
+            output_str = ""
             new_line = "\n"
             if getattr(http, "description", None):
                 for line in http.description.splitlines():
@@ -304,9 +305,12 @@ class HttpFileFormatter(RequestBase):
                     parsed_data = json_or_array_to_json(json_data, lambda a: a)
                     p = f'json({JSON_ENCODER.encode(parsed_data)})'
                 elif files_wrap := payload.fileswrap:
-                    p2 = ",\n\t".join(map(lambda
-                                              file_type: f'("{file_type.name}", "{(file_type.path)}"' +
-                                                         (f' , "{file_type.type}")' if file_type.type else ")"),
+                    def function(multipart):
+                        quote, _ = quote_or_unquote(multipart.path)
+                        multipart_content_type = f', {quote}{multipart.type}{quote})' if multipart.type else ")"
+                        return f'({quote}{multipart.name}{quote}, {quote}{multipart.path}{quote} {multipart_content_type}'
+
+                    p2 = ",\n\t".join(map(function,
                                           files_wrap.files))
                     p = f"files({new_line}\t{p2}{new_line})"
                 output_str += f'{new_line}{p}'
@@ -316,7 +320,32 @@ class HttpFileFormatter(RequestBase):
                 output_str += new_line * 2 + "> {%" + new_line * 2 + http.script_wrap.script + new_line * 2 + "%}" + new_line * 3
             else:
                 output_str += new_line * 3
+            return output_str
+
+    @staticmethod
+    def apply_httpbook(model: Allhttp):
+        arr = []
+        for http in model.allhttps:
+            arr.append({
+                "kind": 2,
+                "language": "dothttp-vscode",
+                "value": HttpFileFormatter.format_http(http),
+                "outputs": []
+            })
+        return json.dumps(arr)
+
+    @staticmethod
+    def apply_http(model: Allhttp):
+        output_str = ""
+        for http in model.allhttps:
+            output_str = output_str + HttpFileFormatter.format_http(http)
         return output_str
+
+    @staticmethod
+    def format(model: Allhttp, filetype=HttpFileType.Httpfile):
+        if filetype == HttpFileType.Httpfile:
+            return HttpFileFormatter.apply_http(model)
+        return HttpFileFormatter.apply_httpbook(model)
 
     def run(self):
         formatted = self.format(self.model)
@@ -346,8 +375,12 @@ class RequestCompiler(RequestBase):
             request_logger.error(f"server with url response {resp.status_code}")
             eprint(f"server responded with non 2XX code. code: {resp.status_code}")
         self.print_req_info(resp, '<')
+        self.write_to_output(resp)
+        request_logger.debug(f'request executed completely')
+        return resp
+
+    def write_to_output(self, resp):
         output = self.get_output()
-        func = None
         if hasattr(output, 'mode') and 'b' in output.mode:
             func = lambda data: output.write(data)
         else:
@@ -360,12 +393,11 @@ class RequestCompiler(RequestBase):
         except:
             request_logger.warning("not able to close, mostly happens while testing in pycharm")
             eprint("output file close failed")
-        request_logger.debug(f'request executed completely')
-        return resp
 
     def get_response(self):
         session = self.get_session()
         request = self.get_request()
+        session.cookies = request._cookies
         if self.httpdef.p12:
             session.mount(request.url,
                           Pkcs12Adapter(pkcs12_filename=self.httpdef.p12[0],
@@ -383,7 +415,10 @@ class RequestCompiler(RequestBase):
             resp: Response = session.send(request, cert=self.httpdef.certificate,
                                           verify=not self.httpdef.allow_insecure)
         if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
-            session.cookies.save()  # lwpCookie has .save method
+            try:
+                session.cookies.save()  # lwpCookie has .save method
+            except:
+                pass
         if self.httpdef.session_clear:
             session.close()
         return resp

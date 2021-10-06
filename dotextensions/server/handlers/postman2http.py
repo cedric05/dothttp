@@ -9,7 +9,7 @@ import requests
 
 from dothttp import Allhttp, Http, NameWrap, UrlWrap, Line, Query, Header, AuthWrap, BasicAuth, DigestAuth, \
     MultiPartFile, FilesWrap, TripleOrDouble, Certificate
-from dothttp.parse_models import Payload, AwsAuthWrap
+from dothttp.parse_models import Payload, AwsAuthWrap, HttpFileType
 from dothttp.request_base import HttpFileFormatter
 from dothttp.utils import APPLICATION_JSON
 from . import logger
@@ -34,7 +34,7 @@ class ImportPostmanCollection(BaseHandler):
 
     @staticmethod
     def import_requests_into_dire(items: Iterator[Items], directory: Path, auth: Optional[Auth],
-                                  variable: Union[None, List[Variable]],
+                                  variable: Union[None, List[Variable]], filetype: HttpFileType,
                                   link: str):
         collection = Allhttp(allhttps=[])
         base_auth_http = None
@@ -55,12 +55,15 @@ class ImportPostmanCollection(BaseHandler):
         d = {}
         # create file only if one or more valid collections availabile
         if not (len(collection.allhttps) == 0 or (len(collection.allhttps) == 1 and base_auth_http)):
-            data = HttpFileFormatter.format(collection)
-            name = str(directory.joinpath("imported_from_collection.http"))
-            newline = "\n"
-            d[name] = f"#!/usr/bin/env dothttp{newline}{newline}" \
-                      f"# imported from {link}{newline}{newline}" \
-                      f"{data}\n"
+            name = str(directory.joinpath(f'imported_from_collection.{filetype.file_exts[0]}'))
+            data = HttpFileFormatter.format(collection, filetype)
+            if HttpFileType.Httpfile == filetype:
+                newline = os.linesep
+                d[name] = f"#!/usr/bin/env dothttp{newline}{newline}" \
+                          f"# imported from {link}{newline}{newline}" \
+                          f"{data}{newline}"
+            else:
+                d[name] = data
             if variable is not None:
                 dothttp_json_environment = {}
                 for i in variable:
@@ -233,6 +236,7 @@ class ImportPostmanCollection(BaseHandler):
         directory: str = command.params.get("directory", "")
         save = command.params.get("save", False)
         overwrite = command.params.get("overwrite", False)
+        filetype = HttpFileType.get_from_filetype(command.params.get("filetype", None))
 
         # input validations
         if save:
@@ -263,22 +267,18 @@ class ImportPostmanCollection(BaseHandler):
                 with open(link) as f:
                     postman_data = json.load(f)
                 link = os.path.basename(link)
-        base_collection_dire = ""
         if "info" in postman_data and 'schema' in postman_data['info']:
             if postman_data['info']['schema'] == POSTMAN_2:
                 collection = postman_collection_from_dict(postman_data)
                 base_collection_dire = Path(directory).joinpath(clean_filename(collection.info.name))
-                d = self.import_items(collection.item, base_collection_dire, collection.auth, collection.variable, link)
             elif postman_data['info']['schema'] == POSTMAN_2_1:
                 collection = postman_collection21_from_dict(postman_data)
                 base_collection_dire = Path(directory).joinpath(clean_filename(collection.info.name))
-                d = self.import_items(collection.item,
-                                      base_collection_dire,
-                                      collection.auth,
-                                      collection.variable,
-                                      link)
             else:
                 return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
+            d = self.import_items(collection.item, base_collection_dire, collection.auth, collection.variable, filetype,
+                                  link,
+                                  )
         else:
             return Result(id=command.id, result={"error_message": "unsupported postman collection", "error": True})
 
@@ -296,13 +296,15 @@ class ImportPostmanCollection(BaseHandler):
         return Result(id=command.id, result={"files": d})
 
     @staticmethod
-    def import_items(items: List[Items], directory: Path, auth: Optional[Auth], variable, link: str = ""):
+    def import_items(items: List[Items], directory: Path, auth: Optional[Auth], variable, filetype: HttpFileType,
+                     link: str = ""):
         leaf_folder = filter(lambda item: item.request, items)
         d = dict()
-        d.update(ImportPostmanCollection.import_requests_into_dire(leaf_folder, directory, auth, variable, link))
+        d.update(
+            ImportPostmanCollection.import_requests_into_dire(leaf_folder, directory, auth, variable, filetype, link))
         folder = map(lambda item: (item.name, item.item, item.auth), filter(lambda item: item.item, items))
         for sub_folder, subitem, item_auth in folder:
             d.update(
                 ImportPostmanCollection.import_items(subitem, directory.joinpath(clean_filename(sub_folder)),
-                                                     item_auth or auth, variable, link))
+                                                     item_auth or auth, variable, filetype, link))
         return d

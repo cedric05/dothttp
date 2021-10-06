@@ -1,0 +1,318 @@
+{
+  "log": {
+    "version": "1.2",
+    "creator": {
+      "name": "WebInspector",
+      "version": "537.36"
+    },
+    "pages": [
+      {
+        "startedDateTime": "2021-06-18T17:23:22.569Z",
+        "id": "page_1",
+        "title": "https://req.dothttp.dev/",
+        "pageTimings": {
+          "onContentLoad": 575.5360000184737,
+          "onLoad": 637.419000006048
+        }
+      }
+    ],
+    "entries": [
+      {
+        "_initiator": {
+          "type": "other"
+        },
+        "_priority": "VeryHigh",
+        "_resourceType": "document",
+        "cache": {},
+        "connection": "282796",
+        "pageref": "page_1",
+        "request": {
+          "method": "GET",
+          "url": "https://req.dothttp.dev/",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Host",
+              "value": "req.dothttp.dev"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Cache-Control",
+              "value": "max-age=0"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\"Chromium\";v=\"92\", \" Not A;Brand\";v=\"99\", \"Microsoft Edge\";v=\"92\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "DNT",
+              "value": "1"
+            },
+            {
+              "name": "Upgrade-Insecure-Requests",
+              "value": "1"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4501.0 Safari/537.36 Edg/92.0.891.1"
+            },
+            {
+              "name": "Accept",
+              "value": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9"
+            },
+            {
+              "name": "Sec-Fetch-Site",
+              "value": "none"
+            },
+            {
+              "name": "Sec-Fetch-Mode",
+              "value": "navigate"
+            },
+            {
+              "name": "Sec-Fetch-User",
+              "value": "?1"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "document"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip, deflate, br"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "en-GB,en;q=0.9,en-US;q=0.8,en-IN;q=0.7,nl;q=0.6"
+            }
+          ],
+          "queryString": [],
+          "cookies": [],
+          "headersSize": 689,
+          "bodySize": 0
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "name": "Content-Type",
+              "value": "text/plain; charset=utf-8"
+            },
+            {
+              "name": "Server",
+              "value": "Kestrel"
+            },
+            {
+              "name": "Access-Control-Allow-Headers",
+              "value": "*"
+            },
+            {
+              "name": "Access-Control-Allow-Methods",
+              "value": "*"
+            },
+            {
+              "name": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "name": "Request-Context",
+              "value": "appId=cid-v1:20ed1732-cd43-4043-a34c-4493b9a40ad9"
+            },
+            {
+              "name": "authoredby",
+              "value": "https://github.com/cedric05"
+            },
+            {
+              "name": "Date",
+              "value": "Fri, 18 Jun 2021 17:23:22 GMT"
+            }
+          ],
+          "cookies": [],
+          "content": {
+            "size": 875,
+            "mimeType": "text/plain",
+            "compression": -12
+          },
+          "redirectURL": "",
+          "headersSize": 349,
+          "bodySize": 887,
+          "_transferSize": 1236,
+          "_error": null
+        },
+        "serverIPAddress": "52.172.195.80",
+        "startedDateTime": "2021-06-18T17:23:22.557Z",
+        "time": 260.749000008218,
+        "timings": {
+          "blocked": 15.223999989505858,
+          "dns": -1,
+          "ssl": -1,
+          "connect": -1,
+          "send": 2.9229999999999996,
+          "wait": 240.15299999726938,
+          "receive": 2.449000021442771,
+          "_blocked_queueing": 12.756999989505857
+        }
+      },
+      {
+        "_initiator": {
+          "type": "other"
+        },
+        "_priority": "High",
+        "_resourceType": "other",
+        "cache": {},
+        "connection": "282796",
+        "pageref": "page_1",
+        "request": {
+          "method": "GET",
+          "url": "https://req.dothttp.dev/favicon.ico",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Host",
+              "value": "req.dothttp.dev"
+            },
+            {
+              "name": "Connection",
+              "value": "keep-alive"
+            },
+            {
+              "name": "Pragma",
+              "value": "no-cache"
+            },
+            {
+              "name": "Cache-Control",
+              "value": "no-cache"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\"Chromium\";v=\"92\", \" Not A;Brand\";v=\"99\", \"Microsoft Edge\";v=\"92\""
+            },
+            {
+              "name": "DNT",
+              "value": "1"
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "User-Agent",
+              "value": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4501.0 Safari/537.36 Edg/92.0.891.1"
+            },
+            {
+              "name": "Accept",
+              "value": "image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8"
+            },
+            {
+              "name": "Sec-Fetch-Site",
+              "value": "same-origin"
+            },
+            {
+              "name": "Sec-Fetch-Mode",
+              "value": "no-cors"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "image"
+            },
+            {
+              "name": "Referer",
+              "value": "https://req.dothttp.dev/"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "gzip, deflate, br"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "en-GB,en;q=0.9,en-US;q=0.8,en-IN;q=0.7,nl;q=0.6"
+            }
+          ],
+          "queryString": [],
+          "cookies": [],
+          "headersSize": 634,
+          "bodySize": 0
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "httpVersion": "HTTP/1.1",
+          "headers": [
+            {
+              "name": "Transfer-Encoding",
+              "value": "chunked"
+            },
+            {
+              "name": "Content-Type",
+              "value": "text/plain; charset=utf-8"
+            },
+            {
+              "name": "Server",
+              "value": "Kestrel"
+            },
+            {
+              "name": "Access-Control-Allow-Headers",
+              "value": "*"
+            },
+            {
+              "name": "Access-Control-Allow-Methods",
+              "value": "*"
+            },
+            {
+              "name": "Access-Control-Allow-Origin",
+              "value": "*"
+            },
+            {
+              "name": "Request-Context",
+              "value": "appId=cid-v1:20ed1732-cd43-4043-a34c-4493b9a40ad9"
+            },
+            {
+              "name": "authoredby",
+              "value": "https://github.com/cedric05"
+            },
+            {
+              "name": "Date",
+              "value": "Fri, 18 Jun 2021 17:23:23 GMT"
+            }
+          ],
+          "cookies": [],
+          "content": {
+            "size": 822,
+            "mimeType": "text/plain",
+            "compression": -12
+          },
+          "redirectURL": "",
+          "headersSize": 349,
+          "bodySize": 834,
+          "_transferSize": 1183,
+          "_error": null
+        },
+        "serverIPAddress": "52.172.195.80",
+        "startedDateTime": "2021-06-18T17:23:23.213Z",
+        "time": 216.18700001272373,
+        "timings": {
+          "blocked": 3.9270000007227064,
+          "dns": -1,
+          "ssl": -1,
+          "connect": -1,
+          "send": 0.281,
+          "wait": 211.26000000870042,
+          "receive": 0.7190000033006072,
+          "_blocked_queueing": 3.2260000007227063
+        }
+      }
+    ]
+  }
+}

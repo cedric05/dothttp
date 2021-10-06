@@ -72,8 +72,18 @@ GET http://httpbin.org/robots.txt
 > {%
 
 const value = client.global.get("setPropertyByfile");
-client.log("value is `" + value+"`");
+console.log("value is `" + value+"`");
 client.global.clear("setPropertyByfile");
+
+%}
+
+
+@name("script error")
+GET http://httpbin.org/robots.txt
+// {{setPropertyByfile=sample}}
+> {%
+
+client.log(response.body.test.out);
 
 %}
 
@@ -88,6 +98,6 @@ const atob = require('atob');
 var b64 = "SGVsbG8sIFdvcmxkIQ==";
 var bin = atob(b64);
 
-client.log("value is `" + bin+"`");
+console.log("value is `" + bin+"`");
 
 %}

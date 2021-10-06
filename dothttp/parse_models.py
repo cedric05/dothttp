@@ -1,5 +1,9 @@
+import enum
+import os
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
+
+from dothttp import DotHttpException
 
 
 @dataclass
@@ -371,3 +375,29 @@ AWS_SERVICES_LIST = {'acm',
                      'workmail',
                      'workspaces',
                      'xray'}
+
+
+class HttpFileType(enum.Enum):
+    Notebookfile = ("notebook", ("hnbk", "httpbook"))
+    Httpfile = ("http", ('http', 'dhttp'))
+
+    def __init__(self, typename, filetypes):
+        self.file_exts = filetypes
+        self.file_type = typename
+
+    @staticmethod
+    def get_from_filetype(filetype: str):
+        if filetype == HttpFileType.Notebookfile.file_type:
+            return HttpFileType.Notebookfile
+        return HttpFileType.Httpfile
+
+    @staticmethod
+    def get_format_from_file_name(filename: str):
+        _, ext = os.path.splitext(filename)
+        if ext and len(ext) > 0:
+            ext = ext[1:]
+        if ext in HttpFileType.Notebookfile.file_exts:
+            return HttpFileType.Notebookfile
+        elif ext in HttpFileType.Httpfile.file_exts:
+            return HttpFileType.Httpfile
+        raise DotHttpException("unknown file type")
