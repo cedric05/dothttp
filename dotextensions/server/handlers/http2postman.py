@@ -1,14 +1,14 @@
 import glob
 import os
 import pathlib
-from typing import Dict
 import urllib.parse
+from typing import Dict
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType, Variable
-from dothttp import dothttp_model, json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
-    request_logger, Payload, APPLICATION_JSON, CONTENT_TYPE, AWS4Auth
+from dothttp import json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
+    request_logger, Payload, APPLICATION_JSON, CONTENT_TYPE, AWS4Auth, dothttp_model
 from dothttp.request_base import RequestCompiler
 from dothttp.utils import json_to_urlencoded_array
 from . import logger
@@ -40,6 +40,9 @@ class PostManCompiler(RequestCompiler):
 
     def load_model(self):
         return
+
+    def validate_names(self):
+        pass
 
     def load_payload_fileinput(self, upload_filename):
         upload_filename = self.get_updated_content(upload_filename)
@@ -148,6 +151,14 @@ class Http2Postman(RunHttpFileHandler):
         return collection
 
     def get_collection_item_for_file(self, config, filename, content):
+        # http_type = HttpFileType.get_format_from_file_name(filename)
+        # if http_type == HttpFileType.Httpfile:
+        #     http_list = dothttp_model.model_from_str(content)
+        # else:
+        #     http_list = []
+        #     for code in json.loads(content):
+        #         if (code["kind"] == 2):
+        #
         http_list = dothttp_model.model_from_str(content)
         dothttpenvjson = pathlib.Path(filename).parent.joinpath('.dothttp.json')
         item_list = Items.from_dict({"item": [], "variable": [], "name": os.path.basename(filename)})

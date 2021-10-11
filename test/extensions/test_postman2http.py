@@ -2,6 +2,8 @@ import json
 import os
 import sys
 
+from dothttp_req.parse_models import HttpFileType
+
 from dotextensions.server.handlers.postman2http import ImportPostmanCollection
 from dotextensions.server.models import Command
 from test import TestBase
@@ -13,16 +15,18 @@ fixtures_dir = f"{dir_path}/fixtures"
 
 class FileExecute(TestBase):
     def setUp(self) -> None:
+        self.maxDiff = 10000
         self.execute_handler = ImportPostmanCollection()
 
     def compare(self,
                 link,
-                file_to_compare):
+                file_to_compare, filetype=HttpFileType.Httpfile.file_type):
         print(f"running for ${link} comparing with file ${file_to_compare}")
         response = self.execute_handler.run(Command(
             method=ImportPostmanCollection.name,
             params={
                 "link": link,
+                "filetype": filetype
             },
             id=1)
         )
@@ -99,3 +103,12 @@ class FileExecute(TestBase):
         ]
         for link in links:
             self.compare(link, os.path.join(fixtures_dir, os.path.basename(link)))
+        #
+
+    def test_notebook(self):
+        # test httpbook
+        collection = "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/multi-level-folders-v2.postman_collection.json"
+        self.compare(
+            collection,
+            os.path.join(fixtures_dir, "multi-level-folders-v2.postman_collection.httpbook.json"),
+            filetype=HttpFileType.Notebookfile.file_type)

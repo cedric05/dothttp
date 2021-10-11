@@ -5,6 +5,7 @@ import tempfile
 
 from dotextensions.server.handlers.har2httphandler import Har2HttpHandler
 from dotextensions.server.models import Command
+from dothttp.parse_models import HttpFileType
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -14,7 +15,7 @@ handler = Har2HttpHandler()
 
 
 @contextlib.contextmanager
-def execute_with_params(input_file_or_json, expected_output):
+def execute_with_params(input_file_or_json, expected_output, filetype=HttpFileType.Httpfile.file_type):
     if isinstance(input_file_or_json, (dict, list)):
         full_path = None
         har_data = input_file_or_json
@@ -24,7 +25,9 @@ def execute_with_params(input_file_or_json, expected_output):
     with tempfile.TemporaryDirectory() as directory:
         command = Command(id=1, method=Har2HttpHandler.name, params={"filename": full_path,
                                                                      "save_directory": directory,
-                                                                     "har": har_data})
+                                                                     "har": har_data,
+                                                                     "filetype": filetype
+                                                                     })
         response = handler.run(command)
         with open(os.path.join(command_dir, expected_output
                                ), 'r') as f:
@@ -77,3 +80,9 @@ class Har2HttpTest(TestBase):
         with execute_with_params(os.path.join("har2http", "chromecolonheaders.json"),
                                  os.path.join("har2http", "chromecolonheaders.http")) as (expected, response):
             self.assertEqual(expected, response.result.get('http'))
+
+    def test_har_import_notebook(self):
+        with execute_with_params(os.path.join("har2http", "req.har.json"),
+                                 os.path.join("har2http", "req.har.httpbook"), HttpFileType.Notebookfile.file_type) as (
+                expected, response):
+            self.assertEqual(json.loads(expected), json.loads(response.result.get('http')))

@@ -680,7 +680,7 @@ class HttpDefBase(BaseModelProcessor):
     def get_output(self):
         if output := self.http.output:
             output_file = self.get_updated_content(output.output)
-            print(f'output will be written to `{os.path.abspath(output_file)}`')
+            request_logger.warning(f'output will be written to `{os.path.abspath(output_file)}`')
             request_logger.debug(
                 f'output will be written into `{self.file}` is `{os.path.abspath(output_file)}`')
             try:
@@ -688,7 +688,7 @@ class HttpDefBase(BaseModelProcessor):
             except Exception as e:
                 request_logger.debug(
                     f'not able to open `{output}`. output will be written to stdout', exc_info=True)
-                return sys.stdout
+                raise
         else:
             return sys.stdout
 
@@ -816,6 +816,7 @@ class HttpDefBase(BaseModelProcessor):
         self.load_certificate()
         self.load_test_script()
         self.load_extra_flags()
+        self.load_output()
         self._loaded = True
 
     def load_test_script(self):
@@ -823,3 +824,7 @@ class HttpDefBase(BaseModelProcessor):
         if script_wrap := self.http.script_wrap:
             script = script_wrap.script[4:-2]
             self.httpdef.test_script = script.strip()
+
+    def load_output(self):
+        if self.http.output and self.http.output.output:
+            self.httpdef.output = self.http.output.output

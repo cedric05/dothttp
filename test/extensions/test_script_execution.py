@@ -67,7 +67,19 @@ class ScriptExecutionTest(TestBase):
                           'tests': []},
                          result.result['script_result'])
 
-    def execute_target(self, target, properties: Dict[str, str] = {}):
+    def test_execute_error(self):
+        result = self.execute_target("script error", )
+        self.assertEqual({'compiled': True,
+                          'error': '',
+                          'properties': {},
+                          'stdout': 'error TypeError: Undefined and null dont have properties (tried '
+                                    "getting property 'out')\n",
+                          'tests': []},
+                         result.result['script_result'])
+
+    def execute_target(self, target, properties=None):
+        if properties is None:
+            properties = {}
         result = self.execute_handler.run(Command(
             method=RunHttpFileHandler.name,
             params={
