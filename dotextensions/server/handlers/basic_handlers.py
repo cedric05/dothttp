@@ -80,7 +80,6 @@ class RunHttpFileHandler(BaseHandler):
 
     def get_request_result(self, command, comp: RequestCompiler):
         resp = comp.get_response()
-        script_result = comp.execute_script(resp).as_json()
         if output := comp.httpdef.output:
             # body = f"Output stored in {output}"
             try:
@@ -88,9 +87,7 @@ class RunHttpFileHandler(BaseHandler):
             except Exception as e:
                 output = f"Not!. unhandled error happened : {e}"
                 logger.warning("unable to write because", exc_info=True)
-                # body = resp.text
-        # else:
-        #     body = resp.text
+        script_result = comp.execute_script(resp).as_json()
         body = resp.text
         response_data = {
             "response": {

@@ -85,4 +85,4 @@ class Har2HttpTest(TestBase):
         with execute_with_params(os.path.join("har2http", "req.har.json"),
                                  os.path.join("har2http", "req.har.httpbook"), HttpFileType.Notebookfile.file_type) as (
                 expected, response):
-            self.assertEqual(expected, response.result.get('http'))
+            self.assertEqual(json.loads(expected), json.loads(response.result.get('http')))

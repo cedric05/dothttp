@@ -307,8 +307,8 @@ class HttpFileFormatter(RequestBase):
                 elif files_wrap := payload.fileswrap:
                     def function(multipart):
                         quote, _ = quote_or_unquote(multipart.path)
-                        multipart_content_type = f', {quote}{multipart.type}{quote})' if multipart.type else ")"
-                        return f'({quote}{multipart.name}{quote}, {quote}{multipart.path}{quote} {multipart_content_type}'
+                        multipart_content_type = f' , {quote}{multipart.type}{quote})' if multipart.type else ")"
+                        return f'({quote}{multipart.name}{quote}, {quote}{multipart.path}{quote}{multipart_content_type}'
 
                     p2 = ",\n\t".join(map(function,
                                           files_wrap.files))
@@ -404,7 +404,9 @@ class RequestCompiler(RequestBase):
                                         pkcs12_password=self.httpdef.p12[1]))
         try:
             resp: Response = session.send(request, cert=self.httpdef.certificate,
-                                          verify=not self.httpdef.allow_insecure)
+                                          verify=not self.httpdef.allow_insecure,
+                                          # stream=True
+                                          )
         except UnicodeEncodeError:
             # for Chinese, smiley all other default encode converts into latin-1
             # as latin-1 didn't consist of those characters it will fail
