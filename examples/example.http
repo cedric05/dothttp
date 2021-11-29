@@ -7,7 +7,6 @@ GET https://req.dothttp.dev/user
 ? projection, name
 ? projection, org
 ? projection, location
-data("hai")
 > {%
     client.global.set("hai", response.headers.valueOf("hai"));
 %}

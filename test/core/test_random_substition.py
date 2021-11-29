@@ -79,6 +79,16 @@ class SubstitutionTest(TestBase):
         self.assertTrue(request_data['test2'], request_data['test4'])
         self.assertTrue(request_data['test2'], request_data['test4'])
 
+    def test_multiple_randoms(self):
+        """
+            Current test checks if property is defined random, it will pick first match and resolve accordingly.
+            For rest of propertys, even if random is of bool or str or int (different from first match), resolution will be same as first
+            usually one should always reuse and redeclare in dothttp unless prop is random
+        """
+        uuid_request: PreparedRequest = self.get_request(file=f'{base_dir}/random_double.http', target='double')
+        request_data = json.loads(uuid_request.body)
+        self.assertTrue(request_data['test_int'] == request_data['test_int2'])
+
     def test_uuid(self):
         ## test uuid
         uuid_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='uuid')

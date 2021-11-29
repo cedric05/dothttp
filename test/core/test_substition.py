@@ -2,6 +2,7 @@ import json
 
 from requests import PreparedRequest
 
+from dothttp import HttpFileException
 from test import TestBase
 from test.core.test_request import dir_path
 
@@ -66,6 +67,11 @@ class SubstitutionTest(TestBase):
         req: PreparedRequest = self.get_request(f"{base_dir}/envvariableswithjson.http", env=['env3'])
         self.assertEqual(b'{"object": {"key": "value"}, "int": 3, "str": "str", "null": null, "true": t'
                          b'rue, "false": false, "float": 1.23}', req.body)
+
+    def test_only_when_required(self):
+        req: PreparedRequest = self.get_request(f"{base_dir}/sub_with_double_sub_notused.http", target="double_def_pass")
+        with self.assertRaises(HttpFileException):
+            req: PreparedRequest = self.get_request(f"{base_dir}/sub_with_double_sub_notused.http", target="double_def_fail")
 
     def test_substitute_one_by_one(self):
         # path

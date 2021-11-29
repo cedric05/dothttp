@@ -8,7 +8,7 @@ from dothttp.request_base import RequestCompiler
 def run_model():
     """
         main use case is to check benchmarks for loading from file to textx model
-        modifying http.tx would increase or lower performance.
+        modifying  would increase or lower performance.
     """
     filename = os.path.join(os.path.dirname(__file__), "../examples/example.http")
     envs = []

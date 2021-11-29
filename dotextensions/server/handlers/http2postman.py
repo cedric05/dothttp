@@ -195,18 +195,20 @@ class Http2Postman(RunHttpFileHandler):
                 logger.warning(f"unknown errors happened, will export rest {e}", exc_info=True)
         return item_list
 
-    def get_http_to_postman_request(self, http: HttpDef, description="") -> RequestClass:
+    @staticmethod
+    def get_http_to_postman_request(http: HttpDef, description="") -> RequestClass:
         request = RequestClass.from_dict({})
         request.url = http.url
         request.method = http.method
         if auth := http.auth:
             request.auth = Auth.from_dict({})
             if isinstance(auth, (HTTPBasicAuth, HTTPDigestAuth)):
+                request_auth = []
                 if isinstance(auth, HTTPBasicAuth):
-                    request_auth = request.auth.basic = []
+                    request.auth.basic = request_auth
                     request.auth.type = AuthType.BASIC
                 elif isinstance(auth, HTTPDigestAuth):
-                    request_auth = request.auth.digest = []
+                    request.auth.digest = request_auth
                     request.auth.type = AuthType.DIGEST
                 request_auth += [ApikeyElement(
                     key="username",

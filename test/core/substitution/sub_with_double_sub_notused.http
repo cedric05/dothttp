@@ -1,0 +1,17 @@
+@name("double_def_pass")
+POST https://req.dothttp.dev/user
+json(
+   {
+       "user": "ram",
+        //"age": {{age=20}},
+   }
+)
+
+@name("double_def_fail")
+POST https://req.dothttp.dev/user
+json(
+   {
+       "uesr": "ram",
+        "age": {{age=25}},
+   }
+)
