@@ -5,6 +5,7 @@ import sys
 from json import JSONDecodeError
 from typing import Dict
 
+from dothttp.__version__ import __version__ as version
 from .handlers.basic_handlers import RunHttpFileHandler, ContentExecuteHandler, FormatHttpFileHandler, \
     GetNameReferencesHandler, ContentNameReferencesHandler
 from .handlers.gohandler import TypeFromPos
@@ -82,6 +83,8 @@ class CmdServer(Base):
         self.pool = concurrent.futures.ThreadPoolExecutor()
 
     def run_forever(self):
+        # publish version
+        self.write_result({"id": -1, "result": {"dothttp_version": version}})
         for line in sys.stdin:
             try:
                 logger.debug(f"got request {line}")

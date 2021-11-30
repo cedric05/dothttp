@@ -1,6 +1,7 @@
 import json
 import os
 import unittest
+from unittest import skip
 
 from dotextensions.server.handlers.basic_handlers import RunHttpFileHandler, GetNameReferencesHandler, \
     ContentNameReferencesHandler
@@ -217,6 +218,10 @@ basicauth("username", "password")
         result = self.execute_file(f"{command_dir}/isolated/env.http", properties={"path": "get"})
         self.assertEqual(200, result.result['status'])
 
+    @skip("""
+    skipping as certificate has expired
+    https://github.com/chromium/badssl.com/issues/482
+    """)
     def test_cert_with_no_key(self):
         filename = f"{http_base}/no-password.http"
         cert_file = f"{cert_base}/no-password.pem"
@@ -230,6 +235,10 @@ certificate(cert="{cert_file}")
 
 """, req_comp_success.result['http'])
 
+    @skip("""
+    skipping as certificate has expired
+    https://github.com/chromium/badssl.com/issues/482
+    """)
     def test_cert_key(self):
         filename = f"{http_base}/no-password.http"
         cert_file = f"{cert_base}/cert.crt"
@@ -247,6 +256,10 @@ certificate(cert="{cert_file}", key="{key_file}")
 
 """, req_comp2.result['http'])
 
+    @skip("""
+    skipping as certificate has expired
+    https://github.com/chromium/badssl.com/issues/482
+    """)
     def test_p12(self):
         filename = f"{http_base}/no-password.http"
         p12 = f"{cert_base}/badssl.com-client.p12"

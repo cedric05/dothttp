@@ -3,8 +3,8 @@ json({
 "string": "simple",
 "list": ["dothttp", "azure"],
 "null": null,
-"bool": False,
-"bool2": True,
+"bool": false,
+"bool2": true,
 "float":1.121212,
 "float2":1
 })

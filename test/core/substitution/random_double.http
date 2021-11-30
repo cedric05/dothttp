@@ -1,0 +1,10 @@
+@name('double')
+POST https://req.dothttp.dev
+json({
+// here ram is defined with randomStr, so property will be generated randomlly
+ "test_int": "{{ram=$randomStr:3}}",
+// here ram is defined one more time, but is still random, as it is computed not user input,
+// it will be substitued. instead of panicing
+ "test_int2": "{{ram=$randomStr}}"
+// important point is, even if category is different, it will not recompute or update
+})

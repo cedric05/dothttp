@@ -20,7 +20,7 @@ base_logger = logging.getLogger('dothttp')
 class Property:
     text: List = field(default_factory=list())
     key: Union[str, None] = None
-    value: Union[str, None] = None
+    value: Union[str, None, HttpFileException] = None
 
 
 def random_string_generator(size=4, chars=string.ascii_lowercase + string.digits):
@@ -203,18 +203,25 @@ class PropertyProvider:
                 # like ranga=" ramprasad" --> we should replace with " ramprasad"
                 value = value[1:-1]
 
-            # if result is randomType
-            value = PropertyProvider.resolve_random(value)
-
-            if key in cache:
-                if cache[key].value and value != cache[key].value:
-                    raise HttpFileException(
-                        message=f'property: `{key}` is defaulted with two/more different values, panicked ')
-                p = cache[key]
-                p.text.append(prop)
-                p.value = value
+            match = PropertyProvider.get_random_match(value)
+            if match:
+                if key in cache:
+                    p = cache[key]
+                    p.text.append(prop)
+                else:
+                    p = Property([prop], key, PropertyProvider.resolve_random(value, match))
             else:
-                p = Property([prop], key, value)
+                # if result is randomType
+                if key in cache:
+                    p = cache[key]
+                    p.text.append(prop)
+                    if cache[key].value and value != cache[key].value:
+                        p.value = HttpFileException(
+                            message=f'propert.y: `{key}` is defaulted with two/more different values, panicked ')
+                    else:
+                        p.value = value
+                else:
+                    p = Property([prop], key, value)
             cache.setdefault(key, p)
         else:
             if prop in cache:
@@ -225,8 +232,7 @@ class PropertyProvider:
         return p
 
     @staticmethod
-    def resolve_random(prop):
-        match = PropertyProvider.random_string_regex.match(prop)
+    def resolve_random(prop, match):
         if (match):
             groups = match.groupdict()
             category = groups['category']
@@ -235,14 +241,22 @@ class PropertyProvider:
             return prop.replace("".join(i for i in match.groups() if i), value)
         return prop
 
+    @staticmethod
+    def get_random_match(prop):
+        match = PropertyProvider.random_string_regex.match(prop)
+        return match
+
     def resolve_property_string(self, key: str):
         if PropertyProvider.is_random_key(key):
-            return PropertyProvider.resolve_random(key)
-        args = self.command_properties.get(key), self.env_properties.get(key), self.infile_properties[key].value
-        for arg in args:
-            if arg is not None:
-                base_logger.debug(f"property `{key}` resolved with value `${arg}`")
-                return arg
+            return PropertyProvider.resolve_random(key, PropertyProvider.get_random_match(key))
+        prop_values = self.command_properties.get(key), self.env_properties.get(key), self.infile_properties[key].value
+        for prop_value in prop_values:
+            if prop_value is not None:
+                if isinstance(prop_value, HttpFileException):
+                    raise prop_value
+                else:
+                    base_logger.debug(f"property `{key}` resolved with value `${prop_value}`")
+                    return prop_value
 
     def resolve_property_object(self, key: str) -> object:
         val = self.resolve_property_string(key)

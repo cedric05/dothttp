@@ -1,4 +1,5 @@
 # tests unix socket dothttp apis
+import sys
 from unittest import skipIf
 
 import requests
@@ -15,7 +16,7 @@ except:
 base_dir = f"{dir_path}/requests"
 
 
-@skipIf(requests_unixsocket is None, "in wasm mode, it will not be available")
+@skipIf(requests_unixsocket is None or not sys.platform.startswith("linux"), "in wasm mode, it will not be available")
 class TestUnixSocketRequests(TestBase):
     def test_simple(self):
         request = self.get_request(
