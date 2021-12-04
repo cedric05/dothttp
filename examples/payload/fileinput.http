@@ -1,2 +1,7 @@
 POST https://req.dothttp.dev
 fileinput('C:\Users\john\documents\movie.mkv')
+
+
+POST https://req.dothttp.dev
+// file input with different syntax
+< 'C:\Users\john\documents\movie.mkv'

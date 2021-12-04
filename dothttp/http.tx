@@ -99,12 +99,16 @@ QUERY:
 ;
 
 PAYLOAD: 
-    (   'data' '(' data+=TRIPLE_OR_DOUBLE_STRING (',' type=STRING)? ','?  ')'
+    (
+          // reordered to provide max performance
+          // most http requests has json input,or urlencoded as input
+        ('json' '(' json=JSON  ')' )
         | ('data' | 'urlencoded') '(' datajson=JSON (',' type=STRING)? ','? ')'
-        | /-d|--data/ data+=TRIPLE_OR_DOUBLE_STRING
-        | 'fileinput' '(' file=STRING   (',' type=STRING)? ','?  ')'
-        | ('json' '(' json=JSON  ')' )
+        | ('data'| 'text') '(' data+=TRIPLE_OR_DOUBLE_STRING ((','|';') type=STRING)? ','?  ')'
         | (fileswrap=FILES)
+        | '<' file=STRING (';' type=STRING)?
+        | 'fileinput' '(' file=STRING   (',' type=STRING)? ','?  ')'
+        | /-d|--data/ data+=TRIPLE_OR_DOUBLE_STRING
     )
 ;
 
@@ -114,15 +118,21 @@ TRIPLE_OR_DOUBLE_STRING:
 
 
 FILES:
-    ("files" | "form") "(" files*=FILETYPE[','] ','? ")"
+    ("files" | "form" | "multipart") "(" files*=FILETYPE[','] ','? ")"
 ;
 
 FILETYPE:
-    ( '(' name=STRING ',' path=STRING  (',' (type=STRING)?)? ')')
+    (
+        '(' name=DotString ',' path=DotString  (',' (type=DotString)?)? ')'
+        | name=DotString ('<' | ':') path=DotString (';' (type=DotString)?)?
+    )
 ;
 
 TOFILE:
-    ('output' '('output=STRING ')')
+    (
+        'output' '('output=STRING ')'
+        | '>>' output=STRING
+    )
 ;
 
 JSON:

@@ -6,3 +6,14 @@ data(
      // has a comment in between
      " payload"
 )
+
+
+POST https://httpbin.org/post
+? key1 = value2
+? key2 = value2
+text(
+     "this is text"
+     // has a comment in between
+     // or text breaks
+     """ with triple quotes"""
+)

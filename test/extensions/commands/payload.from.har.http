@@ -5,7 +5,7 @@ json({
 
 
 POST "https://req.dothttp.dev"
-data({
+urlencoded({
     "paylaod": [
         "json"
     ]
@@ -13,23 +13,23 @@ data({
 
 
 POST "https://req.dothttp.dev"
-data('raw data')
+text('raw data')
 
 
 POST "https://req.dothttp.dev"
-files(
-	("raw data", "other-content-type" , "text/plain"),
-	("raw data", "other-content-type" , "text/plain")
+multipart(
+	"raw data" < "other-content-type" ; "text/plain",
+	"raw data" < "other-content-type" ; "text/plain"
 )
 
 
 POST "https://req.dothttp.dev"
-data('raw data')
+text('raw data')
 
 
 POST "https://req.dothttp.dev"
-files(
-	("file", "/home/prasanth/cedric05/dothttp/test/extensions/commands/payload.http" , "text/plain")
+multipart(
+	"file" < "/home/prasanth/cedric05/dothttp/test/extensions/commands/payload.http" ; "text/plain"
 )
 
 

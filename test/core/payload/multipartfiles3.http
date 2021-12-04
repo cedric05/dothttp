@@ -1,0 +1,5 @@
+POST "https://httpbin.org/post"
+files(
+    "resume" < "{{filename}}",
+    "content2"<  "{{data}}"
+)
