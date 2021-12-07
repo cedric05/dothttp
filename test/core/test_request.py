@@ -48,15 +48,18 @@ class RequestTest(TestBase):
 
     @unittest.skipUnless(sys.platform.startswith("linux"), "requires linux")
     def test_output(self):
-        with tempfile.NamedTemporaryFile() as f:
-            req = self.get_req_comp(f"{base_dir}/output.http",
-                                    properties=[f"file={f.name}"])
-            req.run()
-            data = f.read()
-            self.assertIn(
-                b'curl -X GET "https://req.dothttp.dev/" \\\n    -H "connection: Keep-Alive" \\\n    -H ',
-                data
-            )
+        def output_test(output):
+            with tempfile.NamedTemporaryFile() as f:
+                req = self.get_req_comp(output,
+                                        properties=[f"file={f.name}"])
+                req.run()
+                data = f.read()
+                self.assertIn(
+                    b'curl -X GET "https://req.dothttp.dev/" \\\n    -H "connection: Keep-Alive" \\\n    -H ',
+                    data
+                )
+            output_test(f"{base_dir}/output.http")
+            output_test(f"{base_dir}/output2.http")
 
     def test_non200(self):
         req = self.get_req_comp(f"{base_dir}/non200.http", info=True)
@@ -89,7 +92,7 @@ class RequestTest(TestBase):
 json({
     "{{queryname2}}": "{{valuename2}}"
 })
-output(test)
+>> test
 
 
 """, output)
@@ -114,11 +117,11 @@ output(test)
         self.assertEqual("""POST "https://{{host1}}/ram"
 ? "{{queryname1}}"= "value1"
 ? "key2"= "{{valuename1}}"
-data('
+text('
 "hi this is good"
 \\'this barbarian\\'
 ')
-output(test)
+>> test
 
 
 """, output)

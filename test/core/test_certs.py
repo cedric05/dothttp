@@ -14,10 +14,6 @@ is_windows = sys.platform.startswith("win")
 quote = "'" if is_windows else ''
 
 
-@skip("""
-skipping as certificate has expired
-https://github.com/chromium/badssl.com/issues/482
-""")
 class CertUnitTest(TestBase):
     def test_fail_no_property_certificate(self):
         with self.assertRaises(PropertyNotFoundException):

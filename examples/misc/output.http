@@ -1,0 +1,7 @@
+GET "https://req.dothttp.dev"
+output("/tmp/out.sh")
+
+
+POST "https://httpbin.org/post"
+< "/tmp/out.sh"
+>> "/tmp/out.json"

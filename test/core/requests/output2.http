@@ -1,0 +1,2 @@
+GET "https://req.dothttp.dev"
+>> "{{file}}"

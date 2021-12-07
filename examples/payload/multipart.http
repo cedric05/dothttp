@@ -1,6 +1,16 @@
-POST https://req.dothttp.dev
-files(
-    ('name', 'value'),
-    ('name2', 'test.md'),
-    ('name3', '{"jsondata" : "jsonvalue"}', 'application/json')
+POST "https://req.dothttp.dev"
+multipart(
+	"name" < "ram",
+	"filename" < "resume.md",
+	'extra' < '{"height" : 5.5}' ; 'application/json'
 )
+
+
+POST "https://req.dothttp.dev"
+multipart(
+	"name" < "ram",
+	"filename" < "resume.md",
+	'extra' < '{"height" : 5.5}' ; 'application/json'
+)
+
+

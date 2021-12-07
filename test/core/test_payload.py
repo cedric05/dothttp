@@ -133,11 +133,15 @@ class PayLoadTest(TestBase):
         self.assertEqual(b"{}", req.body, "incorrect method")
 
     def test_file_payload(self):
+        self.file_payload_test(f"{base_dir}/filepayload2.http")
+        self.file_payload_test(f"{base_dir}/filepayload.http")
+
+    def file_payload_test(self, param):
         loadfile = tempfile.NamedTemporaryFile(delete=False)
         test = b"test"
         loadfile.write(test)
         loadfile.flush()
-        req = self.get_request(f"{base_dir}/filepayload.http", properties=[f"filename={loadfile.name}"])
+        req = self.get_request(param, properties=[f"filename={loadfile.name}"])
         self.assertEqual(test, req.body.read())
         loadfile.close()
         try:
@@ -165,7 +169,16 @@ class PayLoadTest(TestBase):
 
         # including integration test here
 
-        req2 = self.get_request(f"{base_dir}/multipartfiles2.http", properties=
+        self.func_multipart_syntax_test(f"{base_dir}/multipartfiles2.http", loadfile, data)
+        self.func_multipart_syntax_test(f"{base_dir}/multipartfiles3.http", loadfile, data)
+        loadfile.close()
+        try:
+            os.unlink(loadfile.name)
+        except:
+            pass
+
+    def func_multipart_syntax_test(self, param, loadfile, data):
+        req2 = self.get_request(param, properties=
         [f"filename={loadfile.name}",
          f"data={data}"
          ])
@@ -173,12 +186,6 @@ class PayLoadTest(TestBase):
         resp = session.send(req2).json()
         self.assertEqual(resp['files'], {'resume': 'test'})
         self.assertEqual(resp['form'], {'content2': 'this is text part'})
-
-        loadfile.close()
-        try:
-            os.unlink(loadfile.name)
-        except:
-            pass
 
     def test_data_multi_payload(self):
         req = self.get_request(f"{base_dir}/quoted.http")

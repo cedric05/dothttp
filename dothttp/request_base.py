@@ -295,27 +295,27 @@ class HttpFileFormatter(RequestBase):
                         # TODO not completely works
                         # url escaping is done wrong
                         data = "'" + data.replace("'", "\\'") + "'"
-                    p = f'data({data}{(" ," + mime_type) if mime_type else ""})'
+                    p = f'text({data}{(" ," + mime_type) if mime_type else ""})'
                 if datajson := payload.datajson:
                     parsed_data = json_or_array_to_json(datajson, lambda a: a)
-                    p = f'data({json.dumps(parsed_data, indent=4)})'
+                    p = f'urlencoded({json.dumps(parsed_data, indent=4)})'
                 elif filetype := payload.file:
-                    p = f'fileinput("{filetype}",{(" ," + mime_type) if mime_type else ""})'
+                    p = f'< "{filetype}"  {(" ;" + mime_type) if mime_type else ""}'
                 elif json_data := payload.json:
                     parsed_data = json_or_array_to_json(json_data, lambda a: a)
                     p = f'json({JSON_ENCODER.encode(parsed_data)})'
                 elif files_wrap := payload.fileswrap:
                     def function(multipart):
                         quote, _ = quote_or_unquote(multipart.path)
-                        multipart_content_type = f' , {quote}{multipart.type}{quote})' if multipart.type else ")"
-                        return f'({quote}{multipart.name}{quote}, {quote}{multipart.path}{quote}{multipart_content_type}'
+                        multipart_content_type = f' ; {quote}{multipart.type}{quote}' if multipart.type else ""
+                        return f'{quote}{multipart.name}{quote} < {quote}{multipart.path}{quote}{multipart_content_type}'
 
                     p2 = ",\n\t".join(map(function,
                                           files_wrap.files))
-                    p = f"files({new_line}\t{p2}{new_line})"
+                    p = f"multipart({new_line}\t{p2}{new_line})"
                 output_str += f'{new_line}{p}'
             if output := http.output:
-                output_str += f'{new_line}output({output.output})'
+                output_str += f'{new_line}>> {output.output}'
             if http.script_wrap and http.script_wrap.script:
                 output_str += new_line * 2 + "> {%" + new_line * 2 + http.script_wrap.script + new_line * 2 + "%}" + new_line * 3
             else:
