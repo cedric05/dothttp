@@ -28,7 +28,8 @@ class TypePositionTest(TestBase):
             "filename": str(command_dir.joinpath("complexrun.http"))
         }
         result = self.execute_n_get(params)
-        self.assertEqual({'base_start': None, 'target': '1', 'target_base': None, 'type': 'url'}, result)
+        self.assertEqual({'base_start': None, 'target': '1',
+                          'target_base': None, 'type': 'url'}, result)
 
     def test_more1(self):
         for params, result in [
@@ -65,7 +66,8 @@ class TypePositionTest(TestBase):
              {'type': 'payload_json', 'target': 'isEquals check', 'target_base': None,
               'base_start': None}),
             ((1215, 'script.http'),
-             {'type': 'script', 'target': 'isEquals check', 'target_base': None,
+             {'start': 1180, 'end': 1427,
+              'type': 'script', 'target': 'isEquals check', 'target_base': None,
               'base_start': None}),
             ((682, 'payload.http'),
              {'type': 'digest_auth', 'target': 'fileinput', 'target_base': None,
