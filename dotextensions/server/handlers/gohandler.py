@@ -50,6 +50,15 @@ class TypeFromPos(BaseHandler):
                         name = str(index + 1)
                         base = None
                         base_position = None
+                        ret = {}
+                        if dot_type == DothttpTypes.SCRIPT:
+                            # vscode can provide suggestions for
+                            # only javascript
+                            # will only useful be for that specific scenario
+                            ret.update({
+                                "start": pick_http.script_wrap._tx_position,
+                                "end": pick_http.script_wrap._tx_position_end
+                            })
                         if namewrap := pick_http.namewrap:
                             name = namewrap.name
                             base = namewrap.base
@@ -58,9 +67,10 @@ class TypeFromPos(BaseHandler):
                                     base_position = BaseModelProcessor.get_target(base, model.allhttps)._tx_position
                                 except:
                                     pass
-                        return {"type": dot_type.value, "target": name, "target_base": base,
-                                "base_start": base_position
-                                }
+                        ret.update({"type": dot_type.value, "target": name, "target_base": base,
+                                    "base_start": base_position
+                                    })
+                        return ret
         return {"type": DothttpTypes.COMMENT.value}
 
     @staticmethod

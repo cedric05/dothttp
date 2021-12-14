@@ -1,8 +1,8 @@
 @name('with-p12')
 @clear
-https://client.badssl.com/
+GET "https://client.badssl.com/"
 p12(file="path/to/p12/file",password="badssl.com")
 
 @name('public and private')
-https://client.badssl.com/
+GET "https://client.badssl.com/"
 certificate(cert="/path/to/cert", key="/path/to/key")
