@@ -228,7 +228,6 @@ var jsHandler = function (isJson, global, responseBody, statusCode, headers) {
         body: isJson ? JSON.parse(responseBody) : responseBody,
         status: statusCode,
         headers: new ResponseHeaders(headers),
-        "hai": statusCode
     };
 
     // bind

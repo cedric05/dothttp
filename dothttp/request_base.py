@@ -2,6 +2,7 @@ import functools
 import logging
 import os
 from http.cookiejar import LWPCookieJar
+from pprint import pprint
 from typing import Union
 from urllib.parse import urlparse, unquote, urlunparse
 
@@ -377,7 +378,24 @@ class RequestCompiler(RequestBase):
         self.print_req_info(resp, '<')
         self.write_to_output(resp)
         request_logger.debug(f'request executed completely')
+        script_result = self.execute_script(resp).as_json()
+        self.print_script_result(script_result)
         return resp
+
+    def print_script_result(self, script_result):
+        print("\n------------")
+        if script_result['stdout']:
+            print("\n##STDOUT:")
+            print(script_result['stdout'])
+        if script_result['error']:
+            print("\n##ERROR:")
+            print(script_result['error'])
+        if len(script_result['properties']) != 0:
+            print("\n##PROPERTIES:")
+            pprint(script_result['properties'])
+        print("\n------------")
+        # TODO print tests output individually
+        request_logger.debug(f'script execution result {script_result}')
 
     def write_to_output(self, resp):
         output = self.get_output()
@@ -431,6 +449,7 @@ class RequestCompiler(RequestBase):
             # in some cases mimetype can have charset
             # like text/plain; charset=utf-8
             content_type = content_type.split(";")[0] if ';' in content_type else content_type
+            request_logger.debug("script exists. starting script")
             return js3py.execute_script(
                 is_json=content_type == MIME_TYPE_JSON,
                 script=self.httpdef.test_script,

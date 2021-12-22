@@ -8,5 +8,6 @@ GET https://req.dothttp.dev/user
 ? projection, org
 ? projection, location
 > {%
-    client.global.set("hai", response.headers.valueOf("hai"));
+    client.global.set("Server", response.headers.valueOf("Server"));
+    client.log('server is :'+ value);
 %}

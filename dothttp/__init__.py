@@ -821,7 +821,8 @@ class HttpDefBase(BaseModelProcessor):
 
     def load_test_script(self):
         self.httpdef.test_script = ""
-        if script_wrap := self.http.script_wrap:
+        script_wrap = self.get_current_or_base("script_wrap")
+        if script_wrap and script_wrap.script:
             script = script_wrap.script[4:-2]
             self.httpdef.test_script = script.strip()
 
