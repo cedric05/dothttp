@@ -1,0 +1,3 @@
+@name('set-cookie')
+GET https://httpbin.org/cookies/set/dev/ram
+

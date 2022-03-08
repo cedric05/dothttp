@@ -104,6 +104,8 @@ class RunHttpFileHandler(BaseHandler):
         data = {}
         data.update(response_data['response'])  # deprecated
         data.update(response_data)
+        if 'cookie' in resp.request.headers:
+            comp.httpdef.headers['cookie'] = resp.request.headers['cookie']
         try:
             data.update({"http": self.get_http_from_req(comp.httpdef)})
         except Exception as e:

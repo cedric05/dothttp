@@ -4,7 +4,7 @@ import tempfile
 import unittest
 
 from dothttp.exceptions import *
-from dothttp.request_base import CurlCompiler, HttpFileFormatter
+from dothttp.request_base import DOTHTTP_COOKIEJAR, CurlCompiler, HttpFileFormatter, RequestBase
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -247,6 +247,33 @@ text('
         self.assertEqual('hi', third_one.body)
         self.assertEqual('https://dev.dothttp.dev/', fourth_one.url)
         self.assertEqual('POST', fourth_one.method)
+
+    def test_cookie(self):
+        # This is an integration test
+        filename = f"{base_dir}/cookie.http"
+        req_comp = self.get_req_comp(filename, target="set-cookie")
+        resp = req_comp.get_response()
+        # confirm cookie is recognized by httpbin.org
+        self.assertEqual({
+            "cookies": {
+                "dev": "ram"
+            }
+        }, resp.json())
+
+        req_comp2 = self.get_req_comp(filename, target="confirm-cookie-sent")
+        self.assertEqual("dev=ram", req_comp2.get_request().headers.get('cookie'))
+        resp = req_comp2.get_response()
+
+        self.assertEqual({
+            "cookies": {
+                "dev": "ram"
+            }
+        }, resp.json())
+        os.remove(DOTHTTP_COOKIEJAR)
+        RequestBase.global_session.cookies.clear()
+
+
+
 
 
 if __name__ == "__main__":

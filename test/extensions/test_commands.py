@@ -6,6 +6,7 @@ from unittest import skip
 from dotextensions.server.handlers.basic_handlers import RunHttpFileHandler, GetNameReferencesHandler, \
     ContentNameReferencesHandler
 from dotextensions.server.models import Command
+from dothttp.request_base import DOTHTTP_COOKIEJAR, RequestBase
 from test import TestBase
 from test.core.test_certs import http_base, cert_base
 
@@ -213,6 +214,20 @@ basicauth("username", "password")
     def test_env(self):
         result = self.execute_file(f"{command_dir}/isolated/env.http", env=["simple"])
         self.assertEqual(200, result.result['status'])
+
+
+    def test_execute(self):
+        result = self.execute_file(f"{command_dir}/cookie.http", target="set-cookie")
+        self.assertEqual("""@name("set-cookie")
+GET "https://httpbin.org/cookies/set/dev/ram"
+"cookie": "dev=ram"
+
+
+
+""", result.result['http'])
+        os.remove(DOTHTTP_COOKIEJAR)
+        RequestBase.global_session.cookies.clear()
+
 
     def test_property(self):
         result = self.execute_file(f"{command_dir}/isolated/env.http", properties={"path": "get"})
