@@ -1,5 +1,5 @@
 @name('header')
-curl -X GET https://google.com
+curl -X GET https://unknowndomain.com
 --header simplekey1 : simplevalue1
 --header simplekey2: simplevalue2
 --header simple-key3 : simplevalue3

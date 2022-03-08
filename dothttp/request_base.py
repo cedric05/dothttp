@@ -192,6 +192,10 @@ class CurlCompiler(RequestBase):
         # if isinstance(self.httpdef.headers, AWS4Auth):
         for k, v in sorted(self.httpdef.headers.items()):
             parts += [('-H', '{0}: {1}'.format(k, v))]
+
+        if 'cookie' in prep.headers:
+            parts += [('-H', '{0}: {1}'.format('cookie', prep.headers['cookie'] ))]
+
         url = prep.url
 
         if url.startswith(UNIX_SOCKET_SCHEME):
