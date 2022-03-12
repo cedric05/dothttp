@@ -42,6 +42,11 @@ class AwsAuthWrap:
     service: str
     region: Union[str, None]
 
+@dataclass
+class NtlmAuthWrap:
+    username: str
+    password: str
+
 
 @dataclass
 class AuthWrap:
@@ -49,6 +54,7 @@ class AuthWrap:
     digest_auth: Optional[DigestAuth] = None
     basic_auth: Optional[BasicAuth] = None
     aws_auth: Optional[AwsAuthWrap] = None
+    ntlm_auth: Optional[NtlmAuthWrap] = None
 
 
 @dataclass

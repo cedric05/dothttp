@@ -9,7 +9,7 @@ import requests
 
 from dothttp import Allhttp, Http, NameWrap, UrlWrap, Line, Query, Header, AuthWrap, BasicAuth, DigestAuth, \
     MultiPartFile, FilesWrap, TripleOrDouble, Certificate
-from dothttp.parse_models import Payload, AwsAuthWrap, HttpFileType
+from dothttp.parse_models import NtlmAuthWrap, Payload, AwsAuthWrap, HttpFileType
 from dothttp.request_base import HttpFileFormatter
 from dothttp.utils import APPLICATION_JSON
 from . import logger
@@ -193,6 +193,13 @@ class ImportPostmanCollection(BaseHandler):
                 auth_wrap = AuthWrap(
                     digest_auth=DigestAuth(username=digest_auth.get('username', ''),
                                            password=digest_auth.get('password', '')))
+            elif ntlm_auth := request_auth.ntlm:
+                # postman 2.1, it is a list of api_key_element have keys and values
+                ntlm_auth = ImportPostmanCollection.api_key_element_to_dict(ntlm_auth)
+                # postman 2.0
+                auth_wrap = AuthWrap(
+                    ntlm_auth=NtlmAuthWrap(username=ntlm_auth.get('username', ''),
+                                           password=ntlm_auth.get('password', '')))
             elif request_auth.apikey:
                 d = ImportPostmanCollection.api_key_element_to_dict(request_auth.apikey)
                 key = d.get('key', '<key>')

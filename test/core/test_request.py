@@ -2,6 +2,10 @@ import os
 import sys
 import tempfile
 import unittest
+from unittest import skip
+
+
+from requests_ntlm import HttpNtlmAuth
 
 from dothttp.exceptions import *
 from dothttp.request_base import DOTHTTP_COOKIEJAR, CurlCompiler, HttpFileFormatter, RequestBase
@@ -272,6 +276,37 @@ text('
         os.remove(DOTHTTP_COOKIEJAR)
         RequestBase.global_session.cookies.clear()
 
+
+    def test_ntlm_auth(self):
+        filename = f"{base_dir}/ntlm.http"
+
+        ## request unit tests
+        req_comp = self.get_req_comp(filename, target=1)
+        req_comp.get_request()
+        self.assertTrue(isinstance(req_comp.httpdef.auth, HttpNtlmAuth))
+        http = req_comp.httpdef.get_http_from_req()
+        self.assertIsNotNone(http.authwrap, "auth, has to be not none")
+        self.assertIsNotNone(http.authwrap.ntlm_auth, "ntlmauth, has to be not none")
+        self.assertEqual("username", http.authwrap.ntlm_auth.username)
+        self.assertEqual("password", http.authwrap.ntlm_auth.password)
+
+        ## format tests
+        formt_comp = self.get_req_comp(filename, target=1, format=True)
+        self.assertEqual("""@name("ntlm auth")
+GET "http://localhost:5000/both"
+ntlmauth("username", "password")
+
+
+""", formt_comp.format(formt_comp.model))
+
+    @skip("integration test, need to run `python -m test.server.ntlm_server`")
+    def test_ntlm_auth_integration(self):
+        filename = f"{base_dir}/ntlm.http"
+        ## integration tests
+        # server has to be started before running this
+        req_comp = self.get_req_comp(filename, target=1)
+        resp = req_comp.get_response()
+        self.assertEqual(200, resp.status_code)
 
 
 

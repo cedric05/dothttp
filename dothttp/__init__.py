@@ -13,6 +13,7 @@ from urllib.parse import urlencode, urljoin, uses_relative, uses_netloc, uses_pa
 from requests import PreparedRequest
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
+from requests_ntlm import HttpNtlmAuth
 
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
 
@@ -31,7 +32,7 @@ from textx import TextXSyntaxError, metamodel_from_file
 
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
-from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, Query, Http, NameWrap, UrlWrap, Header, \
+from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
     MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, \
     AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript
 from .property_schema import property_schema
@@ -161,6 +162,7 @@ class HttpDef:
         payload = self.payload
         prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
         prep.prepare_auth(self.auth, self.url)
+        request_logger.info(f"auth configured is {self.auth}")
         # prep.prepare_hooks({"response": self.save_cookie_call_back})
         if payload.header and CONTENT_TYPE not in prep.headers:
             # if content-type is provided by header
@@ -257,6 +259,8 @@ class HttpDef:
                 auth_wrap = AuthWrap(basic_auth=BasicAuth(self.auth.username, self.auth.password))
             elif isinstance(self.auth, HTTPDigestAuth):
                 auth_wrap = AuthWrap(digest_auth=DigestAuth(self.auth.username, self.auth.password))
+            elif isinstance(self.auth, HttpNtlmAuth):
+                auth_wrap = AuthWrap(ntlm_auth=NtlmAuthWrap(self.auth.username, self.auth.password))
             elif isinstance(self.auth, AWS4Auth):
                 aws_auth: AWS4Auth = self.auth
                 auth_wrap = AuthWrap(
@@ -693,7 +697,7 @@ class HttpDefBase(BaseModelProcessor):
             return sys.stdout
 
     def load_auth(self):
-        auth_wrap = self.get_current_or_base("authwrap")
+        auth_wrap:AuthWrap = self.get_current_or_base("authwrap")
         if auth_wrap:
             if basic_auth := auth_wrap.basic_auth:
                 self.httpdef.auth = HTTPBasicAuth(self.get_updated_content(basic_auth.username),
@@ -703,6 +707,9 @@ class HttpDefBase(BaseModelProcessor):
                 self.httpdef.auth = HTTPDigestAuth(self.get_updated_content(digest_auth.username),
                                                    self.get_updated_content(
                                                        digest_auth.password))
+            elif ntlm_auth := auth_wrap.ntlm_auth:
+                self.httpdef.auth = HttpNtlmAuth(self.get_updated_content(ntlm_auth.username), 
+                                                 self.get_updated_content(ntlm_auth.password))
             elif aws_auth_wrap := auth_wrap.aws_auth:
                 access_id = self.get_updated_content(aws_auth_wrap.access_id)
                 secret_token = self.get_updated_content(aws_auth_wrap.secret_token)

@@ -18,3 +18,5 @@ are expected to work by default for any new feature. here is the checklist
     - [ ] test case
 - [ ] check curl is generated like expected
     - [ ] test case
+- [ ] check format is generated as expected
+    - [ ] test case
