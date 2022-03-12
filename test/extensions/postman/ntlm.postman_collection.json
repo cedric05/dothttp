@@ -1,0 +1,60 @@
+{
+    "auth": null,
+    "event": null,
+    "info": {
+        "_postman_id": null,
+        "description": null,
+        "name": "ntlm_auth.http",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "version": null
+    },
+    "item": [
+        {
+            "auth": null,
+            "description": null,
+            "event": null,
+            "id": null,
+            "item": null,
+            "name": "ntlm auth",
+            "protocolProfileBehavior": null,
+            "request": {
+                "auth": {
+                    "apikey": null,
+                    "awsv4": null,
+                    "basic": null,
+                    "bearer": null,
+                    "digest": null,
+                    "edgegrid": null,
+                    "hawk": null,
+                    "noauth": null,
+                    "ntlm": [
+                        {
+                            "key": "username",
+                            "type": "string",
+                            "value": "username"
+                        },
+                        {
+                            "key": "password",
+                            "type": "string",
+                            "value": "password"
+                        }
+                    ],
+                    "oauth1": null,
+                    "oauth2": null,
+                    "type": "ntlm"
+                },
+                "body": null,
+                "certificate": null,
+                "description": "ntlm auth",
+                "header": null,
+                "method": "GET",
+                "proxy": null,
+                "url": "http://localhost:5000/both"
+            },
+            "response": null,
+            "variable": null
+        }
+    ],
+    "protocolProfileBehavior": null,
+    "variable": null
+}

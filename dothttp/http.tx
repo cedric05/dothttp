@@ -42,7 +42,7 @@ HEADER:
 ;
 
 AUTHWRAP:
-    digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH | aws_auth = AWSAUTH
+    digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH | ntlm_auth = NTLMAUTH | aws_auth = AWSAUTH
 ;
 
 CERTAUTH:
@@ -51,6 +51,12 @@ CERTAUTH:
     ) | (
         'p12' '(' 'file' '=' p12_file=DotString ',' 'password' '=' password=DotString ','? ')'
     )
+;
+
+
+NTLMAUTH:
+    'ntlmauth' '(' username=DotString ',' password= DotString ')'
+
 ;
 
 

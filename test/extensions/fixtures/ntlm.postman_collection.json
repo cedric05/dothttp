@@ -1,0 +1,5 @@
+{
+    "files": {
+        "ntlm_auth.http\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from ntlm.postman_collection.json\n\n// ntlm auth\n\n@name(\"ntlm auth\")\nGET \"http://localhost:5000/both\"\nntlmauth(\"username\", \"password\")\n\n\n\n"
+    }
+}

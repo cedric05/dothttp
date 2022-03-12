@@ -262,6 +262,8 @@ class HttpFileFormatter(RequestBase):
                     output_str += f'{new_line}basicauth("{basic_auth.username}", "{basic_auth.password}")'
                 elif digest_auth := auth_wrap.digest_auth:
                     output_str += f'{new_line}digestauth("{digest_auth.username}", "{digest_auth.password}")'
+                elif ntlm_auth := auth_wrap.ntlm_auth:
+                    output_str += f'{new_line}ntlmauth("{ntlm_auth.username}", "{ntlm_auth.password}")'
                 elif aws_auth := auth_wrap.aws_auth:
                     if aws_auth.service and aws_auth.region:
                         output_str += f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}", service="{aws_auth.service}", region="{aws_auth.region}")'

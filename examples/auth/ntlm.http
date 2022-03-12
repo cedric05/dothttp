@@ -1,0 +1,3 @@
+@name('ntlm auth')
+GET http://localhost:5000/both
+ntlmauth('username','password')

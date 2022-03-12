@@ -112,3 +112,7 @@ class Testhttp2postman(TestBase):
             http2postman_dir.joinpath("folderupload", "examples.postman_collection.json"),
             str(http2postman_dir.joinpath("folderupload", "examples")),
         )
+
+    def test_ntlm_auth(self):
+        self.execute_n_get(http2postman_dir.joinpath("ntlmauth.postman_collection.json"),
+                           os.path.join(http2postman_dir, "ntlm_auth.http"))

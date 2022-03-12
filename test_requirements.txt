@@ -9,3 +9,4 @@ pytest==6.2.3
 pytest-cache==1.0
 pytest-pep8==1.0.2
 waitress==1.4.3
+flask

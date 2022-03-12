@@ -10,6 +10,12 @@ like.
 dothttp will provide simple, cleaner architecture for making http requests. It uses xtext (eclipse developed dsl) to
 build a custom dsl.
 
+
+### Documentation
+
+More information or docs can be cound at https://docs.dothttp.dev
+
+
 ---
 Go through this example for better understanding. for babysteps click [here](#first-dothttprequest-and-more)
 ```http
@@ -258,9 +264,14 @@ User can define headers in below three formats
 
 ### Authentication
 
-- basic auth currently **dothttp** only supports basic auth. more are yet to come.
-
+#### BasicAuth
 `basicauth('username','password')'` --> will compute add respective headers.
+
+#### DigestAuth
+`digestauth('username','password')'` --> will compute add respective headers.
+
+#### NtlmAuth
+`ntlmauth('username','password')'` --> will compute add respective headers.
 
 ### Property file
 
@@ -335,7 +346,6 @@ format:
 
 checkout [examples]('./examples/dothttpazure.http')
 
-
 -----------
 ### Vscode alternatives
 
@@ -347,3 +357,4 @@ checkout [examples]('./examples/dothttpazure.http')
 ### Non Vscode alternatives
 - [http-client](https://www.jetbrains.com/help/idea/http-client-in-product-code-editor.html)  closed source
 - [dothttp](https://github.com/tonsV2/dothttp)  written in python
+

@@ -5,10 +5,12 @@ import urllib.parse
 from typing import Dict
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+from requests_ntlm import HttpNtlmAuth
 
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType, Variable
 from dothttp import json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
     request_logger, Payload, APPLICATION_JSON, CONTENT_TYPE, AWS4Auth, dothttp_model
+from dothttp.parse_models import NtlmAuthWrap
 from dothttp.request_base import RequestCompiler
 from dothttp.utils import json_to_urlencoded_array
 from . import logger
@@ -19,7 +21,6 @@ from ..postman2_1 import RequestClass, Items, Auth, ApikeyElement, Header, Query
 
 try:
     import jstyleson as json
-    from jsonschema import validate
 except:
     import json
 
@@ -202,7 +203,7 @@ class Http2Postman(RunHttpFileHandler):
         request.method = http.method
         if auth := http.auth:
             request.auth = Auth.from_dict({})
-            if isinstance(auth, (HTTPBasicAuth, HTTPDigestAuth)):
+            if isinstance(auth, (HTTPBasicAuth, HTTPDigestAuth, HttpNtlmAuth)):
                 request_auth = []
                 if isinstance(auth, HTTPBasicAuth):
                     request.auth.basic = request_auth
@@ -210,6 +211,9 @@ class Http2Postman(RunHttpFileHandler):
                 elif isinstance(auth, HTTPDigestAuth):
                     request.auth.digest = request_auth
                     request.auth.type = AuthType.DIGEST
+                elif isinstance(auth, HttpNtlmAuth):
+                    request.auth.ntlm = request_auth
+                    request.auth.type = AuthType.NTLM
                 request_auth += [ApikeyElement(
                     key="username",
                     value=auth.username,
