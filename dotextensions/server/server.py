@@ -4,6 +4,8 @@ import logging
 import sys
 from json import JSONDecodeError
 from typing import Dict
+import asyncio
+import typing
 
 from dothttp.__version__ import __version__ as version
 from .handlers.basic_handlers import RunHttpFileHandler, ContentExecuteHandler, FormatHttpFileHandler, \
@@ -108,3 +110,48 @@ class CmdServer(Base):
     def get_command(self, line):
         output = json.loads(line)
         return super().get_command(**output)
+
+async def async_read_stdin() -> str:
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, sys.stdin.readline)
+
+async def connect_stdin_stdout() -> typing.Tuple[asyncio.StreamReader, asyncio.StreamWriter]:
+    loop = asyncio.get_event_loop()
+    reader = asyncio.StreamReader()
+    protocol = asyncio.StreamReaderProtocol(reader)
+    await loop.connect_read_pipe(lambda: protocol, sys.stdin)
+    w_transport, w_protocol = await loop.connect_write_pipe(asyncio.streams.FlowControlMixin, sys.stdout)
+    writer = asyncio.StreamWriter(w_transport, w_protocol, reader, loop)
+    return reader, writer
+
+class AsyncCmdServer(CmdServer):
+
+    async def run_forever(self):
+        self.reader, self.writer = await connect_stdin_stdout()
+        # publish version
+        self.write_result({"id": -1, "result": {"dothttp_version": version}})
+        while True:
+            line = await self.reader.readline()
+            try:
+                logger.debug(f"got request {line}")
+                command = self.get_command(line)
+                if len(line) != 0:
+                    await self.run_respond(command)
+            except JSONDecodeError:
+                logger.info(
+                    f"input line `{line.strip()}` is not json decodable")
+                self.write_result(
+                    {"id": 0, "result": {"error": True, "error_message": "not json decodable"}})
+            except Exception as e:
+                logger.info(
+                    f"unknown exception `{e}` happened ", exc_info=True)
+                self.write_result(
+                    {"id": 0, "result": {"error": True, "error_message": "not json decodable"}})
+
+    async def run_respond(self, command):
+        result = run(command)
+        self.write_result(result)
+
+    def write_result(self, result):
+        string_result = json.dumps(result) + "\n"
+        self.writer.write(string_result.encode())

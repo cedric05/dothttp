@@ -41,6 +41,7 @@ class DothttpTypes(Enum):
     URL = "url"
     BASIC_AUTH = "basic_auth"
     DIGEST_AUTH = "digest_auth"
+    NTLM_AUTH = "ntlm_auth"
     CERTIFICATE = "certificate"
     HEADER = "header"
     URL_PARAMS = "urlparams"

@@ -1,9 +1,10 @@
+import asyncio
 import logging
 import sys
 
 from dothttp.log_utils import setup_logging as root_logging_setup
 from dothttp.__version__ import __version__
-from .server import CmdServer, HttpServer
+from .server import AsyncCmdServer, CmdServer, HttpServer
 
 
 def setup_logging(level):
@@ -18,10 +19,8 @@ def main():
     if len(sys.argv) == 2:
         type_of_server = sys.argv[1]
     else:
-        type_of_server = "cmd"
-    if type_of_server == "cmd":
-        CmdServer().run_forever()
-    elif type_of_server == "http":
+        type_of_server = 'cmd'
+    if type_of_server == "http":
         port = 5000
         if len(sys.argv) == 3:
             try:
@@ -31,6 +30,11 @@ def main():
         HttpServer(port).run_forever()
     elif type_of_server == "version":
         print(__version__)
+    elif type_of_server == "async":
+        print('async')
+        asyncio.run(AsyncCmdServer().run_forever())
+    elif type_of_server == "cmd":
+        CmdServer().run_forever()
     else:
         sys.exit(1)
     sys.exit(0)

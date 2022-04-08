@@ -96,6 +96,9 @@ class TypeFromPos(BaseHandler):
                 elif pick_http.authwrap.digest_auth:
                     if self.is_in_between(pick_http.authwrap.digest_auth, position):
                         return DothttpTypes.DIGEST_AUTH
+                elif pick_http.authwrap.ntlm_auth:
+                    if self.is_in_between(pick_http.authwrap.digest_auth, position):
+                        return DothttpTypes.NTLM_AUTH
             if certificate := pick_http.certificate:
                 if self.is_in_between(certificate, position):
                     return DothttpTypes.CERTIFICATE
