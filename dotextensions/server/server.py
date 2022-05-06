@@ -9,7 +9,7 @@ import typing
 
 from dothttp.__version__ import __version__ as version
 from .handlers.basic_handlers import RunHttpFileHandler, ContentExecuteHandler, FormatHttpFileHandler, \
-    GetNameReferencesHandler, ContentNameReferencesHandler
+    GetNameReferencesHandler, ContentNameReferencesHandler, VersionHandler
 from .handlers.gohandler import TypeFromPos
 from .handlers.har2httphandler import Har2HttpHandler
 from .handlers.http2har import Http2Har
@@ -28,6 +28,7 @@ handlers: Dict[str, BaseHandler] = {handler.get_method(): handler for handler in
                                      TypeFromPos(),
                                      Har2HttpHandler(),
                                      Http2Postman(),
+                                     VersionHandler(),
                                      )}
 
 

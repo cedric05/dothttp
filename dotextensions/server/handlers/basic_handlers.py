@@ -5,6 +5,7 @@ from requests import RequestException
 
 from dothttp import DotHttpException, Config, HttpDef, Allhttp, BaseModelProcessor, UndefinedHttpToExtend
 from dothttp.request_base import CurlCompiler, RequestCompiler, HttpFileFormatter, dothttp_model
+from dothttp.__version__ import __version__
 from . import logger
 from ..models import Command, Result, BaseHandler
 
@@ -12,6 +13,17 @@ from ..models import Command, Result, BaseHandler
 class ContextConfig(Config):
     contexts: List[str] = None
 
+
+class VersionHandler(BaseHandler):
+    name = "/version"
+
+    def get_method(self):
+        return VersionHandler.name
+
+    def run(self, command: Command) -> Result:
+        return Result(id=command.id,
+                            result={
+                                "version": __version__})
 
 class RunHttpFileHandler(BaseHandler):
     name = "/file/execute"
