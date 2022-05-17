@@ -1,0 +1,46 @@
+{
+	"info": {
+		"_postman_id": "132ace27-84f0-4cbf-88cd-40983f5a1b99",
+		"name": "Test",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Multipart file",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "images[]",
+							"type": "file",
+							"src": "/D:/App/Logicwind/GitLAb/whiteboard-digitization/test_images/w11.jpg"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://req.dothttp.dev/api/post-survey",
+					"protocol": "https",
+					"host": [
+						"req",
+						"dothttp",
+						"dev"
+					],
+					"path": [
+						"api",
+						"post-survey"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
