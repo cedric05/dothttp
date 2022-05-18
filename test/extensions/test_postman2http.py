@@ -100,7 +100,7 @@ class FileExecute(TestBase):
             f"{postman_dir}/InheritAuth.postman_collection_2_0.json",
             f"{postman_dir}/variables.postman_collection.json",
             f"{postman_dir}/descriptionobject.postman_collection.json",
-            f"{postman_dir}/ntlm.postman_collection.json"
+            f"{postman_dir}/ntlm.postman_collection.json",
             f"{postman_dir}/multipart.postmancollection.json"
         ]
         for link in links:
