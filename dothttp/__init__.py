@@ -38,7 +38,7 @@ from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
     MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, \
-    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript
+    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript, ScriptType
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -125,6 +125,7 @@ class HttpDef:
     allow_insecure = False
     session_clear = False
     test_script: str = ""
+    test_script_lang: ScriptType = ScriptType.JAVA_SCRIPT
 
     def get_har(self):
         if self.auth:
@@ -832,10 +833,11 @@ class HttpDefBase(BaseModelProcessor):
 
     def load_test_script(self):
         self.httpdef.test_script = ""
-        script_wrap = self.get_current_or_base("script_wrap")
+        script_wrap: TestScript = self.get_current_or_base("script_wrap")
         if script_wrap and script_wrap.script:
             script = script_wrap.script[4:-2]
             self.httpdef.test_script = script.strip()
+            self.httpdef.test_script_lang = ScriptType.get_script_type(script_type=script_wrap.lang)
 
     def load_output(self):
         if self.http.output and self.http.output.output:

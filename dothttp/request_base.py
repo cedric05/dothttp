@@ -19,7 +19,7 @@ from . import eprint, Config, HttpDefBase, js3py, AWS4Auth
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .json_utils import JSONEncoder
-from .parse_models import Allhttp, Http, HttpFileType
+from .parse_models import Allhttp, Http, HttpFileType, ScriptType
 from .utils import quote_or_unquote, apply_quote_or_unquote
 
 JSON_ENCODER = JSONEncoder(indent=4)
@@ -324,7 +324,15 @@ class HttpFileFormatter(RequestBase):
             if output := http.output:
                 output_str += f'{new_line}>> {output.output}'
             if http.script_wrap and http.script_wrap.script:
-                output_str += new_line * 2 + "> {%" + new_line * 2 + http.script_wrap.script + new_line * 2 + "%}" + new_line * 3
+                if http.script_wrap.lang == ScriptType.PYTHON.value:
+                    script_lang = " python"
+                else:
+                    script_lang = ""
+                if http.script_wrap.script.startswith("> {%"):
+                    script_syntax  = http.script_wrap.script
+                else:
+                    script_syntax = "> {%" + new_line * 2 + http.script_wrap.script + new_line * 2 + "%}"
+                output_str += new_line * 2 + script_syntax + script_lang + new_line * 3
             else:
                 output_str += new_line * 3
             return output_str
@@ -449,20 +457,28 @@ class RequestCompiler(RequestBase):
             session.close()
         return resp
 
+    def pre_request(self):
+        try:
+            request_logger.debug("pre request script exists. starting script")
+            return js3py.execute_script(
+                script=self.httpdef.test_script,
+                script_type=self.httpdef.test_script_lang,
+                resp=resp,
+                properties=self.property_util.get_all_properties_variables(),
+            )
+        except Exception as e:
+            request_logger.error(f"unknown exception {e} happened", e)
+
+
+
     def execute_script(self, resp: Response):
         try:
-            content_type = resp.headers.get('content-type', 'text/plain')
-            # in some cases mimetype can have charset
-            # like text/plain; charset=utf-8
-            content_type = content_type.split(";")[0] if ';' in content_type else content_type
             request_logger.debug("script exists. starting script")
             return js3py.execute_script(
-                is_json=content_type == MIME_TYPE_JSON,
                 script=self.httpdef.test_script,
-                status_code=resp.status_code,
-                headers=dict(resp.headers),
+                script_type=self.httpdef.test_script_lang,
+                resp=resp,
                 properties=self.property_util.get_all_properties_variables(),
-                response_body_text=resp.text,
             )
         except Exception as e:
             request_logger.error(f"unknown exception {e} happened", e)

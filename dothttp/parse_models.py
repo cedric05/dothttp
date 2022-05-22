@@ -96,9 +96,9 @@ class TripleOrDouble:
 @dataclass
 class Payload:
     data: Optional[List[TripleOrDouble]]
-    datajson: Optional
+    datajson: Optional[dict]
     file: Optional[str]
-    json: Optional
+    json: Optional[dict]
     fileswrap: Optional[FilesWrap]
     type: Optional[str]
 
@@ -107,10 +107,15 @@ class Payload:
 class ToFile:
     output: str
 
+@dataclass
+class LangOption:
+    javascript: Optional[str]
+    python: Optional[str]
 
 @dataclass
 class TestScript:
     script: Optional[str]
+    lang: Optional[LangOption] = field(init=False)
 
 
 @dataclass
@@ -407,3 +412,16 @@ class HttpFileType(enum.Enum):
         elif ext in HttpFileType.Httpfile.file_exts:
             return HttpFileType.Httpfile
         raise DotHttpException("unknown file type")
+
+
+
+class ScriptType(enum.Enum):
+    PYTHON = "python"
+    JAVA_SCRIPT = "javascript"
+
+    @staticmethod
+    def get_script_type(script_type: LangOption):
+        if script_type == "python":
+            return ScriptType.PYTHON
+        else:
+            return ScriptType.JAVA_SCRIPT

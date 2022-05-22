@@ -214,7 +214,11 @@ URLString:
 // allows http or https till space otherwise go for
 
 HTTP_TEST_SCRIPT:
-    script=/> {%[\s\S]*?%}/
+    script=/> {%[\s\S]*?%}/ (lang=SCRIPT_LANGUAGE)?
+;
+
+SCRIPT_LANGUAGE:
+    'python' | 'javascript'
 ;
 
 SLASH:
