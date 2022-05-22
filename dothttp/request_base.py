@@ -379,6 +379,10 @@ def query_to_http(line):
 class RequestCompiler(RequestBase):
 
     def run(self):
+        self.load_def()
+        execution_cls = js3py.ScriptExecutionJs  if self.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT  else js3py.ScriptExecutionPython
+        script_execution = execution_cls(self.httpdef, self.property_util)
+        script_execution.pre_request_script()
         resp = self.get_response()
         self.print_req_info(resp.request)
         for hist_resp in resp.history:
@@ -392,7 +396,7 @@ class RequestCompiler(RequestBase):
         self.print_req_info(resp, '<')
         self.write_to_output(resp)
         request_logger.debug(f'request executed completely')
-        script_result = self.execute_script(resp).as_json()
+        script_result = script_execution.execute_test_script(resp=resp).as_json()
         self.print_script_result(script_result)
         return resp
 
@@ -456,32 +460,6 @@ class RequestCompiler(RequestBase):
         if self.httpdef.session_clear:
             session.close()
         return resp
-
-    def pre_request(self):
-        try:
-            request_logger.debug("pre request script exists. starting script")
-            return js3py.execute_script(
-                script=self.httpdef.test_script,
-                script_type=self.httpdef.test_script_lang,
-                resp=resp,
-                properties=self.property_util.get_all_properties_variables(),
-            )
-        except Exception as e:
-            request_logger.error(f"unknown exception {e} happened", e)
-
-
-
-    def execute_script(self, resp: Response):
-        try:
-            request_logger.debug("script exists. starting script")
-            return js3py.execute_script(
-                script=self.httpdef.test_script,
-                script_type=self.httpdef.test_script_lang,
-                resp=resp,
-                properties=self.property_util.get_all_properties_variables(),
-            )
-        except Exception as e:
-            request_logger.error(f"unknown exception {e} happened", e)
 
     def print_req_info(self, request: Union[PreparedRequest, Response], prefix=">"):
         if not (self.args.debug or self.args.info):

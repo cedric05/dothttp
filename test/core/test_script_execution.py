@@ -1,9 +1,10 @@
-import json
 from unittest import TestCase
 
 from requests import Response
-from dothttp.js3py import execute_script
+from dothttp import HttpDef
+from dothttp.js3py import ScriptExecutionPython
 from dothttp.parse_models import ScriptType
+from dothttp.property_util import PropertyProvider
 from test import TestBase
 from test.core.test_request import dir_path
 
@@ -47,15 +48,12 @@ class ScriptExecutionIntegration(TestBase):
 class ScriptExecutionIntegration(TestCase):
 
     def test_positive(self):
-        resp = Response()
-        resp.status_code = 200
-        resp.headers = {"sample_header": "sample_value"}
-        properties = {}
-        resp = execute_script("""
+        resp = self.get_script_exe("""
 class SampleTestCase(unittest.TestCase):
     def test_status_code(self):
         self.assertEquals(200 , resp.status_code)
-""", ScriptType.PYTHON, resp, properties)
+""")
+        
         self.assertEqual({'compiled': True,
                           'error': '',
                           'properties': {},
@@ -63,12 +61,17 @@ class SampleTestCase(unittest.TestCase):
                           'tests': [{'name': 'test_status_code (test_script.SampleTestCase)',
                                      'success': True}]}, resp.as_json())
 
-    def test_math_n_headers(self):
+    def get_script_exe(self, script):
         resp = Response()
         resp.status_code = 200
         resp.headers = {"sample_header": "sample_value"}
-        properties = {}
-        resp = execute_script("""
+        httpdef = HttpDef()
+        httpdef.test_script = script
+        script_exe = ScriptExecutionPython(httpdef, PropertyProvider())
+        return script_exe.execute_test_script(resp)
+
+    def test_math_n_headers(self):
+        resp = self.get_script_exe("""
 class SampleTestCase(unittest.TestCase):
     def test_math(self):
         self.assertEquals(4 , math.pow(2,2))
@@ -85,7 +88,7 @@ class SampleTestCase(unittest.TestCase):
         self.assertEquals("92f35115cca41c3270b11813164b0845108686761d73b3e6e4e95ae8380fbdd92c1b9d6ff0e6181214486e9eb7ccdd779ffe1b04b161e510c7d8e7da715eb0ae", 
         hashobj.hexdigest())
 
-""", ScriptType.PYTHON, resp, properties)
+""")
         self.assertEqual({'compiled': True,
                           'error': '',
                           'properties': {},
@@ -111,33 +114,25 @@ class SampleTestCase(unittest.TestCase):
                           }, resp.as_json())
 
     def test_assertion_failure(self):
-        resp = Response()
-        resp.status_code = 401
-        resp.headers = {"sample_header": "sample_value"}
-        properties = {}
-        resp = execute_script("""
+        resp = self.get_script_exe("""
 class SampleTestCase(unittest.TestCase):
     def test_status_code(self):
-        self.assertEquals(200 , resp.status_code)
-""", ScriptType.PYTHON, resp, properties)
+        self.assertEquals(401 , resp.status_code)
+""")
         self.assertEqual({'stdout': '',
                           'error': '',
                           'properties': {},
                           'tests': [{'name': 'test_status_code (test_script.SampleTestCase)',
                                      'success': False,
-                                     'error': 'Traceback (most recent call last):\n  File "test_script.py", line 4, in test_status_code\nAssertionError: 200 != 401\n'}],
+                                     'error': 'Traceback (most recent call last):\n  File "test_script.py", line 4, in test_status_code\nAssertionError: 401 != 200\n'}],
                           'compiled': True}, resp.as_json())
 
     def test_exception(self):
-        resp = Response()
-        resp.status_code = 401
-        resp.headers = {"sample_header": "sample_value"}
-        properties = {}
-        resp = execute_script("""
+        resp = self.get_script_exe("""
 class SampleTestCase(unittest.TestCase):
     def test_raise(self):
         raise Exception()
-""", ScriptType.PYTHON, resp, properties)
+""")
         self.assertEqual({'compiled': True,
                           'error': '',
                           'properties': {},
