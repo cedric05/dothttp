@@ -14,7 +14,8 @@ from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
-from dothttp import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME, TEXT_PLAIN, CONTENT_TYPE
+from .js3py import ScriptResult
+from . import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME, TEXT_PLAIN, CONTENT_TYPE
 from . import eprint, Config, HttpDefBase, js3py, AWS4Auth
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
@@ -396,21 +397,29 @@ class RequestCompiler(RequestBase):
         self.print_req_info(resp, '<')
         self.write_to_output(resp)
         request_logger.debug(f'request executed completely')
-        script_result = script_execution.execute_test_script(resp=resp).as_json()
+        script_result = script_execution.execute_test_script(resp=resp)
         self.print_script_result(script_result)
         return resp
 
-    def print_script_result(self, script_result):
+    def print_script_result(self, script_result: ScriptResult):
         print("\n------------")
-        if script_result['stdout']:
+        if script_result.stdout:
             print("\n##STDOUT:")
-            print(script_result['stdout'])
-        if script_result['error']:
+            print(script_result.stdout)
+        if script_result.error:
             print("\n##ERROR:")
-            print(script_result['error'])
-        if len(script_result['properties']) != 0:
+            print(script_result.error)
+        if len(script_result.properties) != 0:
             print("\n##PROPERTIES:")
-            pprint(script_result['properties'])
+            pprint(script_result.properties)
+        if len(script_result.tests) > 0:
+            print("\n##TESTS:\n")
+            for test in script_result.tests:
+                print(f"Test: {test.name}  {'success' if test.success else 'failure!!'}")
+                if test.result:
+                    print(f"result={test.result}")
+                if test.error:
+                    print(f"{test.error}")
         print("\n------------")
         # TODO print tests output individually
         request_logger.debug(f'script execution result {script_result}')

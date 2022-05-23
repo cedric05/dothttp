@@ -15,6 +15,7 @@ from js2py.base import JsObjectWrapper
 from requests import Response
 from RestrictedPython import compile_restricted, safe_globals
 from RestrictedPython.PrintCollector import PrintCollector
+from operator import getitem
 from faker import Faker
 
 from dothttp.exceptions import PreRequestScriptException
@@ -31,6 +32,9 @@ def write_guard(x):
     else:
         raise Exception("not allowed")
 
+# def read_guard(x, attr):
+#     return getattr(x, attr)
+
 
 allowed_global = {
     '_print_': PrintCollector,
@@ -42,6 +46,7 @@ allowed_global = {
     'unittest': unittest,
     'datetime': datetime,
     '_write_': write_guard,
+    "_getitem_": getitem,
     'csv': csv,
     'uuid': uuid,
     'base64': base64,
@@ -58,8 +63,8 @@ with open(get_real_file_path("postScript.js", __file__)) as f:
 @dataclass
 class TestResult:
     name: str
-    result: str = field(init=False)
-    error: typing.Optional[str] = field(init=False)
+    result: typing.Union[None, str] = None
+    error: typing.Union[None, str] = None
     success: bool = True
 
 
