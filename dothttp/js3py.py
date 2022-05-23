@@ -17,6 +17,8 @@ from RestrictedPython import compile_restricted, safe_globals
 from RestrictedPython.PrintCollector import PrintCollector
 from faker import Faker
 
+from dothttp.exceptions import PreRequestScriptException
+
 
 from .property_util import PropertyProvider
 from . import MIME_TYPE_JSON, HttpDef, request_logger
@@ -135,8 +137,9 @@ class ScriptExecutionEnvironmentBase:
     def pre_request_script(self):
         try:
             self._pre_request_script()
-        except Exception:
+        except Exception as e:
             request_logger.error("unknown exception happened", exc_info=True)
+            raise PreRequestScriptException(payload=str(e))
 
     def execute_test_script(self, resp):
         if not self.client.request.test_script:
@@ -201,7 +204,7 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
             self.client.request.test_script, 'test_script.py', 'exec')
         exec(byte_code, self.script_gloabal, self.local)
 
-    def pre_request_script(self) -> None:
+    def _pre_request_script(self) -> None:
         for key, func in self.local.items():
             if (key.startswith('pre')) and isinstance(func, types.FunctionType):
                 func()

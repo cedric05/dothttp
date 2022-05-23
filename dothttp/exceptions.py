@@ -80,7 +80,12 @@ class PayloadDataNotValidException(PayloadNotValidException):
     pass
 
 
-@exception_wrapper("js test script compilation failed `{payload}`")
+@exception_wrapper("python/js test script compilation failed `{payload}`")
+class PreRequestScriptException(DotHttpException):
+    pass
+
+
+@exception_wrapper("python/js test script compilation failed `{payload}`")
 class ScriptException(DotHttpException):
     pass
 
