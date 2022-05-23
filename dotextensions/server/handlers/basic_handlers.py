@@ -92,6 +92,7 @@ class RunHttpFileHandler(BaseHandler):
         return config
 
     def get_request_result(self, command, comp: RequestCompiler):
+        comp.load_def()
         execution_cls = js3py.ScriptExecutionJs  if comp.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT  else js3py.ScriptExecutionPython
         script_execution = execution_cls(comp.httpdef, comp.property_util)
         script_execution.pre_request_script()

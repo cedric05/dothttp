@@ -285,6 +285,8 @@ class HttpDef:
         if self.headers:
             for key, value in self.headers.items():
                 header_lines.append(Line(header=Header(key=key, value=value), query=None))
+        test_script = TestScript(self.test_script)
+        test_script.lang = self.test_script_lang
         return Http(
             namewrap=NameWrap(self.name),
             extra_args=extra_args,
@@ -292,7 +294,7 @@ class HttpDef:
             lines=header_lines + query_lines,
             payload=payload,
             certificate=certificate,
-            output=None, authwrap=auth_wrap, description=None, script_wrap=TestScript(self.test_script)
+            output=None, authwrap=auth_wrap, description=None, script_wrap=test_script
         )
 
 
