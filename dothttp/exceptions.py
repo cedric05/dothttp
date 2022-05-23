@@ -11,7 +11,8 @@ def exception_wrapper(message, ):
 
 @exception_wrapper("root dothttp exception")
 class DotHttpException(Exception):
-    pass
+    def __str__(self) -> str:
+        return self.message
 
 
 @exception_wrapper("http def with name `{base}` not defined for http  with name `{target}`")

@@ -12,13 +12,14 @@ import uuid
 
 import js2py
 from js2py.base import JsObjectWrapper
+from js2py.internals.simplex import JsException
 from requests import Response
 from RestrictedPython import compile_restricted, safe_globals
 from RestrictedPython.PrintCollector import PrintCollector
 from operator import getitem
 from faker import Faker
 
-from dothttp.exceptions import PreRequestScriptException
+from dothttp.exceptions import DotHttpException, PreRequestScriptException, ScriptException
 
 
 from .property_util import PropertyProvider
@@ -121,6 +122,24 @@ class ScriptTestResult(unittest.TestResult):
         self.script_result.tests.append(result)
 
 
+class Properties(dict):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.updated = {}
+
+    def set(self, key, value):
+        self.setdefault(key, value)
+        self.updated[key] = value
+
+    def clear(self, key):
+        self.setdefault(key, '')
+
+    def clear_all(self, key):
+        for i in self:
+            self.clear(key, '')
+
+
 @dataclass
 class Client:
     request: HttpDef
@@ -131,7 +150,7 @@ class Client:
 class ScriptExecutionEnvironmentBase:
     def __init__(self, httpdef: HttpDef, prop: PropertyProvider) -> None:
         self.client = Client(
-            request=httpdef, properties=prop.get_all_properties_variables())
+            request=httpdef, properties=Properties(prop.get_all_properties_variables()))
 
     def _pre_request_script(self) -> None:
         pass
@@ -152,6 +171,14 @@ class ScriptExecutionEnvironmentBase:
                 stdout="", error="", properties={}, tests=[])
         try:
             return self._execute_test_script(resp)
+        except DotHttpException as e:
+            request_logger.error(f"js/python compile failed with error {e}")
+            script_result = ScriptResult(
+                stdout="", error="", properties={}, tests=[])
+            script_result.compiled = False
+            script_result.error = e.message
+            request_logger.error("unknown exception happened", exc_info=True)
+            return script_result
         except Exception as e:
             request_logger.error(f"js/python compile failed with error {e}")
             script_result = ScriptResult(
@@ -169,8 +196,11 @@ class ScriptExecutionJs(ScriptExecutionEnvironmentBase):
         # those who want to use require in dothttp scripts
         # i will write up a document on how to do it
         context = js2py.EvalJs(enable_require=True)
-        context.execute(js_template.replace(
-            "JS_CODE_REPLACE", self.client.request.test_script))
+        try:
+            context.execute(js_template.replace(
+                "JS_CODE_REPLACE", self.client.request.test_script))
+        except JsException as e:
+            raise ScriptException(payload=str(e))
         content_type = resp.headers.get('content-type', 'text/plain')
         # in some cases mimetype can have charset
         # like text/plain; charset=utf-8
@@ -203,11 +233,14 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
         super().__init__(httpdef, prop)
         self.log_func = PrintFunc()
         self.local = {}
-        self.script_gloabal = dict(
+        script_gloabal = dict(
             log=self.log_func, client=self.client, **allowed_global)
-        byte_code = compile_restricted(
-            self.client.request.test_script, 'test_script.py', 'exec')
-        exec(byte_code, self.script_gloabal, self.local)
+        try:
+            byte_code = compile_restricted(
+                self.client.request.test_script, 'test_script.py', 'exec')
+            exec(byte_code, script_gloabal, self.local)
+        except Exception as e:
+            raise ScriptException(payload=str(e))
 
     def _pre_request_script(self) -> None:
         for key, func in self.local.items():
@@ -238,6 +271,6 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
                 tests = unittest.TestLoader().loadTestsFromTestCase(func)
                 suite.addTests(tests)
         suite.run(unit_test_result)
-        script_result.properties = self.client.properties
+        script_result.properties = self.client.properties.updated
         script_result.stdout = self.log_func.get_script_output()
         return script_result
