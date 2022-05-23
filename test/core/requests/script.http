@@ -4,10 +4,10 @@ GET http://httpbin.org/robots.txt
 
 class SampleTest(unittest.TestCase):
     def test_hai(self):
-        if resp.status_code == 200:
+        if client.response.status_code == 200:
             log("working")
         else:
-            log(f"not working {resp.status_code}")
+            log(f"not working {client.response.status_code}")
 %} python
 
 @name("python_function")
@@ -15,10 +15,10 @@ GET http://httpbin.org/robots.txt
 > {%
 
 def test_hai():
-    if resp.status_code == 200:
+    if client.response.status_code == 200:
         log("working")
     else:
-        log(f"not working {resp.status_code}")
+        log(f"not working {client.response.status_code}")
 
 %} python
 

@@ -2,6 +2,7 @@ from unittest import TestCase
 
 from requests import Response
 from dothttp import HttpDef
+from dothttp import js3py
 from dothttp.js3py import ScriptExecutionPython
 from dothttp.parse_models import ScriptType
 from dothttp.property_util import PropertyProvider
@@ -12,7 +13,7 @@ file_name = f"{dir_path}/requests/script.http"
 
 
 # integration test
-class ScriptExecutionIntegration(TestBase):
+class ScriptExecutionIntegrationTest(TestBase):
 
     def test_python(self):
         req, result = self.load_comp("python_class")
@@ -41,8 +42,10 @@ class ScriptExecutionIntegration(TestBase):
     def load_comp(self, target):
         req = self.get_req_comp(file_name, target=target)
         req.load_def()
+        execution_cls = js3py.ScriptExecutionJs  if req.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT  else js3py.ScriptExecutionPython
+        script_execution = execution_cls(req.httpdef, req.property_util)
         resp = req.get_response()
-        return req, req.execute_script(resp).as_json()
+        return req, script_execution.execute_test_script(resp).as_json()
 
 
 class ScriptExecutionIntegration(TestCase):
@@ -51,9 +54,9 @@ class ScriptExecutionIntegration(TestCase):
         resp = self.get_script_exe("""
 class SampleTestCase(unittest.TestCase):
     def test_status_code(self):
-        self.assertEquals(200 , resp.status_code)
+        self.assertEquals(200 , client.response.status_code)
 """)
-        
+
         self.assertEqual({'compiled': True,
                           'error': '',
                           'properties': {},
@@ -70,6 +73,21 @@ class SampleTestCase(unittest.TestCase):
         script_exe = ScriptExecutionPython(httpdef, PropertyProvider())
         return script_exe.execute_test_script(resp)
 
+    def test_pre_request(self):
+        httpdef = HttpDef()
+        httpdef.headers = {}
+        httpdef.test_script = """
+def pre_request():
+    client.request.headers.setdefault('ram', 'ranga')
+    client.properties.setdefault("new", "value")
+"""
+        props = PropertyProvider()
+        props.add_command_property("ram", "raju")
+        script_exe = ScriptExecutionPython(httpdef, props)
+        script_exe.pre_request_script()
+        self.assertEquals({"ram": "ranga"}, httpdef.headers)
+        self.assertEquals({"new": "value", "ram": "raju"}, script_exe.client.properties)
+
     def test_math_n_headers(self):
         resp = self.get_script_exe("""
 class SampleTestCase(unittest.TestCase):
@@ -77,7 +95,7 @@ class SampleTestCase(unittest.TestCase):
         self.assertEquals(4 , math.pow(2,2))
 
     def test_headers(self):
-        self.assertEquals("sample_value", resp.headers.get("sample_header"))
+        self.assertEquals("sample_value", client.response.headers.get("sample_header"))
 
     def test_date(self):
         datetime.datetime.now()
@@ -117,7 +135,7 @@ class SampleTestCase(unittest.TestCase):
         resp = self.get_script_exe("""
 class SampleTestCase(unittest.TestCase):
     def test_status_code(self):
-        self.assertEquals(401 , resp.status_code)
+        self.assertEquals(401 , client.response.status_code)
 """)
         self.assertEqual({'stdout': '',
                           'error': '',

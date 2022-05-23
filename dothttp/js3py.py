@@ -24,10 +24,10 @@ from .utils import get_real_file_path
 
 
 def write_guard(x):
-    if isinstance(x, HttpDef):
+    if isinstance(x, Client):
         return x
     else:
-        raise
+        raise Exception("not allowed")
 
 
 allowed_global = {
@@ -114,10 +114,17 @@ class ScriptTestResult(unittest.TestResult):
         self.script_result.tests.append(result)
 
 
+@dataclass
+class Client:
+    request: HttpDef
+    properties: typing.Dict
+    response: Response = None
+
+
 class ScriptExecutionEnvironmentBase:
     def __init__(self, httpdef: HttpDef, prop: PropertyProvider) -> None:
-        self.httpdef = httpdef
-        self.props = prop.get_all_properties_variables()
+        self.client = Client(
+            request=httpdef, properties=prop.get_all_properties_variables())
 
     def _pre_request_script(self) -> None:
         pass
@@ -132,7 +139,7 @@ class ScriptExecutionEnvironmentBase:
             request_logger.error("unknown exception happened", exc_info=True)
 
     def execute_test_script(self, resp):
-        if not self.httpdef.test_script:
+        if not self.client.request.test_script:
             return ScriptResult(
                 stdout="", error="", properties={}, tests=[])
         try:
@@ -155,14 +162,14 @@ class ScriptExecutionJs(ScriptExecutionEnvironmentBase):
         # i will write up a document on how to do it
         context = js2py.EvalJs(enable_require=True)
         context.execute(js_template.replace(
-            "JS_CODE_REPLACE", self.httpdef.test_script))
+            "JS_CODE_REPLACE", self.client.request.test_script))
         content_type = resp.headers.get('content-type', 'text/plain')
         # in some cases mimetype can have charset
         # like text/plain; charset=utf-8
         content_type = content_type.split(
             ";")[0] if ';' in content_type else content_type
         client = context.jsHandler(
-            content_type == MIME_TYPE_JSON, self.props, resp.text, resp.status_code, dict(resp.headers))
+            content_type == MIME_TYPE_JSON, self.client.properties, resp.text, resp.status_code, dict(resp.headers))
         script_result = ScriptResult(
             stdout="", error="", properties={}, tests=[])
         for test_name in client.tests:
@@ -188,10 +195,10 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
         super().__init__(httpdef, prop)
         self.log_func = PrintFunc()
         self.local = {}
-        self.script_gloabal = dict(properties=self.props,
-                                   log=self.log_func, resp=None, httpdef=self.httpdef, **allowed_global)
+        self.script_gloabal = dict(
+            log=self.log_func, client=self.client, **allowed_global)
         byte_code = compile_restricted(
-            self.httpdef.test_script, 'test_script.py', 'exec')
+            self.client.request.test_script, 'test_script.py', 'exec')
         exec(byte_code, self.script_gloabal, self.local)
 
     def pre_request_script(self) -> None:
@@ -205,7 +212,7 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
         suite = unittest.TestSuite()
         unit_test_result = ScriptTestResult()
         unit_test_result.script_result(script_result)
-        self.script_gloabal['resp'] = resp
+        self.client.response = resp
         for key, func in self.local.items():
             if (key.startswith('test')):
                 if isinstance(func, types.FunctionType):
@@ -223,6 +230,6 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
                 tests = unittest.TestLoader().loadTestsFromTestCase(func)
                 suite.addTests(tests)
         suite.run(unit_test_result)
-        script_result.properties = self.props
+        script_result.properties = self.client.properties
         script_result.stdout = self.log_func.get_script_output()
         return script_result
