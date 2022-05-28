@@ -5,7 +5,7 @@ import urllib.parse
 from typing import Dict
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
-from requests_ntlm import HttpNtlmAuth
+from dothttp import HttpNtlmAuth
 
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType, Variable
 from dothttp import json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \

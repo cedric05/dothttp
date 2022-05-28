@@ -11,7 +11,8 @@ def exception_wrapper(message, ):
 
 @exception_wrapper("root dothttp exception")
 class DotHttpException(Exception):
-    pass
+    def __str__(self) -> str:
+        return self.message
 
 
 @exception_wrapper("http def with name `{base}` not defined for http  with name `{target}`")
@@ -80,7 +81,12 @@ class PayloadDataNotValidException(PayloadNotValidException):
     pass
 
 
-@exception_wrapper("js test script compilation failed `{payload}`")
+@exception_wrapper("python/js test script compilation failed `{payload}`")
+class PreRequestScriptException(DotHttpException):
+    pass
+
+
+@exception_wrapper("python/js test script compilation failed `{payload}`")
 class ScriptException(DotHttpException):
     pass
 

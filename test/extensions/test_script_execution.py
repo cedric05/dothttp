@@ -22,8 +22,8 @@ class ScriptExecutionTest(TestBase):
                           'stdout': '',
                           'tests': [{'error': 'content-type is json',
                                      'name': 'check json',
-                                     'success': False},
-                                    {'name': 'check status', 'result': None, 'success': True}]},
+                                     'success': False, 'result': None},
+                                    {'name': 'check status', 'result': None, 'success': True, "error": None}]},
                          result.result['script_result'])
 
     def test_execute_script2(self):
@@ -32,8 +32,8 @@ class ScriptExecutionTest(TestBase):
                           'error': '',
                           'properties': {'outputval': 'secret_token'},
                           'stdout': 'this is sample log\n',
-                          'tests': [{'name': 'check headers', 'result': None, 'success': True},
-                                    {'name': 'check status', 'result': None, 'success': True}]},
+                          'tests': [{'name': 'check headers', 'result': None, 'success': True, "error": None},
+                                    {'name': 'check status', 'result': None, 'success': True, "error": None}]},
                          result.result['script_result'])
 
     def test_execute_is_equals_script3(self):
@@ -44,12 +44,14 @@ class ScriptExecutionTest(TestBase):
                           'stdout': '',
                           'tests': [{'name': 'checks payload output recursive',
                                      'result': None,
+                                     'error': None,
                                      'success': True}]},
                          result.result['script_result'])
 
     def test_execute_delete_property_script(self):
         value = "this is before"
-        result = self.execute_target("delete property", properties={"setPropertyByfile": value})
+        result = self.execute_target("delete property", properties={
+                                     "setPropertyByfile": value})
         self.assertEqual({'compiled': True,
                           'error': '',
                           'properties': {'setPropertyByfile': ''},

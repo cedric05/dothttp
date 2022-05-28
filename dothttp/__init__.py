@@ -13,28 +13,32 @@ from urllib.parse import urlencode, urljoin, uses_relative, uses_netloc, uses_pa
 from requests import PreparedRequest
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
-from requests_ntlm import HttpNtlmAuth
 
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
 
 try:
     from requests_aws4auth import AWS4Auth
-except:
+except ImportError:
     AWS4Auth = None
+try:
+    from requests_ntlm import HttpNtlmAuth
+except ImportError:
+    HttpNtlmAuth = None
+
 try:
     import jstyleson as json
     from jsonschema import validate
-except:
+except ImportError:
     import json
-
     validate = None
+
 from textx import TextXSyntaxError, metamodel_from_file
 
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
     MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, \
-    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript
+    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript, ScriptType
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -121,6 +125,7 @@ class HttpDef:
     allow_insecure = False
     session_clear = False
     test_script: str = ""
+    test_script_lang: ScriptType = ScriptType.JAVA_SCRIPT
 
     def get_har(self):
         if self.auth:
@@ -280,6 +285,8 @@ class HttpDef:
         if self.headers:
             for key, value in self.headers.items():
                 header_lines.append(Line(header=Header(key=key, value=value), query=None))
+        test_script = TestScript(self.test_script)
+        test_script.lang = self.test_script_lang
         return Http(
             namewrap=NameWrap(self.name),
             extra_args=extra_args,
@@ -287,7 +294,7 @@ class HttpDef:
             lines=header_lines + query_lines,
             payload=payload,
             certificate=certificate,
-            output=None, authwrap=auth_wrap, description=None, script_wrap=TestScript(self.test_script)
+            output=None, authwrap=auth_wrap, description=None, script_wrap=test_script
         )
 
 
@@ -828,10 +835,11 @@ class HttpDefBase(BaseModelProcessor):
 
     def load_test_script(self):
         self.httpdef.test_script = ""
-        script_wrap = self.get_current_or_base("script_wrap")
+        script_wrap: TestScript = self.get_current_or_base("script_wrap")
         if script_wrap and script_wrap.script:
             script = script_wrap.script[4:-2]
             self.httpdef.test_script = script.strip()
+            self.httpdef.test_script_lang = ScriptType.get_script_type(script_type=script_wrap.lang)
 
     def load_output(self):
         if self.http.output and self.http.output.output:

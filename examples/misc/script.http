@@ -1,15 +1,21 @@
 @name("text payload")
-GET http://httpbin.org/robots.txt
+GET http://httpbin.org/get
 > {%
-client.test("check status", function(){
-    // checking test and assert
-    client.assert(response.status ===200, "status is 200")
-})
-client.test("check json", function(){
-    // were able to check headers
-    client.assert(response.headers.valueOf('content-type') === "application/json", "content-type is json")
-})
-// were able to check json response
-client.global.set("outputval", response.body);
 
-%}
+def pre_hai():
+    client.request.headers.setdefault("preheader", "prevalue")
+
+def test_hai():
+    if client.response.status_code == 200:
+        log('working')
+    else:
+        log('not working')
+
+class SampleTest(unittest.TestCase):
+    def test_is_mime_not_json(self):
+        self.assertTrue(client.response.headers.get("content-type").startswith("application/xml"), "should not be json")
+
+    def test_pre_request_preheader(self):
+        body = client.response.json()
+        self.assertEqual("prevalue", body['headers']['Preheader'])
+%} python

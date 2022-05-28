@@ -1,0 +1,5 @@
+{
+    "files": {
+        "Test\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from multipart.postmancollection.json\n\n@name(\"Multipart file\")\nPOST \"https://req.dothttp.dev/api/post-survey\"\n\"Accept\": \"application/json\"\nmultipart(\n\t\"images[]\" < \"/D:/App/Logicwind/GitLAb/whiteboard-digitization/test_images/w11.jpg\"\n)\n\n\n\n"
+    }
+}

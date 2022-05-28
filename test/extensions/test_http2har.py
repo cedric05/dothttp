@@ -34,7 +34,8 @@ class ToHarTest(TestBase):
         self.basic_test(file=f"{command_dir}/simple.http", content=None)
 
     def test_basic_content(self):
-        self.basic_test(file=None, content="GET https://{{host=httpbin.org}}/get")
+        self.basic_test(
+            file=None, content="GET https://{{host=httpbin.org}}/get")
 
     def basic_test(self, **kwargs):
         command = Command(
@@ -122,7 +123,8 @@ class ToHarTest(TestBase):
                                                             'query': [],
                                                             'url': 'https://req.dothttp.dev'}}},
                          self.execute_payload(target='text-other-content', **kwargs).result)
-        mimetype = 'application/octet-stream' if sys.platform.startswith("win32") else 'text/plain'
+        mimetype = 'application/octet-stream' if sys.platform.startswith(
+            "win32") else 'text/plain'
         self.assertEqual({'target': {'files': {'headers': [],
                                                'method': 'POST',
                                                'payload': {'mimeType': 'multipart/form-data',
@@ -194,9 +196,11 @@ class ToHarTest(TestBase):
         with tempfile.NamedTemporaryFile(delete=False) as f:
             f.write(b"hai")
             f.flush()
-            result = self.execute_payload(target='1', file=filename, fileinputarg=f.name).result
+            result = self.execute_payload(
+                target='1', file=filename, fileinputarg=f.name).result
             self.assertEqual("GET", result['target']['1']['method'], )
-            self.assertEqual("https://s3.amazonaws.com", result['target']['1']['url'], )
+            self.assertEqual("https://s3.amazonaws.com",
+                             result['target']['1']['url'], )
             for headerData in result['target']['1']['headers']:
                 name = headerData['name']
                 self.assertTrue(name.startswith('x-amz') or name.lower().startswith('authorization'),
@@ -220,7 +224,8 @@ class ToHarTest(TestBase):
 
     def execute_payload(self, fileinputarg="", **kwargs):
         kwargs["properties"] = {"filename":
-                                    os.path.join(dir_path, f"{command_dir}/payload.http"),
+                                os.path.join(
+                                    dir_path, f"{command_dir}/payload.http"),
                                 "fileinput2": fileinputarg}
         command = Command(
             method=Http2Har.name,
@@ -230,3 +235,32 @@ class ToHarTest(TestBase):
         # eprint("{\"" + "request" + "\":", json.dumps(result.result['target'][kwargs['target']]), "},")
         self.assertFalse(result.result.get("error", False))
         return result
+
+    def test_context(self):
+        command = Command(
+            method=Http2Har.name,
+            params={
+                "contexts": [
+                    """
+// {{some_variable=some_value}}
+@name("base")
+GET "https://req.dothttp.dev/some/path"
+"""],
+                "content":
+                """
+@name("some request"): "base"
+GET '/{{some_variable}}'
+""",
+                "file": None,
+                "target": "1",
+                "properties": {
+                }
+            },
+            id=1)
+        result = self.execute_handler.run(command=command)
+        self.assertFalse(result.result.get("error", False))
+        self.assertEqual({'target': {'1': {'headers': [],
+                                           'method': 'GET',
+                                           'payload': {},
+                                           'query': [],
+                                           'url': 'https://req.dothttp.dev/some/path/some_value'}}}, result.result)

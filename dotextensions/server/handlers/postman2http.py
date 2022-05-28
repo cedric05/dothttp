@@ -14,8 +14,8 @@ from dothttp.request_base import HttpFileFormatter
 from dothttp.utils import APPLICATION_JSON
 from . import logger
 from ..models import Command, Result, BaseHandler
-from ..postman import Items, Auth, URLClass, POSTMAN_2, postman_collection_from_dict, AuthType, Variable
-from ..postman2_1 import URLClass as URLClass_2_1, ApikeyElement, POSTMAN_2_1, \
+from ..postman import Items, Auth, URLClass, POSTMAN_2, postman_collection_from_dict, AuthType, Variable, FormParameterType as FormParameterType2_0
+from ..postman2_1 import FormParameterType, URLClass as URLClass_2_1, ApikeyElement, POSTMAN_2_1, \
     postman_collection21_from_dict, AuthType as AuthType_2_1
 from ..utils import clean_filename, slashed_path_to_normal_path, get_alternate_filename
 
@@ -122,7 +122,7 @@ class ImportPostmanCollection(BaseHandler):
                 files = []
                 for one_form in formdata:
                     # TODO value can be list
-                    if one_form.type == 'file':
+                    if (one_form.type == FormParameterType.FILE) or (one_form.type == FormParameterType2_0.FILE):
                         # TODO according to type, you would want to normalize path
                         files.append(MultiPartFile(one_form.key, slashed_path_to_normal_path(one_form.src),
                                                    one_form.content_type))

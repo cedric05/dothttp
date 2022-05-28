@@ -5,7 +5,7 @@ import unittest
 from unittest import skip
 
 
-from requests_ntlm import HttpNtlmAuth
+from dothttp import HttpNtlmAuth
 
 from dothttp.exceptions import *
 from dothttp.request_base import DOTHTTP_COOKIEJAR, CurlCompiler, HttpFileFormatter, RequestBase

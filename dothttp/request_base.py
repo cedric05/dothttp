@@ -14,12 +14,13 @@ from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
-from dothttp import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME, TEXT_PLAIN, CONTENT_TYPE
+from .js3py import ScriptResult
+from . import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME, TEXT_PLAIN, CONTENT_TYPE
 from . import eprint, Config, HttpDefBase, js3py, AWS4Auth
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .json_utils import JSONEncoder
-from .parse_models import Allhttp, Http, HttpFileType
+from .parse_models import Allhttp, Http, HttpFileType, ScriptType
 from .utils import quote_or_unquote, apply_quote_or_unquote
 
 JSON_ENCODER = JSONEncoder(indent=4)
@@ -324,7 +325,15 @@ class HttpFileFormatter(RequestBase):
             if output := http.output:
                 output_str += f'{new_line}>> {output.output}'
             if http.script_wrap and http.script_wrap.script:
-                output_str += new_line * 2 + "> {%" + new_line * 2 + http.script_wrap.script + new_line * 2 + "%}" + new_line * 3
+                if http.script_wrap.lang == ScriptType.PYTHON.value:
+                    script_lang = " python"
+                else:
+                    script_lang = ""
+                if http.script_wrap.script.startswith("> {%"):
+                    script_syntax  = http.script_wrap.script
+                else:
+                    script_syntax = "> {%" + new_line * 2 + http.script_wrap.script + new_line * 2 + "%}"
+                output_str += new_line * 2 + script_syntax + script_lang + new_line * 3
             else:
                 output_str += new_line * 3
             return output_str
@@ -371,6 +380,10 @@ def query_to_http(line):
 class RequestCompiler(RequestBase):
 
     def run(self):
+        self.load_def()
+        execution_cls = js3py.ScriptExecutionJs  if self.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT  else js3py.ScriptExecutionPython
+        script_execution = execution_cls(self.httpdef, self.property_util)
+        script_execution.pre_request_script()
         resp = self.get_response()
         self.print_req_info(resp.request)
         for hist_resp in resp.history:
@@ -384,21 +397,29 @@ class RequestCompiler(RequestBase):
         self.print_req_info(resp, '<')
         self.write_to_output(resp)
         request_logger.debug(f'request executed completely')
-        script_result = self.execute_script(resp).as_json()
+        script_result = script_execution.execute_test_script(resp=resp)
         self.print_script_result(script_result)
         return resp
 
-    def print_script_result(self, script_result):
+    def print_script_result(self, script_result: ScriptResult):
         print("\n------------")
-        if script_result['stdout']:
+        if script_result.stdout:
             print("\n##STDOUT:")
-            print(script_result['stdout'])
-        if script_result['error']:
+            print(script_result.stdout)
+        if script_result.error:
             print("\n##ERROR:")
-            print(script_result['error'])
-        if len(script_result['properties']) != 0:
+            print(script_result.error)
+        if len(script_result.properties) != 0:
             print("\n##PROPERTIES:")
-            pprint(script_result['properties'])
+            pprint(script_result.properties)
+        if len(script_result.tests) > 0:
+            print("\n##TESTS:\n")
+            for test in script_result.tests:
+                print(f"Test: {test.name}  {'success' if test.success else 'failure!!'}")
+                if test.result:
+                    print(f"result={test.result}")
+                if test.error:
+                    print(f"{test.error}")
         print("\n------------")
         # TODO print tests output individually
         request_logger.debug(f'script execution result {script_result}')
@@ -448,24 +469,6 @@ class RequestCompiler(RequestBase):
         if self.httpdef.session_clear:
             session.close()
         return resp
-
-    def execute_script(self, resp: Response):
-        try:
-            content_type = resp.headers.get('content-type', 'text/plain')
-            # in some cases mimetype can have charset
-            # like text/plain; charset=utf-8
-            content_type = content_type.split(";")[0] if ';' in content_type else content_type
-            request_logger.debug("script exists. starting script")
-            return js3py.execute_script(
-                is_json=content_type == MIME_TYPE_JSON,
-                script=self.httpdef.test_script,
-                status_code=resp.status_code,
-                headers=dict(resp.headers),
-                properties=self.property_util.get_all_properties_variables(),
-                response_body_text=resp.text,
-            )
-        except Exception as e:
-            request_logger.error(f"unknown exception {e} happened", e)
 
     def print_req_info(self, request: Union[PreparedRequest, Response], prefix=">"):
         if not (self.args.debug or self.args.info):

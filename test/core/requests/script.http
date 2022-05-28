@@ -1,0 +1,50 @@
+@name("python_class")
+GET http://httpbin.org/robots.txt
+> {%
+
+class SampleTest(unittest.TestCase):
+    def test_hai(self):
+        if client.response.status_code == 200:
+            log("working")
+        else:
+            log(f"not working {client.response.status_code}")
+%} python
+
+@name("python_function")
+GET http://httpbin.org/robots.txt
+> {%
+
+def test_hai():
+    if client.response.status_code == 200:
+        log("working")
+    else:
+        log(f"not working {client.response.status_code}")
+
+%} python
+
+
+
+@name("javascript")
+GET http://httpbin.org/robots.txt
+> {%
+
+client.test("check status", function(){
+    // checking test and assert
+    client.assert(response.status ===200, "status is 200")
+})
+
+%} javascript
+
+
+
+@name("default_javascript")
+GET http://httpbin.org/robots.txt
+> {%
+
+
+client.test("check status", function(){
+    // checking test and assert
+    client.assert(response.status ===200, "status is 200")
+})
+
+%}
