@@ -4,16 +4,27 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-textx = "*"
-requests = "*"
-jstyleson = "*"
 jsonschema = "==3.2.0"
+jstyleson = "==0.0.2"
+requests = "==2.27.1"
+requests-pkcs12 = "==1.10"
+requests-unixsocket = "==0.2.0"
+requests-aws4auth = "==1.1.1"
+textX = "==2.3.0"
+Js2Py = "==0.71"
+requests_ntlm = "==1.1.0"
+RestrictedPython = "==5.2"
+Faker = "==13.11.1"
 
 [dev-packages]
 pyinstaller = "*"
 autopep8 = "*"
 ipython = "*"
 pywin32-ctypes = { version = "*", os_name = "=='nt'" }
+waitress = "==2.1.1"
+Flask = "*"
+pyperf = "==2.2.0"
+pytest-benchmark = "*"
 
 [requires]
 python_version = "3.9"
