@@ -21,7 +21,7 @@ pyinstaller = "*"
 autopep8 = "*"
 ipython = "*"
 pywin32-ctypes = { version = "*", os_name = "=='nt'" }
-waitress = "==2.1.1"
+waitress = "==2.1.2"
 Flask = "*"
 pyperf = "==2.2.0"
 pytest-benchmark = "*"
