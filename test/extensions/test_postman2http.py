@@ -31,7 +31,7 @@ class FileExecute(TestBase):
             id=1)
         )
         # -------------------------------------------------------------------------------------
-        ## For Linux
+        # # For Linux
         # with open(os.path.join(fixtures_dir, file_to_compare), 'w') as f:
         #     result_normalize = {}
         #     if 'files' in response.result:
@@ -40,11 +40,11 @@ class FileExecute(TestBase):
         #         json.dump({"files": result_normalize}, f)
         #     else:
         #         json.dump(response.result, f)
-        # -------------------------------------------------------------------------------------
-        # For Windows
+        # # -------------------------------------------------------------------------------------
+        ## For Windows
         # with open(os.path.join(fixtures_dir, file_to_compare), 'w') as f:
         #     json.dump(response.result, f)
-        # -------------------------------------------------------------------------------------
+        ## -------------------------------------------------------------------------------------
         with open(os.path.join(fixtures_dir, file_to_compare), 'r') as f:
             if sys.platform.startswith("windows"):
                 self.assertEqual(json.load(f), response.result)
@@ -101,7 +101,8 @@ class FileExecute(TestBase):
             f"{postman_dir}/variables.postman_collection.json",
             f"{postman_dir}/descriptionobject.postman_collection.json",
             f"{postman_dir}/ntlm.postman_collection.json",
-            f"{postman_dir}/multipart.postmancollection.json"
+            f"{postman_dir}/multipart.postmancollection.json",
+            f"{postman_dir}/dottedhost.postman_collection.json"
         ]
         for link in links:
             self.compare(link, os.path.join(fixtures_dir, os.path.basename(link)))
