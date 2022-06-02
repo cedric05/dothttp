@@ -1,0 +1,64 @@
+{
+    "auth": null,
+    "event": null,
+    "info": {
+        "_postman_id": null,
+        "description": null,
+        "name": "test.http",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "version": null
+    },
+    "item": [
+        {
+            "description": null,
+            "event": null,
+            "id": null,
+            "name": "base",
+            "protocolProfileBehavior": null,
+            "request": {
+                "auth": null,
+                "body": null,
+                "certificate": null,
+                "description": "base",
+                "header": null,
+                "method": "GET",
+                "proxy": null,
+                "url": {
+                    "hash": null,
+                    "host": "httpbin.org",
+                    "path": "/get",
+                    "port": null,
+                    "protocol": "https",
+                    "query": [
+                        {
+                            "description": null,
+                            "disabled": false,
+                            "key": "q",
+                            "value": "tetris language:assembly"
+                        },
+                        {
+                            "description": null,
+                            "disabled": false,
+                            "key": "order",
+                            "value": "asc"
+                        },
+                        {
+                            "description": null,
+                            "disabled": false,
+                            "key": "sort",
+                            "value": "stars"
+                        }
+                    ],
+                    "raw": "https://httpbin.org/get",
+                    "variable": null
+                }
+            },
+            "response": null,
+            "variable": null,
+            "auth": null,
+            "item": null
+        }
+    ],
+    "protocolProfileBehavior": null,
+    "variable": null
+}

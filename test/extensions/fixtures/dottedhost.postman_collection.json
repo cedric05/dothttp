@@ -1,0 +1,5 @@
+{
+    "files": {
+        "test.http\\imported_from_collection.http": "#!/usr/bin/env dothttp\n\n# imported from dottedhost.postman_collection.json\n\n// base\n\n@name(\"base\")\nGET \"https://httpbin.org//get\"\n? \"q\"= \"tetris language:assembly\"\n? \"order\"= \"asc\"\n? \"sort\"= \"stars\"\n\n\n\n"
+    }
+}

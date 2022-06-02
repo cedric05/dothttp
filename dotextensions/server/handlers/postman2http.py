@@ -3,7 +3,7 @@ import os
 from collections import defaultdict
 from pathlib import Path
 from typing import Iterator, Optional, Union, Dict, List
-from urllib.parse import unquote
+from urllib.parse import unquote, urljoin
 
 import requests
 
@@ -87,9 +87,18 @@ class ImportPostmanCollection(BaseHandler):
 
         auth_wrap, lines = ImportPostmanCollection.get_auth_wrap(request_auth)
         if isinstance(req.url, (URLClass, URLClass_2_1)):
-            host = ".".join(req.url.host) if req.url.host else "{{host}}"
+            if host := req.url.host:
+                if isinstance(host, list):
+                    host = ".".join(host)
+            else:
+                host = "{{host}}"
+            if path := req.url.path:
+                if isinstance(path, list):
+                    path = "/".join(path)
+            else:
+                path = ""
             proto = req.url.protocol or "https"
-            path = "/".join(req.url.path) if req.url.path else ""
+            # url = urljoin(f"{proto}://{host}", path)
             url = f"{proto}://{host}/{path}"
             urlwrap.url = slashed_path_to_normal_path(url)
             if req.url.query:

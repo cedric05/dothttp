@@ -54,7 +54,8 @@ class Base:
 class HttpServer(Base):
     def __init__(self, port=5000):
         from flask import Flask
-        app = Flask("dothttp-server")
+        from flask_cors import CORS
+        app = CORS(Flask("dothttp-server"))
         self.app = app
         self.port = port
 
