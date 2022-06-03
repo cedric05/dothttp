@@ -25,20 +25,22 @@ jobs:
           pip install -r all_requirements.txt
       - name: Run tests
         run: python -m unittest
-      - name: Run benchmark
-        run: pytest benchmarks/__main__.py --benchmark-json output.json
-      - name: Download previous benchmark data
-        uses: actions/cache@v1
-        with:
-          path: ./cache
-          key: ${{ runner.os }}-benchmark
-      - name: Store benchmark result
-        uses: rhysd/github-action-benchmark@v1
-        with:
-          name: Python Benchmark with pytest-benchmark
-          tool: 'pytest'
-          output-file-path: output.json
-          alert-threshold: '150%'
-          fail-on-alert: true
-          github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
-          comment-on-alert: true
+# benchmark is not working for long time.
+# TODO
+      # - name: Run benchmark
+      #   run: pytest benchmarks/__main__.py --benchmark-json output.json
+      # - name: Download previous benchmark data
+      #   uses: actions/cache@v1
+      #   with:
+      #     path: ./cache
+      #     key: ${{ runner.os }}-benchmark
+      # - name: Store benchmark result
+      #   uses: rhysd/github-action-benchmark@v1
+      #   with:
+      #     name: Python Benchmark with pytest-benchmark
+      #     tool: 'pytest'
+      #     output-file-path: output.json
+      #     alert-threshold: '150%'
+      #     fail-on-alert: true
+      #     github-token: ${{ secrets.PERSONAL_GITHUB_TOKEN }}
+      #     comment-on-alert: true
