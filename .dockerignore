@@ -5,3 +5,6 @@ dist
 .devcontainer
 .github
 venv
+benchmarks
+examples
+test
