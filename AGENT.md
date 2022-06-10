@@ -6,7 +6,7 @@ There is support for running http notebooks on `https://vscode.dev` with dothttp
 To run agent via docker 
 
 ```shell
-docker run --restart always -p 5000:5000 ghcr.io/cedric05/dothttp/dothttp:agent
+docker run --restart always -d -p 5000:5000 --name dothttpagent ghcr.io/cedric05/dothttp/dothttp:agent
 ```
 
 To run with python 
