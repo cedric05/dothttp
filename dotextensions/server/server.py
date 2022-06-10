@@ -55,14 +55,14 @@ class HttpServer(Base):
     def __init__(self, port=5000):
         from flask import Flask
         from flask_cors import CORS
-        app = CORS(Flask("dothttp-server"))
+        app = Flask("dothttp-server")
+        CORS(app)
         self.app = app
         self.port = port
+        for handler in handlers.keys():
+            self.app.route(handler, methods=["POST"])(self.get_handler(handler))
 
     def run_forever(self):
-        for handler in handlers.keys():
-            api = self.get_handler(handler)
-            api = self.app.route(handler, methods=["POST"])(api)
         self.app.run("localhost", self.port)
 
     def get_handler(self, handler):

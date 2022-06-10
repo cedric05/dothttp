@@ -1,6 +1,13 @@
 FROM python:3.10
 LABEL io.whalebrew.config.networks '["host"]'
-RUN pip install dothttp-req --pre
-RUN pip install flask flask-cors
+ADD requirements.txt /app/
+WORKDIR /app
+RUN pip install -r requirements.txt
+COPY dothttp /app/dothttp
+COPY dotextensions /app/dotextensions
+COPY setup.py README.md  /app/
+RUN ls && python setup.py install
+RUN pip install flask flask-cors waitress
 ENTRYPOINT ["python"]
-CMD ["-m dotextensions.server http"]
+CMD ["-m", "waitress", "--port", "5000", "dotextensions.server.agent:app"]
+EXPOSE 5000
