@@ -14,8 +14,12 @@ import js2py
 from js2py.base import JsObjectWrapper
 from js2py.internals.simplex import JsException
 from requests import Response
+
 from RestrictedPython import compile_restricted, safe_globals
 from RestrictedPython.PrintCollector import PrintCollector
+from RestrictedPython.Guards import guarded_iter_unpack_sequence
+from RestrictedPython.Eval import default_guarded_getiter
+
 from operator import getitem
 from faker import Faker
 
@@ -48,6 +52,8 @@ allowed_global = {
     'datetime': datetime,
     '_write_': write_guard,
     "_getitem_": getitem,
+    "_getiter_" : default_guarded_getiter,
+    "_iter_unpack_sequence_": guarded_iter_unpack_sequence,
     'csv': csv,
     'uuid': uuid,
     'base64': base64,

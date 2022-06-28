@@ -48,3 +48,14 @@ client.test("check status", function(){
 })
 
 %}
+
+
+@name("python iter")
+GET http://httpbin.org/robots.txt
+> {%
+
+def test_iter():
+    for i in range(10):
+        log('something')
+
+%} python

@@ -18,26 +18,112 @@ class ScriptExecutionIntegrationTest(TestBase):
     def test_python(self):
         req, result = self.load_comp("python_class")
         self.assertEqual(ScriptType.PYTHON, req.httpdef.test_script_lang)
-        self.assertEqual({"stdout": "working\n", "error": "", "properties": {}, "tests": [
-                         {"name": "test_hai (test_script.SampleTest)", "success": True,"result": None,"error": None}], "compiled": True}, result)
+        self.assertEqual(
+            {
+                "stdout":
+                "working\n",
+                "error":
+                "",
+                "properties": {},
+                "tests": [{
+                    "name": "test_hai (test_script.SampleTest)",
+                    "success": True,
+                    "result": None,
+                    "error": None
+                }],
+                "compiled":
+                True
+            }, result)
+
+    def test_python_iter(self):
+        req, result = self.load_comp("python iter")
+        self.assertEqual(ScriptType.PYTHON, req.httpdef.test_script_lang)
+        self.assertEqual(
+            {
+                "stdout":
+                """something
+something
+something
+something
+something
+something
+something
+something
+something
+something
+""",
+                "error":
+                "",
+                "properties": {},
+                "tests": [{
+                    "name": "test_iter",
+                    "success": True,
+                    "result": None,
+                    "error": None
+                }],
+                "compiled":
+                True
+            }, result)
 
     def test_python_func(self):
         req, result = self.load_comp("python_function")
         self.assertEqual(ScriptType.PYTHON, req.httpdef.test_script_lang)
-        self.assertEqual({"stdout": "working\n", "error": "", "properties": {}, "tests": [
-                         {"name": "test_hai", "success": True, "result": None,"error": None}], "compiled": True}, result)
+        self.assertEqual(
+            {
+                "stdout":
+                "working\n",
+                "error":
+                "",
+                "properties": {},
+                "tests": [{
+                    "name": "test_hai",
+                    "success": True,
+                    "result": None,
+                    "error": None
+                }],
+                "compiled":
+                True
+            }, result)
 
     def test_javascript(self):
         req, result = self.load_comp("javascript")
         self.assertEqual(ScriptType.JAVA_SCRIPT, req.httpdef.test_script_lang)
-        self.assertEqual({"stdout": "", "error": "", "properties": {}, "tests": [
-                         {"name": "check status", "success": True, "result": None,"error": None}], "compiled": True}, result)
+        self.assertEqual(
+            {
+                "stdout":
+                "",
+                "error":
+                "",
+                "properties": {},
+                "tests": [{
+                    "name": "check status",
+                    "success": True,
+                    "result": None,
+                    "error": None
+                }],
+                "compiled":
+                True
+            }, result)
 
     def test_javascript_default(self):
         req, result = self.load_comp("default_javascript")
         self.assertEqual(ScriptType.JAVA_SCRIPT, req.httpdef.test_script_lang)
-        self.assertEqual({"stdout": "", "error": "", "properties": {}, "tests": [
-                         {"name": "check status", "success": True, "result": None,"error": None}], "compiled": True}, result)
+        self.assertEqual(
+            {
+                "stdout":
+                "",
+                "error":
+                "",
+                "properties": {},
+                "tests": [{
+                    "name": "check status",
+                    "success": True,
+                    "result": None,
+                    "error": None
+                }],
+                "compiled":
+                True
+            }, result)
 
     def load_comp(self, target):
         req = self.get_req_comp(file_name, target=target)
@@ -57,14 +143,22 @@ class SampleTestCase(unittest.TestCase):
         self.assertEquals(200 , client.response.status_code)
 """)
 
-        self.assertEqual({'compiled': True,
-                          'error': '',
-                          'properties': {},
-                          'stdout': '',
-                          'tests': [{'name': 'test_status_code (test_script.SampleTestCase)',
-                                     'success': True,
-                                     'result': None,
-                                     'error': None}]}, resp.as_json())
+        self.assertEqual(
+            {
+                'compiled':
+                True,
+                'error':
+                '',
+                'properties': {},
+                'stdout':
+                '',
+                'tests': [{
+                    'name': 'test_status_code (test_script.SampleTestCase)',
+                    'success': True,
+                    'result': None,
+                    'error': None
+                }]
+            }, resp.as_json())
 
     def get_script_exe(self, script):
         resp = Response()
@@ -88,8 +182,10 @@ def pre_request():
         script_exe = ScriptExecutionPython(httpdef, props)
         script_exe.pre_request_script()
         self.assertEquals({"ram": "ranga"}, httpdef.headers)
-        self.assertEquals({"new": "value", "ram": "raju"},
-                          script_exe.client.properties)
+        self.assertEquals({
+            "new": "value",
+            "ram": "raju"
+        }, script_exe.client.properties)
 
     def test_math_n_headers(self):
         resp = self.get_script_exe("""
@@ -110,37 +206,37 @@ class SampleTestCase(unittest.TestCase):
         hashobj.hexdigest())
 
 """)
-        self.assertEqual({'compiled': True,
-                          'error': '',
-                          'properties': {},
-                          'stdout': '',
-                          'tests': [
-                              {
-                                  'name': 'test_date (test_script.SampleTestCase)',
-                                  'success': True,
-                                  'result': None,
-                                  'error': None
-                              },
-                              {
-                                  'name': 'test_hash (test_script.SampleTestCase)',
-                                  'success': True,
-                                  'result': None,
-                                  'error': None
-                              },
-                              {
-                                  'name': 'test_headers (test_script.SampleTestCase)',
-                                  'success': True,
-                                  'result': None,
-                                  'error': None
-                              },
-                              {
-                                  'name': 'test_math (test_script.SampleTestCase)',
-                                  'success': True,
-                                  'result': None,
-                                  'error': None
-                              }
-                          ]
-                          }, resp.as_json())
+        self.assertEqual(
+            {
+                'compiled':
+                True,
+                'error':
+                '',
+                'properties': {},
+                'stdout':
+                '',
+                'tests': [{
+                    'name': 'test_date (test_script.SampleTestCase)',
+                    'success': True,
+                    'result': None,
+                    'error': None
+                }, {
+                    'name': 'test_hash (test_script.SampleTestCase)',
+                    'success': True,
+                    'result': None,
+                    'error': None
+                }, {
+                    'name': 'test_headers (test_script.SampleTestCase)',
+                    'success': True,
+                    'result': None,
+                    'error': None
+                }, {
+                    'name': 'test_math (test_script.SampleTestCase)',
+                    'success': True,
+                    'result': None,
+                    'error': None
+                }]
+            }, resp.as_json())
 
     def test_assertion_failure(self):
         resp = self.get_script_exe("""
@@ -148,14 +244,26 @@ class SampleTestCase(unittest.TestCase):
     def test_status_code(self):
         self.assertEquals(401 , client.response.status_code)
 """)
-        self.assertEqual({'stdout': '',
-                          'error': '',
-                          'properties': {},
-                          'tests': [{'name': 'test_status_code (test_script.SampleTestCase)',
-                                     'success': False,
-                                     'result': None,
-                                     'error': 'Traceback (most recent call last):\n  File "test_script.py", line 4, in test_status_code\nAssertionError: 401 != 200\n'}],
-                          'compiled': True}, resp.as_json())
+        self.assertEqual(
+            {
+                'stdout':
+                '',
+                'error':
+                '',
+                'properties': {},
+                'tests': [{
+                    'name':
+                    'test_status_code (test_script.SampleTestCase)',
+                    'success':
+                    False,
+                    'result':
+                    None,
+                    'error':
+                    'Traceback (most recent call last):\n  File "test_script.py", line 4, in test_status_code\nAssertionError: 401 != 200\n'
+                }],
+                'compiled':
+                True
+            }, resp.as_json())
 
     def test_exception(self):
         resp = self.get_script_exe("""
@@ -163,13 +271,25 @@ class SampleTestCase(unittest.TestCase):
     def test_raise(self):
         raise Exception()
 """)
-        self.assertEqual({'compiled': True,
-                          'error': '',
-                          'properties': {},
-                          'stdout': '',
-                          'tests': [{'error': 'Traceback (most recent call last):\n'
-                                     '  File "test_script.py", line 4, in test_raise\n'
-                                     'Exception\n',
-                                     'name': 'test_raise (test_script.SampleTestCase)',
-                                     'result': None,
-                                     'success': False}]}, resp.as_json())
+        self.assertEqual(
+            {
+                'compiled':
+                True,
+                'error':
+                '',
+                'properties': {},
+                'stdout':
+                '',
+                'tests': [{
+                    'error':
+                    'Traceback (most recent call last):\n'
+                    '  File "test_script.py", line 4, in test_raise\n'
+                    'Exception\n',
+                    'name':
+                    'test_raise (test_script.SampleTestCase)',
+                    'result':
+                    None,
+                    'success':
+                    False
+                }]
+            }, resp.as_json())
