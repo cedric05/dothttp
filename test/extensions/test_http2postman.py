@@ -85,7 +85,7 @@ class Testhttp2postman(TestBase):
         second = self.error_scenario("names_fail.http")
         self.assertTrue(second.get("error"))
         self.assertTrue(second.get("error_message").startswith(
-            "unable to parse because of parsing issues None:2:2: error: Expected '(' or STRING or '\w+' at position"))
+            "unable to parse because of parsing issues None:2:2: Expected '(' or STRING or '\\w+' => 'http.dev ?*'"))
 
     def test_extend(self):
         self.execute_n_get("auth_extend.postman_collection.json", os.path.join(requests_dir, "auth_extend.http"))
