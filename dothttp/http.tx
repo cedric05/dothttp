@@ -93,7 +93,9 @@ METHODTYPE:
     | "HEAD" | "TRACE" | "PATCH"
     | "COPY" | "LINK" | "UNLINK"
     | "PURGE" | "LOCK" | "UNLOCK"
-    | "PROPFIND" | "VIEW"
+    | "PROPFIND" | "VIEW" | "MKCOL" 
+    | "MOVE" | "PROPPATCH" | "REPORT"
+    | "SEARCH"
 ;
 
 QUERY: 
