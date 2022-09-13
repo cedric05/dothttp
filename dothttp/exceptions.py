@@ -91,6 +91,6 @@ class ScriptException(DotHttpException):
     pass
 
 
-@exception_wrapper("AWSAuth expects all(access_id, secret_token, region, service) to be non empty `{access_id}`")
+@exception_wrapper("AWSAuth expects all(access_id, secret_token, region, service) to be non empty access_id:`{access_id}`")
 class DothttpAwsAuthException(DotHttpException):
     pass
