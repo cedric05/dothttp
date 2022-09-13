@@ -809,7 +809,7 @@ class HttpDefBase(BaseModelProcessor):
                     ## with current state, we are not support this use case
                     ## we may come back
                     ## all four parameters are required and are to be non empty
-                    raise DothttpAwsAuthException()
+                    raise DothttpAwsAuthException(access_id = access_id)
 
     def get_current_or_base(self, attr_key) -> Any:
         if getattr(self.http, attr_key):
