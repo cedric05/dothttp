@@ -149,7 +149,7 @@ class Properties(dict):
 @dataclass
 class Client:
     request: HttpDef
-    properties: typing.Dict
+    properties: Properties
     response: Response = None
 
 
@@ -162,14 +162,14 @@ class ScriptExecutionEnvironmentBase:
         pass
 
     def _execute_test_script(self, resp: Response) -> ScriptResult:
-        raise NotImplemented
+        raise NotImplementedError()
 
     def pre_request_script(self):
         try:
             self._pre_request_script()
-        except Exception as e:
+        except Exception as exc:
             request_logger.error("unknown exception happened", exc_info=True)
-            raise PreRequestScriptException(payload=str(e))
+            raise PreRequestScriptException(payload=str(exc))
 
     def execute_test_script(self, resp):
         if not self.client.request.test_script:
@@ -177,20 +177,20 @@ class ScriptExecutionEnvironmentBase:
                 stdout="", error="", properties={}, tests=[])
         try:
             return self._execute_test_script(resp)
-        except DotHttpException as e:
-            request_logger.error(f"js/python compile failed with error {e}")
+        except DotHttpException as exc:
+            request_logger.error(f"js/python compile failed with error {exc}")
             script_result = ScriptResult(
                 stdout="", error="", properties={}, tests=[])
             script_result.compiled = False
-            script_result.error = e.message
+            script_result.error = exc.message
             request_logger.error("unknown exception happened", exc_info=True)
             return script_result
-        except Exception as e:
-            request_logger.error(f"js/python compile failed with error {e}")
+        except Exception as exc:
+            request_logger.error(f"js/python compile failed with error {exc}")
             script_result = ScriptResult(
                 stdout="", error="", properties={}, tests=[])
             script_result.compiled = False
-            script_result.error = str(e)
+            script_result.error = str(exc)
             request_logger.error("unknown exception happened", exc_info=True)
             return script_result
 
@@ -205,8 +205,8 @@ class ScriptExecutionJs(ScriptExecutionEnvironmentBase):
         try:
             context.execute(js_template.replace(
                 "JS_CODE_REPLACE", self.client.request.test_script))
-        except JsException as e:
-            raise ScriptException(payload=str(e))
+        except JsException as exc:
+            raise ScriptException(payload=str(exc))
         content_type = resp.headers.get('content-type', 'text/plain')
         # in some cases mimetype can have charset
         # like text/plain; charset=utf-8
@@ -221,10 +221,10 @@ class ScriptExecutionJs(ScriptExecutionEnvironmentBase):
             try:
                 test_result.result = client.tests[test_name]()
                 test_result.success = True
-            except Exception as e:
-                test_result.error = str(e)
+            except Exception as exc:
+                test_result.error = str(exc)
                 test_result.success = False
-                request_logger.error(f"test execution failed {e}")
+                request_logger.error(f"test execution failed {exc}")
             script_result.tests.append(test_result)
         for i in client.properties.updated:
             if type(client.properties.vars[i]) != JsObjectWrapper:
@@ -245,8 +245,8 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
             byte_code = compile_restricted(
                 self.client.request.test_script, 'test_script.py', 'exec')
             exec(byte_code, script_gloabal, self.local)
-        except Exception as e:
-            raise ScriptException(payload=str(e))
+        except Exception as exc:
+            raise ScriptException(payload=str(exc))
 
     def _pre_request_script(self) -> None:
         for key, func in self.local.items():
@@ -267,11 +267,11 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
                     try:
                         test_result.result = func()
                         test_result.success = True
-                    except BaseException as e:
-                        test_result.error = str(e)
+                    except BaseException as exc:
+                        test_result.error = str(exc)
                         test_result.success = False
                         request_logger.error(
-                            f"test execution failed {e}")
+                            f"test execution failed {exc}")
                     script_result.tests.append(test_result)
             elif inspect.isclass(func) and issubclass(func, unittest.TestCase):
                 tests = unittest.TestLoader().loadTestsFromTestCase(func)

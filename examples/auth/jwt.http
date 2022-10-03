@@ -1,0 +1,26 @@
+@name('base')
+GET 'https://mockbin.com/bin/'
+
+@name("auth login")  : "base"
+POST /22cdcdfd-0a62-4bfe-ae3f-95f6e4332b06
+json({
+    "username": "username",
+    "password": "password"
+})
+
+> {%
+
+def test_capture_json_token():
+    # capture jwt_token by read post data
+    # in here we are just taking 
+    client.properties.set("jwt_token", client.response.json().get("access_token"))
+
+%} python
+
+
+@name("next apis") : "base"
+POST https://httpbin.org/post
+"Authorization" : "Bearer {{jwt_token}}"
+json({
+    "some_data": "some_value"
+})
