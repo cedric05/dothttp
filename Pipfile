@@ -15,6 +15,7 @@ Js2Py = "==0.71"
 requests_ntlm = "==1.1.0"
 RestrictedPython = "==5.2"
 Faker = "==13.11.1"
+requests-hawk = "==1.1.1"
 
 [dev-packages]
 pyinstaller = "*"

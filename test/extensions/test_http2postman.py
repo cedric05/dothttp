@@ -116,3 +116,8 @@ class Testhttp2postman(TestBase):
     def test_ntlm_auth(self):
         self.execute_n_get(http2postman_dir.joinpath("ntlmauth.postman_collection.json"),
                            os.path.join(http2postman_dir, "ntlm_auth.http"))
+
+
+    def test_hawk_auth(self):
+        self.execute_n_get(http2postman_dir.joinpath("hawk.postman_collection.json"),
+                           os.path.join(http2postman_dir, "hawkauth.http"))
