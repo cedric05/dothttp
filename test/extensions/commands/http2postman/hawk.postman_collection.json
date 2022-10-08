@@ -1,0 +1,67 @@
+{
+    "collection": {
+        "auth": null,
+        "event": null,
+        "info": {
+            "_postman_id": null,
+            "description": null,
+            "name": "hawkauth.http",
+            "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+            "version": null
+        },
+        "item": [
+            {
+                "description": null,
+                "event": null,
+                "id": null,
+                "name": "hawk auth",
+                "protocolProfileBehavior": null,
+                "request": {
+                    "auth": {
+                        "apikey": null,
+                        "awsv4": null,
+                        "basic": null,
+                        "bearer": null,
+                        "digest": null,
+                        "edgegrid": null,
+                        "hawk": [
+                            {
+                                "key": "hawkId",
+                                "type": "string",
+                                "value": "dh37fgj492je"
+                            },
+                            {
+                                "key": "authKey",
+                                "type": "string",
+                                "value": "werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn"
+                            },
+                            {
+                                "key": "algorithm",
+                                "type": "string",
+                                "value": "sha256"
+                            }
+                        ],
+                        "noauth": null,
+                        "ntlm": null,
+                        "oauth1": null,
+                        "oauth2": null,
+                        "type": "hawk"
+                    },
+                    "body": null,
+                    "certificate": null,
+                    "description": "hawk auth",
+                    "header": null,
+                    "method": "GET",
+                    "proxy": null,
+                    "url": "https://postman-echo.com/auth/hawk"
+                },
+                "response": null,
+                "variable": null,
+                "auth": null,
+                "item": null
+            }
+        ],
+        "protocolProfileBehavior": null,
+        "variable": null
+    }
+}

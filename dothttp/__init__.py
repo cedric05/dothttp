@@ -13,6 +13,7 @@ from urllib.parse import urlencode, urljoin, uses_relative, uses_netloc, uses_pa
 from requests import PreparedRequest
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
+from requests_hawk import HawkAuth as RequestsHawkAuth 
 
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
 
@@ -38,7 +39,7 @@ from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
     MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, \
-    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript, ScriptType
+    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript, ScriptType, HawkAuth
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -266,6 +267,11 @@ class HttpDef:
                 auth_wrap = AuthWrap(digest_auth=DigestAuth(self.auth.username, self.auth.password))
             elif isinstance(self.auth, HttpNtlmAuth):
                 auth_wrap = AuthWrap(ntlm_auth=NtlmAuthWrap(self.auth.username, self.auth.password))
+            elif isinstance(self.auth, RequestsHawkAuth):
+                hawk_id = self.auth.credentials['id']
+                hawk_key = self.auth.credentials['key']
+                hawk_algorithm = self.auth.credentials['algorithm']
+                auth_wrap = AuthWrap(hawk_auth=HawkAuth(hawk_id, hawk_key, hawk_algorithm))
             elif isinstance(self.auth, AWS4Auth):
                 aws_auth: AWS4Auth = self.auth
                 auth_wrap = AuthWrap(
@@ -717,6 +723,15 @@ class HttpDefBase(BaseModelProcessor):
             elif ntlm_auth := auth_wrap.ntlm_auth:
                 self.httpdef.auth = HttpNtlmAuth(self.get_updated_content(ntlm_auth.username), 
                                                  self.get_updated_content(ntlm_auth.password))
+            elif hawk_auth := auth_wrap.hawk_auth:
+                if hawk_auth.algorithm:
+                    algorithm = hawk_auth.algorithm
+                else:
+                    algorithm = "sha256"
+                self.httpdef.auth =  RequestsHawkAuth(
+                                        id=self.get_updated_content(hawk_auth.id), 
+                                        key=self.get_updated_content(hawk_auth.key),
+                                        algorithm=self.get_updated_content(algorithm))
             elif aws_auth_wrap := auth_wrap.aws_auth:
                 access_id = self.get_updated_content(aws_auth_wrap.access_id)
                 secret_token = self.get_updated_content(aws_auth_wrap.secret_token)

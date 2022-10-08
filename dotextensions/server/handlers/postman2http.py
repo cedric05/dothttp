@@ -9,7 +9,7 @@ import requests
 
 from dothttp import Allhttp, Http, NameWrap, UrlWrap, Line, Query, Header, AuthWrap, BasicAuth, DigestAuth, \
     MultiPartFile, FilesWrap, TripleOrDouble, Certificate
-from dothttp.parse_models import NtlmAuthWrap, Payload, AwsAuthWrap, HttpFileType
+from dothttp.parse_models import NtlmAuthWrap, Payload, AwsAuthWrap, HttpFileType, HawkAuth
 from dothttp.request_base import HttpFileFormatter
 from dothttp.utils import APPLICATION_JSON
 from . import logger
@@ -209,6 +209,13 @@ class ImportPostmanCollection(BaseHandler):
                 auth_wrap = AuthWrap(
                     ntlm_auth=NtlmAuthWrap(username=ntlm_auth.get('username', ''),
                                            password=ntlm_auth.get('password', '')))
+            elif hawk_auth := request_auth.hawk:
+                hawk_auth = ImportPostmanCollection.api_key_element_to_dict(hawk_auth)
+                # postman 2.0
+                auth_wrap = AuthWrap(
+                    hawk_auth=HawkAuth(hawk_id=hawk_auth.get('authId', ''),
+                                        key=hawk_auth.get('authKey', ''),
+                                        algorithm=hawk_auth.get('algorithm', '')))
             elif request_auth.apikey:
                 d = ImportPostmanCollection.api_key_element_to_dict(request_auth.apikey)
                 key = d.get('key', '<key>')

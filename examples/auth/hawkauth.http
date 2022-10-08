@@ -1,0 +1,4 @@
+@name('hawk auth')
+GET https://postman-echo.com/auth/hawk
+hawkauth('dh37fgj492je','werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn')
+json({})

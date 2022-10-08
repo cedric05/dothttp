@@ -34,6 +34,12 @@ class DigestAuth:
     username: str
     password: str
 
+@dataclass
+class HawkAuth:
+    hawk_id: str
+    key: str
+    algorithm: Optional[str] = None
+
 
 @dataclass
 class AwsAuthWrap:
@@ -50,12 +56,11 @@ class NtlmAuthWrap:
 
 @dataclass
 class AuthWrap:
-    # digest = DIGESTAUTH | basicauth = BASICAUTH
     digest_auth: Optional[DigestAuth] = None
     basic_auth: Optional[BasicAuth] = None
     aws_auth: Optional[AwsAuthWrap] = None
     ntlm_auth: Optional[NtlmAuthWrap] = None
-
+    hawk_auth: Optional[HawkAuth] = None
 
 @dataclass
 class Query:

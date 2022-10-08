@@ -42,7 +42,7 @@ HEADER:
 ;
 
 AUTHWRAP:
-    digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH | ntlm_auth = NTLMAUTH | aws_auth = AWSAUTH
+    digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH | ntlm_auth = NTLMAUTH | hawk_auth=HAWKAUTH | aws_auth = AWSAUTH 
 ;
 
 CERTAUTH:
@@ -53,10 +53,13 @@ CERTAUTH:
     )
 ;
 
+HAWKAUTH:
+    'hawkauth' '(' id=DotString ',' key = DotString (',' algorithm=DotString)? ')'
+;
+
 
 NTLMAUTH:
     'ntlmauth' '(' username=DotString ',' password= DotString ')'
-
 ;
 
 

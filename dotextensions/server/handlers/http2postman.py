@@ -5,6 +5,7 @@ import urllib.parse
 from typing import Dict
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
+from requests_hawk import HawkAuth as RequestsHawkAuth
 from dothttp import HttpNtlmAuth
 
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType, Variable
@@ -219,6 +220,20 @@ class Http2Postman(RunHttpFileHandler):
                     value=auth.username,
                     type="string"
                 ), ApikeyElement(key="password", value=auth.password, type="string")]
+            if isinstance(auth, RequestsHawkAuth):
+                request_auth = []
+                request.auth.hawk = request_auth
+                request.auth.type = AuthType.HAWK
+                hawk_id = auth.credentials.get("id", "")
+                hawk_key = auth.credentials.get("key", "")
+                hawk_algorithm = auth.credentials.get("algorithm", "")
+                request_auth += [ApikeyElement(
+                    key="hawkId",
+                    value=hawk_id,
+                    type="string"
+                ), 
+                ApikeyElement(key="authKey", value=hawk_key, type="string"),
+                ApikeyElement(key="algorithm", value=hawk_algorithm, type="string")]
             elif isinstance(auth, AWS4Auth):
                 request.auth.type = AuthType.AWSV4
                 request.auth.awsv4 = [
