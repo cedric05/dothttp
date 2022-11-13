@@ -27,6 +27,8 @@ class ScriptExecutionIntegrationTest(TestBase):
                 "properties": {},
                 "tests": [{
                     "name": "test_hai (test_script.SampleTest)",
+                    # python3.11
+                    # "name": "test_hai (test_script.SampleTest.test_hai)",
                     "success": True,
                     "result": None,
                     "error": None
@@ -154,6 +156,8 @@ class SampleTestCase(unittest.TestCase):
                 '',
                 'tests': [{
                     'name': 'test_status_code (test_script.SampleTestCase)',
+                    # python3.11
+                    # 'name': 'test_status_code (test_script.SampleTestCase.test_status_code)',
                     'success': True,
                     'result': None,
                     'error': None
@@ -217,21 +221,29 @@ class SampleTestCase(unittest.TestCase):
                 '',
                 'tests': [{
                     'name': 'test_date (test_script.SampleTestCase)',
+                    # python3.11
+                    #'name': 'test_date (test_script.SampleTestCase.test_date)',
                     'success': True,
                     'result': None,
                     'error': None
                 }, {
                     'name': 'test_hash (test_script.SampleTestCase)',
+                    # python3.11
+                    #'name': 'test_hash (test_script.SampleTestCase.test_hash)',
                     'success': True,
                     'result': None,
                     'error': None
                 }, {
                     'name': 'test_headers (test_script.SampleTestCase)',
+                    # python3.11
+                    #'name': 'test_headers (test_script.SampleTestCase.test_headers)',
                     'success': True,
                     'result': None,
                     'error': None
                 }, {
                     'name': 'test_math (test_script.SampleTestCase)',
+                    # python3.11
+                    #'name': 'test_math (test_script.SampleTestCase.test_math)',
                     'success': True,
                     'result': None,
                     'error': None
@@ -254,6 +266,8 @@ class SampleTestCase(unittest.TestCase):
                 'tests': [{
                     'name':
                     'test_status_code (test_script.SampleTestCase)',
+                    # python3.11
+                    # 'test_status_code (test_script.SampleTestCase.test_status_code)',
                     'success':
                     False,
                     'result':
@@ -287,6 +301,8 @@ class SampleTestCase(unittest.TestCase):
                     'Exception\n',
                     'name':
                     'test_raise (test_script.SampleTestCase)',
+                    #python3.11
+                    # 'test_raise (test_script.SampleTestCase.test_raise)',
                     'result':
                     None,
                     'success':
