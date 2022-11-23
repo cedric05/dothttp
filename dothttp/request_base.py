@@ -118,7 +118,10 @@ class RequestBase(HttpDefBase):
         self.load_def()
         prep = self.httpdef.get_prepared_request()
         # cookie is separately prepared
-        prep.prepare_cookies(self.get_cookie())
+        if not self.httpdef.session_clear:
+            prep.prepare_cookies(self.get_cookie())
+        else:
+            prep.prepare_cookies({})
         return prep
 
     def run(self):
