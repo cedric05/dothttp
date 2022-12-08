@@ -108,15 +108,14 @@ class RunHttpFileHandler(BaseHandler):
         body = resp.text
         response_data = {
             "response": {
-                "headers":
-                    {key: value for key, value in resp.headers.items()},
                 "body": body,  # for binary out, it will fail, check for alternatives
-                "status": resp.status_code,
-                "method": resp.request.method,
                 "output_file": output or "",
-                "url": resp.url},
+                **self._get_resp_data(resp)
+            },
             "script_result": script_result,
         }
+        if resp.history:
+            response_data["history"] = [self._get_resp_data(hist_item) for hist_item in resp.history]
         # will be used for response
         data = {}
         data.update(response_data['response'])  # deprecated
@@ -132,6 +131,14 @@ class RunHttpFileHandler(BaseHandler):
         result = Result(id=command.id,
                         result=data)
         return result
+
+    def _get_resp_data(self, resp):
+        return {
+            "headers": {key: value for key, value in resp.headers.items()},
+            "status": resp.status_code,
+            "method": resp.request.method,
+            "url": resp.url
+        }
 
     def get_request_comp(self, config):
         return RequestCompiler(config)

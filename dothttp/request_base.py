@@ -390,7 +390,6 @@ class RequestCompiler(RequestBase):
         script_execution = execution_cls(self.httpdef, self.property_util)
         script_execution.pre_request_script()
         resp = self.get_response()
-        self.print_req_info(resp.request)
         for hist_resp in resp.history:
             self.print_req_info(hist_resp, '<')
             request_logger.debug(
@@ -447,6 +446,7 @@ class RequestCompiler(RequestBase):
     def get_response(self):
         session = self.get_session()
         request = self.get_request()
+        self.print_req_info(request)
         session.cookies = request._cookies
         if self.httpdef.p12:
             session.mount(request.url,
