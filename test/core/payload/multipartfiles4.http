@@ -1,0 +1,5 @@
+POST "https://httpbin.org/post"
+files(
+    "resume" < "something else",
+    "content2"<  """this is text part"""
+)

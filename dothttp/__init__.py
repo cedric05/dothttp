@@ -648,7 +648,11 @@ class HttpDefBase(BaseModelProcessor):
         elif files_wrap := self.http.payload.fileswrap:
             files = []
             for multipart_file in files_wrap.files:
-                multipart_content = self.get_updated_content(multipart_file.path)
+                if multipart_file.path.triple:
+                    multipart_file_path = multipart_file.path.triple[3:-3]
+                else:
+                    multipart_file_path = multipart_file.path.str
+                multipart_content = self.get_updated_content(multipart_file_path)
                 multipart_key = self.get_updated_content(multipart_file.name)
                 mimetype = self.get_updated_content(multipart_file.type) if multipart_file.type else None
                 if os.path.exists(multipart_content):  # probably check valid path, then check for exists

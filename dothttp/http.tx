@@ -136,8 +136,8 @@ FILES:
 
 FILETYPE:
     (
-        '(' name=DotString ',' path=DotString  (',' (type=DotString)?)? ')'
-        | name=DotString ('<' | ':') path=DotString (';' (type=DotString)?)?
+        '(' name=DotString ',' path=TRIPLE_OR_DOUBLE_STRING  (',' (type=DotString)?)? ')'
+        | name=DotString ('<' | ':') path=TRIPLE_OR_DOUBLE_STRING (';' (type=DotString)?)?
     )
 ;
 
