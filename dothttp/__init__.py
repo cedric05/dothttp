@@ -13,7 +13,11 @@ from urllib.parse import urlencode, urljoin, uses_relative, uses_netloc, uses_pa
 from requests import PreparedRequest
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
-from requests_hawk import HawkAuth as RequestsHawkAuth 
+
+try: 
+    from requests_hawk import HawkAuth as RequestsHawkAuth 
+except:
+    RequestsHawkAuth = None
 
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
 
@@ -267,7 +271,7 @@ class HttpDef:
                 auth_wrap = AuthWrap(digest_auth=DigestAuth(self.auth.username, self.auth.password))
             elif isinstance(self.auth, HttpNtlmAuth):
                 auth_wrap = AuthWrap(ntlm_auth=NtlmAuthWrap(self.auth.username, self.auth.password))
-            elif isinstance(self.auth, RequestsHawkAuth):
+            elif RequestsHawkAuth and isinstance(self.auth, RequestsHawkAuth):
                 hawk_id = self.auth.credentials['id']
                 hawk_key = self.auth.credentials['key']
                 hawk_algorithm = self.auth.credentials['algorithm']

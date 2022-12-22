@@ -5,7 +5,6 @@ import urllib.parse
 from typing import Dict
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
-from requests_hawk import HawkAuth as RequestsHawkAuth
 from dothttp import HttpNtlmAuth
 
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType, Variable
@@ -25,6 +24,10 @@ try:
 except:
     import json
 
+try: 
+    from requests_hawk import HawkAuth as RequestsHawkAuth 
+except:
+    RequestsHawkAuth = None
 
 class PostManCompiler(RequestCompiler):
     def __init__(self, config, model):
@@ -220,7 +223,7 @@ class Http2Postman(RunHttpFileHandler):
                     value=auth.username,
                     type="string"
                 ), ApikeyElement(key="password", value=auth.password, type="string")]
-            if isinstance(auth, RequestsHawkAuth):
+            if RequestsHawkAuth and isinstance(auth, RequestsHawkAuth):
                 request_auth = []
                 request.auth.hawk = request_auth
                 request.auth.type = AuthType.HAWK
