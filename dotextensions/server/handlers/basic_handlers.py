@@ -78,6 +78,7 @@ class RunHttpFileHandler(BaseHandler):
         properties = [f"{i}={j}" for i, j in params.get('properties', {}).items()]
         content = params.get("content", None)
         contexts = params.get("contexts")
+        property_file = params.get("property-file", None)
         if contexts is None:
             contexts = []
         if content:
@@ -85,7 +86,7 @@ class RunHttpFileHandler(BaseHandler):
                 content = "\n".join(content.splitlines())
             except:
                 content = None
-        config = ContextConfig(file=filename, env=envs, properties=properties, curl=curl, property_file=None,
+        config = ContextConfig(file=filename, env=envs, properties=properties, curl=curl, property_file=property_file,
                                debug=True,
                                no_cookie=nocookie, format=False, info=False, target=target, content=content)
         config.contexts = contexts

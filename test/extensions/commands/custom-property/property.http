@@ -1,0 +1,4 @@
+POST "https://httpbin.org/post"
+json({
+	"prop": "{{prop}}"
+})

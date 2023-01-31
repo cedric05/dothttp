@@ -188,7 +188,7 @@ basicauth("username", "password")
         result = self.execute_file(f"{command_dir}/syntax.http")
         self.assertEqual(True, result.result['error'])
 
-    def execute_file(self, filename, env=None, properties=None, target=None):
+    def execute_file(self, filename, env=None, properties=None, target=None, property_file=None):
         if properties is None:
             properties = {}
         if env is None:
@@ -196,7 +196,8 @@ basicauth("username", "password")
         params = {
             "file": filename,
             "env": env,
-            "properties": properties
+            "properties": properties,
+            "property-file": property_file
         }
         if target:
             params['target'] = target
@@ -301,6 +302,16 @@ awsauth(access_id="dummy", secret_key="dummy", service="s3", region="eu-east-1")
 
 
 """, result.result['http'])
+
+
+
+    def test_property_file(self):
+        http_file = f"{command_dir}/custom-property/property.http"
+        result = self.execute_file(http_file, property_file=os.path.join(os.path.dirname(http_file), "different-name.json"), env=["env"])
+        self.assertEqual(200, result.result['status'])
+        body = json.loads(result.result['body'])
+        self.assertEqual({"prop": "value"}, body['json'])
+        print(result)
 
 
 if __name__ == '__main__':
