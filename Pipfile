@@ -13,7 +13,7 @@ requests-aws4auth = "==1.1.1"
 textX = "==3.1.1"
 Js2Py = "==0.74"
 requests_ntlm = "==1.1.0"
-RestrictedPython = "==6.0"
+RestrictedPython = "==6.1"
 Faker = "==13.11.1"
 requests-hawk = "==1.1.1"
 
