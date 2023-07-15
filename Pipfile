@@ -16,6 +16,8 @@ requests_ntlm = "==1.1.0"
 RestrictedPython = "==6.1"
 Faker = "==13.11.1"
 requests-hawk = "==1.1.1"
+toml = "0.10.2"
+pyyaml = "6.0"
 
 [dev-packages]
 pyinstaller = "*"

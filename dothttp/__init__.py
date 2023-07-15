@@ -36,7 +36,8 @@ try:
 except ImportError:
     import json
     validate = None
-
+import yaml
+import toml
 from textx import TextXSyntaxError, metamodel_from_file
 
 from .dsl_jsonparser import json_or_array_to_json
@@ -314,7 +315,6 @@ class Property:
     key: Union[str, None] = None
     value: Union[str, None] = None
 
-
 class BaseModelProcessor:
     var_regex = re.compile(r'{{(?P<var>.*?)}}')
 
@@ -350,11 +350,26 @@ class BaseModelProcessor:
         """
         if not self.property_file and self.file:
             base_logger.debug('property file not specified')
-            default = os.path.join(os.path.dirname(self.file), ".dothttp.json")
-            if os.path.exists(default):
+            default_json = os.path.join(os.path.dirname(self.file), ".dothttp.json")
+            default_yaml = os.path.join(os.path.dirname(self.file), ".dothttp.yaml")
+            default_yml = os.path.join(os.path.dirname(self.file), ".dothttp.yml")
+            default_toml = os.path.join(os.path.dirname(self.file), ".dothttp.toml")
+            if os.path.exists(default_json):
                 base_logger.debug(
-                    f'file: {default} exists. it will be used for property reference')
-                self.property_file = default
+                    f'file: {default_json} exists. it will be used for property reference')
+                self.property_file = default_json
+            elif os.path.exists(default_yaml):
+                base_logger.debug(
+                    f'file: {default_yaml} exists. it will be used for property reference')
+                self.property_file = default_yaml
+            elif os.path.exists(default_yml):
+                base_logger.debug(
+                    f'file: {default_yaml} exists. it will be used for property reference')
+                self.property_file = default_yml
+            elif os.path.exists(default_toml):
+                base_logger.debug(
+                    f'file: {default_yaml} exists. it will be used for property reference')
+                self.property_file = default_toml
         if self.property_file and not os.path.exists(self.property_file):
             base_logger.debug(
                 f'file: {self.property_file} not found')
@@ -363,7 +378,14 @@ class BaseModelProcessor:
         if self.property_file:
             with open(self.property_file, 'r') as f:
                 try:
-                    props = json.load(f)
+                    if self.property_file.endswith('.json'):
+                        props = json.load(f)
+                    elif self.property_file.endswith('.yaml') or self.property_file.endswith('.yml') :
+                        props = yaml.load(f, yaml.SafeLoader)
+                    elif self.property_file.endswith('.toml'):
+                        props = toml.load(f)
+                    else:
+                        raise Exception("unrecognized property file")
                     base_logger.debug(
                         f'file: {self.property_file} loaded successfully')
                 except Exception as e:
