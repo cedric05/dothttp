@@ -7,7 +7,7 @@ requests_pkcs12==1.10
 requests-unixsocket==0.2.0
 requests-aws4auth==1.1.1
 requests_ntlm==1.1.0
-RestrictedPython==6.0
+RestrictedPython==6.1
 Faker==13.11.1
 requests-hawk==1.1.1
 PyYaml==6.0
