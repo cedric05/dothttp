@@ -1,5 +1,5 @@
 @name(base)  # <-- base is used to identify
-GET "https://httpbin.org/"
+GET "http://localhost:8000/"
 basicauth("username", "password")
 header1: headervalue1
 

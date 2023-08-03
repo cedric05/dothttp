@@ -1,4 +1,4 @@
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 /*
 {{ram="{ "data":
 {"candidateID": "1117026","isAnonymous": true } }"

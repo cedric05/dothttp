@@ -45,7 +45,7 @@ class ExtendTests(TestBase):
     def test_url_extend_from_parent(self):
         filename = f"{base_dir}/auth_extend.http"
         request = self.get_request(filename, target="query2")
-        self.assertEqual("https://httpbin.org/digest-auth/20202/username/password/md5", request.url)
+        self.assertEqual("http://localhost:8000/digest-auth/20202/username/password/md5", request.url)
 
     def test_recursive(self):
         filename = f"{base_dir}/auth_extend.http"

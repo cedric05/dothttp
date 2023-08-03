@@ -1,8 +1,8 @@
 // first one
 @name('get')
-GET https://httpbin.org/get
+GET http://localhost:8000/get
 
 
 // second one
 @name('second')
-POST https://httpbin.org/post
+POST http://localhost:8000/post

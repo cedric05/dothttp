@@ -24,7 +24,9 @@ jobs:
           # can use single requirement file referring all three
           pip install -r all_requirements.txt
       - name: Run tests
-        run: python -m unittest
+        run: |
+          docker run -d -p 8000:80 kennethreitz/httpbin 
+          python -m unittest
 # benchmark is not working for long time.
 # TODO
       # - name: Run benchmark

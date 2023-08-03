@@ -1,4 +1,4 @@
-POST "https://httpbin.org/post"
+POST "http://localhost:8000/post"
 files(
 ("resume", "{{filename}}"),
 ("content2", "{{data}}")

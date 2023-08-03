@@ -12,19 +12,19 @@ class TestTarget(TestBase):
         request = self.get_request(
             file=f"{base_dir}/default_target.http"
         )
-        self.assertEqual("https://httpbin.org/get", request.url)
+        self.assertEqual("http://localhost:8000/get", request.url)
 
     def test_target_first_one_with_index(self):
         request = self.get_request(
             file=f"{base_dir}/default_target.http", target='1'
         )
-        self.assertEqual("https://httpbin.org/get", request.url)
+        self.assertEqual("http://localhost:8000/get", request.url)
 
     def test_target_second_one_with_index(self):
         request = self.get_request(
             file=f"{base_dir}/default_target.http", target=2
         )
-        self.assertEqual("https://httpbin.org/post", request.url)
+        self.assertEqual("http://localhost:8000/post", request.url)
 
     def test_invalid_names(self):
         with self.assertRaises(HttpFileException):

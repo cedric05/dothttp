@@ -66,7 +66,7 @@ class TypePositionTest(TestBase):
              {'type': 'payload_json', 'target': 'isEquals check', 'target_base': None,
               'base_start': None}),
             ((1215, 'script.http'),
-             {'start': 1180, 'end': 1427,
+             {'start': 1189, 'end': 1436,
               'type': 'script', 'target': 'isEquals check', 'target_base': None,
               'base_start': None}),
             ((682, 'payload.http'),

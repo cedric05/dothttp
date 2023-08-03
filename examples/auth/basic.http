@@ -1,4 +1,4 @@
 @name('basic auth')
-GET http://httpbin.org/basic-auth/foo/bar
+GET http://localhost:8000/basic-auth/foo/bar
 basicauth('foo','bar')
 // basicauth('<username>', '<password>')

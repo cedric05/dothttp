@@ -1,4 +1,4 @@
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 content-type: application/json
 ? key1 = value2
 ? key2 = value2

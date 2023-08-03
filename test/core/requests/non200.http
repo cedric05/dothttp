@@ -1,2 +1,2 @@
-GET "https://httpbin.org/redirect-to"
+GET "http://localhost:8000/redirect-to"
 ? 'url', "https://dothttp.azurewebsites.net"

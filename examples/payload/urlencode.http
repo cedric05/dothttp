@@ -1,4 +1,4 @@
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 urlencoded({
      "name": "john",
      "age" : 20,

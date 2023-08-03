@@ -49,7 +49,7 @@ class SubstitutionTest(TestBase):
 
     def test_json_substition(self):
         req: PreparedRequest = self.get_request(f"{base_dir}/jsonsub.http")
-        self.assertEqual("https://httpbin.org/post", req.url)
+        self.assertEqual("http://localhost:8000/post", req.url)
         self.assertEqual("POST", req.method)
         self.assertEqual(b'{"test": {"data": {"candidateID": "1117026", "isAnonymous": true}}}', req.body)
 

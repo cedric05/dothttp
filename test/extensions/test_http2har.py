@@ -35,7 +35,7 @@ class ToHarTest(TestBase):
 
     def test_basic_content(self):
         self.basic_test(
-            file=None, content="GET https://{{host=httpbin.org}}/get")
+            file=None, content="GET http://{{host=localhost:8000}}/get")
 
     def basic_test(self, **kwargs):
         command = Command(
@@ -45,7 +45,7 @@ class ToHarTest(TestBase):
                 "file": kwargs['file'],
                 "target": "1",
                 "properties": {
-                    "host": "httpbin.org"
+                    "host": "localhost:8000"
                 }
             },
             id=1)
@@ -55,7 +55,7 @@ class ToHarTest(TestBase):
                                            'method': 'GET',
                                            'payload': {},
                                            'query': [],
-                                           'url': 'https://httpbin.org/get'}}}, result.result)
+                                           'url': 'http://localhost:8000/get'}}}, result.result)
 
     def test_content_target(self):
         self.complex_test(file=f"{command_dir}/complexrun.http", content=None)
@@ -72,7 +72,7 @@ class ToHarTest(TestBase):
                 "file": f"{command_dir}/complexrun.http",
                 "target": "1",
                 "properties": {
-                    "host": "httpbin.org"
+                    "host": "localhost:8000"
                 }
             },
             id=1)
@@ -82,7 +82,7 @@ class ToHarTest(TestBase):
                                            'method': 'GET',
                                            'payload': {},
                                            'query': [{'name': 'dothttp', 'value': 'rocks'}],
-                                           'url': 'https://httpbin.org/get'}}}, result1.result)
+                                           'url': 'http://localhost:8000/get'}}}, result1.result)
         command.params['target'] = "2"
         result2 = self.execute_handler.run(command=command)
         self.assertFalse(result2.result.get("error", False))
@@ -90,7 +90,7 @@ class ToHarTest(TestBase):
                                            'method': 'POST',
                                            'payload': {},
                                            'query': [{'name': 'startusing', 'value': 'dothttp'}],
-                                           'url': 'https://httpbin.org/post'}}}, result2.result)
+                                           'url': 'http://localhost:8000/post'}}}, result2.result)
 
     def test_payload_file(self):
         filename = f"{command_dir}/payload.http"
@@ -176,7 +176,7 @@ class ToHarTest(TestBase):
                                                     'method': 'GET',
                                                     'payload': {},
                                                     'query': [],
-                                                    'url': 'http://httpbin.org/basic-auth/foo/bar'}}},
+                                                    'url': 'http://localhost:8000/basic-auth/foo/bar'}}},
                          self.execute_payload(target='basic auth', file=filename).result)
 
     def test_payloadfileinput(self):

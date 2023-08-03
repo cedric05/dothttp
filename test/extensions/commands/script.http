@@ -1,5 +1,5 @@
 @name("text payload")
-GET http://httpbin.org/robots.txt
+GET http://localhost:8000/robots.txt
 > {%
 client.test("check status", function(){
     // checking test and assert
@@ -15,7 +15,7 @@ client.global.set("outputval", response.body);
 %}
 
 @name("json_payload")
-POST http://httpbin.org/post
+POST http://localhost:8000/post
 
 json({"token": "secret_token"})
 > {%
@@ -35,7 +35,7 @@ client.log("this is sample log");
 
 
 @name("isEquals check")
-POST http://httpbin.org/post
+POST http://localhost:8000/post
 
 json(
 {'simpleKey':'simpleValue',
@@ -67,7 +67,7 @@ client.test("checks payload output recursive",  function(){
 
 
 @name("delete property")
-GET http://httpbin.org/robots.txt
+GET http://localhost:8000/robots.txt
 // {{setPropertyByfile=sample}}
 > {%
 
@@ -79,7 +79,7 @@ client.global.clear("setPropertyByfile");
 
 
 @name("script error")
-GET http://httpbin.org/robots.txt
+GET http://localhost:8000/robots.txt
 // {{setPropertyByfile=sample}}
 > {%
 
@@ -90,7 +90,7 @@ client.log(response.body.test.out);
 
 
 @name("require check")
-GET http://httpbin.org/robots.txt
+GET http://localhost:8000/robots.txt
 // {{setPropertyByfile=sample}}
 > {%
 

@@ -4,32 +4,32 @@ basicauth("username", "password")
 header1: headervalue1
 
 @name(sub): base
-GET "https://httpbin.org/basic-auth/username/password"
+GET "http://localhost:8000/basic-auth/username/password"
 header2: headervalue2
 
 @name(sub2): sub
-GET "https://httpbin.org/basic-auth/username/password"
+GET "http://localhost:8000/basic-auth/username/password"
 header3: headervalue3
 
 @name(sub3): unknown
-GET "https://httpbin.org/basic-auth/username/password"
+GET "http://localhost:8000/basic-auth/username/password"
 header3: headervalue3
 
 
 @name(digest)
-GET "https://httpbin.org/digest-auth/20202/username/password/md5"
+GET "http://localhost:8000/digest-auth/20202/username/password/md5"
 digestauth("username", "password")
 header4: headervalue4
 
 @name("use digest auth"): digest
-GET "https://httpbin.org/digest-auth/20202/username/password/md5"
+GET "http://localhost:8000/digest-auth/20202/username/password/md5"
 
 @name("use digest auth post"): digest
-POST "https://httpbin.org/digest-auth/20202/username/password/md5"
+POST "http://localhost:8000/digest-auth/20202/username/password/md5"
 
 
 @name(query)
-GET "https://httpbin.org/"
+GET "http://localhost:8000/"
 ? ram = raju
 
 @name("query2"): query
@@ -37,14 +37,14 @@ POST "digest-auth/20202/username/password/md5"
 
 
 @name("recursive"): recursive
-POST "https://httpbin.org/digest-auth/20202/username/password/md5"
+POST "http://localhost:8000/digest-auth/20202/username/password/md5"
 
 
 
 @name("args")
 @insecure
 @clear
-POST "https://httpbin.org/digest-auth/20202/username/password/md5"
+POST "http://localhost:8000/digest-auth/20202/username/password/md5"
 
 @name("argsextend") : "args"
-POST "https://httpbin.org/digest-auth/20202/username/password/md5"
+POST "http://localhost:8000/digest-auth/20202/username/password/md5"
