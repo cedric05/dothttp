@@ -1,8 +1,8 @@
 @name('set-cookie')
-GET https://httpbin.org/cookies/set/dev/ram
+GET http://localhost:8000/cookies/set/dev/ram
 
 
 
 
 @name('confirm-cookie-sent')
-GET https://httpbin.org/cookies
+GET http://localhost:8000/cookies

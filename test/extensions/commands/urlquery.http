@@ -13,11 +13,11 @@ GET https://req.dothttp.dev?user=ram
 headerkey: headervalue
 
 @name('basic auth')
-GET http://httpbin.org/basic-auth/foo/bar
+GET http://localhost:8000/basic-auth/foo/bar
 basicauth('foo','bar')
 
 @name(digest)
-GET "https://httpbin.org/digest-auth/20202/username/password/md5"
+GET "http://localhost:8000/digest-auth/20202/username/password/md5"
 digestauth("username", "password")
 
 

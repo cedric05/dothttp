@@ -162,7 +162,7 @@
           "header": null,
           "method": "GET",
           "proxy": null,
-          "url": "http://httpbin.org/basic-auth/foo/bar"
+          "url": "http://localhost:8000/basic-auth/foo/bar"
         },
         "response": null,
         "variable": null,
@@ -207,7 +207,7 @@
           "header": null,
           "method": "GET",
           "proxy": null,
-          "url": "https://httpbin.org/digest-auth/20202/username/password/md5"
+          "url": "http://localhost:8000/digest-auth/20202/username/password/md5"
         },
         "response": null,
         "variable": null,

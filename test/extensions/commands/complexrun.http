@@ -1,15 +1,15 @@
 // some comment
 // some comment2
-GET https://{{host=httpbin.org}}/get
+GET http://{{host=localhost:8000}}/get
 ? dothttp, rocks
 
-POST https://{{host}}/post
+POST http://{{host}}/post
 ? startusing, dothttp
 
 
-POST https://{{host}}/POST // status 404
+POST http://{{host}}/POST // status 404
 ? startusing, dothttp
 
 @name(basicauth)
-GET https://{{host=httpbin.org}}/get
+GET http://{{host=localhost:8000}}/get
 basicauth('username', 'password')

@@ -1,1 +1,1 @@
-GET https://{{host=httpbin.org}}/get
+GET http://{{host=localhost:8000}}/get

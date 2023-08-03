@@ -1,5 +1,5 @@
 @name('xml payload')
-POST "https://httpbin.org/post"
+POST "http://localhost:8000/post"
 "Content-Type" : "application/xml"
 data(
 """

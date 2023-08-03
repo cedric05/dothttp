@@ -1,11 +1,11 @@
 //test.http
-GET https://httpbin.org/{{var=get}}
+GET http://localhost:8000/{{var=get}}
 ? path = "{{var}}"
-// curl -X GET 'https://httpbin.org/get?path=get'
+// curl -X GET 'http://localhost:8000/get?path=get'
 
 
 
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 json({
   "firstname": "{{name=john}}",
   "lastname": "{{lastname=doe}}",

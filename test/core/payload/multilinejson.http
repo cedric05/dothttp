@@ -1,18 +1,18 @@
 @name("simple1")
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 json({
    "simple": """test"""
 })
 
 @name("simple2")
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 json({
    "simple": '''test'''
 })
 
 
 @name("withquotes")
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 json({
    "simple": '''
 test
@@ -27,7 +27,7 @@ test
 
 
 @name("withquoteskey")
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 json({
    """simple""": '''
 test

@@ -113,7 +113,7 @@
           ],
           "method": "GET",
           "proxy": null,
-          "url": "https://httpbin.org/basic-auth/username/password"
+          "url": "http://localhost:8000/basic-auth/username/password"
         },
         "response": null,
         "variable": null,
@@ -147,7 +147,7 @@
           ],
           "method": "GET",
           "proxy": null,
-          "url": "https://httpbin.org/basic-auth/username/password"
+          "url": "http://localhost:8000/basic-auth/username/password"
         },
         "response": null,
         "variable": null,
@@ -199,7 +199,7 @@
           ],
           "method": "GET",
           "proxy": null,
-          "url": "https://httpbin.org/digest-auth/20202/username/password/md5"
+          "url": "http://localhost:8000/digest-auth/20202/username/password/md5"
         },
         "response": null,
         "variable": null,
@@ -251,7 +251,7 @@
           ],
           "method": "GET",
           "proxy": null,
-          "url": "https://httpbin.org/digest-auth/20202/username/password/md5"
+          "url": "http://localhost:8000/digest-auth/20202/username/password/md5"
         },
         "response": null,
         "variable": null,
@@ -303,7 +303,7 @@
           ],
           "method": "POST",
           "proxy": null,
-          "url": "https://httpbin.org/digest-auth/20202/username/password/md5"
+          "url": "http://localhost:8000/digest-auth/20202/username/password/md5"
         },
         "response": null,
         "variable": null,
@@ -326,10 +326,10 @@
           "proxy": null,
           "url": {
             "hash": null,
-            "host": "httpbin.org",
+            "host": "localhost",
             "path": "/",
-            "port": null,
-            "protocol": "https",
+            "port": "8000",
+            "protocol": "http",
             "query": [
               {
                 "description": null,
@@ -338,7 +338,7 @@
                 "value": "raju"
               }
             ],
-            "raw": "https://httpbin.org/",
+            "raw": "http://localhost:8000/",
             "variable": null
           }
         },
@@ -361,7 +361,7 @@
           "header": null,
           "method": "POST",
           "proxy": null,
-          "url": "https://httpbin.org/digest-auth/20202/username/password/md5"
+          "url": "http://localhost:8000/digest-auth/20202/username/password/md5"
         },
         "response": null,
         "variable": null,
@@ -382,7 +382,7 @@
           "header": null,
           "method": "POST",
           "proxy": null,
-          "url": "https://httpbin.org/digest-auth/20202/username/password/md5"
+          "url": "http://localhost:8000/digest-auth/20202/username/password/md5"
         },
         "response": null,
         "variable": null,
@@ -403,7 +403,7 @@
           "header": null,
           "method": "POST",
           "proxy": null,
-          "url": "https://httpbin.org/digest-auth/20202/username/password/md5"
+          "url": "http://localhost:8000/digest-auth/20202/username/password/md5"
         },
         "response": null,
         "variable": null,

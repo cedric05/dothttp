@@ -1,5 +1,5 @@
 @name("python_class")
-GET http://httpbin.org/robots.txt
+GET https://postman-echo.com/get
 > {%
 
 class SampleTest(unittest.TestCase):
@@ -11,7 +11,7 @@ class SampleTest(unittest.TestCase):
 %} python
 
 @name("python_function")
-GET http://httpbin.org/robots.txt
+GET https://postman-echo.com/get
 > {%
 
 def test_hai():
@@ -25,7 +25,7 @@ def test_hai():
 
 
 @name("javascript")
-GET http://httpbin.org/robots.txt
+GET https://postman-echo.com/get
 > {%
 
 client.test("check status", function(){
@@ -38,7 +38,7 @@ client.test("check status", function(){
 
 
 @name("default_javascript")
-GET http://httpbin.org/robots.txt
+GET https://postman-echo.com/get
 > {%
 
 
@@ -51,7 +51,7 @@ client.test("check status", function(){
 
 
 @name("python iter")
-GET http://httpbin.org/robots.txt
+GET https://postman-echo.com/get
 > {%
 
 def test_iter():

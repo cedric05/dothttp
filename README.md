@@ -138,7 +138,7 @@ dothttp examples/dothttpazure.http
 ## First DotHttpRequest and more
 
 ```get.http
-GET "https://httpbin.org/get"
+GET "http://localhost:8000/get"
 ```
 
 `dothttp get.http`  or `python -m dothttp get.http`
@@ -159,14 +159,14 @@ prints
     "X-Amzn-Trace-Id": "Root=1-6022266a-20fb552e530ba3d90c75be6d"
   },
   "origin": "117.216.243.24",
-  "url": "https://httpbin.org/get"
+  "url": "http://localhost:8000/get"
 }
 ```
 
 ### POST request
 
 ```post.http
-POST "https://httpbin.org/post"
+POST "http://localhost:8000/post"
 ```
 
 ```json
@@ -184,7 +184,7 @@ POST "https://httpbin.org/post"
   },
   "json": null,
   "origin": "117.216.243.24",
-  "url": "https://httpbin.org/post"
+  "url": "http://localhost:8000/post"
 }
 ```
 
@@ -229,7 +229,7 @@ user can specify payload by mentioning below four forms (for various scenarios).
 ### Templating
 
 ```.http
-POST 'https://httpbin.org/post'
+POST 'http://localhost:8000/post'
 ? ("{{key}}", "{{value}}")
 data('{"{{key}}" :"{{value}}"}', 'application/json')
 ```

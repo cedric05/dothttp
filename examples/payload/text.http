@@ -1,4 +1,4 @@
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 ? key1 = value2
 ? key2 = value2
 data(
@@ -8,7 +8,7 @@ data(
 )
 
 
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 ? key1 = value2
 ? key2 = value2
 text(

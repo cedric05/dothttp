@@ -11,8 +11,8 @@ class FileExecute(TestBase):
         self.execute_handler = ContentExecuteHandler()
 
     def test_execute_content(self):
-        result = self.execute_and_result("GET https://httpbin.org/get")
-        self.compare_results(result, "https://httpbin.org/get")
+        result = self.execute_and_result("GET http://localhost:8000/get")
+        self.compare_results(result, "http://localhost:8000/get")
 
     def compare_results(self, result, url):
         body = json.loads(result.result['body'])
@@ -23,7 +23,7 @@ class FileExecute(TestBase):
         self.assertEqual(200, result.result['status'])
 
     def test_405_execute_content(self):
-        result = self.execute_and_result("GET https://httpbin.org/post")
+        result = self.execute_and_result("GET http://localhost:8000/post")
         self.assertEqual(405, result.result['status'])
 
     def execute_and_result(self, content, target: Union[str, int] = 1, contexts=None, curl=False):
@@ -42,13 +42,13 @@ class FileExecute(TestBase):
         )
 
     def test_fail_syntax(self):
-        result = self.execute_and_result("GET2 https://httpbin.org/post")
+        result = self.execute_and_result("GET2 http://localhost:8000/post")
         self.assertEqual(True, result.result['error'])
 
     def test_properties(self):
         """env doesnt live as it has no relative .dothttp.json path"""
-        result = self.execute_and_result("GET https://httpbin.org/{{post}}")
-        self.compare_results(result, "https://httpbin.org/get")
+        result = self.execute_and_result("GET http://localhost:8000/{{post}}")
+        self.compare_results(result, "http://localhost:8000/get")
 
     def test_execute_content_context(self):
         # tests to confirm contexts can be used
@@ -69,9 +69,9 @@ class FileExecute(TestBase):
                 """
                 @name("base")
                 // {{testvar=bye}}
-                POST https://httpbin.org/post
+                POST http://localhost:8000/post
                 """])
-        self.assertEqual('''curl -X POST --url https://httpbin.org/post \\
+        self.assertEqual('''curl -X POST --url http://localhost:8000/post \\
 -H \'content-type: application/json\' \\
 -d \'{
     "hai": "bye"

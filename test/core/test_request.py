@@ -134,16 +134,16 @@ text('
     def test_multiline_curl(self):
         with tempfile.NamedTemporaryFile(delete=False) as f:
             # with files
-            self.assertEqual(f'''curl -X POST --url https://httpbin.org/post \\
+            self.assertEqual(f'''curl -X POST --url http://localhost:8000/post \\
 --form 'test=@{f.name}' \\
 --form hi=hi2''', self.get_curl_out(f))
 
             # with file input
-            self.assertEqual(f"""curl -X POST --url https://httpbin.org/post \\
+            self.assertEqual(f"""curl -X POST --url http://localhost:8000/post \\
 --data '@{f.name}'""", self.get_curl_out(f, 2))
 
             # with json out
-            self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
+            self.assertEqual("""curl -X POST --url http://localhost:8000/post \\
 -H 'content-type: application/json' \\
 -d '{
     "hi": "hi2"
@@ -153,22 +153,22 @@ text('
     def test_multiline_curl_linux(self):
         with tempfile.NamedTemporaryFile(delete=False) as f:
             # with files
-            self.assertEqual(f'''curl -X POST --url https://httpbin.org/post \\
+            self.assertEqual(f'''curl -X POST --url http://localhost:8000/post \\
 --form test=@{f.name} \\
 --form hi=hi2''', self.get_curl_out(f))
 
             # with file input
-            self.assertEqual(f'''curl -X POST --url https://httpbin.org/post \\
+            self.assertEqual(f'''curl -X POST --url http://localhost:8000/post \\
 --data @{f.name}''', self.get_curl_out(f, 2))
 
             # with json out
-            self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
+            self.assertEqual("""curl -X POST --url http://localhost:8000/post \\
 -H 'content-type: application/json' \\
 -d '{
     "hi": "hi2"
 }'""", self.get_curl_out(f, 3))
 
-            self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
+            self.assertEqual("""curl -X POST --url http://localhost:8000/post \\
 -H 'content-type: text/xml' \\
 -d '<xml>
     <body> hi this is test body</body>
@@ -201,7 +201,7 @@ text('
         comp2 = self.get_req_comp(f'{base_dir}/curlgen.http', curl=True,
                                   target="urlencoded")
         out = comp2.get_curl_output()
-        self.assertEqual("""curl -X POST --url https://httpbin.org/post \\
+        self.assertEqual("""curl -X POST --url http://localhost:8000/post \\
 -H 'content-type: application/x-www-form-urlencoded' \\
 -d 'test=hai&test=bye&test2=ram'""", out)
 

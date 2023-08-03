@@ -1,5 +1,5 @@
 
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 
 files(
     ('test', '{{filename}}'),
@@ -7,25 +7,25 @@ files(
 )
 
 
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 fileinput('{{filename}}')
 
 
 
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 json({
    'hi':'hi2'
 })
 
 
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 data('<xml>
     <body> hi this is test body</body>
 </xml>
 ', "text/xml")
 
 @name('urlencoded')
-POST https://httpbin.org/post
+POST http://localhost:8000/post
 data({
     "test" : ["hai", "bye"],
     "test2": "ram"

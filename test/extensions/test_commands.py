@@ -93,7 +93,7 @@ class FileExecute(TestBase):
         self.assertTrue("args" in body)
         self.assertTrue("headers" in body)
         self.assertEqual({}, body['args'])
-        self.assertEqual("https://httpbin.org/get", body['url'])
+        self.assertEqual("http://localhost:8000/get", body['url'])
 
     def test_complex_file(self):
         result = self.execute_handler.run(Command(
@@ -108,9 +108,9 @@ class FileExecute(TestBase):
         self.assertTrue("status" in result.result)
         self.assertEqual(200, result.result["status"])
         self.assertTrue("headers" in result.result)
-        self.assertEqual("https://httpbin.org/post?startusing=dothttp", body['url'])
+        self.assertEqual("http://localhost:8000/post?startusing=dothttp", body['url'])
         self.assertEqual('''@name("2")
-POST "https://httpbin.org/post"
+POST "http://localhost:8000/post"
 ? "startusing"= "dothttp"
 
 
@@ -131,9 +131,9 @@ POST "https://httpbin.org/post"
         self.assertTrue("status" in result2.result)
         self.assertEqual(200, result2.result["status"])
         self.assertTrue("headers" in result2.result)
-        self.assertEqual("https://httpbin.org/post?startusing=dothttp", body['url'])
+        self.assertEqual("http://localhost:8000/post?startusing=dothttp", body['url'])
         self.assertEqual("""@name("2")
-POST "https://req.dothttp.dev/post"
+POST "http://req.dothttp.dev/post"
 ? "startusing"= "dothttp"
 
 
@@ -146,13 +146,13 @@ POST "https://req.dothttp.dev/post"
                 "file": f"{command_dir}/complexrun.http",
                 "target": "3",
                 "properties": {
-                    "host": "httpbin.org"
+                    "host": "localhost:8000"
                 }
             },
             id=1)
         )
         self.assertEqual("""@name("3")
-POST "https://httpbin.org/POST"
+POST "http://localhost:8000/POST"
 ? "startusing"= "dothttp"
 
 
@@ -166,14 +166,14 @@ POST "https://httpbin.org/POST"
                 "file": f"{command_dir}/complexrun.http",
                 "target": "4",
                 "properties": {
-                    "host": "httpbin.org"
+                    "host": "localhost:8000"
                 }
             },
             id=1)
         )
         self.assertEqual(200, result4.result["status"])
         self.assertEqual("""@name("4")
-GET "https://httpbin.org/get"
+GET "http://localhost:8000/get"
 basicauth("username", "password")
 
 
@@ -220,7 +220,7 @@ basicauth("username", "password")
     def test_execute(self):
         result = self.execute_file(f"{command_dir}/cookie.http", target="set-cookie")
         self.assertEqual("""@name("set-cookie")
-GET "https://httpbin.org/cookies/set/dev/ram"
+GET "http://localhost:8000/cookies/set/dev/ram"
 "cookie": "dev=ram"
 
 
