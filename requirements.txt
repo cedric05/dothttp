@@ -4,10 +4,10 @@ requests==2.31.0
 textx==3.1.1
 js2py==0.74
 requests_pkcs12==1.10
-requests-unixsocket==0.2.0
+parsys-requests-unixsocket==0.3.1
 requests-aws4auth==1.1.1
 requests_ntlm==1.1.0
-RestrictedPython==6.1
+RestrictedPython==6.2
 Faker==13.11.1
 requests-hawk==1.1.1
 PyYaml==6.0

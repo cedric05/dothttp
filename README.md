@@ -1,14 +1,12 @@
 # Inspiration
 
-With the rise in usage of microservices, using http/curl is essential part of most developer's jobs. There are multiple
-options out there (some are curl, postmant) . My Ideal choice would be to use curl but problems with it is having no
-history. Postman solves that problem but once user logs in, postman actually syncs it to their servers which i did not
-like.
+With the rise in usage of microservices, Making http requests is essential job of most devs. For these, there are multiple options like curl, insomnia postman. My Ideal choice is to use curl but problems with it is, having no history and no easy way to save and rerun. Postman solves that problem, but once user logs in(earlier it used to be optional, now its mandatory), it stores all request metadata(body/headers/urls/credentails) to their servers although it helps solve using it across multiple devices, backup but it could be potential security loop hole if they can access it. (now a days, postman desktop is super slow also).
+
+This project aims to solve save&reuse requests, maintaining history and no sync in proprietery servers (although you can achive sync via commiting http files into git).
 
 ## GOAL
 
-dothttp will provide simple, cleaner architecture for making http requests. It uses xtext (eclipse developed dsl) to
-build a custom dsl.
+dothttp will provide simple, cleaner architecture for making http requests. It uses xtext (eclipse developed dsl) to build a custom dsl.
 
 
 ### Documentation
