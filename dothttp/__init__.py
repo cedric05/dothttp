@@ -475,16 +475,16 @@ class BaseModelProcessor:
                 else:
                     raise HttpFileException(message=f"import file should be a file, current: {import_file}")
             with open(import_file, 'r', encoding="utf-8") as f:
-                imported_content = "\n\n#just spacing for easy understanding \n" + f.read()
-            try:
-                imported_model = dothttp_model.model_from_str(imported_content)
-                import_list += imported_model.allhttps
-                property_util.add_infile_properties(imported_content)
-                BaseModelProcessor._load_imports(imported_model, import_file, property_util, import_list)
-            except TextXSyntaxError as e:
-                raise HttpFileSyntaxException(file=import_file, message=e.args)
-            except Exception as e:
-                raise HttpFileException(message=e.args)
+                imported_content = f.read()
+                try:
+                    imported_model = dothttp_model.model_from_str(imported_content)
+                    import_list += imported_model.allhttps
+                    property_util.add_infile_properties(imported_content)
+                    BaseModelProcessor._load_imports(imported_model, import_file, property_util, import_list)
+                except TextXSyntaxError as e:
+                    raise HttpFileSyntaxException(file=import_file, message=e.args)
+                except Exception as e:
+                    raise HttpFileException(message=e.args)
         return
 
     def load_content(self):
