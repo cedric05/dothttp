@@ -6,7 +6,7 @@ from typing import List, Iterator
 
 import requests
 
-from dothttp import HttpDef, APPLICATION_JSON, FORM_URLENCODED, Allhttp, Payload, Http, MULTIPART_FORM_INPUT
+from dothttp import HttpDef, APPLICATION_JSON, FORM_URLENCODED, MultidefHttp, Payload, Http, MULTIPART_FORM_INPUT
 from dothttp.parse_models import HttpFileType
 from dothttp.request_base import HttpFileFormatter
 from . import logger
@@ -133,7 +133,7 @@ class Har2HttpHandler(BaseHandler):
             save_filename = get_alternate_filename(save_filename)
         save_filename.parent.mkdir(parents=True, exist_ok=True)
         with open(save_filename, 'w') as f:
-            output = HttpFileFormatter.format(Allhttp(allhttps=http_list), filetype=filetype)
+            output = HttpFileFormatter.format(MultidefHttp(allhttps=http_list, import_list=[]), filetype=filetype)
             f.write(output)
         return Result.get_result(command, {"http": output, "filename": str(save_filename)})
         # return Result.to_error(command, "har file has not requests")

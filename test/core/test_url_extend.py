@@ -25,7 +25,7 @@ class UrlExtend(TestBase):
         self.check_url("https://req.dothttp.dev/user/profile", "parenturlparamsinurl_sub")
 
     def test_parenturlparamsext(self):
-        self.check_url("https://req.dothttp.dev/user/profile", "parenturlparamsext_sub")
+        self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "parenturlparamsext_sub")
 
     def test_childurlparamsinurl(self):
         self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "childurlparamsinurl_sub")
@@ -34,7 +34,7 @@ class UrlExtend(TestBase):
         self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "childurlparamsext_sub")
 
     def test_bothurlparamsext(self):
-        self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "bothurlparamsext_sub")
+        self.check_url("https://req.dothttp.dev/user/profile?rajesh=ranga&ramu=ranga", "bothurlparamsext_sub")
 
     def test_bothurlparamsinurl(self):
         self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "bothurlparamsinurl_sub")
@@ -43,7 +43,7 @@ class UrlExtend(TestBase):
         self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "parenturlchildext_sub")
 
     def test_childurlparentext(self):
-        self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga", "childurlparentext_sub")
+        self.check_url("https://req.dothttp.dev/user/profile?ramu=ranga&rajesh=ranga", "childurlparentext_sub")
 
     def test_childwithonlyparams(self):
         self.check_url("https://req.dothttp.dev/user/?rajesh=ranga", "childwithonlyparams_sub")

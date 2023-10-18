@@ -14,8 +14,8 @@ from requests import PreparedRequest
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
 
-try: 
-    from requests_hawk import HawkAuth as RequestsHawkAuth 
+try:
+    from requests_hawk import HawkAuth as RequestsHawkAuth
 except:
     RequestsHawkAuth = None
 
@@ -42,7 +42,7 @@ from textx import TextXSyntaxError, metamodel_from_file
 
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
-from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
+from .parse_models import MultidefHttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
     MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, \
     AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript, ScriptType, HawkAuth
 from .property_schema import property_schema
@@ -425,6 +425,7 @@ class BaseModelProcessor:
     def load(self):
         self.load_content()
         self.load_model()
+        self.load_imports()
         self.load_properties_n_headers()
         self.load_command_line_props()
         self.validate_names()
@@ -453,7 +454,38 @@ class BaseModelProcessor:
             raise HttpFileSyntaxException(file=self.file, message=e.args)
         except Exception as e:
             raise HttpFileException(message=e.args)
-        self.model: Allhttp = model
+        self.model: MultidefHttp = model
+
+    
+    def load_imports(self):
+        import_list = []
+        BaseModelProcessor._load_imports(self.model, self.file, self.property_util, import_list)
+        self.model.allhttps += import_list
+
+    def _load_imports(model: MultidefHttp, filename: str, property_util: PropertyProvider, import_list: List[Http]):
+        if not model.import_list:
+            return
+        for filename_string in model.import_list.filename:
+            import_file = filename_string.value
+            if not os.path.isabs(import_file):
+                import_file = os.path.join(os.path.dirname(os.path.realpath(filename)), import_file)
+            if not os.path.isfile(import_file):
+                if os.path.isfile(import_file + '.http'):
+                    import_file += '.http'
+                else:
+                    raise HttpFileException(message=f"import file should be a file, current: {import_file}")
+            with open(import_file, 'r', encoding="utf-8") as f:
+                imported_content = f.read()
+                try:
+                    imported_model = dothttp_model.model_from_str(imported_content)
+                    import_list += imported_model.allhttps
+                    property_util.add_infile_properties(imported_content)
+                    BaseModelProcessor._load_imports(imported_model, import_file, property_util, import_list)
+                except TextXSyntaxError as e:
+                    raise HttpFileSyntaxException(file=import_file, message=e.args)
+                except Exception as e:
+                    raise HttpFileException(message=e.args)
+        return
 
     def load_content(self):
         if not os.path.exists(self.file):
@@ -472,16 +504,21 @@ class BaseModelProcessor:
             self.http = self.get_target(target, self.model.allhttps)
         else:
             self.http = self.model.allhttps[0]
-        self.base_http = None
+        self.parents_http = []
         if self.http.namewrap and self.http.namewrap.base:
-            base = self.http.namewrap.base
-            if base == self.http.namewrap.name:
+            parent = self.http.namewrap.base
+            if parent == self.http.namewrap.name:
                 raise ParameterException(message="target and base should not be equal", key=target,
-                                         value=base)
+                                        value=parent)
             try:
-                self.base_http = self.get_target(base, self.model.allhttps)
+                while parent:
+                    if parent in self.parents_http:
+                        raise ParameterException(message="Found circular reference", target=self.http.namewrap.name)
+                    grand_http = self.get_target(parent, self.model.allhttps)
+                    self.parents_http.append(grand_http)
+                    parent = grand_http.namewrap.base
             except Exception:
-                raise UndefinedHttpToExtend(target=self.http.namewrap.name, base=base)
+                raise UndefinedHttpToExtend(target=self.http.namewrap.name, base=parent)
 
     @staticmethod
     def get_target(target: Union[str, int], http_def_list: List[Http]):
@@ -514,7 +551,10 @@ class BaseModelProcessor:
             names.append(str(index + 1))
 
     def load_props_needed_for_content(self):
-        self.property_util.add_infile_properties(self.content)
+        self._load_props_from_content(self.content, self.property_util)
+
+    def _load_props_from_content(self, content, property_util: PropertyProvider):
+        property_util.add_infile_properties(content)
 
 
 class HttpDefBase(BaseModelProcessor):
@@ -525,6 +565,10 @@ class HttpDefBase(BaseModelProcessor):
 
     def load_query(self):
         params: DefaultDict[List] = defaultdict(list)
+        for parent in self.parents_http:
+            for line in parent.lines:
+                if query := line.query:
+                    params[self.get_updated_content(query.key)].append(self.get_updated_content(query.value))
         for line in self.http.lines:
             if query := line.query:
                 params[self.get_updated_content(query.key)].append(self.get_updated_content(query.value))
@@ -550,7 +594,8 @@ class HttpDefBase(BaseModelProcessor):
         ## having duplicate headers creates problem while exporting to curl,postman import..
         headers = CaseInsensitiveDict()
         headers.update(self.default_headers)
-        self.load_headers_to_dict(self.base_http, headers)
+        for parent in self.parents_http:
+            self.load_headers_to_dict(parent, headers)
         self.load_headers_to_dict(self.http, headers)
         request_logger.debug(
             f'computed query params from `{self.file}` are `{headers}`')
@@ -581,9 +626,11 @@ class HttpDefBase(BaseModelProcessor):
         # flags are extendable
         # once its marked as allow insecure
         # user would want all child to have same effect
-        extra_args = self.http.extra_args
-        if self.base_http and self.base_http.extra_args:
-            extra_args += self.base_http.extra_args
+        extra_args = list(self.http.extra_args)
+        if self.parents_http:
+            for parent in self.parents_http:
+                if parent.extra_args:
+                    extra_args += parent.extra_args
         if extra_args:
             for flag in extra_args:
                 if flag.clear:
@@ -595,21 +642,24 @@ class HttpDefBase(BaseModelProcessor):
         request_logger.debug(
             f'url is {self.http.urlwrap.url}')
         url_path = self.get_updated_content(self.http.urlwrap.url)
-        if base_http := self.base_http:
-            base_url = self.get_updated_content(base_http.urlwrap.url)
-            if not url_path:
-                self.httpdef.url = base_url
-            elif url_path.startswith("http://") or url_path.startswith("https://") or url_path.startswith(
-                    "http+unix://"):
-                self.httpdef.url = url_path
-            elif base_url.endswith("/") and url_path.startswith("/"):
-                self.httpdef.url = urljoin(base_url, url_path[1:])
-            elif url_path.startswith("/"):
-                self.httpdef.url = urljoin(base_url + "/", url_path[1:])
-            elif not base_url.endswith("/") and not url_path.startswith("/"):
-                self.httpdef.url = urljoin(base_url + "/", url_path)
-            else:
-                self.httpdef.url = urljoin(base_url, url_path)
+        if self.parents_http:
+            for base_http in self.parents_http:
+                base_url = self.get_updated_content(base_http.urlwrap.url)
+                if not url_path:
+                    url = base_url
+                elif url_path.startswith("http://") or url_path.startswith("https://") or url_path.startswith(
+                        "http+unix://"):
+                    url = url_path
+                elif base_url.endswith("/") and url_path.startswith("/"):
+                    url = urljoin(base_url, url_path[1:])
+                elif url_path.startswith("/"):
+                    url = urljoin(base_url + "/", url_path[1:])
+                elif not base_url.endswith("/") and not url_path.startswith("/"):
+                    url = urljoin(base_url + "/", url_path)
+                else:
+                    url = urljoin(base_url, url_path)
+                url_path = url
+            self.httpdef.url = url_path
         else:
             self.httpdef.url = url_path
         if self.httpdef.url and not (
@@ -751,7 +801,7 @@ class HttpDefBase(BaseModelProcessor):
                                                    self.get_updated_content(
                                                        digest_auth.password))
             elif ntlm_auth := auth_wrap.ntlm_auth:
-                self.httpdef.auth = HttpNtlmAuth(self.get_updated_content(ntlm_auth.username), 
+                self.httpdef.auth = HttpNtlmAuth(self.get_updated_content(ntlm_auth.username),
                                                  self.get_updated_content(ntlm_auth.password))
             elif hawk_auth := auth_wrap.hawk_auth:
                 if hawk_auth.algorithm:
@@ -759,7 +809,7 @@ class HttpDefBase(BaseModelProcessor):
                 else:
                     algorithm = "sha256"
                 self.httpdef.auth =  RequestsHawkAuth(
-                                        id=self.get_updated_content(hawk_auth.id), 
+                                        id=self.get_updated_content(hawk_auth.id),
                                         key=self.get_updated_content(hawk_auth.key),
                                         algorithm=self.get_updated_content(algorithm))
             elif aws_auth_wrap := auth_wrap.aws_auth:
@@ -859,8 +909,10 @@ class HttpDefBase(BaseModelProcessor):
     def get_current_or_base(self, attr_key) -> Any:
         if getattr(self.http, attr_key):
             return getattr(self.http, attr_key)
-        elif self.base_http:
-            return getattr(self.base_http, attr_key)
+        elif self.parents_http:
+            for parent in self.parents_http:
+                if getattr(parent, attr_key):
+                    return getattr(parent, attr_key)
 
     def load_def(self):
         if self._loaded:

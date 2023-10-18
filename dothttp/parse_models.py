@@ -7,11 +7,6 @@ from dothttp import DotHttpException
 
 
 @dataclass
-class Allhttp:
-    pass
-
-
-@dataclass
 class NameWrap:
     name: str
     base: Optional[str] = None
@@ -158,7 +153,16 @@ class Http:
 
 
 @dataclass
-class Allhttp:
+class FileName:
+    value: str
+@dataclass
+class ImportStmt:
+    filename = List[FileName]
+
+
+@dataclass
+class MultidefHttp:
+    import_list: Optional[ImportStmt]
     allhttps: List[Http]
 
 

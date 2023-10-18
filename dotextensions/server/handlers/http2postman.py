@@ -24,8 +24,8 @@ try:
 except:
     import json
 
-try: 
-    from requests_hawk import HawkAuth as RequestsHawkAuth 
+try:
+    from requests_hawk import HawkAuth as RequestsHawkAuth
 except:
     RequestsHawkAuth = None
 
@@ -234,7 +234,7 @@ class Http2Postman(RunHttpFileHandler):
                     key="hawkId",
                     value=hawk_id,
                     type="string"
-                ), 
+                ),
                 ApikeyElement(key="authKey", value=hawk_key, type="string"),
                 ApikeyElement(key="algorithm", value=hawk_algorithm, type="string")]
             elif isinstance(auth, AWS4Auth):

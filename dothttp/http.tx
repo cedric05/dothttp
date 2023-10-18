@@ -1,5 +1,7 @@
 //HTTP: ram=HTTP2
-MULTISET: allhttps=HTTP+;
+MULTISET: (import_list=IMPORT)? allhttps=HTTP+;
+
+IMPORT: ('import' filename=String ';')* ;
 
 HTTP:
     (
