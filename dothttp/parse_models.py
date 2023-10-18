@@ -151,9 +151,13 @@ class Http:
     extra_args: Optional[List[ExtraArg]] = field(default_factory=lambda: [])
     script_wrap: Optional[TestScript] = field(default_factory=lambda: TestScript(''))
 
+
+@dataclass
+class FileName:
+    value: str
 @dataclass
 class ImportStmt:
-    import_list = List[str]
+    filename = List[FileName]
 
 
 @dataclass

@@ -36,7 +36,7 @@ class ImportPostmanCollection(BaseHandler):
     def import_requests_into_dire(items: Iterator[Items], directory: Path, auth: Optional[Auth],
                                   variable: Union[None, List[Variable]], filetype: HttpFileType,
                                   link: str):
-        collection = MultidefHttp(allhttps=[])
+        collection = MultidefHttp(import_list=[], allhttps=[])
         base_auth_http = None
         if auth:
             base_inherit_auth_wrap, lines = ImportPostmanCollection.get_auth_wrap(auth)

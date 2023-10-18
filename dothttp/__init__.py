@@ -507,10 +507,10 @@ class BaseModelProcessor:
         self.parents_http = []
         if self.http.namewrap and self.http.namewrap.base:
             parent = self.http.namewrap.base
+            if parent == self.http.namewrap.name:
+                raise ParameterException(message="target and base should not be equal", key=target,
+                                        value=parent)
             try:
-                if parent == self.http.namewrap.name:
-                    raise ParameterException(message="target and base should not be equal", key=target,
-                                            value=parent)
                 while parent:
                     if parent in self.parents_http:
                         raise ParameterException(message="Found circular reference", target=self.http.namewrap.name)

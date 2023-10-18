@@ -220,6 +220,9 @@ class CurlCompiler(RequestBase):
         return curl_req
 
 
+## HttpFileFormater
+## Ignores parents, all comments, all imports
+## this is just to record history or finalized version of http file (not to be used for any other purpose)
 class HttpFileFormatter(RequestBase):
 
     def get_updated_content(self, content):

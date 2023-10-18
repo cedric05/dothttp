@@ -133,7 +133,7 @@ class Har2HttpHandler(BaseHandler):
             save_filename = get_alternate_filename(save_filename)
         save_filename.parent.mkdir(parents=True, exist_ok=True)
         with open(save_filename, 'w') as f:
-            output = HttpFileFormatter.format(MultidefHttp(allhttps=http_list), filetype=filetype)
+            output = HttpFileFormatter.format(MultidefHttp(allhttps=http_list, import_list=[]), filetype=filetype)
             f.write(output)
         return Result.get_result(command, {"http": output, "filename": str(save_filename)})
         # return Result.to_error(command, "har file has not requests")
