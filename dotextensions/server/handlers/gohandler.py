@@ -44,6 +44,9 @@ class TypeFromPos(BaseHandler):
     def figure_n_get(self, model: MultidefHttp, position: int) -> dict:
         if self.is_in_between(model, position):
             index = 0
+            for index, import_file in enumerate(model.import_list.filename):
+                if self.is_in_between(import_file, position):
+                    return {"type": DothttpTypes.IMPORT.value, "filename": import_file.value}
             for index, pick_http in enumerate(model.allhttps):
                 if self.is_in_between(pick_http, position):
                     if dot_type := self.pick_in_http(pick_http, position):

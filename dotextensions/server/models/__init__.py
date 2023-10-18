@@ -53,3 +53,4 @@ class DothttpTypes(Enum):
     OUTPUT = "output"
     SCRIPT = "script"
     COMMENT = "comment"
+    IMPORT = "import"

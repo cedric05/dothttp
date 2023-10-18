@@ -458,21 +458,34 @@ class BaseModelProcessor:
 
     
     def load_imports(self):
-        if not self.model.import_list:
+        import_list = []
+        BaseModelProcessor._load_imports(self.model, self.file, self.property_util, import_list)
+        self.model.allhttps += import_list
+
+    def _load_imports(model: MultidefHttp, filename: str, property_util: PropertyProvider, import_list: List[Http]):
+        if not model.import_list:
             return
-        for filename_string in self.model.import_list.filename:
+        for filename_string in model.import_list.filename:
             import_file = filename_string.value
-            if not os.path.exists(import_file):
-                raise HttpFileNotFoundException(file=import_file)
+            if not os.path.isabs(import_file):
+                import_file = os.path.join(os.path.dirname(os.path.realpath(filename)), import_file)
+            if not os.path.isfile(import_file):
+                if os.path.isfile(import_file + '.http'):
+                    import_file += '.http'
+                else:
+                    raise HttpFileException(message=f"import file should be a file, current: {import_file}")
             with open(import_file, 'r', encoding="utf-8") as f:
                 imported_content = "\n\n#just spacing for easy understanding \n" + f.read()
             try:
                 imported_model = dothttp_model.model_from_str(imported_content)
-                self.model.allhttps += imported_model.allhttps
+                import_list += imported_model.allhttps
+                property_util.add_infile_properties(imported_content)
+                BaseModelProcessor._load_imports(imported_model, import_file, property_util, import_list)
             except TextXSyntaxError as e:
-                raise HttpFileSyntaxException(file=self.file, message=e.args)
+                raise HttpFileSyntaxException(file=import_file, message=e.args)
             except Exception as e:
                 raise HttpFileException(message=e.args)
+        return
 
     def load_content(self):
         if not os.path.exists(self.file):
@@ -538,7 +551,10 @@ class BaseModelProcessor:
             names.append(str(index + 1))
 
     def load_props_needed_for_content(self):
-        self.property_util.add_infile_properties(self.content)
+        self._load_props_from_content(self.content, self.property_util)
+
+    def _load_props_from_content(self, content, property_util: PropertyProvider):
+        property_util.add_infile_properties(content)
 
 
 class HttpDefBase(BaseModelProcessor):
