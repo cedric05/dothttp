@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.8
 LABEL io.whalebrew.config.networks '["host"]'
 ADD requirements.txt /app/
 WORKDIR /app
