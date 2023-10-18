@@ -3,7 +3,7 @@ from typing import List
 
 from requests import RequestException
 
-from dothttp import DotHttpException, Config, HttpDef, Allhttp, BaseModelProcessor, UndefinedHttpToExtend, js3py
+from dothttp import DotHttpException, Config, HttpDef, MultidefHttp, BaseModelProcessor, UndefinedHttpToExtend, js3py
 from dothttp.request_base import CurlCompiler, RequestCompiler, HttpFileFormatter, dothttp_model
 from dothttp.__version__ import __version__
 from dothttp.parse_models import ScriptType
@@ -146,7 +146,7 @@ class RunHttpFileHandler(BaseHandler):
 
     @staticmethod
     def get_http_from_req(request: HttpDef):
-        http_def = Allhttp([request.get_http_from_req()])
+        http_def = MultidefHttp([request.get_http_from_req()])
         return HttpFileFormatter.format(http_def)
 
 
@@ -183,7 +183,7 @@ class ContentBase(BaseModelProcessor):
             for context in self.args.contexts:
                 try:
                     # if model is generated, try to figure out target
-                    model: Allhttp = dothttp_model.model_from_str(context)
+                    model: MultidefHttp = dothttp_model.model_from_str(context)
                     # by including targets in to model
                     self.model.allhttps = self.model.allhttps + model.allhttps
                     self.content += context + "\n\n" + context

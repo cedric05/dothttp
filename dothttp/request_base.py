@@ -20,7 +20,7 @@ from . import eprint, Config, HttpDefBase, js3py, AWS4Auth
 from .curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
 from .json_utils import JSONEncoder
-from .parse_models import Allhttp, Http, HttpFileType, ScriptType
+from .parse_models import MultidefHttp, Http, HttpFileType, ScriptType
 from .utils import quote_or_unquote, apply_quote_or_unquote
 
 JSON_ENCODER = JSONEncoder(indent=4)
@@ -344,7 +344,7 @@ class HttpFileFormatter(RequestBase):
             return output_str
 
     @staticmethod
-    def apply_httpbook(model: Allhttp):
+    def apply_httpbook(model: MultidefHttp):
         arr = []
         for http in model.allhttps:
             arr.append({
@@ -356,14 +356,14 @@ class HttpFileFormatter(RequestBase):
         return json.dumps(arr)
 
     @staticmethod
-    def apply_http(model: Allhttp):
+    def apply_http(model: MultidefHttp):
         output_str = ""
         for http in model.allhttps:
             output_str = output_str + HttpFileFormatter.format_http(http)
         return output_str
 
     @staticmethod
-    def format(model: Allhttp, filetype=HttpFileType.Httpfile):
+    def format(model: MultidefHttp, filetype=HttpFileType.Httpfile):
         if filetype == HttpFileType.Httpfile:
             return HttpFileFormatter.apply_http(model)
         return HttpFileFormatter.apply_httpbook(model)

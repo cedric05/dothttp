@@ -14,8 +14,8 @@ from requests import PreparedRequest
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 from requests.structures import CaseInsensitiveDict
 
-try: 
-    from requests_hawk import HawkAuth as RequestsHawkAuth 
+try:
+    from requests_hawk import HawkAuth as RequestsHawkAuth
 except:
     RequestsHawkAuth = None
 
@@ -42,7 +42,7 @@ from textx import TextXSyntaxError, metamodel_from_file
 
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
-from .parse_models import Allhttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
+from .parse_models import MultidefHttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
     MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, \
     AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript, ScriptType, HawkAuth
 from .property_schema import property_schema
@@ -453,7 +453,7 @@ class BaseModelProcessor:
             raise HttpFileSyntaxException(file=self.file, message=e.args)
         except Exception as e:
             raise HttpFileException(message=e.args)
-        self.model: Allhttp = model
+        self.model: MultidefHttp = model
 
     def load_content(self):
         if not os.path.exists(self.file):
@@ -751,7 +751,7 @@ class HttpDefBase(BaseModelProcessor):
                                                    self.get_updated_content(
                                                        digest_auth.password))
             elif ntlm_auth := auth_wrap.ntlm_auth:
-                self.httpdef.auth = HttpNtlmAuth(self.get_updated_content(ntlm_auth.username), 
+                self.httpdef.auth = HttpNtlmAuth(self.get_updated_content(ntlm_auth.username),
                                                  self.get_updated_content(ntlm_auth.password))
             elif hawk_auth := auth_wrap.hawk_auth:
                 if hawk_auth.algorithm:
@@ -759,7 +759,7 @@ class HttpDefBase(BaseModelProcessor):
                 else:
                     algorithm = "sha256"
                 self.httpdef.auth =  RequestsHawkAuth(
-                                        id=self.get_updated_content(hawk_auth.id), 
+                                        id=self.get_updated_content(hawk_auth.id),
                                         key=self.get_updated_content(hawk_auth.key),
                                         algorithm=self.get_updated_content(algorithm))
             elif aws_auth_wrap := auth_wrap.aws_auth:

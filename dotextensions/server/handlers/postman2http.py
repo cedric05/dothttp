@@ -7,7 +7,7 @@ from urllib.parse import unquote, urljoin
 
 import requests
 
-from dothttp import Allhttp, Http, NameWrap, UrlWrap, Line, Query, Header, AuthWrap, BasicAuth, DigestAuth, \
+from dothttp import MultidefHttp, Http, NameWrap, UrlWrap, Line, Query, Header, AuthWrap, BasicAuth, DigestAuth, \
     MultiPartFile, FilesWrap, TripleOrDouble, Certificate
 from dothttp.parse_models import NtlmAuthWrap, Payload, AwsAuthWrap, HttpFileType, HawkAuth
 from dothttp.request_base import HttpFileFormatter
@@ -36,7 +36,7 @@ class ImportPostmanCollection(BaseHandler):
     def import_requests_into_dire(items: Iterator[Items], directory: Path, auth: Optional[Auth],
                                   variable: Union[None, List[Variable]], filetype: HttpFileType,
                                   link: str):
-        collection = Allhttp(allhttps=[])
+        collection = MultidefHttp(allhttps=[])
         base_auth_http = None
         if auth:
             base_inherit_auth_wrap, lines = ImportPostmanCollection.get_auth_wrap(auth)

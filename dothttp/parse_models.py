@@ -7,11 +7,6 @@ from dothttp import DotHttpException
 
 
 @dataclass
-class Allhttp:
-    pass
-
-
-@dataclass
 class NameWrap:
     name: str
     base: Optional[str] = None
@@ -156,9 +151,14 @@ class Http:
     extra_args: Optional[List[ExtraArg]] = field(default_factory=lambda: [])
     script_wrap: Optional[TestScript] = field(default_factory=lambda: TestScript(''))
 
+@dataclass
+class ImportStmt:
+    import_list = List[str]
+
 
 @dataclass
-class Allhttp:
+class MultidefHttp:
+    import_list: Optional[ImportStmt]
     allhttps: List[Http]
 
 

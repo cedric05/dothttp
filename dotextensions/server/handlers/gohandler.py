@@ -1,7 +1,7 @@
 import os
 from typing import Union, Any
 
-from dothttp import Allhttp, BaseModelProcessor, Http
+from dothttp import MultidefHttp, BaseModelProcessor, Http
 from dothttp.request_base import dothttp_model
 from ..models import Command, Result, BaseHandler, DothttpTypes
 
@@ -33,15 +33,15 @@ class TypeFromPos(BaseHandler):
             return Result(id=command.id,
                           result={"error_message": f"content should be string", "error": True})
         if filename:
-            model: Allhttp = dothttp_model.model_from_file(filename)
+            model: MultidefHttp = dothttp_model.model_from_file(filename)
         else:
-            model: Allhttp = dothttp_model.model_from_str(content)
+            model: MultidefHttp = dothttp_model.model_from_str(content)
         try:
             return Result(id=command.id, result=self.figure_n_get(model, position))
         except Exception as e:
             return Result(id=command.id, result={"error_message": f"unknown Exception {e}", "error": True})
 
-    def figure_n_get(self, model: Allhttp, position: int) -> dict:
+    def figure_n_get(self, model: MultidefHttp, position: int) -> dict:
         if self.is_in_between(model, position):
             index = 0
             for index, pick_http in enumerate(model.allhttps):
