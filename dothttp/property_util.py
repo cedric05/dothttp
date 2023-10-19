@@ -139,7 +139,7 @@ class PropertyProvider:
         self.env_properties[key] = value
 
     def add_infile_properties(self, content):
-        self.infile_properties = self.get_properties_for_content(content)
+        self.infile_properties.update(self.get_properties_for_content(content))
 
     def get_properties_for_content(self, content):
         infile_properties: Dict[str, Property] = {}
