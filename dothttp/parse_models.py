@@ -137,6 +137,10 @@ class ExtraArg:
     # allows insecure
     insecure: Optional[str] = ''
 
+@dataclass
+class NamedArg:
+    key: str
+    value: str
 
 @dataclass
 class Http:
@@ -149,6 +153,7 @@ class Http:
     output: Optional[ToFile]
     description: Optional[str] = None
     extra_args: Optional[List[ExtraArg]] = field(default_factory=lambda: [])
+    named_args: Optional[List[NamedArg]] = field(default_factory=lambda: [])
     script_wrap: Optional[TestScript] = field(default_factory=lambda: TestScript(''))
 
 

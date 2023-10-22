@@ -458,6 +458,7 @@ class RequestCompiler(RequestBase):
         try:
             resp: Response = session.send(request, cert=self.httpdef.certificate,
                                           verify=not self.httpdef.allow_insecure,
+                                          proxies=self.httpdef.proxy
                                           # stream=True
                                           )
         except UnicodeEncodeError:

@@ -132,6 +132,7 @@ class HttpDef:
     session_clear = False
     test_script: str = ""
     test_script_lang: ScriptType = ScriptType.JAVA_SCRIPT
+    proxy: Optional[Dict[str,str]] =None
 
     def get_har(self):
         if self.auth:
@@ -580,6 +581,21 @@ class HttpDefBase(BaseModelProcessor):
         if header.key.startswith(s) and header.value.endswith(s):
             header.key = header.key[1:]
             header.value = header.value[:-1]
+    
+    def load_proxy(self):
+        proxy_dict = dict()
+        for http_parent in self.parents_http:
+            HttpDefBase._load_proxy_details(http_parent, proxy_dict, self.property_util)
+        HttpDefBase._load_proxy_details(self.http, proxy_dict, self.property_util)
+        self.httpdef.proxy = proxy_dict
+
+    def _load_proxy_details(http: Http, property_util: PropertyProvider, proxy_dict: Dict[str,str]):
+        if http.named_args:
+            for arg in http.named_args:
+                if arg.key == "http.proxy":
+                    proxy_dict['http'] = property_util.get_updated_content(arg.value) if arg.value else None
+                elif arg.key == 'https.proxy':
+                    proxy_dict['https'] = property_util.get_updated_content(arg.value) if arg.value else None
 
     def load_headers(self):
         """
@@ -924,6 +940,7 @@ class HttpDefBase(BaseModelProcessor):
         self.load_query()
         self.load_payload()
         self.load_auth()
+        self.load_proxy()
         self.load_certificate()
         self.load_test_script()
         self.load_extra_flags()

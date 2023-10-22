@@ -186,6 +186,12 @@ class ContentBase(BaseModelProcessor):
                     model: MultidefHttp = dothttp_model.model_from_str(context)
                     # by including targets in to model
                     self.model.allhttps = self.model.allhttps + model.allhttps
+                    if model.import_list and model.import_list.filename:
+                        if self.model.import_list and self.model.import_list.filename:
+                            self.model.import_list.filename += model.import_list.filename
+                        else:
+                            self.model.import_list = model.import_list
+                        self.load_imports()
                     self.content += context + "\n\n" + context
                     return super(ContentBase, self).select_target()
                 except Exception as e:

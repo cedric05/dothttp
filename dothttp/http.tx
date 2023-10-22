@@ -7,6 +7,7 @@ HTTP:
     (
         (namewrap=NAMEWRAP)?
         (extra_args*=EXTRA_ARG)?
+        (named_args*=NAMED_ARG)?
         "curl"?
         urlwrap=URL
         (authwrap=AUTHWRAP)?
@@ -82,6 +83,11 @@ AWSAUTH:
 EXTRA_ARG:
     // there can be more
     clear=CLEAR_SESSION | insecure=INSECURE
+;
+
+NAMED_ARG:
+    // key and value
+    '(' key=STRING ',' value=STRING ')'
 ;
 
 CLEAR_SESSION:
