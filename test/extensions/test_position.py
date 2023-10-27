@@ -46,8 +46,14 @@ class TypePositionTest(TestBase):
             ((268, 'complexrun.http'),
              {'type': 'basic_auth', 'target': 'basicauth', 'target_base': None, 'base_start': None})
         ]:
-            self.assertEqual(result, self.execute_n_get(params={"position": params[0], "filename": str(
-                command_dir.joinpath(params[1]))}))
+            self.assertEqual(
+                result,
+                self.execute_n_get(
+                    params={
+                        "position": params[0],
+                        "filename": str(
+                            command_dir.joinpath(
+                                params[1]))}))
 
     def test_more2(self):
         for params, result in [
@@ -86,8 +92,14 @@ class TypePositionTest(TestBase):
             # print(({"position": params[0], "filename": params[1]},
             #        self.execute_n_get(params={"position": params[0], "filename": str(
             #            command_dir.joinpath(params[1]))})))
-            self.assertEqual(result, self.execute_n_get(params={"position": params[0], "filename": str(
-                command_dir.joinpath(params[1]))}))
+            self.assertEqual(
+                result,
+                self.execute_n_get(
+                    params={
+                        "position": params[0],
+                        "filename": str(
+                            command_dir.joinpath(
+                                params[1]))}))
 
     # def test_more3(self):
     #     for file_name in ("payload.http",
@@ -96,7 +108,8 @@ class TypePositionTest(TestBase):
     #             count = len(f.read())
     #         for i in range(count):
     #             print(((i, file_name),
-    #                    self.execute_n_get({"position": i, "filename": str(command_dir.joinpath(file_name))})))
+    # self.execute_n_get({"position": i, "filename":
+    # str(command_dir.joinpath(file_name))})))
 
     def execute_n_get(self, params):
         return self.execute_handler.run(

@@ -17,37 +17,63 @@ class TypeFromPos(BaseHandler):
         filename: Union[str, None] = command.params.get('filename', None)
         content: Union[str, None] = command.params.get('content', None)
         if not isinstance(position, int):
-            return Result(id=command.id,
-                          result={"error_message": f"position should be int", "error": True})
+            return Result(
+                id=command.id,
+                result={
+                    "error_message": f"position should be int",
+                    "error": True})
         if filename:
             if not isinstance(filename, str):
-                return Result(id=command.id,
-                              result={"error_message": f"filename should be should be string", "error": True})
+                return Result(
+                    id=command.id,
+                    result={
+                        "error_message": f"filename should be should be string",
+                        "error": True})
             if not os.path.isfile(filename):
-                return Result(id=command.id,
-                              result={"error_message": f"non existant file", "error": True})
+                return Result(
+                    id=command.id,
+                    result={
+                        "error_message": f"non existant file",
+                        "error": True})
         if not filename and not content:
-            return Result(id=command.id,
-                          result={"error_message": f"filename or content should be available", "error": True})
+            return Result(
+                id=command.id,
+                result={
+                    "error_message": f"filename or content should be available",
+                    "error": True})
         if content and not isinstance(content, str):
-            return Result(id=command.id,
-                          result={"error_message": f"content should be string", "error": True})
+            return Result(
+                id=command.id,
+                result={
+                    "error_message": f"content should be string",
+                    "error": True})
         if filename:
             model: MultidefHttp = dothttp_model.model_from_file(filename)
         else:
             model: MultidefHttp = dothttp_model.model_from_str(content)
         try:
-            return Result(id=command.id, result=self.figure_n_get(model, position))
+            return Result(
+                id=command.id,
+                result=self.figure_n_get(
+                    model,
+                    position))
         except Exception as e:
-            return Result(id=command.id, result={"error_message": f"unknown Exception {e}", "error": True})
+            return Result(
+                id=command.id,
+                result={
+                    "error_message": f"unknown Exception {e}",
+                    "error": True})
 
     def figure_n_get(self, model: MultidefHttp, position: int) -> dict:
         if self.is_in_between(model, position):
             index = 0
             if model.import_list:
-                for index, import_file in enumerate(model.import_list.filename):
+                for index, import_file in enumerate(
+                        model.import_list.filename):
                     if self.is_in_between(import_file, position):
-                        return {"type": DothttpTypes.IMPORT.value, "filename": import_file.value}
+                        return {
+                            "type": DothttpTypes.IMPORT.value,
+                            "filename": import_file.value}
             for index, pick_http in enumerate(model.allhttps):
                 if self.is_in_between(pick_http, position):
                     if dot_type := self.pick_in_http(pick_http, position):
@@ -68,12 +94,14 @@ class TypeFromPos(BaseHandler):
                             base = namewrap.base
                             if base:
                                 try:
-                                    base_position = BaseModelProcessor.get_target(base, model.allhttps)._tx_position
-                                except:
+                                    base_position = BaseModelProcessor.get_target(
+                                        base, model.allhttps)._tx_position
+                                except BaseException:
                                     pass
-                        ret.update({"type": dot_type.value, "target": name, "target_base": base,
-                                    "base_start": base_position
-                                    })
+                        ret.update({"type": dot_type.value,
+                                    "target": name,
+                                    "target_base": base,
+                                    "base_start": base_position})
                         return ret
         return {"type": DothttpTypes.COMMENT.value}
 
@@ -82,7 +110,8 @@ class TypeFromPos(BaseHandler):
         self = TypeFromPos
         if pick_http:
             # order
-            # name, extra args, url, basic/digest auth, certificate, query or headers, payload, output, script_wrap
+            # name, extra args, url, basic/digest auth, certificate, query or
+            # headers, payload, output, script_wrap
             if namewrap := pick_http.namewrap:
                 if self.is_in_between(namewrap, position):
                     return DothttpTypes.NAME
@@ -98,10 +127,12 @@ class TypeFromPos(BaseHandler):
                     if self.is_in_between(auth_wrap.basic_auth, position):
                         return DothttpTypes.BASIC_AUTH
                 elif pick_http.authwrap.digest_auth:
-                    if self.is_in_between(pick_http.authwrap.digest_auth, position):
+                    if self.is_in_between(
+                            pick_http.authwrap.digest_auth, position):
                         return DothttpTypes.DIGEST_AUTH
                 elif pick_http.authwrap.ntlm_auth:
-                    if self.is_in_between(pick_http.authwrap.digest_auth, position):
+                    if self.is_in_between(
+                            pick_http.authwrap.digest_auth, position):
                         return DothttpTypes.NTLM_AUTH
             if certificate := pick_http.certificate:
                 if self.is_in_between(certificate, position):

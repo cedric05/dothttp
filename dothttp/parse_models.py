@@ -29,6 +29,7 @@ class DigestAuth:
     username: str
     password: str
 
+
 @dataclass
 class HawkAuth:
     hawk_id: str
@@ -43,6 +44,7 @@ class AwsAuthWrap:
     service: str
     region: Union[str, None]
 
+
 @dataclass
 class NtlmAuthWrap:
     username: str
@@ -56,6 +58,7 @@ class AuthWrap:
     aws_auth: Optional[AwsAuthWrap] = None
     ntlm_auth: Optional[NtlmAuthWrap] = None
     hawk_auth: Optional[HawkAuth] = None
+
 
 @dataclass
 class Query:
@@ -107,10 +110,12 @@ class Payload:
 class ToFile:
     output: str
 
+
 @dataclass
 class LangOption:
     javascript: Optional[str]
     python: Optional[str]
+
 
 @dataclass
 class TestScript:
@@ -137,10 +142,12 @@ class ExtraArg:
     # allows insecure
     insecure: Optional[str] = ''
 
+
 @dataclass
 class NamedArg:
     key: str
     value: str
+
 
 @dataclass
 class Http:
@@ -154,12 +161,15 @@ class Http:
     description: Optional[str] = None
     extra_args: Optional[List[ExtraArg]] = field(default_factory=lambda: [])
     named_args: Optional[List[NamedArg]] = field(default_factory=lambda: [])
-    script_wrap: Optional[TestScript] = field(default_factory=lambda: TestScript(''))
+    script_wrap: Optional[TestScript] = field(
+        default_factory=lambda: TestScript(''))
 
 
 @dataclass
 class FileName:
     value: str
+
+
 @dataclass
 class ImportStmt:
     filename = List[FileName]
@@ -426,7 +436,6 @@ class HttpFileType(enum.Enum):
         elif ext in HttpFileType.Httpfile.file_exts:
             return HttpFileType.Httpfile
         raise DotHttpException("unknown file type")
-
 
 
 class ScriptType(enum.Enum):

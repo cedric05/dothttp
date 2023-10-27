@@ -17,7 +17,9 @@ class Multiplefiletest(TestBase):
     def test_simple_http(self):
         # should run as it is not using any vars
         req = self.get_request(f"{base_dir}/multi.http", target=1)
-        self.assertEqual("https://req.dothttp.dev/?querykey=queryvalue", req.url)
+        self.assertEqual(
+            "https://req.dothttp.dev/?querykey=queryvalue",
+            req.url)
 
     def test_infiledefined_data_prop_http(self):
         # should run as it is not using any vars

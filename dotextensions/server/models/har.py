@@ -61,7 +61,8 @@ class Param:
         result["name"] = from_union([from_str, from_none], self.name)
         result["value"] = from_union([from_str, from_none], self.value)
         result["fileName"] = from_union([from_str, from_none], self.fileName)
-        result["contentType"] = from_union([from_str, from_none], self.contentType)
+        result["contentType"] = from_union(
+            [from_str, from_none], self.contentType)
         result["comment"] = from_union([from_str, from_none], self.comment)
         return result
 
@@ -77,7 +78,8 @@ class PostData:
     def from_dict(obj: Any) -> 'PostData':
         assert isinstance(obj, dict)
         mimeType = from_union([from_str, from_none], obj.get("mimeType"))
-        params = from_union([lambda x: from_list(Param.from_dict, x), from_none], obj.get("params"))
+        params = from_union([lambda x: from_list(
+            Param.from_dict, x), from_none], obj.get("params"))
         text = from_union([from_str, from_none], obj.get("text"))
         comment = from_union([from_str, from_none], obj.get("comment"))
         return PostData(mimeType, params, text, comment)
@@ -85,7 +87,8 @@ class PostData:
     def to_dict(self) -> dict:
         result: dict = {}
         result["mimeType"] = from_union([from_str, from_none], self.mimeType)
-        result["params"] = from_union([lambda x: from_list(lambda x: to_class(Param, x), x), from_none], self.params)
+        result["params"] = from_union([lambda x: from_list(
+            lambda x: to_class(Param, x), x), from_none], self.params)
         result["text"] = from_union([from_str, from_none], self.text)
         result["comment"] = from_union([from_str, from_none], self.comment)
         return result
@@ -107,22 +110,35 @@ class HarRequest:
         method = from_union([from_str, from_none], obj.get("method"))
         url = from_union([from_str, from_none], obj.get("url"))
         httpVersion = from_union([from_str, from_none], obj.get("httpVersion"))
-        headers = from_union([lambda x: from_list(Header.from_dict, x), from_none], obj.get("headers"))
-        queryString = from_union([lambda x: from_list(QueryString.from_dict, x), from_none], obj.get("queryString"))
-        postData = from_union([PostData.from_dict, from_none], obj.get("postData"))
+        headers = from_union([lambda x: from_list(
+            Header.from_dict, x), from_none], obj.get("headers"))
+        queryString = from_union([lambda x: from_list(
+            QueryString.from_dict, x), from_none], obj.get("queryString"))
+        postData = from_union(
+            [PostData.from_dict, from_none], obj.get("postData"))
         comment = from_union([from_str, from_none], obj.get("comment"))
-        return HarRequest(method, url, httpVersion, headers, queryString, postData, comment)
+        return HarRequest(
+            method,
+            url,
+            httpVersion,
+            headers,
+            queryString,
+            postData,
+            comment)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["method"] = from_union([from_str, from_none], self.method)
         result["url"] = from_union([from_str, from_none], self.url)
-        result["httpVersion"] = from_union([from_str, from_none], self.httpVersion)
-        result["headers"] = from_union([lambda x: from_list(lambda x: to_class(Header, x), x), from_none], self.headers)
-        result["queryString"] = from_union([lambda x: from_list(lambda x: to_class(Header, x), x), from_none],
-                                           self.queryString)
+        result["httpVersion"] = from_union(
+            [from_str, from_none], self.httpVersion)
+        result["headers"] = from_union([lambda x: from_list(
+            lambda x: to_class(Header, x), x), from_none], self.headers)
+        result["queryString"] = from_union([lambda x: from_list(
+            lambda x: to_class(Header, x), x), from_none], self.queryString)
         result["comment"] = from_union([from_str, from_none], self.comment)
-        result["postData"] = from_union([lambda x: to_class(PostData, x), from_none], self.postData)
+        result["postData"] = from_union(
+            [lambda x: to_class(PostData, x), from_none], self.postData)
         return result
 
 
@@ -133,12 +149,14 @@ class Entry:
     @staticmethod
     def from_dict(obj: Any) -> 'Entry':
         assert isinstance(obj, dict)
-        request = from_union([HarRequest.from_dict, from_none], obj.get("request"))
+        request = from_union(
+            [HarRequest.from_dict, from_none], obj.get("request"))
         return Entry(request)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["request"] = from_union([lambda x: to_class(HarRequest, x), from_none], self.request)
+        result["request"] = from_union(
+            [lambda x: to_class(HarRequest, x), from_none], self.request)
         return result
 
 
@@ -149,12 +167,14 @@ class Log:
     @staticmethod
     def from_dict(obj: Any) -> 'Log':
         assert isinstance(obj, dict)
-        entries = from_union([lambda x: from_list(Entry.from_dict, x), from_none], obj.get("entries"))
+        entries = from_union([lambda x: from_list(
+            Entry.from_dict, x), from_none], obj.get("entries"))
         return Log(entries)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["entries"] = from_union([lambda x: from_list(lambda x: to_class(Entry, x), x), from_none], self.entries)
+        result["entries"] = from_union([lambda x: from_list(
+            lambda x: to_class(Entry, x), x), from_none], self.entries)
         return result
 
 
@@ -170,7 +190,8 @@ class Har:
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["log"] = from_union([lambda x: to_class(Log, x), from_none], self.log)
+        result["log"] = from_union(
+            [lambda x: to_class(Log, x), from_none], self.log)
         return result
 
 

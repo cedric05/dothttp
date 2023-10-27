@@ -13,7 +13,9 @@ class ExtendTests(TestBase):
         request = self.get_request(filename, target="sub")
         self.assertEqual("headervalue1", request.headers.get('header1'))
         self.assertEqual("headervalue2", request.headers.get('header2'))
-        self.assertEqual("Basic dXNlcm5hbWU6cGFzc3dvcmQ=", request.headers.get('Authorization'))
+        self.assertEqual(
+            "Basic dXNlcm5hbWU6cGFzc3dvcmQ=",
+            request.headers.get('Authorization'))
 
     def test_grand_should_work(self):
         # recursive extend will not work
@@ -21,7 +23,9 @@ class ExtendTests(TestBase):
         request = self.get_request(filename, target="sub2")
         self.assertEqual("headervalue2", request.headers.get('header2'))
         self.assertEqual("headervalue3", request.headers.get('header3'))
-        self.assertEqual("Basic dXNlcm5hbWU6cGFzc3dvcmQ=", request.headers.get('Authorization'))
+        self.assertEqual(
+            "Basic dXNlcm5hbWU6cGFzc3dvcmQ=",
+            request.headers.get('Authorization'))
 
     def test_should_throw_in_case_of_undefined(self):
         # for undefined base it should throw error
@@ -36,7 +40,7 @@ class ExtendTests(TestBase):
         self.assertEqual("headervalue4", request.headers.get('header4'))
 
     def test_digest_auth_post(self):
-        ## should work for any method
+        # should work for any method
         # for undefined base it should throw error
         filename = f"{base_dir}/auth_extend.http"
         request = self.get_request(filename, target="use digest auth post")
@@ -45,7 +49,9 @@ class ExtendTests(TestBase):
     def test_url_extend_from_parent(self):
         filename = f"{base_dir}/auth_extend.http"
         request = self.get_request(filename, target="query2")
-        self.assertEqual("http://localhost:8000/digest-auth/20202/username/password/md5?ram=raju", request.url)
+        self.assertEqual(
+            "http://localhost:8000/digest-auth/20202/username/password/md5?ram=raju",
+            request.url)
 
     def test_recursive(self):
         filename = f"{base_dir}/auth_extend.http"

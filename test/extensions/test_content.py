@@ -26,7 +26,12 @@ class FileExecute(TestBase):
         result = self.execute_and_result("GET http://localhost:8000/post")
         self.assertEqual(405, result.result['status'])
 
-    def execute_and_result(self, content, target: Union[str, int] = 1, contexts=None, curl=False):
+    def execute_and_result(self,
+                           content,
+                           target: Union[str,
+                                         int] = 1,
+                           contexts=None,
+                           curl=False):
         return self.execute_handler.run(Command(
             method=ContentExecuteHandler.name,
             params={
@@ -54,8 +59,7 @@ class FileExecute(TestBase):
         # tests to confirm contexts can be used
         # (curl and run)
         kwargs = dict(
-            content=
-            """
+            content="""
             @name('test'):"base"
             POST ""
             json({
@@ -77,7 +81,9 @@ class FileExecute(TestBase):
     "hai": "bye"
 }\'''', self.execute_and_result(curl=True, **kwargs).result['body'])
 
-        self.assertEqual(200, self.execute_and_result(curl=False, **kwargs).result['status'])
+        self.assertEqual(
+            200, self.execute_and_result(
+                curl=False, **kwargs).result['status'])
 
     def test_execute_content_context_error(self):
         # tests to throw when base is not found
@@ -87,8 +93,9 @@ class FileExecute(TestBase):
             POST "https://google.com"
             """, target="test", contexts=["", ""], curl=True)
         self.assertTrue(result.result['error'])
-        self.assertEqual('http def with name `base` not defined for http  with name `test`',
-                         result.result['error_message'])
+        self.assertEqual(
+            'http def with name `base` not defined for http  with name `test`',
+            result.result['error_message'])
 
     def test_execute_content_context_multiple_base(self):
         # tests to pick first context if multiple contexts are there

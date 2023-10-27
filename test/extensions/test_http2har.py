@@ -51,11 +51,8 @@ class ToHarTest(TestBase):
             id=1)
         result = self.execute_handler.run(command=command)
         self.assertFalse(result.result.get("error", False))
-        self.assertEqual({'target': {'1': {'headers': [],
-                                           'method': 'GET',
-                                           'payload': {},
-                                           'query': [],
-                                           'url': 'http://localhost:8000/get'}}}, result.result)
+        self.assertEqual({'target': {'1': {'headers': [], 'method': 'GET', 'payload': {
+        }, 'query': [], 'url': 'http://localhost:8000/get'}}}, result.result)
 
     def test_content_target(self):
         self.complex_test(file=f"{command_dir}/complexrun.http", content=None)
@@ -109,13 +106,20 @@ class ToHarTest(TestBase):
                                               'query': [],
                                               'url': 'https://req.dothttp.dev'}}},
                          self.execute_payload(target='json', **kwargs).result)
-        self.assertEqual({'target': {'urlencode': {'headers': [],
-                                                   'method': 'POST',
-                                                   'payload': {'mimeType': 'application/x-www-form-urlencoded',
-                                                               'text': 'paylaod=json'},
-                                                   'query': [],
-                                                   'url': 'https://req.dothttp.dev'}}},
-                         self.execute_payload(target='urlencode', **kwargs).result)
+        self.assertEqual(
+            {
+                'target': {
+                    'urlencode': {
+                        'headers': [],
+                        'method': 'POST',
+                        'payload': {
+                            'mimeType': 'application/x-www-form-urlencoded',
+                            'text': 'paylaod=json'},
+                        'query': [],
+                        'url': 'https://req.dothttp.dev'}}},
+            self.execute_payload(
+                target='urlencode',
+                **kwargs).result)
         self.assertEqual({'target': {'text-other-content': {'headers': [],
                                                             'method': 'POST',
                                                             'payload': {'mimeType': 'other-content-type',
@@ -161,35 +165,63 @@ class ToHarTest(TestBase):
 
     def test_headers_file(self):
         filename = f"{command_dir}/payload.http"
-        self.assertEqual({'target': {'headers': {'headers': [{'name': 'key', 'value': 'value'},
-                                                             {'name': 'key2', 'value': 'value'}],
-                                                 'method': 'POST',
-                                                 'payload': {},
-                                                 'query': [],
-                                                 'url': 'https://req.dothttp.dev'}}},
-                         self.execute_payload(target='headers', file=filename).result)
+        self.assertEqual(
+            {
+                'target': {
+                    'headers': {
+                        'headers': [
+                            {
+                                'name': 'key',
+                                'value': 'value'},
+                            {
+                                'name': 'key2',
+                                'value': 'value'}],
+                        'method': 'POST',
+                        'payload': {},
+                        'query': [],
+                        'url': 'https://req.dothttp.dev'}}},
+            self.execute_payload(
+                target='headers',
+                file=filename).result)
 
     def test_basicauth(self):
         filename = f"{command_dir}/urlquery.http"
-        self.assertEqual({'target': {'basic auth': {'headers': [{'name': 'Authorization',
-                                                                 'value': 'Basic Zm9vOmJhcg=='}],
-                                                    'method': 'GET',
-                                                    'payload': {},
-                                                    'query': [],
-                                                    'url': 'http://localhost:8000/basic-auth/foo/bar'}}},
-                         self.execute_payload(target='basic auth', file=filename).result)
+        self.assertEqual(
+            {
+                'target': {
+                    'basic auth': {
+                        'headers': [
+                            {
+                                'name': 'Authorization',
+                                'value': 'Basic Zm9vOmJhcg=='}],
+                        'method': 'GET',
+                        'payload': {},
+                        'query': [],
+                        'url': 'http://localhost:8000/basic-auth/foo/bar'}}},
+            self.execute_payload(
+                target='basic auth',
+                file=filename).result)
 
     def test_payloadfileinput(self):
         filename = f"{command_dir}/fileinput.http"
         with tempfile.NamedTemporaryFile(delete=False) as f:
             f.write(b"hai")
             f.flush()
-            self.assertEqual({'target': {'fileinput': {'headers': [],
-                                                       'method': 'POST',
-                                                       'payload': {'mimeType': 'text/plain', 'text': 'hai'},
-                                                       'query': [],
-                                                       'url': 'https://req.dothttp.dev'}}},
-                             self.execute_payload(target='fileinput', file=filename, fileinputarg=f.name).result)
+            self.assertEqual(
+                {
+                    'target': {
+                        'fileinput': {
+                            'headers': [],
+                            'method': 'POST',
+                            'payload': {
+                                'mimeType': 'text/plain',
+                                'text': 'hai'},
+                            'query': [],
+                            'url': 'https://req.dothttp.dev'}}},
+                self.execute_payload(
+                    target='fileinput',
+                    file=filename,
+                    fileinputarg=f.name).result)
 
     def test_aws_auth(self):
         filename = f"{command_dir}/http2har/awsauth.http"
@@ -203,8 +235,9 @@ class ToHarTest(TestBase):
                              result['target']['1']['url'], )
             for headerData in result['target']['1']['headers']:
                 name = headerData['name']
-                self.assertTrue(name.startswith('x-amz') or name.lower().startswith('authorization'),
-                                'header should be x-amz or authorization')
+                self.assertTrue(
+                    name.startswith('x-amz') or name.lower().startswith('authorization'),
+                    'header should be x-amz or authorization')
                 if headerData['name'].lower() == "authorization":
                     self.assertTrue(
                         "/eu-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=" in
@@ -220,7 +253,7 @@ class ToHarTest(TestBase):
     #                                                'payload': {},
     #                                                'query': [],
     #                                                'url': 'https://req.dothttp.dev'}}},
-    #                      self.execute_payload(target='digestauth', file=filename).result)
+    # self.execute_payload(target='digestauth', file=filename).result)
 
     def execute_payload(self, fileinputarg="", **kwargs):
         kwargs["properties"] = {"filename":
@@ -263,4 +296,5 @@ GET '/{{some_variable}}'
                                            'method': 'GET',
                                            'payload': {},
                                            'query': [],
-                                           'url': 'https://req.dothttp.dev/some/path/some_value'}}}, result.result)
+                                           'url': 'https://req.dothttp.dev/some/path/some_value'}}},
+                         result.result)

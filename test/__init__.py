@@ -8,13 +8,14 @@ class TestBase(unittest.TestCase):
 
     @staticmethod
     def get_request(file, env=None, prop=None, properties=None, target=None):
-        return TestBase.get_req_comp(file, env, prop, properties, target=target).get_request()
+        return TestBase.get_req_comp(
+            file, env, prop, properties, target=target).get_request()
 
     @staticmethod
     def get_req_comp(file, env=None, prop=None, properties=None,
                      info=False, debug=False, curl=False,
                      format=False, stdout=False, target=None) -> Union[
-        HttpFileFormatter, CurlCompiler, RequestCompiler]:
+            HttpFileFormatter, CurlCompiler, RequestCompiler]:
         if properties is None:
             properties = []
         if env is None:

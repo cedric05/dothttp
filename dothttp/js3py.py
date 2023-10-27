@@ -52,7 +52,7 @@ allowed_global = {
     'datetime': datetime,
     '_write_': write_guard,
     "_getitem_": getitem,
-    "_getiter_" : default_guarded_getiter,
+    "_getiter_": default_guarded_getiter,
     "_iter_unpack_sequence_": guarded_iter_unpack_sequence,
     'csv': csv,
     'uuid': uuid,
@@ -156,7 +156,8 @@ class Client:
 class ScriptExecutionEnvironmentBase:
     def __init__(self, httpdef: HttpDef, prop: PropertyProvider) -> None:
         self.client = Client(
-            request=httpdef, properties=Properties(prop.get_all_properties_variables()))
+            request=httpdef, properties=Properties(
+                prop.get_all_properties_variables()))
 
     def _pre_request_script(self) -> None:
         pass
@@ -213,7 +214,12 @@ class ScriptExecutionJs(ScriptExecutionEnvironmentBase):
         content_type = content_type.split(
             ";")[0] if ';' in content_type else content_type
         client = context.jsHandler(
-            content_type == MIME_TYPE_JSON, self.client.properties, resp.text, resp.status_code, dict(resp.headers))
+            content_type == MIME_TYPE_JSON,
+            self.client.properties,
+            resp.text,
+            resp.status_code,
+            dict(
+                resp.headers))
         script_result = ScriptResult(
             stdout="", error="", properties={}, tests=[])
         for test_name in client.tests:
@@ -227,7 +233,7 @@ class ScriptExecutionJs(ScriptExecutionEnvironmentBase):
                 request_logger.error(f"test execution failed {exc}")
             script_result.tests.append(test_result)
         for i in client.properties.updated:
-            if type(client.properties.vars[i]) != JsObjectWrapper:
+            if not isinstance(client.properties.vars[i], JsObjectWrapper):
                 script_result.properties[i] = client.properties.vars[i] or ""
         script_result.stdout += "\n".join(client.stdout)
         return script_result
@@ -250,7 +256,8 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
 
     def _pre_request_script(self) -> None:
         for key, func in self.local.items():
-            if (key.startswith('pre')) and isinstance(func, types.FunctionType):
+            if (key.startswith('pre')) and isinstance(
+                    func, types.FunctionType):
                 func()
 
     def _execute_test_script(self, resp: Response) -> ScriptResult:

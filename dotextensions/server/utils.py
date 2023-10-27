@@ -16,7 +16,9 @@ def clean_filename(filename, whitelist=valid_filename_chars, replace=' '):
         filename = filename.replace(r, '_')
 
     # keep only valid ascii chars
-    cleaned_filename = unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore').decode()
+    cleaned_filename = unicodedata.normalize(
+        'NFKD', filename).encode(
+        'ASCII', 'ignore').decode()
 
     # keep only whitelisted chars
     cleaned_filename = ''.join(c for c in cleaned_filename if c in whitelist)
@@ -48,7 +50,7 @@ def from_union(fs, x):
     for f in fs:
         try:
             return f(x)
-        except:
+        except BaseException:
             pass
     assert False
 

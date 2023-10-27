@@ -17,7 +17,8 @@ class TestBaseModelProcessor(unittest.TestCase):
         filename = "test.http"
         property_util = PropertyProvider()
         import_list = []
-        self.processor._load_imports(model, filename, property_util, import_list)
+        self.processor._load_imports(
+            model, filename, property_util, import_list)
         self.assertEqual(len(import_list), 0)
 
     def test_load_imports_with_absolute_import_file(self):
@@ -30,7 +31,8 @@ class TestBaseModelProcessor(unittest.TestCase):
             f.write("GET https://httpbin.org/get")
         model.import_list = ImportStmt()
         model.import_list.filename = [FileName(import_file)]
-        self.processor._load_imports(model, filename, property_util, import_list)
+        self.processor._load_imports(
+            model, filename, property_util, import_list)
         self.assertEqual(len(import_list), 1)
         self.assertEqual(import_list[0].urlwrap.url, "https://httpbin.org/get")
 
@@ -44,10 +46,10 @@ class TestBaseModelProcessor(unittest.TestCase):
         import_file = os.path.join(tempfile.gettempdir(), "test_import.http")
         with open(import_file, "w") as f:
             f.write("GET https://httpbin.org/get")
-        self.processor._load_imports(model, filename, property_util, import_list)
+        self.processor._load_imports(
+            model, filename, property_util, import_list)
         self.assertEqual(len(import_list), 1)
         self.assertEqual(import_list[0].urlwrap.url, "https://httpbin.org/get")
-
 
     def test_load_imports_with_nonexistent_import_file(self):
         model = MultidefHttp(allhttps=[], import_list=[])
@@ -58,9 +60,11 @@ class TestBaseModelProcessor(unittest.TestCase):
         model.import_list = ImportStmt()
         model.import_list.filename = [FileName(import_file)]
         with self.assertRaises(HttpFileException):
-            self.processor._load_imports(model, filename, property_util, import_list)
+            self.processor._load_imports(
+                model, filename, property_util, import_list)
 
-    def test_load_imports_with_nonexistent_import_file_with_http_extension(self):
+    def test_load_imports_with_nonexistent_import_file_with_http_extension(
+            self):
         model = MultidefHttp(allhttps=[], import_list=[])
         filename = "test.dothttp"
         property_util = PropertyProvider()
@@ -70,7 +74,8 @@ class TestBaseModelProcessor(unittest.TestCase):
         model.import_list.filename = [FileName(import_file)]
 
         with self.assertRaises(HttpFileException):
-            self.processor._load_imports(model, filename, property_util, import_list)
+            self.processor._load_imports(
+                model, filename, property_util, import_list)
 
     def test_load_imports_with_syntax_error_in_import_file(self):
         property_util = PropertyProvider()
@@ -78,9 +83,11 @@ class TestBaseModelProcessor(unittest.TestCase):
         import_file = os.path.join(tempfile.gettempdir(), "test_import.http")
         with open(import_file, "w") as f:
             f.write("INVALID SYNTAX")
-        model = dothttp_model.model_from_str(f"import '{import_file}'; GET 'https://httpbin.org/get'")
+        model = dothttp_model.model_from_str(
+            f"import '{import_file}'; GET 'https://httpbin.org/get'")
         with self.assertRaises(HttpFileSyntaxException):
-            self.processor._load_imports(model, import_file, property_util, import_list)
+            self.processor._load_imports(
+                model, import_file, property_util, import_list)
 
     def test_load_imports_with_nested_imports(self):
         model = MultidefHttp(allhttps=[], import_list=[])
@@ -97,7 +104,8 @@ class TestBaseModelProcessor(unittest.TestCase):
             f.write("GET https://httpbin.org/3")
         with open(filename, "w") as f:
             f.write(f"import '{import_file1}'; GET 'https://httpbin.org/1' ")
-        self.processor._load_imports(model, filename, property_util, import_list)
+        self.processor._load_imports(
+            model, filename, property_util, import_list)
         self.assertEqual(len(import_list), 3)
         self.assertEqual(import_list[0].urlwrap.url, "https://httpbin.org/1")
         self.assertEqual(import_list[1].urlwrap.url, "https://httpbin.org/2")

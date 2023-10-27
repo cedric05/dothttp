@@ -22,8 +22,12 @@ class ScriptExecutionTest(TestBase):
                           'stdout': '',
                           'tests': [{'error': 'content-type is json',
                                      'name': 'check json',
-                                     'success': False, 'result': None},
-                                    {'name': 'check status', 'result': None, 'success': True, "error": None}]},
+                                     'success': False,
+                                     'result': None},
+                                    {'name': 'check status',
+                                     'result': None,
+                                     'success': True,
+                                     "error": None}]},
                          result.result['script_result'])
 
     def test_execute_script2(self):
@@ -32,8 +36,14 @@ class ScriptExecutionTest(TestBase):
                           'error': '',
                           'properties': {'outputval': 'secret_token'},
                           'stdout': 'this is sample log\n',
-                          'tests': [{'name': 'check headers', 'result': None, 'success': True, "error": None},
-                                    {'name': 'check status', 'result': None, 'success': True, "error": None}]},
+                          'tests': [{'name': 'check headers',
+                                     'result': None,
+                                     'success': True,
+                                     "error": None},
+                                    {'name': 'check status',
+                                     'result': None,
+                                     'success': True,
+                                     "error": None}]},
                          result.result['script_result'])
 
     def test_execute_is_equals_script3(self):
@@ -71,13 +81,15 @@ class ScriptExecutionTest(TestBase):
 
     def test_execute_error(self):
         result = self.execute_target("script error", )
-        self.assertEqual({'compiled': True,
-                          'error': '',
-                          'properties': {},
-                          'stdout': 'error TypeError: Undefined and null dont have properties (tried '
-                                    "getting property 'out')\n",
-                          'tests': []},
-                         result.result['script_result'])
+        self.assertEqual(
+            {
+                'compiled': True,
+                'error': '',
+                'properties': {},
+                'stdout': 'error TypeError: Undefined and null dont have properties (tried '
+                "getting property 'out')\n",
+                'tests': []},
+            result.result['script_result'])
 
     def execute_target(self, target, properties=None):
         if properties is None:

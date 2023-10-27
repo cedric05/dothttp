@@ -3,7 +3,8 @@
 
 from shlex import quote
 
-# for file input and multipart, rather than converting them to body, we use curl's actual syntax
+# for file input and multipart, rather than converting them to body, we
+# use curl's actual syntax
 
 
 def to_curl(url, method, bodydata=None):

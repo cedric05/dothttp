@@ -50,7 +50,8 @@ class TestRandoms(TestCase):
 
 class SubstitutionTest(TestBase):
     def test_basic(self):
-        int_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='int')
+        int_request: PreparedRequest = self.get_request(
+            file=f'{base_dir}/random.http', target='int')
         int_payload = json.loads(int_request.body)
         int_value = int(int_payload['test'])
         print(f'int_value  {int_value} and int_payload {int_payload}')
@@ -58,22 +59,27 @@ class SubstitutionTest(TestBase):
         self.assertTrue(int(int_payload['test2']))
 
     def test_bool(self):
-        bool_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target=2)
+        bool_request: PreparedRequest = self.get_request(
+            file=f'{base_dir}/random.http', target=2)
         trueOrFalse = json.loads(bool_request.body)['test']
-        self.assertTrue(trueOrFalse == True or trueOrFalse == False)
+        self.assertTrue(trueOrFalse or trueOrFalse == False)
 
     def test_str(self):
-        str_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='str')
+        str_request: PreparedRequest = self.get_request(
+            file=f'{base_dir}/random.http', target='str')
         data = json.loads(str_request.body)
-        self.assertTrue(10 == len(data['test']), f'this is skeptical {str_request.body}')
+        self.assertTrue(10 == len(data['test']),
+                        f'this is skeptical {str_request.body}')
         self.assertTrue(1 <= len(data['test2']) <= 10, data['test2'])
 
     def test_float(self):
-        float_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='float')
+        float_request: PreparedRequest = self.get_request(
+            file=f'{base_dir}/random.http', target='float')
         request_data = json.loads(float_request.body)
         self.assertTrue(float(request_data['test']))
 
-        float_request2: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='random+string')
+        float_request2: PreparedRequest = self.get_request(
+            file=f'{base_dir}/random.http', target='random+string')
         request_data = json.loads(float_request2.body)
         self.assertTrue(request_data['test2'].endswith('@gmail.com'))
         self.assertTrue(request_data['test2'], request_data['test4'])
@@ -85,20 +91,23 @@ class SubstitutionTest(TestBase):
             For rest of propertys, even if random is of bool or str or int (different from first match), resolution will be same as first
             usually one should always reuse and redeclare in dothttp unless prop is random
         """
-        uuid_request: PreparedRequest = self.get_request(file=f'{base_dir}/random_double.http', target='double')
+        uuid_request: PreparedRequest = self.get_request(
+            file=f'{base_dir}/random_double.http', target='double')
         request_data = json.loads(uuid_request.body)
         self.assertTrue(request_data['test_int'] == request_data['test_int2'])
 
     def test_uuid(self):
-        ## test uuid
-        uuid_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='uuid')
+        # test uuid
+        uuid_request: PreparedRequest = self.get_request(
+            file=f'{base_dir}/random.http', target='uuid')
         request_data = json.loads(uuid_request.body)
         self.assertTrue('uuid' in request_data)
         self.assertEqual(36, len(request_data['uuid']))
 
     def test_slug(self):
-        ## test uuid
-        slug_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='slug')
+        # test uuid
+        slug_request: PreparedRequest = self.get_request(
+            file=f'{base_dir}/random.http', target='slug')
         request_data = json.loads(slug_request.body)
         self.assertTrue('slug' in request_data)
         slug = request_data['slug']
@@ -106,23 +115,29 @@ class SubstitutionTest(TestBase):
         self.assertTrue('-' in slug, 'slug should contain atleast one `-`')
 
     def test_timestamp(self):
-        ## test uuid
-        timestamp_request: PreparedRequest = self.get_request(file=f'{base_dir}/random.http', target='timestamp')
+        # test uuid
+        timestamp_request: PreparedRequest = self.get_request(
+            file=f'{base_dir}/random.http', target='timestamp')
         request_data = json.loads(timestamp_request.body)
         self.assertTrue('timestamp' in request_data)
         now = datetime.datetime.now()
-        fromtimestamp = datetime.datetime.fromtimestamp(int(request_data['timestamp']))
+        fromtimestamp = datetime.datetime.fromtimestamp(
+            int(request_data['timestamp']))
         self.assertGreater(now, fromtimestamp)
         # self.assertLess((now - fromtimestamp).seconds, 4)
         self.assertAlmostEqual(int(now.timestamp()), request_data['timestamp'])
 
     def test_complex(self):
-        should_load_basic: PreparedRequest = self.get_request(file=f'{base_dir}/complexrandom.http', target=1)
+        should_load_basic: PreparedRequest = self.get_request(
+            file=f'{base_dir}/complexrandom.http', target=1)
         self.assertNotEqual("https://req.dothttp.dev/", should_load_basic.url)
-        self.assertTrue(should_load_basic.url.startswith("https://req.dothttp.dev/"))
+        self.assertTrue(should_load_basic.url.startswith(
+            "https://req.dothttp.dev/"))
 
-        json_reuse_request: PreparedRequest = self.get_request(file=f'{base_dir}/complexrandom.http', target='reuse')
-        self.assertTrue(json_reuse_request.url.startswith("https://req.dothttp.dev/"))
+        json_reuse_request: PreparedRequest = self.get_request(
+            file=f'{base_dir}/complexrandom.http', target='reuse')
+        self.assertTrue(json_reuse_request.url.startswith(
+            "https://req.dothttp.dev/"))
         payload = json.loads(json_reuse_request.body)
         self.assertTrue(isinstance(payload['int'], int))
         self.assertTrue(isinstance(payload['bool'], bool))
@@ -138,12 +153,18 @@ class SubstitutionTest(TestBase):
         self.assertTrue(payload['slug'].lower() == payload['slug'])
 
         self.assertEqual(
-            f"https://req.dothttp.dev/?int={payload['int']}&bool={'true' if payload['bool'] else 'false'}&str={payload['str']}&float={payload['float']}"
-            , json_reuse_request.url)
+            f"https://req.dothttp.dev/?int={payload['int']}&bool={'true' if payload['bool'] else 'false'}&str={payload['str']}&float={payload['float']}",
+            json_reuse_request.url)
 
-        dataJsonreuse2: PreparedRequest = self.get_request(file=f'{base_dir}/complexrandom.http', target='reuse2')
+        dataJsonreuse2: PreparedRequest = self.get_request(
+            file=f'{base_dir}/complexrandom.http', target='reuse2')
         reuse2_str_value = parse_qs(dataJsonreuse2.body)['str'][0]
-        self.assertEqual(f"https://req.dothttp.dev/?str={reuse2_str_value}", dataJsonreuse2.url)
+        self.assertEqual(
+            f"https://req.dothttp.dev/?str={reuse2_str_value}",
+            dataJsonreuse2.url)
 
-        datareuse3: PreparedRequest = self.get_request(file=f'{base_dir}/complexrandom.http', target='reuse3')
-        self.assertEqual(f"https://req.dothttp.dev/?str={datareuse3.body}", datareuse3.url)
+        datareuse3: PreparedRequest = self.get_request(
+            file=f'{base_dir}/complexrandom.http', target='reuse3')
+        self.assertEqual(
+            f"https://req.dothttp.dev/?str={datareuse3.body}",
+            datareuse3.url)

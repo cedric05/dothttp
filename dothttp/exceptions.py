@@ -15,12 +15,14 @@ class DotHttpException(Exception):
         return self.message
 
 
-@exception_wrapper("http def with name `{base}` not defined for http  with name `{target}`")
+@exception_wrapper(
+    "http def with name `{base}` not defined for http  with name `{target}`")
 class UndefinedHttpToExtend(DotHttpException):
     pass
 
 
-@exception_wrapper("incorrect paramter key: `{key}` value: `{value}` . message `{message}`")
+@exception_wrapper(
+    "incorrect paramter key: `{key}` value: `{value}` . message `{message}`")
 class ParameterException(DotHttpException):
     pass
 
@@ -61,12 +63,14 @@ class DataFileNotFoundException(HttpFileException):
     message = "data file mentioned is not a valid"
 
 
-@exception_wrapper('property `{var}` not defined in propertyfile/commandline/httpfile propertyfile:`{propertyfile}`')
+@exception_wrapper(
+    'property `{var}` not defined in propertyfile/commandline/httpfile propertyfile:`{propertyfile}`')
 class PropertyNotFoundException(PropertyFileException):
     pass
 
 
-@exception_wrapper("error with command line property format, property `{prop}`")
+@exception_wrapper(
+    "error with command line property format, property `{prop}`")
 class CommandLinePropError(DotHttpException):
     pass
 
@@ -76,7 +80,8 @@ class PayloadNotValidException(HttpFileException):
     pass
 
 
-@exception_wrapper("invalid payload data, expected str,json payload: `{payload}`")
+@exception_wrapper(
+    "invalid payload data, expected str,json payload: `{payload}`")
 class PayloadDataNotValidException(PayloadNotValidException):
     pass
 
@@ -91,6 +96,7 @@ class ScriptException(DotHttpException):
     pass
 
 
-@exception_wrapper("AWSAuth expects all(access_id, secret_token, region, service) to be non empty access_id:`{access_id}`")
+@exception_wrapper(
+    "AWSAuth expects all(access_id, secret_token, region, service) to be non empty access_id:`{access_id}`")
 class DothttpAwsAuthException(DotHttpException):
     pass

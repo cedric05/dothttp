@@ -15,7 +15,10 @@ handler = Har2HttpHandler()
 
 
 @contextlib.contextmanager
-def execute_with_params(input_file_or_json, expected_output, filetype=HttpFileType.Httpfile.file_type):
+def execute_with_params(
+        input_file_or_json,
+        expected_output,
+        filetype=HttpFileType.Httpfile.file_type):
     if isinstance(input_file_or_json, (dict, list)):
         full_path = None
         har_data = input_file_or_json
@@ -23,11 +26,14 @@ def execute_with_params(input_file_or_json, expected_output, filetype=HttpFileTy
         full_path = os.path.join(command_dir, input_file_or_json)
         har_data = None
     with tempfile.TemporaryDirectory() as directory:
-        command = Command(id=1, method=Har2HttpHandler.name, params={"filename": full_path,
-                                                                     "save_directory": directory,
-                                                                     "har": har_data,
-                                                                     "filetype": filetype
-                                                                     })
+        command = Command(
+            id=1,
+            method=Har2HttpHandler.name,
+            params={
+                "filename": full_path,
+                "save_directory": directory,
+                "har": har_data,
+                "filetype": filetype})
         response = handler.run(command)
         with open(os.path.join(command_dir, expected_output
                                ), 'r') as f:
@@ -49,7 +55,8 @@ class Har2HttpTest(TestBase):
     def test_har_list(self):
         with open(os.path.join(command_dir, "req.har.json")) as f:
             har_data = json.load(f)
-        har_requests = [entry['request'] for entry in har_data['log']['entries']]
+        har_requests = [entry['request']
+                        for entry in har_data['log']['entries']]
         with execute_with_params(input_file_or_json=har_requests, expected_output="req.har.http") as (
                 expected, response):
             self.assertEqual(expected, response.result.get('http'))
@@ -85,4 +92,6 @@ class Har2HttpTest(TestBase):
         with execute_with_params(os.path.join("har2http", "req.har.json"),
                                  os.path.join("har2http", "req.har.httpbook"), HttpFileType.Notebookfile.file_type) as (
                 expected, response):
-            self.assertEqual(json.loads(expected), json.loads(response.result.get('http')))
+            self.assertEqual(
+                json.loads(expected), json.loads(
+                    response.result.get('http')))

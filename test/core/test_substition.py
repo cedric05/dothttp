@@ -12,15 +12,22 @@ base_dir = f"{dir_path}/substitution"
 class SubstitutionTest(TestBase):
     def test_substitution(self):
         req = self.get_request(f"{base_dir}/host.http")
-        self.assertEqual("https://dothttp.azurewebsites.net/ram", req.url, "incorrect url")
+        self.assertEqual(
+            "https://dothttp.azurewebsites.net/ram",
+            req.url,
+            "incorrect url")
 
     def test_substitution_json_query_multiple(self):
         req = self.get_request(f"{base_dir}/multipleprop.http",
                                prop=f"{base_dir}/multipleprop.json", )
-        self.assertEqual("https://httpbing.org/ram?haha=value1&key2=ahah", req.url, "incorrect url")
+        self.assertEqual(
+            "https://httpbing.org/ram?haha=value1&key2=ahah",
+            req.url,
+            "incorrect url")
         self.assertEqual({"qu2": "va2"}, json.loads(req.body), )
 
-    def test_substitution_multiple_env(self, filename=f"{base_dir}/prop1.json"):
+    def test_substitution_multiple_env(
+            self, filename=f"{base_dir}/prop1.json"):
         req = self.get_request(f"{base_dir}/multipleenv.http",
                                prop=filename,
                                env=["env1", "env2"])
@@ -37,12 +44,15 @@ class SubstitutionTest(TestBase):
         self.assertEqual("GET", req.method)
 
     def test_substitution_commandline(self):
-        req = self.get_request(f"{base_dir}/httpfileprop.http", properties=["dontsubstitute=dothttp.azurewebsites.net"])
+        req = self.get_request(
+            f"{base_dir}/httpfileprop.http",
+            properties=["dontsubstitute=dothttp.azurewebsites.net"])
         self.assertEqual("https://dothttp.azurewebsites.net/", req.url)
         self.assertEqual("GET", req.method)
 
     def test_substitution_infile_with_quotes(self):
-        req: PreparedRequest = self.get_request(f"{base_dir}/infilepropwithquotes.http")
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/infilepropwithquotes.http")
         self.assertEqual("https://google.com/", req.url)
         self.assertEqual("POST", req.method)
         self.assertEqual(b'{"key": " space in between quotes"}', req.body)
@@ -51,93 +61,125 @@ class SubstitutionTest(TestBase):
         req: PreparedRequest = self.get_request(f"{base_dir}/jsonsub.http")
         self.assertEqual("http://localhost:8000/post", req.url)
         self.assertEqual("POST", req.method)
-        self.assertEqual(b'{"test": {"data": {"candidateID": "1117026", "isAnonymous": true}}}', req.body)
+        self.assertEqual(
+            b'{"test": {"data": {"candidateID": "1117026", "isAnonymous": true}}}',
+            req.body)
 
     def test_substitution_infile_with_multiple_suages(self):
-        req: PreparedRequest = self.get_request(f"{base_dir}/infilesinglewithmultipleusages.http")
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/infilesinglewithmultipleusages.http")
         self.assertEqual("https://google.com/", req.url)
         self.assertEqual(b'{"google.com": "google.com"}', req.body)
 
     def test_define_on_second_occurence(self):
-        req: PreparedRequest = self.get_request(f"{base_dir}/definevariableonsecond.http")
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/definevariableonsecond.http")
         self.assertEqual("https://dothttp.dev/", req.url)
         self.assertEqual('dothttp.dev', req.body)
 
     def test_object_substitution(self):
-        req: PreparedRequest = self.get_request(f"{base_dir}/envvariableswithjson.http", env=['env3'])
-        self.assertEqual(b'{"object": {"key": "value"}, "int": 3, "str": "str", "null": null, "true": t'
-                         b'rue, "false": false, "float": 1.23}', req.body)
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/envvariableswithjson.http", env=['env3'])
+        self.assertEqual(
+            b'{"object": {"key": "value"}, "int": 3, "str": "str", "null": null, "true": t'
+            b'rue, "false": false, "float": 1.23}', req.body)
 
     def test_only_when_required(self):
-        req: PreparedRequest = self.get_request(f"{base_dir}/sub_with_double_sub_notused.http", target="double_def_pass")
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/sub_with_double_sub_notused.http",
+            target="double_def_pass")
         with self.assertRaises(HttpFileException):
-            req: PreparedRequest = self.get_request(f"{base_dir}/sub_with_double_sub_notused.http", target="double_def_fail")
+            req: PreparedRequest = self.get_request(
+                f"{base_dir}/sub_with_double_sub_notused.http",
+                target="double_def_fail")
 
     def test_substitute_one_by_one(self):
         # path
-        req: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"])
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/header_subs.http", properties=["path=get"])
         self.assertEqual("https://req.dothttp.dev/get", req.url)
 
         # header
-        req2: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"],
-                                                 target="headers")
+        req2: PreparedRequest = self.get_request(
+            f"{base_dir}/header_subs.http",
+            properties=["path=get"],
+            target="headers")
         self.assertEqual({'get': 'get'}, req2.headers)
 
         # basicauth
-        req3: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"],
-                                                 target="auth")
+        req3: PreparedRequest = self.get_request(
+            f"{base_dir}/header_subs.http",
+            properties=["path=get"],
+            target="auth")
         self.assertEqual({'Authorization': 'Basic Z2V0OmdldA=='}, req3.headers)
 
         # query
-        req4: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"],
-                                                 target="query")
+        req4: PreparedRequest = self.get_request(
+            f"{base_dir}/header_subs.http",
+            properties=["path=get"],
+            target="query")
         self.assertEqual("https://req.dothttp.dev/?get=get", req4.url)
 
         # data
-        req5: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http", properties=["path=get"],
-                                                 target="body")
+        req5: PreparedRequest = self.get_request(
+            f"{base_dir}/header_subs.http",
+            properties=["path=get"],
+            target="body")
         self.assertEqual("get", req5.body)
 
         # files
-        req6: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http",
-                                                 properties=["path=sadfasdfasdfasdfasdfasdfasf"],
-                                                 target="files")
+        req6: PreparedRequest = self.get_request(
+            f"{base_dir}/header_subs.http",
+            properties=["path=sadfasdfasdfasdfasdfasdfasf"],
+            target="files")
         self.assertIn(b"sadfasdfasdfasdfasdfasdfasf", req6.body)
 
         # datajson
-        req7: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http",
-                                                 properties=["path=get"],
-                                                 target="data")
+        req7: PreparedRequest = self.get_request(
+            f"{base_dir}/header_subs.http",
+            properties=["path=get"],
+            target="data")
         self.assertEqual("get=get", req7.body)
 
         # json
-        req8: PreparedRequest = self.get_request(f"{base_dir}/header_subs.http",
-                                                 properties=["path=get"],
-                                                 target="json")
+        req8: PreparedRequest = self.get_request(
+            f"{base_dir}/header_subs.http",
+            properties=["path=get"],
+            target="json")
         self.assertEqual(b'{"get": "get"}', req8.body)
 
     def test_substitution_preference(self):
-        ## command line > env (last env > first env) > infile
-        req: PreparedRequest = self.get_request(f"{base_dir}/simpleinfile.http", prop=f"{base_dir}/simepleinfile.json")
+        # command line > env (last env > first env) > infile
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/simpleinfile.http",
+            prop=f"{base_dir}/simepleinfile.json")
         self.assertEqual("https://google.com/", req.url)
-        req: PreparedRequest = self.get_request(f"{base_dir}/simpleinfile.http",
-                                                prop=f"{base_dir}/simepleinfile.json",
-                                                env=["env1"]
-                                                )
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/simpleinfile.http",
+            prop=f"{base_dir}/simepleinfile.json",
+            env=["env1"])
         self.assertEqual("https://yahoo.com/", req.url)
-        req: PreparedRequest = self.get_request(f"{base_dir}/simpleinfile.http",
-                                                prop=f"{base_dir}/simepleinfile.json",
-                                                env=["env1", "env2"]
-                                                )
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/simpleinfile.http",
+            prop=f"{base_dir}/simepleinfile.json",
+            env=[
+                "env1",
+                "env2"])
         self.assertEqual("https://ins.com/", req.url)
-        req: PreparedRequest = self.get_request(f"{base_dir}/simpleinfile.http",
-                                                prop=f"{base_dir}/simepleinfile.json",
-                                                env=["env1", "env2", "env3"]
-                                                )
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/simpleinfile.http",
+            prop=f"{base_dir}/simepleinfile.json",
+            env=[
+                "env1",
+                "env2",
+                "env3"])
         self.assertEqual("https://hub.com/", req.url)
-        req: PreparedRequest = self.get_request(f"{base_dir}/simpleinfile.http",
-                                                prop=f"{base_dir}/simepleinfile.json",
-                                                env=["env1", "env2", "env3"],
-                                                properties=["host=ramba.com"]
-                                                )
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/simpleinfile.http",
+            prop=f"{base_dir}/simepleinfile.json",
+            env=[
+                "env1",
+                "env2",
+                "env3"],
+            properties=["host=ramba.com"])
         self.assertEqual("https://ramba.com/", req.url)

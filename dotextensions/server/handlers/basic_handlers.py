@@ -23,8 +23,9 @@ class VersionHandler(BaseHandler):
 
     def run(self, command: Command) -> Result:
         return Result(id=command.id,
-                            result={
-                                "version": __version__})
+                      result={
+                          "version": __version__})
+
 
 class RunHttpFileHandler(BaseHandler):
     name = "/file/execute"
@@ -75,7 +76,11 @@ class RunHttpFileHandler(BaseHandler):
         target = params.get("target", '1')
         nocookie = params.get("nocookie", False)
         curl = params.get("curl", False)
-        properties = [f"{i}={j}" for i, j in params.get('properties', {}).items()]
+        properties = [
+            f"{i}={j}" for i,
+            j in params.get(
+                'properties',
+                {}).items()]
         content = params.get("content", None)
         contexts = params.get("contexts")
         property_file = params.get("property-file", None)
@@ -84,17 +89,26 @@ class RunHttpFileHandler(BaseHandler):
         if content:
             try:
                 content = "\n".join(content.splitlines())
-            except:
+            except BaseException:
                 content = None
-        config = ContextConfig(file=filename, env=envs, properties=properties, curl=curl, property_file=property_file,
-                               debug=True,
-                               no_cookie=nocookie, format=False, info=False, target=target, content=content)
+        config = ContextConfig(
+            file=filename,
+            env=envs,
+            properties=properties,
+            curl=curl,
+            property_file=property_file,
+            debug=True,
+            no_cookie=nocookie,
+            format=False,
+            info=False,
+            target=target,
+            content=content)
         config.contexts = contexts
         return config
 
     def get_request_result(self, command, comp: RequestCompiler):
         comp.load_def()
-        execution_cls = js3py.ScriptExecutionJs  if comp.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT  else js3py.ScriptExecutionPython
+        execution_cls = js3py.ScriptExecutionJs if comp.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT else js3py.ScriptExecutionPython
         script_execution = execution_cls(comp.httpdef, comp.property_util)
         script_execution.pre_request_script()
         resp = comp.get_response()
@@ -116,7 +130,8 @@ class RunHttpFileHandler(BaseHandler):
             "script_result": script_result,
         }
         if resp.history:
-            response_data["history"] = [self._get_resp_data(hist_item) for hist_item in resp.history]
+            response_data["history"] = [self._get_resp_data(
+                hist_item) for hist_item in resp.history]
         # will be used for response
         data = {}
         data.update(response_data['response'])  # deprecated
@@ -127,8 +142,10 @@ class RunHttpFileHandler(BaseHandler):
         try:
             data.update({"http": self.get_http_from_req(comp.httpdef)})
         except Exception as e:
-            logger.error("ran into error regenerating http def from parsed object")
-            data.update({"http": f"ran into error \n Exception: `{e}` message:{e.args}"})
+            logger.error(
+                "ran into error regenerating http def from parsed object")
+            data.update(
+                {"http": f"ran into error \n Exception: `{e}` message:{e.args}"})
         result = Result(id=command.id,
                         result=data)
         return result
@@ -146,7 +163,9 @@ class RunHttpFileHandler(BaseHandler):
 
     @staticmethod
     def get_http_from_req(request: HttpDef):
-        http_def = MultidefHttp(import_list=[],allhttps=[request.get_http_from_req()])
+        http_def = MultidefHttp(
+            import_list=[], allhttps=[
+                request.get_http_from_req()])
         return HttpFileFormatter.format(http_def)
 
 
@@ -169,8 +188,8 @@ class ContentBase(BaseModelProcessor):
         # reqcomp will try to resolve properties right after model is generated
         super(ContentBase, self).load_model()
         ##
-        ## context has varibles defined
-        ## for resolving purpose, including them into content
+        # context has varibles defined
+        # for resolving purpose, including them into content
         self.content = self.content + CONTEXT_SEP + CONTEXT_SEP.join(
             self.args.contexts)
 
@@ -179,7 +198,8 @@ class ContentBase(BaseModelProcessor):
             # first try to resolve target from current context
             super().select_target()
         except UndefinedHttpToExtend as ex:
-            # if it weren't able to figure out context, try to resolve from contexts
+            # if it weren't able to figure out context, try to resolve from
+            # contexts
             for context in self.args.contexts:
                 try:
                     # if model is generated, try to figure out target
@@ -196,8 +216,10 @@ class ContentBase(BaseModelProcessor):
                     return super(ContentBase, self).select_target()
                 except Exception as e:
                     # contexts, can not always be correct syntax
-                    # in such scenarios, don't complain, try to resolve with next contexts
-                    logger.info("ignoring exception, context is not looking good")
+                    # in such scenarios, don't complain, try to resolve with
+                    # next contexts
+                    logger.info(
+                        "ignoring exception, context is not looking good")
             raise ex
 
 
@@ -262,7 +284,11 @@ class GetNameReferencesHandler(BaseHandler):
         with open(filename) as f:
             http_data = f.read()
             all_names, all_urls = self.parse_n_get(http_data)
-            result = Result(id=command.id, result={"names": all_names, "urls": all_urls})
+            result = Result(
+                id=command.id,
+                result={
+                    "names": all_names,
+                    "urls": all_urls})
         return result
 
     def parse_n_get(self, http_data):
@@ -304,5 +330,9 @@ class ContentNameReferencesHandler(GetNameReferencesHandler):
     def execute(self, command, filename):
         http_data = command.params.get("content", "")
         all_names, all_urls = self.parse_n_get(http_data)
-        result = Result(id=command.id, result={"names": all_names, "urls": all_urls})
+        result = Result(
+            id=command.id,
+            result={
+                "names": all_names,
+                "urls": all_urls})
         return result

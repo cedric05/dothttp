@@ -40,11 +40,11 @@ class FileExecute(TestBase):
         #         json.dump({"files": result_normalize}, f)
         #     else:
         #         json.dump(response.result, f)
-        # # -------------------------------------------------------------------------------------
-        ## For Windows
+        # # -------------------------------------------------------------------
+        # For Windows
         # with open(os.path.join(fixtures_dir, file_to_compare), 'w') as f:
         #     json.dump(response.result, f)
-        ## -------------------------------------------------------------------------------------
+        # -------------------------------------------------------------------------------------
         with open(os.path.join(fixtures_dir, file_to_compare), 'r') as f:
             if sys.platform.startswith("windows"):
                 self.assertEqual(json.load(f), response.result)
@@ -53,7 +53,8 @@ class FileExecute(TestBase):
                     return self.assertEqual(json.load(f), response.result)
                 result_normalize = {}
                 for file in response.result["files"]:
-                    result_normalize[file.replace('/', "\\")] = response.result["files"][file]
+                    result_normalize[file.replace(
+                        '/', "\\")] = response.result["files"][file]
                 self.assertEqual(json.load(f), {"files": result_normalize})
 
     def test_base(self):
@@ -102,10 +103,13 @@ class FileExecute(TestBase):
             f"{postman_dir}/descriptionobject.postman_collection.json",
             f"{postman_dir}/ntlm.postman_collection.json",
             f"{postman_dir}/multipart.postmancollection.json",
-            f"{postman_dir}/dottedhost.postman_collection.json"
-        ]
+            f"{postman_dir}/dottedhost.postman_collection.json"]
         for link in links:
-            self.compare(link, os.path.join(fixtures_dir, os.path.basename(link)))
+            self.compare(
+                link,
+                os.path.join(
+                    fixtures_dir,
+                    os.path.basename(link)))
         #
 
     def test_notebook(self):
@@ -113,5 +117,7 @@ class FileExecute(TestBase):
         collection = "https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/multi-level-folders-v2.postman_collection.json"
         self.compare(
             collection,
-            os.path.join(fixtures_dir, "multi-level-folders-v2.postman_collection.httpbook.json"),
+            os.path.join(
+                fixtures_dir,
+                "multi-level-folders-v2.postman_collection.httpbook.json"),
             filetype=HttpFileType.Notebookfile.file_type)

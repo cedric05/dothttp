@@ -19,17 +19,19 @@ from .models import Command, BaseHandler
 
 logger = logging.getLogger('handler')
 
-handlers: Dict[str, BaseHandler] = {handler.get_method(): handler for handler in
-                                    (FormatHttpFileHandler(), RunHttpFileHandler(), GetNameReferencesHandler(),
-                                     ImportPostmanCollection(),
-                                     ContentExecuteHandler(),
-                                     Http2Har(),
-                                     ContentNameReferencesHandler(),
-                                     TypeFromPos(),
-                                     Har2HttpHandler(),
-                                     Http2Postman(),
-                                     VersionHandler(),
-                                     )}
+handlers: Dict[str,
+               BaseHandler] = {handler.get_method(): handler for handler in (FormatHttpFileHandler(),
+                                                                             RunHttpFileHandler(),
+                                                                             GetNameReferencesHandler(),
+                                                                             ImportPostmanCollection(),
+                                                                             ContentExecuteHandler(),
+                                                                             Http2Har(),
+                                                                             ContentNameReferencesHandler(),
+                                                                             TypeFromPos(),
+                                                                             Har2HttpHandler(),
+                                                                             Http2Postman(),
+                                                                             VersionHandler(),
+                                                                             )}
 
 
 def run(command: Command) -> Dict:
@@ -39,7 +41,12 @@ def run(command: Command) -> Dict:
         return {"id": result.id, "result": result.result}
     except Exception as e:
         logger.error("unknown error happened", exc_info=True)
-        return {"id": command.id, "result": {"error": True, "error_message": str(e.args)}}
+        return {
+            "id": command.id,
+            "result": {
+                "error": True,
+                "error_message": str(
+                    e.args)}}
 
 
 class Base:
@@ -60,7 +67,9 @@ class HttpServer(Base):
         self.app = app
         self.port = port
         for handler in handlers.keys():
-            self.app.route(handler, methods=["POST"])(self.get_handler(handler))
+            self.app.route(
+                handler, methods=["POST"])(
+                self.get_handler(handler))
 
     def run_forever(self):
         self.app.run("localhost", self.port)
@@ -70,12 +79,17 @@ class HttpServer(Base):
             from flask import request
             try:
                 id = int(request.args['id'])
-                command = {'method': handler, 'params': json.loads(request.data), 'id': id}
+                command = {
+                    'method': handler,
+                    'params': json.loads(
+                        request.data),
+                    'id': id}
                 command = super(HttpServer, self).get_command(**command)
                 result = run(command)
                 return result
             except JSONDecodeError:
-                logger.error(f"jsondecode error happened message: {request.data} args: {request.args}")
+                logger.error(
+                    f"jsondecode error happened message: {request.data} args: {request.args}")
                 return {}
 
         flask_api_handler.__name__ = handler
@@ -95,11 +109,16 @@ class CmdServer(Base):
                 command = self.get_command(line)
                 self.pool.submit(self.run_respond, command)
             except JSONDecodeError:
-                logger.info(f"input line `{line.strip()}` is not json decodable")
-                self.write_result({"id": 0, "result": {"error": True, "error_message": "not json decodable"}})
+                logger.info(
+                    f"input line `{line.strip()}` is not json decodable")
+                self.write_result(
+                    {"id": 0, "result": {"error": True, "error_message": "not json decodable"}})
             except Exception as e:
-                logger.info(f"unknown exception `{e}` happened ", exc_info=True)
-                self.write_result({"id": 0, "result": {"error": True, "error_message": "not json decodable"}})
+                logger.info(
+                    f"unknown exception `{e}` happened ",
+                    exc_info=True)
+                self.write_result(
+                    {"id": 0, "result": {"error": True, "error_message": "not json decodable"}})
 
     def run_respond(self, command):
         result = run(command)
@@ -113,9 +132,11 @@ class CmdServer(Base):
         output = json.loads(line)
         return super().get_command(**output)
 
+
 async def async_read_stdin() -> str:
     loop = asyncio.get_event_loop()
     return await loop.run_in_executor(None, sys.stdin.readline)
+
 
 async def connect_stdin_stdout() -> typing.Tuple[asyncio.StreamReader, asyncio.StreamWriter]:
     loop = asyncio.get_event_loop()
@@ -125,6 +146,7 @@ async def connect_stdin_stdout() -> typing.Tuple[asyncio.StreamReader, asyncio.S
     w_transport, w_protocol = await loop.connect_write_pipe(asyncio.streams.FlowControlMixin, sys.stdout)
     writer = asyncio.StreamWriter(w_transport, w_protocol, reader, loop)
     return reader, writer
+
 
 class AsyncCmdServer(CmdServer):
 

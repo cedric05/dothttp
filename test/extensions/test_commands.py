@@ -28,10 +28,22 @@ class TargetTest(TestBase):
         return self.execute_and_compare_names(result)
 
     def execute_and_compare_names(self, result):
-        self.assertEqual({'names': [{'end': 77, 'method': 'GET', 'name': 'test', 'start': 0},
-                                    {'end': 207, 'method': 'POST', 'name': 'test2', 'start': 79},
-                                    {'end': 337, 'method': 'POST', 'name': 'test3', 'start': 209},
-                                    {'end': 398, 'method': 'POST', 'name': 'test4.test', 'start': 339}],
+        self.assertEqual({'names': [{'end': 77,
+                                     'method': 'GET',
+                                     'name': 'test',
+                                     'start': 0},
+                                    {'end': 207,
+                                     'method': 'POST',
+                                     'name': 'test2',
+                                     'start': 79},
+                                    {'end': 337,
+                                     'method': 'POST',
+                                     'name': 'test3',
+                                     'start': 209},
+                                    {'end': 398,
+                                     'method': 'POST',
+                                     'name': 'test4.test',
+                                     'start': 339}],
                           'urls': [{'end': 41,
                                     'method': 'GET',
                                     'start': 14,
@@ -108,7 +120,9 @@ class FileExecute(TestBase):
         self.assertTrue("status" in result.result)
         self.assertEqual(200, result.result["status"])
         self.assertTrue("headers" in result.result)
-        self.assertEqual("http://localhost:8000/post?startusing=dothttp", body['url'])
+        self.assertEqual(
+            "http://localhost:8000/post?startusing=dothttp",
+            body['url'])
         self.assertEqual('''@name("2")
 POST "http://localhost:8000/post"
 ? "startusing"= "dothttp"
@@ -131,7 +145,9 @@ POST "http://localhost:8000/post"
         self.assertTrue("status" in result2.result)
         self.assertEqual(200, result2.result["status"])
         self.assertTrue("headers" in result2.result)
-        self.assertEqual("http://localhost:8000/post?startusing=dothttp", body['url'])
+        self.assertEqual(
+            "http://localhost:8000/post?startusing=dothttp",
+            body['url'])
         self.assertEqual("""@name("2")
 POST "http://req.dothttp.dev/post"
 ? "startusing"= "dothttp"
@@ -188,7 +204,13 @@ basicauth("username", "password")
         result = self.execute_file(f"{command_dir}/syntax.http")
         self.assertEqual(True, result.result['error'])
 
-    def execute_file(self, filename, env=None, properties=None, target=None, property_file=None):
+    def execute_file(
+            self,
+            filename,
+            env=None,
+            properties=None,
+            target=None,
+            property_file=None):
         if properties is None:
             properties = {}
         if env is None:
@@ -213,12 +235,15 @@ basicauth("username", "password")
         self.assertEqual(True, result.result['error'])
 
     def test_env(self):
-        result = self.execute_file(f"{command_dir}/isolated/env.http", env=["simple"])
+        result = self.execute_file(
+            f"{command_dir}/isolated/env.http",
+            env=["simple"])
         self.assertEqual(200, result.result['status'])
 
-
     def test_execute(self):
-        result = self.execute_file(f"{command_dir}/cookie.http", target="set-cookie")
+        result = self.execute_file(
+            f"{command_dir}/cookie.http",
+            target="set-cookie")
         self.assertEqual("""@name("set-cookie")
 GET "http://localhost:8000/cookies/set/dev/ram"
 "cookie": "dev=ram"
@@ -229,9 +254,11 @@ GET "http://localhost:8000/cookies/set/dev/ram"
         os.remove(DOTHTTP_COOKIEJAR)
         RequestBase.global_session.cookies.clear()
 
-
     def test_property(self):
-        result = self.execute_file(f"{command_dir}/isolated/env.http", properties={"path": "get"})
+        result = self.execute_file(
+            f"{command_dir}/isolated/env.http",
+            properties={
+                "path": "get"})
         self.assertEqual(200, result.result['status'])
 
     # @skip("""
@@ -241,7 +268,12 @@ GET "http://localhost:8000/cookies/set/dev/ram"
     def test_cert_with_no_key(self):
         filename = f"{http_base}/no-password.http"
         cert_file = f"{cert_base}/no-password.pem"
-        req_comp_success = self.execute_file(filename, target="no-password", properties={"cert": cert_file, "file": ""})
+        req_comp_success = self.execute_file(
+            filename,
+            target="no-password",
+            properties={
+                "cert": cert_file,
+                "file": ""})
         self.assertEqual(200, req_comp_success.result['status'])
         self.assertEqual(f"""@name("no-password")
 GET "https://client.badssl.com/"
@@ -259,8 +291,12 @@ certificate(cert="{cert_file}")
         filename = f"{http_base}/no-password.http"
         cert_file = f"{cert_base}/cert.crt"
         key_file = f"{cert_base}/key.key"
-        req_comp2 = self.execute_file(filename, target="with-key-and-cert",
-                                      properties={"cert": cert_file, "key": key_file})
+        req_comp2 = self.execute_file(
+            filename,
+            target="with-key-and-cert",
+            properties={
+                "cert": cert_file,
+                "key": key_file})
         self.assertEqual(200, req_comp2.result['status'])
         self.assertEqual(f"""@name("with-key-and-cert")
 @clear
@@ -279,7 +315,12 @@ certificate(cert="{cert_file}", key="{key_file}")
     def test_p12(self):
         filename = f"{http_base}/no-password.http"
         p12 = f"{cert_base}/badssl.com-client.p12"
-        result = self.execute_file(filename, properties={"p12": p12, "password": "badssl.com"}, target="with-p12")
+        result = self.execute_file(
+            filename,
+            properties={
+                "p12": p12,
+                "password": "badssl.com"},
+            target="with-p12")
         self.assertEqual(200, result.result['status'])
         self.assertEqual(f"""@name("with-p12")
 @clear
@@ -303,11 +344,14 @@ awsauth(access_id="dummy", secret_key="dummy", service="s3", region="eu-east-1")
 
 """, result.result['http'])
 
-
-
     def test_property_file(self):
         http_file = f"{command_dir}/custom-property/property.http"
-        result = self.execute_file(http_file, property_file=os.path.join(os.path.dirname(http_file), "different-name.json"), env=["env"])
+        result = self.execute_file(
+            http_file,
+            property_file=os.path.join(
+                os.path.dirname(http_file),
+                "different-name.json"),
+            env=["env"])
         self.assertEqual(200, result.result['status'])
         body = json.loads(result.result['body'])
         self.assertEqual({"prop": "value"}, body['json'])

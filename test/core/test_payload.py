@@ -28,7 +28,8 @@ class PayLoadTest(TestBase):
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual(
             b'{"string": "simple", "list": ["dothttp", "azure"], "null": null, "bool": false, "bool2": true, "float": 1.121212, "float2": 1}',
-            req.body, "incorrect method")
+            req.body,
+            "incorrect method")
 
     def test_json_payload3(self):
         req = self.get_request(f"{base_dir}/jsonpayload3.http")
@@ -117,21 +118,18 @@ class PayLoadTest(TestBase):
                             "GlossEntry": {
                                 "ID": "SGML",
                                 "SortAs": "SGML",
-                                "GlossTerm":
-                                "Standard Generalized Markup Language",
+                                "GlossTerm": "Standard Generalized Markup Language",
                                 "Acronym": "SGML",
                                 "Abbrev": "ISO 8879:1986",
                                 "GlossDef": {
-                                    "para":
-                                    "A meta-markup language, used to create markup languages such as DocBook.",
-                                    "GlossSeeAlso": ["GML", "XML"]
-                                },
-                                "GlossSee": "markup"
-                            }
-                        }
-                    }
-                }
-            }, json.loads(req.body), "json Payload parsed wrong")
+                                    "para": "A meta-markup language, used to create markup languages such as DocBook.",
+                                    "GlossSeeAlso": [
+                                        "GML",
+                                        "XML"]},
+                                "GlossSee": "markup"}}}}},
+            json.loads(
+                req.body),
+            "json Payload parsed wrong")
         self.assertEqual('application/json', req.headers['content-type'])
 
     def test_payload(self):
@@ -180,7 +178,7 @@ class PayLoadTest(TestBase):
         loadfile.close()
         try:
             os.unlink(loadfile.name)
-        except:
+        except BaseException:
             pass
 
     def test_data_json_payload(self):
@@ -210,7 +208,7 @@ class PayLoadTest(TestBase):
         loadfile.close()
         try:
             os.unlink(loadfile.name)
-        except:
+        except BaseException:
             pass
 
     def func_multipart_syntax_test(self, param, loadfile, data):
@@ -256,14 +254,12 @@ class PayLoadTest(TestBase):
                              target="2").body)
         self.assertEqual(
             b'{"simple": "\\ntest\\n\\"simple 1\\"\\n\'simple 2\'\\n\'\'simple 3\'\'\\n'
-            b'\\"\\"simple 4\\"\\"\\n\\n"}',
-            self.get_request(f"{base_dir}/multilinejson.http",
-                             target="3").body)
+            b'\\"\\"simple 4\\"\\"\\n\\n"}', self.get_request(
+                f"{base_dir}/multilinejson.http", target="3").body)
         self.assertEqual(
             b'{"simple": "\\ntest\\n\\"simple 1\\"\\n\'simple 2\'\\n\'\'simple 3\'\'\\n'
-            b'\\"\\"simple 4\\"\\"\\n\\n"}',
-            self.get_request(f"{base_dir}/multilinejson.http",
-                             target="4").body)
+            b'\\"\\"simple 4\\"\\"\\n\\n"}', self.get_request(
+                f"{base_dir}/multilinejson.http", target="4").body)
 
     def test_payload_with_breaks(self):
         self.assertEqual(

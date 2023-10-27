@@ -23,7 +23,10 @@ class Property:
     value: Union[str, None, HttpFileException] = None
 
 
-def random_string_generator(size=4, chars=string.ascii_lowercase + string.digits):
+def random_string_generator(
+        size=4,
+        chars=string.ascii_lowercase +
+        string.digits):
     """
     Args:
         size: size of string
@@ -48,7 +51,8 @@ def get_random_str(length=None):
     if not length:
         length = random.randint(1, 10)
     initial = random.choice(string.ascii_letters)
-    return initial + random_string_generator(length - 1, string.ascii_letters + string.digits)
+    return initial + \
+        random_string_generator(length - 1, string.ascii_letters + string.digits)
 
 
 def get_random_int(length=None):
@@ -77,7 +81,8 @@ def get_uuid(*_args):
 def get_random_slug(length):
     if not length or length <= 1:
         length = 4
-    return '-'.join(random_string_generator(size=get_random_int(1)) for _i in range(length))
+    return '-'.join(random_string_generator(size=get_random_int(1))
+                    for _i in range(length))
 
 
 def get_timestamp(*_args):
@@ -114,7 +119,11 @@ class PropertyProvider:
     # random_string_regex = re.compile(
     #     r'.*?(?P<category>\$randomStr|\$randomInt|\$randomBool|\$randomFloat|\$guid)(?P<length>:\d*)?')
     random_string_regex = re.compile(
-        r'.*?(?P<category>' + "|".join("\\" + key for key in rand_map) + ')(?P<length>:\d*)?')
+        r'.*?(?P<category>' +
+        "|".join(
+            "\\" +
+            key for key in rand_map) +
+        ')(?P<length>:\\d*)?')
 
     def __init__(self, property_file=""):
         self.command_properties = {}
@@ -139,13 +148,18 @@ class PropertyProvider:
         self.env_properties[key] = value
 
     def add_infile_properties(self, content):
-        self.infile_properties.update(self.get_properties_for_content(content))
+        self.update_in_file_properties_for_content(
+            content, self.infile_properties)
 
     def get_properties_for_content(self, content):
         infile_properties: Dict[str, Property] = {}
+        self.update_in_file_properties_for_content(content, infile_properties)
+        return infile_properties
+
+    def update_in_file_properties_for_content(
+            self, content, infile_properties):
         out = self.var_regex.findall(content)
         tuple(self.validate_n_gen(x, infile_properties) for x in out if x)
-        return infile_properties
 
     def check_properties_for_content(self, content):
         content_prop_needed = self.get_properties_for_content(content)
@@ -154,7 +168,8 @@ class PropertyProvider:
         missing_props = props_needed - self.available_properties_list()
         if len(missing_props) != 0:
             raise PropertyNotFoundException(
-                var=missing_props, propertyfile=self.property_file if self.property_file else "not specified")
+                var=missing_props,
+                propertyfile=self.property_file if self.property_file else "not specified")
         return content_prop_needed, props_needed
 
     @lru_cache
@@ -172,10 +187,12 @@ class PropertyProvider:
 
     @staticmethod
     def is_random_key(key):
-        return any(key.startswith(rand_category_name) for rand_category_name in PropertyProvider.rand_map)
+        return any(key.startswith(rand_category_name)
+                   for rand_category_name in PropertyProvider.rand_map)
 
     def get_updated_content(self, content, type='str'):
-        content_prop_needed, props_needed = self.check_properties_for_content(content)
+        content_prop_needed, props_needed = self.check_properties_for_content(
+            content)
         for var in props_needed:
             # command line props take preference
             func = self.resolve_property_string if type == 'str' else self.resolve_property_object
@@ -191,7 +208,8 @@ class PropertyProvider:
         if '=' in prop:
             key_values = prop.split('=')
             if len(key_values) != 2:
-                raise HttpFileException(message='default property should not have multiple `=`')
+                raise HttpFileException(
+                    message='default property should not have multiple `=`')
             key, value = key_values
             # strip white space for keys
             key = key.strip()
@@ -200,7 +218,8 @@ class PropertyProvider:
             value = value.strip()
             if value and value[0] == value[-1] and value[0] in {"'", '"'}:
                 # strip "'" "'" if it has any
-                # like ranga=" ramprasad" --> we should replace with " ramprasad"
+                # like ranga=" ramprasad" --> we should replace with "
+                # ramprasad"
                 value = value[1:-1]
 
             match = PropertyProvider.get_random_match(value)
@@ -209,7 +228,9 @@ class PropertyProvider:
                     p = cache[key]
                     p.text.append(prop)
                 else:
-                    p = Property([prop], key, PropertyProvider.resolve_random(value, match))
+                    p = Property(
+                        [prop], key, PropertyProvider.resolve_random(
+                            value, match))
             else:
                 # if result is randomType
                 if key in cache:
@@ -236,7 +257,8 @@ class PropertyProvider:
         if (match):
             groups = match.groupdict()
             category = groups['category']
-            rand_length = int((groups.get('length') if groups.get('length') else ':0')[1:])
+            rand_length = int(
+                (groups.get('length') if groups.get('length') else ':0')[1:])
             value = str(PropertyProvider.rand_map[category](rand_length))
             return prop.replace("".join(i for i in match.groups() if i), value)
         return prop
@@ -248,14 +270,17 @@ class PropertyProvider:
 
     def resolve_property_string(self, key: str):
         if PropertyProvider.is_random_key(key):
-            return PropertyProvider.resolve_random(key, PropertyProvider.get_random_match(key))
-        prop_values = self.command_properties.get(key), self.env_properties.get(key), self.infile_properties[key].value
+            return PropertyProvider.resolve_random(
+                key, PropertyProvider.get_random_match(key))
+        prop_values = self.command_properties.get(key), self.env_properties.get(
+            key), self.infile_properties[key].value
         for prop_value in prop_values:
             if prop_value is not None:
                 if isinstance(prop_value, HttpFileException):
                     raise prop_value
                 else:
-                    base_logger.debug(f"property `{key}` resolved with value `${prop_value}`")
+                    base_logger.debug(
+                        f"property `{key}` resolved with value `${prop_value}`")
                     return prop_value
 
     def resolve_property_object(self, key: str) -> object:

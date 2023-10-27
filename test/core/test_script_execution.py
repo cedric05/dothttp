@@ -206,7 +206,7 @@ class SampleTestCase(unittest.TestCase):
     def test_hash(self):
         hashobj = hashlib.sha512()
         hashobj.update(b'ram')
-        self.assertEquals("92f35115cca41c3270b11813164b0845108686761d73b3e6e4e95ae8380fbdd92c1b9d6ff0e6181214486e9eb7ccdd779ffe1b04b161e510c7d8e7da715eb0ae", 
+        self.assertEquals("92f35115cca41c3270b11813164b0845108686761d73b3e6e4e95ae8380fbdd92c1b9d6ff0e6181214486e9eb7ccdd779ffe1b04b161e510c7d8e7da715eb0ae",
         hashobj.hexdigest())
 
 """)
@@ -222,28 +222,28 @@ class SampleTestCase(unittest.TestCase):
                 'tests': [{
                     'name': 'test_date (test_script.SampleTestCase)',
                     # python3.11
-                    #'name': 'test_date (test_script.SampleTestCase.test_date)',
+                    # 'name': 'test_date (test_script.SampleTestCase.test_date)',
                     'success': True,
                     'result': None,
                     'error': None
                 }, {
                     'name': 'test_hash (test_script.SampleTestCase)',
                     # python3.11
-                    #'name': 'test_hash (test_script.SampleTestCase.test_hash)',
+                    # 'name': 'test_hash (test_script.SampleTestCase.test_hash)',
                     'success': True,
                     'result': None,
                     'error': None
                 }, {
                     'name': 'test_headers (test_script.SampleTestCase)',
                     # python3.11
-                    #'name': 'test_headers (test_script.SampleTestCase.test_headers)',
+                    # 'name': 'test_headers (test_script.SampleTestCase.test_headers)',
                     'success': True,
                     'result': None,
                     'error': None
                 }, {
                     'name': 'test_math (test_script.SampleTestCase)',
                     # python3.11
-                    #'name': 'test_math (test_script.SampleTestCase.test_math)',
+                    # 'name': 'test_math (test_script.SampleTestCase.test_math)',
                     'success': True,
                     'result': None,
                     'error': None
@@ -301,7 +301,7 @@ class SampleTestCase(unittest.TestCase):
                     'Exception\n',
                     'name':
                     'test_raise (test_script.SampleTestCase)',
-                    #python3.11
+                    # python3.11
                     # 'test_raise (test_script.SampleTestCase.test_raise)',
                     'result':
                     None,

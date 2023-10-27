@@ -87,33 +87,65 @@ class Auth:
     @staticmethod
     def from_dict(obj: Any) -> 'Auth':
         assert isinstance(obj, dict)
-        apikey = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("apikey"))
-        awsv4 = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("awsv4"))
-        basic = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("basic"))
-        bearer = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("bearer"))
-        digest = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("digest"))
-        edgegrid = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("edgegrid"))
-        hawk = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("hawk"))
+        apikey = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("apikey"))
+        awsv4 = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("awsv4"))
+        basic = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("basic"))
+        bearer = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("bearer"))
+        digest = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("digest"))
+        edgegrid = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("edgegrid"))
+        hawk = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("hawk"))
         noauth = obj.get("noauth")
-        ntlm = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("ntlm"))
-        oauth1 = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("oauth1"))
-        oauth2 = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("oauth2"))
+        ntlm = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("ntlm"))
+        oauth1 = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("oauth1"))
+        oauth2 = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("oauth2"))
         type = AuthType(obj.get("type"))
-        return Auth(apikey, awsv4, basic, bearer, digest, edgegrid, hawk, noauth, ntlm, oauth1, oauth2, type)
+        return Auth(
+            apikey,
+            awsv4,
+            basic,
+            bearer,
+            digest,
+            edgegrid,
+            hawk,
+            noauth,
+            ntlm,
+            oauth1,
+            oauth2,
+            type)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["apikey"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.apikey)
-        result["awsv4"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.awsv4)
-        result["basic"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.basic)
-        result["bearer"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.bearer)
-        result["digest"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.digest)
-        result["edgegrid"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.edgegrid)
-        result["hawk"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.hawk)
+        result["apikey"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.apikey)
+        result["awsv4"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.awsv4)
+        result["basic"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.basic)
+        result["bearer"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.bearer)
+        result["digest"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.digest)
+        result["edgegrid"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.edgegrid)
+        result["hawk"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.hawk)
         result["noauth"] = self.noauth
-        result["ntlm"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.ntlm)
-        result["oauth1"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.oauth1)
-        result["oauth2"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.oauth2)
+        result["ntlm"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.ntlm)
+        result["oauth1"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.oauth1)
+        result["oauth2"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.oauth2)
         result["type"] = to_enum(AuthType, self.type)
         return result
 
@@ -151,7 +183,11 @@ class Description:
     """Description can have versions associated with it, which should be put in this property."""
     version: Any
 
-    def __init__(self, content: Optional[str], type: Optional[str], version: Any) -> None:
+    def __init__(
+            self,
+            content: Optional[str],
+            type: Optional[str],
+            version: Any) -> None:
         self.content = content
         self.type = type
         self.version = version
@@ -179,7 +215,12 @@ class QueryParam:
     key: Optional[str]
     value: Optional[str]
 
-    def __init__(self, description: Union[Description, None, str], disabled: Optional[bool], key: Optional[str],
+    def __init__(self,
+                 description: Union[Description,
+                                    None,
+                                    str],
+                 disabled: Optional[bool],
+                 key: Optional[str],
                  value: Optional[str]) -> None:
         self.description = description
         self.disabled = disabled
@@ -189,7 +230,8 @@ class QueryParam:
     @staticmethod
     def from_dict(obj: Any) -> 'QueryParam':
         assert isinstance(obj, dict)
-        description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
+        description = from_union(
+            [Description.from_dict, from_none, from_str], obj.get("description"))
         disabled = from_union([from_bool, from_none], obj.get("disabled"))
         key = from_union([from_none, from_str], obj.get("key"))
         value = from_union([from_none, from_str], obj.get("value"))
@@ -197,7 +239,8 @@ class QueryParam:
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["description"] = from_union([lambda x: to_class(Description, x), from_none, from_str], self.description)
+        result["description"] = from_union([lambda x: to_class(
+            Description, x), from_none, from_str], self.description)
         result["disabled"] = from_union([from_bool, from_none], self.disabled)
         result["key"] = from_union([from_none, from_str], self.key)
         result["value"] = from_union([from_none, from_str], self.value)
@@ -243,8 +286,16 @@ class Variable:
     """
     value: Any
 
-    def __init__(self, description: Union[Description, None, str], disabled: Optional[bool], id: Optional[str],
-                 key: Optional[str], name: Optional[str], system: Optional[bool], type: Optional[VariableType],
+    def __init__(self,
+                 description: Union[Description,
+                                    None,
+                                    str],
+                 disabled: Optional[bool],
+                 id: Optional[str],
+                 key: Optional[str],
+                 name: Optional[str],
+                 system: Optional[bool],
+                 type: Optional[VariableType],
                  value: Any) -> None:
         self.description = description
         self.disabled = disabled
@@ -258,7 +309,8 @@ class Variable:
     @staticmethod
     def from_dict(obj: Any) -> 'Variable':
         assert isinstance(obj, dict)
-        description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
+        description = from_union(
+            [Description.from_dict, from_none, from_str], obj.get("description"))
         disabled = from_union([from_bool, from_none], obj.get("disabled"))
         id = from_union([from_str, from_none], obj.get("id"))
         key = from_union([from_str, from_none], obj.get("key"))
@@ -266,17 +318,27 @@ class Variable:
         system = from_union([from_bool, from_none], obj.get("system"))
         type = from_union([VariableType, from_none], obj.get("type"))
         value = obj.get("value")
-        return Variable(description, disabled, id, key, name, system, type, value)
+        return Variable(
+            description,
+            disabled,
+            id,
+            key,
+            name,
+            system,
+            type,
+            value)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["description"] = from_union([lambda x: to_class(Description, x), from_none, from_str], self.description)
+        result["description"] = from_union([lambda x: to_class(
+            Description, x), from_none, from_str], self.description)
         result["disabled"] = from_union([from_bool, from_none], self.disabled)
         result["id"] = from_union([from_str, from_none], self.id)
         result["key"] = from_union([from_str, from_none], self.key)
         result["name"] = from_union([from_str, from_none], self.name)
         result["system"] = from_union([from_bool, from_none], self.system)
-        result["type"] = from_union([lambda x: to_enum(VariableType, x), from_none], self.type)
+        result["type"] = from_union(
+            [lambda x: to_enum(VariableType, x), from_none], self.type)
         result["value"] = self.value
         return result
 
@@ -310,9 +372,20 @@ class URLClass:
     """
     variable: Optional[List[Variable]]
 
-    def __init__(self, hash: Optional[str], host: Union[List[str], None, str],
-                 path: Union[List[Union[PathClass, str]], None, str], port: Optional[str], protocol: Optional[str],
-                 query: Optional[List[QueryParam]], raw: Optional[str], variable: Optional[List[Variable]]) -> None:
+    def __init__(self,
+                 hash: Optional[str],
+                 host: Union[List[str],
+                             None,
+                             str],
+                 path: Union[List[Union[PathClass,
+                                        str]],
+                             None,
+                             str],
+                 port: Optional[str],
+                 protocol: Optional[str],
+                 query: Optional[List[QueryParam]],
+                 raw: Optional[str],
+                 variable: Optional[List[Variable]]) -> None:
         self.hash = hash
         self.host = host
         self.path = path
@@ -326,30 +399,33 @@ class URLClass:
     def from_dict(obj: Any) -> 'URLClass':
         assert isinstance(obj, dict)
         hash = from_union([from_str, from_none], obj.get("hash"))
-        host = from_union([lambda x: from_list(from_str, x), from_str, from_none], obj.get("host"))
-        path = from_union(
-            [lambda x: from_list(lambda x: from_union([PathClass.from_dict, from_str], x), x), from_str, from_none],
-            obj.get("path"))
+        host = from_union([lambda x: from_list(from_str, x),
+                          from_str, from_none], obj.get("host"))
+        path = from_union([lambda x: from_list(lambda x: from_union(
+            [PathClass.from_dict, from_str], x), x), from_str, from_none], obj.get("path"))
         port = from_union([from_str, from_none], obj.get("port"))
         protocol = from_union([from_str, from_none], obj.get("protocol"))
-        query = from_union([lambda x: from_list(QueryParam.from_dict, x), from_none], obj.get("query"))
+        query = from_union([lambda x: from_list(
+            QueryParam.from_dict, x), from_none], obj.get("query"))
         raw = from_union([from_str, from_none], obj.get("raw"))
-        variable = from_union([lambda x: from_list(Variable.from_dict, x), from_none], obj.get("variable"))
+        variable = from_union([lambda x: from_list(
+            Variable.from_dict, x), from_none], obj.get("variable"))
         return URLClass(hash, host, path, port, protocol, query, raw, variable)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["hash"] = from_union([from_str, from_none], self.hash)
-        result["host"] = from_union([lambda x: from_list(from_str, x), from_str, from_none], self.host)
-        result["path"] = from_union(
-            [lambda x: from_list(lambda x: from_union([lambda x: to_class(PathClass, x), from_str], x), x), from_str,
-             from_none], self.path)
+        result["host"] = from_union([lambda x: from_list(
+            from_str, x), from_str, from_none], self.host)
+        result["path"] = from_union([lambda x: from_list(lambda x: from_union(
+            [lambda x: to_class(PathClass, x), from_str], x), x), from_str, from_none], self.path)
         result["port"] = from_union([from_str, from_none], self.port)
         result["protocol"] = from_union([from_str, from_none], self.protocol)
-        result["query"] = from_union([lambda x: from_list(lambda x: to_class(QueryParam, x), x), from_none], self.query)
+        result["query"] = from_union([lambda x: from_list(
+            lambda x: to_class(QueryParam, x), x), from_none], self.query)
         result["raw"] = from_union([from_str, from_none], self.raw)
-        result["variable"] = from_union([lambda x: from_list(lambda x: to_class(Variable, x), x), from_none],
-                                        self.variable)
+        result["variable"] = from_union([lambda x: from_list(
+            lambda x: to_class(Variable, x), x), from_none], self.variable)
         return result
 
 
@@ -366,8 +442,16 @@ class Script:
     """Type of the script. E.g: 'text/javascript'"""
     type: Optional[str]
 
-    def __init__(self, exec: Union[List[str], None, str], id: Optional[str], name: Optional[str],
-                 src: Union[URLClass, None, str], type: Optional[str]) -> None:
+    def __init__(self,
+                 exec: Union[List[str],
+                             None,
+                             str],
+                 id: Optional[str],
+                 name: Optional[str],
+                 src: Union[URLClass,
+                            None,
+                            str],
+                 type: Optional[str]) -> None:
         self.exec = exec
         self.id = id
         self.name = name
@@ -377,19 +461,23 @@ class Script:
     @staticmethod
     def from_dict(obj: Any) -> 'Script':
         assert isinstance(obj, dict)
-        exec = from_union([lambda x: from_list(from_str, x), from_str, from_none], obj.get("exec"))
+        exec = from_union([lambda x: from_list(from_str, x),
+                          from_str, from_none], obj.get("exec"))
         id = from_union([from_str, from_none], obj.get("id"))
         name = from_union([from_str, from_none], obj.get("name"))
-        src = from_union([URLClass.from_dict, from_str, from_none], obj.get("src"))
+        src = from_union([URLClass.from_dict, from_str,
+                         from_none], obj.get("src"))
         type = from_union([from_str, from_none], obj.get("type"))
         return Script(exec, id, name, src, type)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["exec"] = from_union([lambda x: from_list(from_str, x), from_str, from_none], self.exec)
+        result["exec"] = from_union([lambda x: from_list(
+            from_str, x), from_str, from_none], self.exec)
         result["id"] = from_union([from_str, from_none], self.id)
         result["name"] = from_union([from_str, from_none], self.name)
-        result["src"] = from_union([lambda x: to_class(URLClass, x), from_str, from_none], self.src)
+        result["src"] = from_union(
+            [lambda x: to_class(URLClass, x), from_str, from_none], self.src)
         result["type"] = from_union([from_str, from_none], self.type)
         return result
 
@@ -408,7 +496,12 @@ class Event:
     listen: str
     script: Optional[Script]
 
-    def __init__(self, disabled: Optional[bool], id: Optional[str], listen: str, script: Optional[Script]) -> None:
+    def __init__(
+            self,
+            disabled: Optional[bool],
+            id: Optional[str],
+            listen: str,
+            script: Optional[Script]) -> None:
         self.disabled = disabled
         self.id = id
         self.listen = listen
@@ -428,7 +521,8 @@ class Event:
         result["disabled"] = from_union([from_bool, from_none], self.disabled)
         result["id"] = from_union([from_str, from_none], self.id)
         result["listen"] = from_str(self.listen)
-        result["script"] = from_union([lambda x: to_class(Script, x), from_none], self.script)
+        result["script"] = from_union(
+            [lambda x: to_class(Script, x), from_none], self.script)
         return result
 
 
@@ -447,7 +541,13 @@ class CollectionVersionClass:
     """Ideally, minor changes to a collection should result in the increment of this number."""
     patch: int
 
-    def __init__(self, identifier: Optional[str], major: int, meta: Any, minor: int, patch: int) -> None:
+    def __init__(
+            self,
+            identifier: Optional[str],
+            major: int,
+            meta: Any,
+            minor: int,
+            patch: int) -> None:
         self.identifier = identifier
         self.major = major
         self.meta = meta
@@ -466,7 +566,8 @@ class CollectionVersionClass:
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["identifier"] = from_union([from_str, from_none], self.identifier)
+        result["identifier"] = from_union(
+            [from_str, from_none], self.identifier)
         result["major"] = from_int(self.major)
         result["meta"] = self.meta
         result["minor"] = from_int(self.minor)
@@ -495,8 +596,16 @@ class Information:
     schema: str
     version: Union[CollectionVersionClass, None, str]
 
-    def __init__(self, postman_id: Optional[str], description: Union[Description, None, str], name: str, schema: str,
-                 version: Union[CollectionVersionClass, None, str]) -> None:
+    def __init__(self,
+                 postman_id: Optional[str],
+                 description: Union[Description,
+                                    None,
+                                    str],
+                 name: str,
+                 schema: str,
+                 version: Union[CollectionVersionClass,
+                                None,
+                                str]) -> None:
         self.postman_id = postman_id
         self.description = description
         self.name = name
@@ -507,20 +616,24 @@ class Information:
     def from_dict(obj: Any) -> 'Information':
         assert isinstance(obj, dict)
         postman_id = from_union([from_str, from_none], obj.get("_postman_id"))
-        description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
+        description = from_union(
+            [Description.from_dict, from_none, from_str], obj.get("description"))
         name = from_str(obj.get("name"))
         schema = from_str(obj.get("schema"))
-        version = from_union([CollectionVersionClass.from_dict, from_str, from_none], obj.get("version"))
+        version = from_union(
+            [CollectionVersionClass.from_dict, from_str, from_none], obj.get("version"))
         return Information(postman_id, description, name, schema, version)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["_postman_id"] = from_union([from_str, from_none], self.postman_id)
-        result["description"] = from_union([lambda x: to_class(Description, x), from_none, from_str], self.description)
+        result["_postman_id"] = from_union(
+            [from_str, from_none], self.postman_id)
+        result["description"] = from_union([lambda x: to_class(
+            Description, x), from_none, from_str], self.description)
         result["name"] = from_str(self.name)
         result["schema"] = from_str(self.schema)
-        result["version"] = from_union([lambda x: to_class(CollectionVersionClass, x), from_str, from_none],
-                                       self.version)
+        result["version"] = from_union([lambda x: to_class(
+            CollectionVersionClass, x), from_str, from_none], self.version)
         return result
 
 
@@ -562,9 +675,18 @@ class FormParameter:
     value: Optional[str]
     src: Union[List[Any], None, str]
 
-    def __init__(self, content_type: Optional[str], description: Union[Description, None, str],
-                 disabled: Optional[bool], key: str, type: Optional[FormParameterType], value: Optional[str],
-                 src: Union[List[Any], None, str]) -> None:
+    def __init__(self,
+                 content_type: Optional[str],
+                 description: Union[Description,
+                                    None,
+                                    str],
+                 disabled: Optional[bool],
+                 key: str,
+                 type: Optional[FormParameterType],
+                 value: Optional[str],
+                 src: Union[List[Any],
+                            None,
+                            str]) -> None:
         self.content_type = content_type
         self.description = description
         self.disabled = disabled
@@ -576,24 +698,38 @@ class FormParameter:
     @staticmethod
     def from_dict(obj: Any) -> 'FormParameter':
         assert isinstance(obj, dict)
-        content_type = from_union([from_str, from_none], obj.get("contentType"))
-        description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
+        content_type = from_union(
+            [from_str, from_none], obj.get("contentType"))
+        description = from_union(
+            [Description.from_dict, from_none, from_str], obj.get("description"))
         disabled = from_union([from_bool, from_none], obj.get("disabled"))
         key = from_str(obj.get("key"))
         type = from_union([FormParameterType, from_none], obj.get("type"))
         value = from_union([from_str, from_int, from_none], obj.get("value"))
-        src = from_union([lambda x: from_list(lambda x: x, x), from_none, from_str], obj.get("src"))
-        return FormParameter(content_type, description, disabled, key, type, value, src)
+        src = from_union([lambda x: from_list(lambda x: x, x),
+                         from_none, from_str], obj.get("src"))
+        return FormParameter(
+            content_type,
+            description,
+            disabled,
+            key,
+            type,
+            value,
+            src)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["contentType"] = from_union([from_str, from_none], self.content_type)
-        result["description"] = from_union([lambda x: to_class(Description, x), from_none, from_str], self.description)
+        result["contentType"] = from_union(
+            [from_str, from_none], self.content_type)
+        result["description"] = from_union([lambda x: to_class(
+            Description, x), from_none, from_str], self.description)
         result["disabled"] = from_union([from_bool, from_none], self.disabled)
         result["key"] = from_str(self.key)
-        result["type"] = from_union([lambda x: to_enum(FormParameterType, x), from_none], self.type)
+        result["type"] = from_union(
+            [lambda x: to_enum(FormParameterType, x), from_none], self.type)
         result["value"] = from_union([from_str, from_none], self.value)
-        result["src"] = from_union([lambda x: from_list(lambda x: x, x), from_none, from_str], self.src)
+        result["src"] = from_union([lambda x: from_list(
+            lambda x: x, x), from_none, from_str], self.src)
         return result
 
 
@@ -612,7 +748,12 @@ class URLEncodedParameter:
     key: str
     value: Optional[str]
 
-    def __init__(self, description: Union[Description, None, str], disabled: Optional[bool], key: str,
+    def __init__(self,
+                 description: Union[Description,
+                                    None,
+                                    str],
+                 disabled: Optional[bool],
+                 key: str,
                  value: Optional[str]) -> None:
         self.description = description
         self.disabled = disabled
@@ -622,7 +763,8 @@ class URLEncodedParameter:
     @staticmethod
     def from_dict(obj: Any) -> 'URLEncodedParameter':
         assert isinstance(obj, dict)
-        description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
+        description = from_union(
+            [Description.from_dict, from_none, from_str], obj.get("description"))
         disabled = from_union([from_bool, from_none], obj.get("disabled"))
         key = from_str(obj.get("key"))
         value = from_union([from_str, from_none], obj.get("value"))
@@ -630,7 +772,8 @@ class URLEncodedParameter:
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["description"] = from_union([lambda x: to_class(Description, x), from_none, from_str], self.description)
+        result["description"] = from_union([lambda x: to_class(
+            Description, x), from_none, from_str], self.description)
         result["disabled"] = from_union([from_bool, from_none], self.disabled)
         result["key"] = from_str(self.key)
         result["value"] = from_union([from_str, from_none], self.value)
@@ -651,9 +794,17 @@ class Body:
     raw: Optional[str]
     urlencoded: Optional[List[URLEncodedParameter]]
 
-    def __init__(self, disabled: Optional[bool], file: Optional[File], formdata: Optional[List[FormParameter]],
-                 graphql: Optional[Dict[str, Any]], mode: Optional[Mode], options: Optional[Dict[str, Any]],
-                 raw: Optional[str], urlencoded: Optional[List[URLEncodedParameter]]) -> None:
+    def __init__(self,
+                 disabled: Optional[bool],
+                 file: Optional[File],
+                 formdata: Optional[List[FormParameter]],
+                 graphql: Optional[Dict[str,
+                                        Any]],
+                 mode: Optional[Mode],
+                 options: Optional[Dict[str,
+                                        Any]],
+                 raw: Optional[str],
+                 urlencoded: Optional[List[URLEncodedParameter]]) -> None:
         self.disabled = disabled
         self.file = file
         self.formdata = formdata
@@ -668,27 +819,42 @@ class Body:
         assert isinstance(obj, dict)
         disabled = from_union([from_bool, from_none], obj.get("disabled"))
         file = from_union([File.from_dict, from_none], obj.get("file"))
-        formdata = from_union([lambda x: from_list(FormParameter.from_dict, x), from_none], obj.get("formdata"))
-        graphql = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("graphql"))
+        formdata = from_union([lambda x: from_list(
+            FormParameter.from_dict, x), from_none], obj.get("formdata"))
+        graphql = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("graphql"))
         mode = from_union([Mode, from_none], obj.get("mode"))
-        options = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("options"))
+        options = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("options"))
         raw = from_union([from_str, from_none], obj.get("raw"))
-        urlencoded = from_union([lambda x: from_list(URLEncodedParameter.from_dict, x), from_none],
-                                obj.get("urlencoded"))
-        return Body(disabled, file, formdata, graphql, mode, options, raw, urlencoded)
+        urlencoded = from_union([lambda x: from_list(
+            URLEncodedParameter.from_dict, x), from_none], obj.get("urlencoded"))
+        return Body(
+            disabled,
+            file,
+            formdata,
+            graphql,
+            mode,
+            options,
+            raw,
+            urlencoded)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["disabled"] = from_union([from_bool, from_none], self.disabled)
-        result["file"] = from_union([lambda x: to_class(File, x), from_none], self.file)
-        result["formdata"] = from_union([lambda x: from_list(lambda x: to_class(FormParameter, x), x), from_none],
-                                        self.formdata)
-        result["graphql"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.graphql)
-        result["mode"] = from_union([lambda x: to_enum(Mode, x), from_none], self.mode)
-        result["options"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.options)
+        result["file"] = from_union(
+            [lambda x: to_class(File, x), from_none], self.file)
+        result["formdata"] = from_union([lambda x: from_list(
+            lambda x: to_class(FormParameter, x), x), from_none], self.formdata)
+        result["graphql"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.graphql)
+        result["mode"] = from_union(
+            [lambda x: to_enum(Mode, x), from_none], self.mode)
+        result["options"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.options)
         result["raw"] = from_union([from_str, from_none], self.raw)
-        result["urlencoded"] = from_union(
-            [lambda x: from_list(lambda x: to_class(URLEncodedParameter, x), x), from_none], self.urlencoded)
+        result["urlencoded"] = from_union([lambda x: from_list(
+            lambda x: to_class(URLEncodedParameter, x), x), from_none], self.urlencoded)
         return result
 
 
@@ -745,7 +911,11 @@ class Certificate:
     """The passphrase for the certificate"""
     passphrase: Optional[str]
 
-    def __init__(self, cert: Optional[CERT], key: Optional[Key], matches: Optional[List[str]], name: Optional[str],
+    def __init__(self,
+                 cert: Optional[CERT],
+                 key: Optional[Key],
+                 matches: Optional[List[str]],
+                 name: Optional[str],
                  passphrase: Optional[str]) -> None:
         self.cert = cert
         self.key = key
@@ -758,18 +928,23 @@ class Certificate:
         assert isinstance(obj, dict)
         cert = from_union([CERT.from_dict, from_none], obj.get("cert"))
         key = from_union([Key.from_dict, from_none], obj.get("key"))
-        matches = from_union([lambda x: from_list(from_str, x), from_none], obj.get("matches"))
+        matches = from_union([lambda x: from_list(
+            from_str, x), from_none], obj.get("matches"))
         name = from_union([from_str, from_none], obj.get("name"))
         passphrase = from_union([from_str, from_none], obj.get("passphrase"))
         return Certificate(cert, key, matches, name, passphrase)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["cert"] = from_union([lambda x: to_class(CERT, x), from_none], self.cert)
-        result["key"] = from_union([lambda x: to_class(Key, x), from_none], self.key)
-        result["matches"] = from_union([lambda x: from_list(from_str, x), from_none], self.matches)
+        result["cert"] = from_union(
+            [lambda x: to_class(CERT, x), from_none], self.cert)
+        result["key"] = from_union(
+            [lambda x: to_class(Key, x), from_none], self.key)
+        result["matches"] = from_union(
+            [lambda x: from_list(from_str, x), from_none], self.matches)
         result["name"] = from_union([from_str, from_none], self.name)
-        result["passphrase"] = from_union([from_str, from_none], self.passphrase)
+        result["passphrase"] = from_union(
+            [from_str, from_none], self.passphrase)
         return result
 
 
@@ -786,7 +961,12 @@ class Header:
     """The value (or the RHS) of the Header is stored in this field."""
     value: str
 
-    def __init__(self, description: Union[Description, None, str], disabled: Optional[bool], key: str,
+    def __init__(self,
+                 description: Union[Description,
+                                    None,
+                                    str],
+                 disabled: Optional[bool],
+                 key: str,
                  value: str) -> None:
         self.description = description
         self.disabled = disabled
@@ -796,7 +976,8 @@ class Header:
     @staticmethod
     def from_dict(obj: Any) -> 'Header':
         assert isinstance(obj, dict)
-        description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
+        description = from_union(
+            [Description.from_dict, from_none, from_str], obj.get("description"))
         disabled = from_union([from_bool, from_none], obj.get("disabled"))
         key = from_str(obj.get("key"))
         value = from_str(obj.get("value"))
@@ -804,7 +985,8 @@ class Header:
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["description"] = from_union([lambda x: to_class(Description, x), from_none, from_str], self.description)
+        result["description"] = from_union([lambda x: to_class(
+            Description, x), from_none, from_str], self.description)
         result["disabled"] = from_union([from_bool, from_none], self.disabled)
         result["key"] = from_str(self.key)
         result["value"] = from_str(self.value)
@@ -826,8 +1008,13 @@ class ProxyConfig:
     """The tunneling details for the proxy config"""
     tunnel: Optional[bool]
 
-    def __init__(self, disabled: Optional[bool], host: Optional[str], match: Optional[str], port: Optional[int],
-                 tunnel: Optional[bool]) -> None:
+    def __init__(
+            self,
+            disabled: Optional[bool],
+            host: Optional[str],
+            match: Optional[str],
+            port: Optional[int],
+            tunnel: Optional[bool]) -> None:
         self.disabled = disabled
         self.host = host
         self.match = match
@@ -864,9 +1051,21 @@ class RequestClass:
     proxy: Optional[ProxyConfig]
     url: Union[URLClass, None, str]
 
-    def __init__(self, auth: Optional[Auth], body: Optional[Body], certificate: Optional[Certificate],
-                 description: Union[Description, None, str], header: Union[List[Header], None, str],
-                 method: Optional[str], proxy: Optional[ProxyConfig], url: Union[URLClass, None, str]) -> None:
+    def __init__(self,
+                 auth: Optional[Auth],
+                 body: Optional[Body],
+                 certificate: Optional[Certificate],
+                 description: Union[Description,
+                                    None,
+                                    str],
+                 header: Union[List[Header],
+                               None,
+                               str],
+                 method: Optional[str],
+                 proxy: Optional[ProxyConfig],
+                 url: Union[URLClass,
+                            None,
+                            str]) -> None:
         self.auth = auth
         self.body = body
         self.certificate = certificate
@@ -881,25 +1080,44 @@ class RequestClass:
         assert isinstance(obj, dict)
         auth = from_union([from_none, Auth.from_dict], obj.get("auth"))
         body = from_union([Body.from_dict, from_none], obj.get("body"))
-        certificate = from_union([Certificate.from_dict, from_none], obj.get("certificate"))
-        description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
-        header = from_union([lambda x: from_list(Header.from_dict, x), from_str, from_none], obj.get("header"))
+        certificate = from_union(
+            [Certificate.from_dict, from_none], obj.get("certificate"))
+        description = from_union(
+            [Description.from_dict, from_none, from_str], obj.get("description"))
+        header = from_union([lambda x: from_list(
+            Header.from_dict, x), from_str, from_none], obj.get("header"))
         method = from_union([from_str, from_none], obj.get("method"))
-        proxy = from_union([ProxyConfig.from_dict, from_none], obj.get("proxy"))
-        url = from_union([URLClass.from_dict, from_str, from_none], obj.get("url"))
-        return RequestClass(auth, body, certificate, description, header, method, proxy, url)
+        proxy = from_union(
+            [ProxyConfig.from_dict, from_none], obj.get("proxy"))
+        url = from_union([URLClass.from_dict, from_str,
+                         from_none], obj.get("url"))
+        return RequestClass(
+            auth,
+            body,
+            certificate,
+            description,
+            header,
+            method,
+            proxy,
+            url)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["auth"] = from_union([from_none, lambda x: to_class(Auth, x)], self.auth)
-        result["body"] = from_union([lambda x: to_class(Body, x), from_none], self.body)
-        result["certificate"] = from_union([lambda x: to_class(Certificate, x), from_none], self.certificate)
-        result["description"] = from_union([lambda x: to_class(Description, x), from_none, from_str], self.description)
-        result["header"] = from_union([lambda x: from_list(lambda x: to_class(Header, x), x), from_str, from_none],
-                                      self.header)
+        result["auth"] = from_union(
+            [from_none, lambda x: to_class(Auth, x)], self.auth)
+        result["body"] = from_union(
+            [lambda x: to_class(Body, x), from_none], self.body)
+        result["certificate"] = from_union(
+            [lambda x: to_class(Certificate, x), from_none], self.certificate)
+        result["description"] = from_union([lambda x: to_class(
+            Description, x), from_none, from_str], self.description)
+        result["header"] = from_union([lambda x: from_list(
+            lambda x: to_class(Header, x), x), from_str, from_none], self.header)
         result["method"] = from_union([from_str, from_none], self.method)
-        result["proxy"] = from_union([lambda x: to_class(ProxyConfig, x), from_none], self.proxy)
-        result["url"] = from_union([lambda x: to_class(URLClass, x), from_str, from_none], self.url)
+        result["proxy"] = from_union(
+            [lambda x: to_class(ProxyConfig, x), from_none], self.proxy)
+        result["url"] = from_union(
+            [lambda x: to_class(URLClass, x), from_str, from_none], self.url)
         return result
 
 
@@ -937,9 +1155,20 @@ class Cookie:
     """The value of the Cookie."""
     value: Optional[str]
 
-    def __init__(self, domain: str, expires: Union[float, None, str], extensions: Optional[List[Any]],
-                 host_only: Optional[bool], http_only: Optional[bool], max_age: Optional[str], name: Optional[str],
-                 path: str, secure: Optional[bool], session: Optional[bool], value: Optional[str]) -> None:
+    def __init__(self,
+                 domain: str,
+                 expires: Union[float,
+                                None,
+                                str],
+                 extensions: Optional[List[Any]],
+                 host_only: Optional[bool],
+                 http_only: Optional[bool],
+                 max_age: Optional[str],
+                 name: Optional[str],
+                 path: str,
+                 secure: Optional[bool],
+                 session: Optional[bool],
+                 value: Optional[str]) -> None:
         self.domain = domain
         self.expires = expires
         self.extensions = extensions
@@ -956,8 +1185,10 @@ class Cookie:
     def from_dict(obj: Any) -> 'Cookie':
         assert isinstance(obj, dict)
         domain = from_str(obj.get("domain"))
-        expires = from_union([from_float, from_str, from_none], obj.get("expires"))
-        extensions = from_union([lambda x: from_list(lambda x: x, x), from_none], obj.get("extensions"))
+        expires = from_union(
+            [from_float, from_str, from_none], obj.get("expires"))
+        extensions = from_union([lambda x: from_list(
+            lambda x: x, x), from_none], obj.get("extensions"))
         host_only = from_union([from_bool, from_none], obj.get("hostOnly"))
         http_only = from_union([from_bool, from_none], obj.get("httpOnly"))
         max_age = from_union([from_str, from_none], obj.get("maxAge"))
@@ -966,13 +1197,26 @@ class Cookie:
         secure = from_union([from_bool, from_none], obj.get("secure"))
         session = from_union([from_bool, from_none], obj.get("session"))
         value = from_union([from_str, from_none], obj.get("value"))
-        return Cookie(domain, expires, extensions, host_only, http_only, max_age, name, path, secure, session, value)
+        return Cookie(
+            domain,
+            expires,
+            extensions,
+            host_only,
+            http_only,
+            max_age,
+            name,
+            path,
+            secure,
+            session,
+            value)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["domain"] = from_str(self.domain)
-        result["expires"] = from_union([to_float, from_str, from_none], self.expires)
-        result["extensions"] = from_union([lambda x: from_list(lambda x: x, x), from_none], self.extensions)
+        result["expires"] = from_union(
+            [to_float, from_str, from_none], self.expires)
+        result["extensions"] = from_union(
+            [lambda x: from_list(lambda x: x, x), from_none], self.extensions)
         result["hostOnly"] = from_union([from_bool, from_none], self.host_only)
         result["httpOnly"] = from_union([from_bool, from_none], self.http_only)
         result["maxAge"] = from_union([from_str, from_none], self.max_age)
@@ -1005,10 +1249,24 @@ class ResponseClass:
     """Set of timing information related to request and response in milliseconds"""
     timings: Optional[Dict[str, Any]]
 
-    def __init__(self, body: Optional[str], code: Optional[int], cookie: Optional[List[Cookie]],
-                 header: Union[List[Union[Header, str]], None, str], id: Optional[str],
-                 original_request: Union[RequestClass, None, str], response_time: Union[float, None, str],
-                 status: Optional[str], timings: Optional[Dict[str, Any]]) -> None:
+    def __init__(self,
+                 body: Optional[str],
+                 code: Optional[int],
+                 cookie: Optional[List[Cookie]],
+                 header: Union[List[Union[Header,
+                                          str]],
+                               None,
+                               str],
+                 id: Optional[str],
+                 original_request: Union[RequestClass,
+                                         None,
+                                         str],
+                 response_time: Union[float,
+                                      None,
+                                      str],
+                 status: Optional[str],
+                 timings: Optional[Dict[str,
+                                        Any]]) -> None:
         self.body = body
         self.code = code
         self.cookie = cookie
@@ -1024,31 +1282,45 @@ class ResponseClass:
         assert isinstance(obj, dict)
         body = from_union([from_none, from_str], obj.get("body"))
         code = from_union([from_int, from_str, from_none], obj.get("code"))
-        cookie = from_union([lambda x: from_list(Cookie.from_dict, x), from_none], obj.get("cookie"))
-        header = from_union(
-            [lambda x: from_list(lambda x: from_union([Header.from_dict, from_str], x), x), from_none, from_str],
-            obj.get("header"))
+        cookie = from_union([lambda x: from_list(
+            Cookie.from_dict, x), from_none], obj.get("cookie"))
+        header = from_union([lambda x: from_list(lambda x: from_union(
+            [Header.from_dict, from_str], x), x), from_none, from_str], obj.get("header"))
         id = from_union([from_str, from_none], obj.get("id"))
-        original_request = from_union([RequestClass.from_dict, from_str, from_none], obj.get("originalRequest"))
-        response_time = from_union([from_float, from_str, from_none], obj.get("responseTime"))
+        original_request = from_union(
+            [RequestClass.from_dict, from_str, from_none], obj.get("originalRequest"))
+        response_time = from_union(
+            [from_float, from_str, from_none], obj.get("responseTime"))
         status = from_union([from_str, from_none], obj.get("status"))
-        timings = from_union([lambda x: from_dict(lambda x: x, x), from_none], obj.get("timings"))
-        return ResponseClass(body, code, cookie, header, id, original_request, response_time, status, timings)
+        timings = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("timings"))
+        return ResponseClass(
+            body,
+            code,
+            cookie,
+            header,
+            id,
+            original_request,
+            response_time,
+            status,
+            timings)
 
     def to_dict(self) -> dict:
         result: dict = {}
         result["body"] = from_union([from_none, from_str], self.body)
         result["code"] = from_union([from_int, from_none], self.code)
-        result["cookie"] = from_union([lambda x: from_list(lambda x: to_class(Cookie, x), x), from_none], self.cookie)
-        result["header"] = from_union(
-            [lambda x: from_list(lambda x: from_union([lambda x: to_class(Header, x), from_str], x), x), from_none,
-             from_str], self.header)
+        result["cookie"] = from_union([lambda x: from_list(
+            lambda x: to_class(Cookie, x), x), from_none], self.cookie)
+        result["header"] = from_union([lambda x: from_list(lambda x: from_union(
+            [lambda x: to_class(Header, x), from_str], x), x), from_none, from_str], self.header)
         result["id"] = from_union([from_str, from_none], self.id)
-        result["originalRequest"] = from_union([lambda x: to_class(RequestClass, x), from_str, from_none],
-                                               self.original_request)
-        result["responseTime"] = from_union([to_float, from_str, from_none], self.response_time)
+        result["originalRequest"] = from_union([lambda x: to_class(
+            RequestClass, x), from_str, from_none], self.original_request)
+        result["responseTime"] = from_union(
+            [to_float, from_str, from_none], self.response_time)
         result["status"] = from_union([from_str, from_none], self.status)
-        result["timings"] = from_union([lambda x: from_dict(lambda x: x, x), from_none], self.timings)
+        result["timings"] = from_union(
+            [lambda x: from_dict(lambda x: x, x), from_none], self.timings)
         return result
 
 
@@ -1072,7 +1344,8 @@ class Items:
     name: Optional[str]
     protocol_profile_behavior: Optional[Dict[str, Any]]
     request: Union[RequestClass, None, str]
-    response: Optional[List[Union[List[Any], bool, ResponseClass, float, int, None, str]]]
+    response: Optional[List[Union[List[Any], bool,
+                                  ResponseClass, float, int, None, str]]]
     variable: Optional[List[Variable]]
     auth: Optional[Auth]
     """Items are entities which contain an actual HTTP request, and sample responses attached to
@@ -1080,11 +1353,28 @@ class Items:
     """
     item: Optional[List['Items']]
 
-    def __init__(self, description: Union[Description, None, str], event: Optional[List[Event]], id: Optional[str],
-                 name: Optional[str], protocol_profile_behavior: Optional[Dict[str, Any]],
-                 request: Union[RequestClass, None, str],
-                 response: Optional[List[Union[List[Any], bool, ResponseClass, float, int, None, str]]],
-                 variable: Optional[List[Variable]], auth: Optional[Auth], item: Optional[List['Items']]) -> None:
+    def __init__(self,
+                 description: Union[Description,
+                                    None,
+                                    str],
+                 event: Optional[List[Event]],
+                 id: Optional[str],
+                 name: Optional[str],
+                 protocol_profile_behavior: Optional[Dict[str,
+                                                          Any]],
+                 request: Union[RequestClass,
+                                None,
+                                str],
+                 response: Optional[List[Union[List[Any],
+                                               bool,
+                                               ResponseClass,
+                                               float,
+                                               int,
+                                               None,
+                                               str]]],
+                 variable: Optional[List[Variable]],
+                 auth: Optional[Auth],
+                 item: Optional[List['Items']]) -> None:
         self.description = description
         self.event = event
         self.id = id
@@ -1099,37 +1389,57 @@ class Items:
     @staticmethod
     def from_dict(obj: Any) -> 'Items':
         assert isinstance(obj, dict)
-        description = from_union([Description.from_dict, from_none, from_str], obj.get("description"))
-        event = from_union([lambda x: from_list(Event.from_dict, x), from_none], obj.get("event"))
+        description = from_union(
+            [Description.from_dict, from_none, from_str], obj.get("description"))
+        event = from_union([lambda x: from_list(
+            Event.from_dict, x), from_none], obj.get("event"))
         id = from_union([from_str, from_none], obj.get("id"))
         name = from_union([from_str, from_none], obj.get("name"))
-        protocol_profile_behavior = from_union([lambda x: from_dict(lambda x: x, x), from_none],
-                                               obj.get("protocolProfileBehavior"))
-        request = from_union([RequestClass.from_dict, from_str, from_none], obj.get("request"))
+        protocol_profile_behavior = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("protocolProfileBehavior"))
+        request = from_union(
+            [RequestClass.from_dict, from_str, from_none], obj.get("request"))
         response = from_union([lambda x: from_list(lambda x: from_union(
             [from_none, from_float, from_int, from_bool, from_str, lambda x: from_list(lambda x: x, x),
              ResponseClass.from_dict], x), x), from_none], obj.get("response"))
-        variable = from_union([lambda x: from_list(Variable.from_dict, x), from_none], obj.get("variable"))
+        variable = from_union([lambda x: from_list(
+            Variable.from_dict, x), from_none], obj.get("variable"))
         auth = from_union([from_none, Auth.from_dict], obj.get("auth"))
-        item = from_union([lambda x: from_list(Items.from_dict, x), from_none], obj.get("item"))
-        return Items(description, event, id, name, protocol_profile_behavior, request, response, variable, auth, item)
+        item = from_union([lambda x: from_list(
+            Items.from_dict, x), from_none], obj.get("item"))
+        return Items(
+            description,
+            event,
+            id,
+            name,
+            protocol_profile_behavior,
+            request,
+            response,
+            variable,
+            auth,
+            item)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["description"] = from_union([lambda x: to_class(Description, x), from_none, from_str], self.description)
-        result["event"] = from_union([lambda x: from_list(lambda x: to_class(Event, x), x), from_none], self.event)
+        result["description"] = from_union([lambda x: to_class(
+            Description, x), from_none, from_str], self.description)
+        result["event"] = from_union([lambda x: from_list(
+            lambda x: to_class(Event, x), x), from_none], self.event)
         result["id"] = from_union([from_str, from_none], self.id)
         result["name"] = from_union([from_str, from_none], self.name)
-        result["protocolProfileBehavior"] = from_union([lambda x: from_dict(lambda x: x, x), from_none],
-                                                       self.protocol_profile_behavior)
-        result["request"] = from_union([lambda x: to_class(RequestClass, x), from_str, from_none], self.request)
+        result["protocolProfileBehavior"] = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], self.protocol_profile_behavior)
+        result["request"] = from_union([lambda x: to_class(
+            RequestClass, x), from_str, from_none], self.request)
         result["response"] = from_union([lambda x: from_list(lambda x: from_union(
             [from_none, to_float, from_int, from_bool, from_str, lambda x: from_list(lambda x: x, x),
              lambda x: to_class(ResponseClass, x)], x), x), from_none], self.response)
-        result["variable"] = from_union([lambda x: from_list(lambda x: to_class(Variable, x), x), from_none],
-                                        self.variable)
-        result["auth"] = from_union([from_none, lambda x: to_class(Auth, x)], self.auth)
-        result["item"] = from_union([lambda x: from_list(lambda x: to_class(Items, x), x), from_none], self.item)
+        result["variable"] = from_union([lambda x: from_list(
+            lambda x: to_class(Variable, x), x), from_none], self.variable)
+        result["auth"] = from_union(
+            [from_none, lambda x: to_class(Auth, x)], self.auth)
+        result["item"] = from_union([lambda x: from_list(
+            lambda x: to_class(Items, x), x), from_none], self.item)
         return result
 
 
@@ -1145,8 +1455,14 @@ class PostmanCollection:
     protocol_profile_behavior: Optional[Dict[str, Any]]
     variable: Optional[List[Variable]]
 
-    def __init__(self, auth: Optional[Auth], event: Optional[List[Event]], info: Information, item: List[Items],
-                 protocol_profile_behavior: Optional[Dict[str, Any]], variable: Optional[List[Variable]]) -> None:
+    def __init__(self,
+                 auth: Optional[Auth],
+                 event: Optional[List[Event]],
+                 info: Information,
+                 item: List[Items],
+                 protocol_profile_behavior: Optional[Dict[str,
+                                                          Any]],
+                 variable: Optional[List[Variable]]) -> None:
         self.auth = auth
         self.event = event
         self.info = info
@@ -1158,24 +1474,35 @@ class PostmanCollection:
     def from_dict(obj: Any) -> 'PostmanCollection':
         assert isinstance(obj, dict)
         auth = from_union([from_none, Auth.from_dict], obj.get("auth"))
-        event = from_union([lambda x: from_list(Event.from_dict, x), from_none], obj.get("event"))
+        event = from_union([lambda x: from_list(
+            Event.from_dict, x), from_none], obj.get("event"))
         info = from_union([from_none, Information.from_dict], obj.get("info"))
-        item = from_union([lambda x: from_list(Items.from_dict, x), from_none], obj.get("item"))
-        protocol_profile_behavior = from_union([lambda x: from_dict(lambda x: x, x), from_none],
-                                               obj.get("protocolProfileBehavior"))
-        variable = from_union([lambda x: from_list(Variable.from_dict, x), from_none], obj.get("variable"))
-        return PostmanCollection(auth, event, info, item, protocol_profile_behavior, variable)
+        item = from_union([lambda x: from_list(
+            Items.from_dict, x), from_none], obj.get("item"))
+        protocol_profile_behavior = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], obj.get("protocolProfileBehavior"))
+        variable = from_union([lambda x: from_list(
+            Variable.from_dict, x), from_none], obj.get("variable"))
+        return PostmanCollection(
+            auth,
+            event,
+            info,
+            item,
+            protocol_profile_behavior,
+            variable)
 
     def to_dict(self) -> dict:
         result: dict = {}
-        result["auth"] = from_union([from_none, lambda x: to_class(Auth, x)], self.auth)
-        result["event"] = from_union([lambda x: from_list(lambda x: to_class(Event, x), x), from_none], self.event)
+        result["auth"] = from_union(
+            [from_none, lambda x: to_class(Auth, x)], self.auth)
+        result["event"] = from_union([lambda x: from_list(
+            lambda x: to_class(Event, x), x), from_none], self.event)
         result["info"] = to_class(Information, self.info)
         result["item"] = from_list(lambda x: to_class(Items, x), self.item)
-        result["protocolProfileBehavior"] = from_union([lambda x: from_dict(lambda x: x, x), from_none],
-                                                       self.protocol_profile_behavior)
-        result["variable"] = from_union([lambda x: from_list(lambda x: to_class(Variable, x), x), from_none],
-                                        self.variable)
+        result["protocolProfileBehavior"] = from_union([lambda x: from_dict(
+            lambda x: x, x), from_none], self.protocol_profile_behavior)
+        result["variable"] = from_union([lambda x: from_list(
+            lambda x: to_class(Variable, x), x), from_none], self.variable)
         return result
 
 

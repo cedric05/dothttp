@@ -16,7 +16,7 @@ from requests.structures import CaseInsensitiveDict
 
 try:
     from requests_hawk import HawkAuth as RequestsHawkAuth
-except:
+except BaseException:
     RequestsHawkAuth = None
 
 from .utils import get_real_file_path, triple_or_double_tostring, APPLICATION_JSON, json_to_urlencoded_array
@@ -79,7 +79,10 @@ def install_unix_socket_scheme():
 
 install_unix_socket_scheme()
 
-dothttp_model = metamodel_from_file(get_real_file_path(path="http.tx", current_file=__file__))
+dothttp_model = metamodel_from_file(
+    get_real_file_path(
+        path="http.tx",
+        current_file=__file__))
 
 
 def eprint(*args, **kwargs):
@@ -112,8 +115,8 @@ class Payload:
     # [[ "key", ["filename", "content", "datatype"],
     #  ["key",  ["filename2", "content", "datatype"]],
     #  ["key2",  [None, "content", "datatype"]],]
-    files: Optional[
-        List[Union[Tuple[str, Tuple[str, BinaryIO, Optional[str]]], Tuple[str, Tuple[None, str, None]]]]] = None
+    files: Optional[List[Union[Tuple[str, Tuple[str, BinaryIO,
+                                                Optional[str]]], Tuple[str, Tuple[None, str, None]]]]] = None
 
 
 @dataclass
@@ -132,7 +135,7 @@ class HttpDef:
     session_clear = False
     test_script: str = ""
     test_script_lang: ScriptType = ScriptType.JAVA_SCRIPT
-    proxy: Optional[Dict[str,str]] =None
+    proxy: Optional[Dict[str, str]] = None
 
     def get_har(self):
         if self.auth:
@@ -144,7 +147,8 @@ class HttpDef:
             self.auth(request)
             # For any other auth, it is bad
             if isinstance(self.auth, HTTPBasicAuth):
-                self.headers[BASEIC_AUTHORIZATION_HEADER] = request.headers.get(BASEIC_AUTHORIZATION_HEADER)
+                self.headers[BASEIC_AUTHORIZATION_HEADER] = request.headers.get(
+                    BASEIC_AUTHORIZATION_HEADER)
             elif isinstance(self.auth, AWS4Auth):
                 for header_key, header_value in request.headers.items():
                     self.headers[header_key] = header_value
@@ -172,7 +176,10 @@ class HttpDef:
         prep.prepare_method(self.method)
         prep.prepare_headers(self.headers)
         payload = self.payload
-        prep.prepare_body(data=payload.data, json=payload.json, files=payload.files)
+        prep.prepare_body(
+            data=payload.data,
+            json=payload.json,
+            files=payload.files)
         prep.prepare_auth(self.auth, self.url)
         request_logger.info(f"auth configured is {self.auth}")
         # prep.prepare_hooks({"response": self.save_cookie_call_back})
@@ -191,7 +198,8 @@ class HttpDef:
         if payload.data:
             if isinstance(payload.data, dict):
                 return_data["mimeType"] = FORM_URLENCODED
-                return_data["text"] = urlencode(json_to_urlencoded_array(payload.data))
+                return_data["text"] = urlencode(
+                    json_to_urlencoded_array(payload.data))
             else:
                 return_data["mimeType"] = payload.header or "text/plain"
                 if isinstance(payload.data, (str, bytes)):
@@ -200,7 +208,7 @@ class HttpDef:
                     try:
                         data_read = payload.data.read()
                         return_data["text"] = data_read.decode("utf-8")
-                    except:
+                    except BaseException:
                         return_data["text"] = "file conversion to uft-8 ran into error"
                     finally:
                         payload.data.close()
@@ -210,7 +218,11 @@ class HttpDef:
         elif payload.files:
             return_data["mimeType"] = MULTIPART_FORM_INPUT
             params = []
-            for (name, (multipart_filename, multipart_content, mimetype)) in payload.files:
+            for (
+                name,
+                (multipart_filename,
+                 multipart_content,
+                 mimetype)) in payload.files:
                 content = multipart_content
                 if isinstance(content, IOBase):
                     multipart_filename = multipart_content.name
@@ -229,7 +241,8 @@ class HttpDef:
                 values] if self.query else []
 
     def get_headers(self):
-        return [{"name": key, "value": value} for key, value in self.headers.items()] if self.headers else []
+        return [{"name": key, "value": value}
+                for key, value in self.headers.items()] if self.headers else []
 
     def get_http_from_req(self):
         data = None
@@ -252,37 +265,61 @@ class HttpDef:
                 fileswrap = FilesWrap([])
                 for filekey, multipartdata in self.payload.files:
                     fileswrap.files.append(
-                        MultiPartFile(name=filekey,
-                                      path=multipartdata[1].name if multipartdata[0] else multipartdata[1],
-                                      type=multipartdata[2] if len(multipartdata) > 2 else None)
-                    )
+                        MultiPartFile(
+                            name=filekey,
+                            path=multipartdata[1].name if multipartdata[0] else multipartdata[1],
+                            type=multipartdata[2] if len(multipartdata) > 2 else None))
 
-            payload = ParsePayload(data=data, datajson=datajson, file=file, json=json_payload, fileswrap=fileswrap,
-                                   type=type)
+            payload = ParsePayload(
+                data=data,
+                datajson=datajson,
+                file=file,
+                json=json_payload,
+                fileswrap=fileswrap,
+                type=type)
 
         query_lines = []
         if self.query:
             for key, values in self.query.items():
                 for value in values:
-                    query_lines.append(Line(header=None, query=Query(key=key, value=value)))
+                    query_lines.append(
+                        Line(
+                            header=None,
+                            query=Query(
+                                key=key,
+                                value=value)))
         auth_wrap = None
         if self.auth:
             if isinstance(self.auth, HTTPBasicAuth):
-                auth_wrap = AuthWrap(basic_auth=BasicAuth(self.auth.username, self.auth.password))
+                auth_wrap = AuthWrap(
+                    basic_auth=BasicAuth(
+                        self.auth.username,
+                        self.auth.password))
             elif isinstance(self.auth, HTTPDigestAuth):
-                auth_wrap = AuthWrap(digest_auth=DigestAuth(self.auth.username, self.auth.password))
+                auth_wrap = AuthWrap(
+                    digest_auth=DigestAuth(
+                        self.auth.username,
+                        self.auth.password))
             elif isinstance(self.auth, HttpNtlmAuth):
-                auth_wrap = AuthWrap(ntlm_auth=NtlmAuthWrap(self.auth.username, self.auth.password))
+                auth_wrap = AuthWrap(
+                    ntlm_auth=NtlmAuthWrap(
+                        self.auth.username,
+                        self.auth.password))
             elif RequestsHawkAuth and isinstance(self.auth, RequestsHawkAuth):
                 hawk_id = self.auth.credentials['id']
                 hawk_key = self.auth.credentials['key']
                 hawk_algorithm = self.auth.credentials['algorithm']
-                auth_wrap = AuthWrap(hawk_auth=HawkAuth(hawk_id, hawk_key, hawk_algorithm))
+                auth_wrap = AuthWrap(
+                    hawk_auth=HawkAuth(
+                        hawk_id, hawk_key, hawk_algorithm))
             elif isinstance(self.auth, AWS4Auth):
                 aws_auth: AWS4Auth = self.auth
                 auth_wrap = AuthWrap(
-                    aws_auth=AwsAuthWrap(aws_auth.access_id, aws_auth.signing_key.secret_key, aws_auth.service,
-                                         aws_auth.region))
+                    aws_auth=AwsAuthWrap(
+                        aws_auth.access_id,
+                        aws_auth.signing_key.secret_key,
+                        aws_auth.service,
+                        aws_auth.region))
         certificate = None
         if self.certificate:
             certificate = Certificate(*self.certificate)
@@ -296,18 +333,29 @@ class HttpDef:
         header_lines = []
         if self.headers:
             for key, value in self.headers.items():
-                header_lines.append(Line(header=Header(key=key, value=value), query=None))
+                header_lines.append(
+                    Line(
+                        header=Header(
+                            key=key,
+                            value=value),
+                        query=None))
         test_script = TestScript(self.test_script)
         test_script.lang = self.test_script_lang
         return Http(
-            namewrap=NameWrap(self.name),
+            namewrap=NameWrap(
+                self.name),
             extra_args=extra_args,
-            urlwrap=UrlWrap(url=self.url, method=self.method),
-            lines=header_lines + query_lines,
+            urlwrap=UrlWrap(
+                url=self.url,
+                method=self.method),
+            lines=header_lines +
+            query_lines,
             payload=payload,
             certificate=certificate,
-            output=None, authwrap=auth_wrap, description=None, script_wrap=test_script
-        )
+            output=None,
+            authwrap=auth_wrap,
+            description=None,
+            script_wrap=test_script)
 
 
 @dataclass
@@ -315,6 +363,7 @@ class Property:
     text: List = field(default_factory=list())
     key: Union[str, None] = None
     value: Union[str, None] = None
+
 
 class BaseModelProcessor:
     var_regex = re.compile(r'{{(?P<var>.*?)}}')
@@ -351,10 +400,18 @@ class BaseModelProcessor:
         """
         if not self.property_file and self.file:
             base_logger.debug('property file not specified')
-            default_json = os.path.join(os.path.dirname(self.file), ".dothttp.json")
-            default_yaml = os.path.join(os.path.dirname(self.file), ".dothttp.yaml")
-            default_yml = os.path.join(os.path.dirname(self.file), ".dothttp.yml")
-            default_toml = os.path.join(os.path.dirname(self.file), ".dothttp.toml")
+            default_json = os.path.join(
+                os.path.dirname(
+                    self.file), ".dothttp.json")
+            default_yaml = os.path.join(
+                os.path.dirname(
+                    self.file), ".dothttp.yaml")
+            default_yml = os.path.join(
+                os.path.dirname(
+                    self.file), ".dothttp.yml")
+            default_toml = os.path.join(
+                os.path.dirname(
+                    self.file), ".dothttp.toml")
             if os.path.exists(default_json):
                 base_logger.debug(
                     f'file: {default_json} exists. it will be used for property reference')
@@ -381,7 +438,7 @@ class BaseModelProcessor:
                 try:
                     if self.property_file.endswith('.json'):
                         props = json.load(f)
-                    elif self.property_file.endswith('.yaml') or self.property_file.endswith('.yml') :
+                    elif self.property_file.endswith('.yaml') or self.property_file.endswith('.yml'):
                         props = yaml.load(f, yaml.SafeLoader)
                     elif self.property_file.endswith('.toml'):
                         props = toml.load(f)
@@ -390,16 +447,20 @@ class BaseModelProcessor:
                     base_logger.debug(
                         f'file: {self.property_file} loaded successfully')
                 except Exception as e:
-                    base_logger.error(f'exception loading property file ', exc_info=True)
+                    base_logger.error(
+                        f'exception loading property file ', exc_info=True)
                     raise PropertyFileNotJsonException(
                         propertyfile=self.property_file)
                 try:
                     if validate:
                         validate(instance=props, schema=property_schema)
                 except Exception as e:
-                    base_logger.error(f'property json schema validation failed! ', exc_info=True)
-                    raise PropertyFileException(message="property file has invalid json schema",
-                                                file=self.property_file)
+                    base_logger.error(
+                        f'property json schema validation failed! ',
+                        exc_info=True)
+                    raise PropertyFileException(
+                        message="property file has invalid json schema",
+                        file=self.property_file)
 
         else:
             props = {}
@@ -407,14 +468,16 @@ class BaseModelProcessor:
         self.property_util.add_env_property_from_dict(props.get("*", {}))
         if self.env:
             for env_name in self.env:
-                self.property_util.add_env_property_from_dict(props.get(env_name, {}))
+                self.property_util.add_env_property_from_dict(
+                    props.get(env_name, {}))
 
     def __init__(self, args: Config):
         self.args = args
         self.file = args.file
         # dev can define default headers, which dev dont want to do it for all requests
         # in most scenarios, headers are either computed or common across all other requests
-        # best syntax would be headers section of property file will define default headers
+        # best syntax would be headers section of property file will define
+        # default headers
         self.default_headers = {}
         self.property_file = args.property_file
         self.env = args.env
@@ -441,9 +504,10 @@ class BaseModelProcessor:
                     raise
                 key = prop[:index]
                 value = prop[index + 1:]
-                base_logger.debug(f"detected command line property {key} value: {value}")
+                base_logger.debug(
+                    f"detected command line property {key} value: {value}")
                 self.property_util.add_command_property(key, value)
-            except:
+            except BaseException:
                 raise CommandLinePropError(prop=prop)
 
     def load_model(self):
@@ -457,33 +521,44 @@ class BaseModelProcessor:
             raise HttpFileException(message=e.args)
         self.model: MultidefHttp = model
 
-    
     def load_imports(self):
         import_list = []
-        BaseModelProcessor._load_imports(self.model, self.file, self.property_util, import_list)
+        BaseModelProcessor._load_imports(
+            self.model, self.file, self.property_util, import_list)
         self.model.allhttps += import_list
 
-    def _load_imports(model: MultidefHttp, filename: str, property_util: PropertyProvider, import_list: List[Http]):
+    def _load_imports(
+            model: MultidefHttp,
+            filename: str,
+            property_util: PropertyProvider,
+            import_list: List[Http]):
         if not model.import_list:
             return
         for filename_string in model.import_list.filename:
             import_file = filename_string.value
             if not os.path.isabs(import_file):
-                import_file = os.path.join(os.path.dirname(os.path.realpath(filename)), import_file)
+                import_file = os.path.join(
+                    os.path.dirname(
+                        os.path.realpath(filename)),
+                    import_file)
             if not os.path.isfile(import_file):
                 if os.path.isfile(import_file + '.http'):
                     import_file += '.http'
                 else:
-                    raise HttpFileException(message=f"import file should be a file, current: {import_file}")
+                    raise HttpFileException(
+                        message=f"import file should be a file, current: {import_file}")
             with open(import_file, 'r', encoding="utf-8") as f:
                 imported_content = f.read()
                 try:
-                    imported_model = dothttp_model.model_from_str(imported_content)
+                    imported_model = dothttp_model.model_from_str(
+                        imported_content)
                     import_list += imported_model.allhttps
                     property_util.add_infile_properties(imported_content)
-                    BaseModelProcessor._load_imports(imported_model, import_file, property_util, import_list)
+                    BaseModelProcessor._load_imports(
+                        imported_model, import_file, property_util, import_list)
                 except TextXSyntaxError as e:
-                    raise HttpFileSyntaxException(file=import_file, message=e.args)
+                    raise HttpFileSyntaxException(
+                        file=import_file, message=e.args)
                 except Exception as e:
                     raise HttpFileException(message=e.args)
         return
@@ -509,17 +584,22 @@ class BaseModelProcessor:
         if self.http.namewrap and self.http.namewrap.base:
             parent = self.http.namewrap.base
             if parent == self.http.namewrap.name:
-                raise ParameterException(message="target and base should not be equal", key=target,
-                                        value=parent)
+                raise ParameterException(
+                    message="target and base should not be equal",
+                    key=target,
+                    value=parent)
             try:
                 while parent:
                     if parent in self.parents_http:
-                        raise ParameterException(message="Found circular reference", target=self.http.namewrap.name)
+                        raise ParameterException(
+                            message="Found circular reference",
+                            target=self.http.namewrap.name)
                     grand_http = self.get_target(parent, self.model.allhttps)
                     self.parents_http.append(grand_http)
                     parent = grand_http.namewrap.base
             except Exception:
-                raise UndefinedHttpToExtend(target=self.http.namewrap.name, base=parent)
+                raise UndefinedHttpToExtend(
+                    target=self.http.namewrap.name, base=parent)
 
     @staticmethod
     def get_target(target: Union[str, int], http_def_list: List[Http]):
@@ -529,17 +609,21 @@ class BaseModelProcessor:
             if 1 <= int(target) <= len(http_def_list):
                 selected = http_def_list[int(target) - 1]
             else:
-                raise ParameterException(message="target startswith 1", key='target',
-                                         value=target)
+                raise ParameterException(
+                    message="target startswith 1", key='target', value=target)
         else:
             try:
                 # if multiple names have same value, it will create confusion
                 # if they want to go with that. then pass id
-                selected = next(filter(lambda http: http.namewrap.name == target,
-                                       (http for http in http_def_list if http.namewrap)))
+                selected = next(
+                    filter(
+                        lambda http: http.namewrap.name == target,
+                        (http for http in http_def_list if http.namewrap)))
             except StopIteration:
-                raise ParameterException(message="target is not spelled correctly", key='target',
-                                         value=target)
+                raise ParameterException(
+                    message="target is not spelled correctly",
+                    key='target',
+                    value=target)
         return selected
 
     def validate_names(self):
@@ -547,14 +631,18 @@ class BaseModelProcessor:
         for index, http in enumerate(self.model.allhttps):
             name = http.namewrap.name if http.namewrap else str(index + 1)
             if name in names:
-                raise HttpFileException(message=f"target: `{name}` appeared twice or more. panicked while processing")
+                raise HttpFileException(
+                    message=f"target: `{name}` appeared twice or more. panicked while processing")
             names.append(name)
             names.append(str(index + 1))
 
     def load_props_needed_for_content(self):
         self._load_props_from_content(self.content, self.property_util)
 
-    def _load_props_from_content(self, content, property_util: PropertyProvider):
+    def _load_props_from_content(
+            self,
+            content,
+            property_util: PropertyProvider):
         property_util.add_infile_properties(content)
 
 
@@ -569,10 +657,12 @@ class HttpDefBase(BaseModelProcessor):
         for parent in self.parents_http:
             for line in parent.lines:
                 if query := line.query:
-                    params[self.get_updated_content(query.key)].append(self.get_updated_content(query.value))
+                    params[self.get_updated_content(query.key)].append(
+                        self.get_updated_content(query.value))
         for line in self.http.lines:
             if query := line.query:
-                params[self.get_updated_content(query.key)].append(self.get_updated_content(query.value))
+                params[self.get_updated_content(query.key)].append(
+                    self.get_updated_content(query.value))
         request_logger.debug(
             f'computed query params from `{self.file}` are `{params}`')
         self.httpdef.query = params
@@ -581,21 +671,26 @@ class HttpDefBase(BaseModelProcessor):
         if header.key.startswith(s) and header.value.endswith(s):
             header.key = header.key[1:]
             header.value = header.value[:-1]
-    
+
     def load_proxy(self):
         proxy_dict = dict()
         for http_parent in self.parents_http:
-            HttpDefBase._load_proxy_details(http_parent, proxy_dict, self.property_util)
-        HttpDefBase._load_proxy_details(self.http, proxy_dict, self.property_util)
+            HttpDefBase._load_proxy_details(
+                http_parent, proxy_dict, self.property_util)
+        HttpDefBase._load_proxy_details(
+            self.http, proxy_dict, self.property_util)
         self.httpdef.proxy = proxy_dict
 
-    def _load_proxy_details(http: Http, property_util: PropertyProvider, proxy_dict: Dict[str,str]):
+    def _load_proxy_details(
+            http: Http, property_util: PropertyProvider, proxy_dict: Dict[str, str]):
         if http.named_args:
             for arg in http.named_args:
                 if arg.key == "http.proxy":
-                    proxy_dict['http'] = property_util.get_updated_content(arg.value) if arg.value else None
+                    proxy_dict['http'] = property_util.get_updated_content(
+                        arg.value) if arg.value else None
                 elif arg.key == 'https.proxy':
-                    proxy_dict['https'] = property_util.get_updated_content(arg.value) if arg.value else None
+                    proxy_dict['https'] = property_util.get_updated_content(
+                        arg.value) if arg.value else None
 
     def load_headers(self):
         """
@@ -606,8 +701,9 @@ class HttpDefBase(BaseModelProcessor):
                 4. dev can define in data/file/files's type attribute section for ('content-type')
         :return:
         """
-        ## headers are case insensitive
-        ## having duplicate headers creates problem while exporting to curl,postman import..
+        # headers are case insensitive
+        # having duplicate headers creates problem while exporting to
+        # curl,postman import..
         headers = CaseInsensitiveDict()
         headers.update(self.default_headers)
         for parent in self.parents_http:
@@ -624,19 +720,25 @@ class HttpDefBase(BaseModelProcessor):
             if header := line.header:
                 self.remove_quotes(header, "'")
                 self.remove_quotes(header, '"')
-                headers[self.get_updated_content(header.key)] = self.get_updated_content(header.value)
+                headers[self.get_updated_content(
+                    header.key)] = self.get_updated_content(header.value)
 
     def load_certificate(self):
         request_logger.debug(
             f'url is {self.http.certificate}')
-        certificate: Union[Certificate, P12Certificate] = self.get_current_or_base("certificate")
+        certificate: Union[Certificate, P12Certificate] = self.get_current_or_base(
+            "certificate")
         if certificate:
             if certificate.cert:
-                self.httpdef.certificate = [self.get_updated_content(certificate.cert),
-                                            self.get_updated_content(certificate.key) if certificate.key else None]
+                self.httpdef.certificate = [
+                    self.get_updated_content(
+                        certificate.cert), self.get_updated_content(
+                        certificate.key) if certificate.key else None]
             elif certificate.p12_file:
-                self.httpdef.p12 = [self.get_updated_content(certificate.p12_file),
-                                    self.get_updated_content(certificate.password)]
+                self.httpdef.p12 = [
+                    self.get_updated_content(
+                        certificate.p12_file), self.get_updated_content(
+                        certificate.password)]
 
     def load_extra_flags(self):
         # flags are extendable
@@ -719,16 +821,19 @@ class HttpDefBase(BaseModelProcessor):
         if not self.http.payload:
             return Payload()
         elif self.http.payload.data:
-            content = triple_or_double_tostring(self.http.payload.data, self.get_updated_content)
-            mimetype = self.get_mimetype_from_buffer(content,
-                                                     self.get_updated_content(self.http.payload.type))
+            content = triple_or_double_tostring(
+                self.http.payload.data, self.get_updated_content)
+            mimetype = self.get_mimetype_from_buffer(
+                content, self.get_updated_content(
+                    self.http.payload.type))
             request_logger.debug(
                 f'payload for request is `{content}`')
             return Payload(content, header=mimetype)
         elif data_json := self.http.payload.datajson:
             d = json_or_array_to_json(data_json, self.get_updated_content)
             if isinstance(d, list):
-                raise PayloadDataNotValidException(payload=f"data should be json/str, current: {d}")
+                raise PayloadDataNotValidException(
+                    payload=f"data should be json/str, current: {d}")
             # TODO convert all into string
             # varstring hanlding
             return Payload(data=d, header=FORM_URLENCODED)
@@ -744,17 +849,24 @@ class HttpDefBase(BaseModelProcessor):
                     multipart_file_path = multipart_file.path.triple[3:-3]
                 else:
                     multipart_file_path = multipart_file.path.str
-                multipart_content = self.get_updated_content(multipart_file_path)
+                multipart_content = self.get_updated_content(
+                    multipart_file_path)
                 multipart_key = self.get_updated_content(multipart_file.name)
-                mimetype = self.get_updated_content(multipart_file.type) if multipart_file.type else None
-                if os.path.exists(multipart_content):  # probably check valid path, then check for exists
-                    mimetype = self.get_mimetype_from_file(multipart_content, mimetype)
+                mimetype = self.get_updated_content(
+                    multipart_file.type) if multipart_file.type else None
+                if os.path.exists(
+                        multipart_content):  # probably check valid path, then check for exists
+                    mimetype = self.get_mimetype_from_file(
+                        multipart_content, mimetype)
                     multipart_filename = os.path.basename(multipart_content)
                     multipart_content = open(multipart_content, 'rb')
-                    files.append((multipart_key, (multipart_filename, multipart_content, mimetype)))
+                    files.append(
+                        (multipart_key, (multipart_filename, multipart_content, mimetype)))
                 else:
-                    mimetype = self.get_mimetype_from_buffer(multipart_content, mimetype)
-                    files.append((multipart_key, (None, multipart_content, mimetype)))
+                    mimetype = self.get_mimetype_from_buffer(
+                        multipart_content, mimetype)
+                    files.append(
+                        (multipart_key, (None, multipart_content, mimetype)))
             return Payload(files=files, header=MULTIPART_FORM_INPUT)
         return Payload()
 
@@ -766,12 +878,14 @@ class HttpDefBase(BaseModelProcessor):
             request_logger.debug(
                 f'payload file `{upload_filename}` Not found. ')
             raise DataFileNotFoundException(datafile=upload_filename)
-        mimetype = self.get_mimetype_from_file(upload_filename, self.http.payload.type)
+        mimetype = self.get_mimetype_from_file(
+            upload_filename, self.http.payload.type)
         f = open(upload_filename, 'rb')
         return Payload(data=f, header=mimetype, filename=upload_filename)
 
     @staticmethod
-    def get_mimetype_from_file(filename, mimetype: Optional[str]) -> Optional[str]:
+    def get_mimetype_from_file(filename,
+                               mimetype: Optional[str]) -> Optional[str]:
         if mimetype:
             return mimetype
         if magic:
@@ -781,7 +895,8 @@ class HttpDefBase(BaseModelProcessor):
         return mimetype
 
     @staticmethod
-    def get_mimetype_from_buffer(data, mimetype: Optional[str]) -> Optional[str]:
+    def get_mimetype_from_buffer(
+            data, mimetype: Optional[str]) -> Optional[str]:
         if mimetype:
             return mimetype
         else:
@@ -793,48 +908,56 @@ class HttpDefBase(BaseModelProcessor):
     def get_output(self):
         if output := self.http.output:
             output_file = self.get_updated_content(output.output)
-            request_logger.warning(f'output will be written to `{os.path.abspath(output_file)}`')
+            request_logger.warning(
+                f'output will be written to `{os.path.abspath(output_file)}`')
             request_logger.debug(
                 f'output will be written into `{self.file}` is `{os.path.abspath(output_file)}`')
             try:
                 return open(output_file, 'wb')
             except Exception as e:
                 request_logger.debug(
-                    f'not able to open `{output}`. output will be written to stdout', exc_info=True)
+                    f'not able to open `{output}`. output will be written to stdout',
+                    exc_info=True)
                 raise
         else:
             return sys.stdout
 
     def load_auth(self):
-        auth_wrap:AuthWrap = self.get_current_or_base("authwrap")
+        auth_wrap: AuthWrap = self.get_current_or_base("authwrap")
         if auth_wrap:
             if basic_auth := auth_wrap.basic_auth:
-                self.httpdef.auth = HTTPBasicAuth(self.get_updated_content(basic_auth.username),
-                                                  self.get_updated_content(
-                                                      basic_auth.password))
+                self.httpdef.auth = HTTPBasicAuth(
+                    self.get_updated_content(
+                        basic_auth.username), self.get_updated_content(
+                        basic_auth.password))
             elif digest_auth := auth_wrap.digest_auth:
-                self.httpdef.auth = HTTPDigestAuth(self.get_updated_content(digest_auth.username),
-                                                   self.get_updated_content(
-                                                       digest_auth.password))
+                self.httpdef.auth = HTTPDigestAuth(
+                    self.get_updated_content(
+                        digest_auth.username), self.get_updated_content(
+                        digest_auth.password))
             elif ntlm_auth := auth_wrap.ntlm_auth:
-                self.httpdef.auth = HttpNtlmAuth(self.get_updated_content(ntlm_auth.username),
-                                                 self.get_updated_content(ntlm_auth.password))
+                self.httpdef.auth = HttpNtlmAuth(
+                    self.get_updated_content(
+                        ntlm_auth.username), self.get_updated_content(
+                        ntlm_auth.password))
             elif hawk_auth := auth_wrap.hawk_auth:
                 if hawk_auth.algorithm:
                     algorithm = hawk_auth.algorithm
                 else:
                     algorithm = "sha256"
-                self.httpdef.auth =  RequestsHawkAuth(
-                                        id=self.get_updated_content(hawk_auth.id),
-                                        key=self.get_updated_content(hawk_auth.key),
-                                        algorithm=self.get_updated_content(algorithm))
+                self.httpdef.auth = RequestsHawkAuth(
+                    id=self.get_updated_content(hawk_auth.id),
+                    key=self.get_updated_content(hawk_auth.key),
+                    algorithm=self.get_updated_content(algorithm))
             elif aws_auth_wrap := auth_wrap.aws_auth:
                 access_id = self.get_updated_content(aws_auth_wrap.access_id)
-                secret_token = self.get_updated_content(aws_auth_wrap.secret_token)
+                secret_token = self.get_updated_content(
+                    aws_auth_wrap.secret_token)
                 aws_service = None
                 aws_region = None
                 if aws_auth_wrap.service:
-                    aws_service = self.get_updated_content(aws_auth_wrap.service)
+                    aws_service = self.get_updated_content(
+                        aws_auth_wrap.service)
                 if aws_auth_wrap.region:
                     aws_region = self.get_updated_content(aws_auth_wrap.region)
                 parsed_url = urlparse(self.httpdef.url)
@@ -848,7 +971,8 @@ class HttpDefBase(BaseModelProcessor):
                             # if region is not defined,
                             # us-east-1 is considered as region
                             aws_region = "us-east-1"
-                            base_logger.warning(f"region not defined, so defaulting with {aws_region}")
+                            base_logger.warning(
+                                f"region not defined, so defaulting with {aws_region}")
                         if aws_service:
                             if (hosts[-3] in AWS_SERVICES_LIST and aws_service != hosts[-3]):
                                 # host is in predefiend aws_service list
@@ -870,15 +994,19 @@ class HttpDefBase(BaseModelProcessor):
                         # https://ec2-us-east-1.amazonaws.com
                         index = hosts[-3].find('-')
                         if index != -1:
-                            base_logger.info("figuring out service and region host via legacy")
+                            base_logger.info(
+                                "figuring out service and region host via legacy")
                             _aws_service = hosts[-3][:index]
                             _aws_region = hosts[-3][index + 1:]
                             # aws_region is not figured till now
                             # according to above definition
-                            # we can consider aws_region and aws_service like below
-                            if (not aws_region) or (_aws_region in AWS_REGION_LIST and aws_region != _aws_region):
+                            # we can consider aws_region and aws_service like
+                            # below
+                            if (not aws_region) or (
+                                    _aws_region in AWS_REGION_LIST and aws_region != _aws_region):
                                 aws_region = _aws_region
-                            if (not aws_service) or (_aws_service in AWS_SERVICES_LIST and aws_service != _aws_service):
+                            if (not aws_service) or (
+                                    _aws_service in AWS_SERVICES_LIST and aws_service != _aws_service):
                                 aws_service = _aws_service
                     elif len(hosts) >= 4:
                         if hosts[-4] in AWS_SERVICES_LIST:
@@ -891,7 +1019,8 @@ class HttpDefBase(BaseModelProcessor):
                                 # user has not provided service
                                 # from url, service can be deduced
                                 aws_service = hosts[-4]
-                            base_logger.info(f"default with url service defined in url (`{aws_service}`)")
+                            base_logger.info(
+                                f"default with url service defined in url (`{aws_service}`)")
                         if hosts[-3] in AWS_REGION_LIST:
                             # host is in predefined region list
                             if aws_region:
@@ -899,7 +1028,8 @@ class HttpDefBase(BaseModelProcessor):
                                     base_logger.warning(
                                         f"aws_service = {aws_region} and service from url is {hosts[1]}. incorrectly defined")
                                     aws_region = hosts[-3]
-                                    base_logger.info(f"default with url service defined in url (`{aws_region}`)")
+                                    base_logger.info(
+                                        f"default with url service defined in url (`{aws_region}`)")
                             else:
                                 # user has not provided service
                                 # from url, service can be deduced
@@ -907,7 +1037,8 @@ class HttpDefBase(BaseModelProcessor):
                 if not aws_region:
                     aws_region = 'us-east-1'
                 if access_id and secret_token and aws_service and aws_region:
-                    base_logger.info(f"aws request with region aws_service: {aws_service} region: {aws_region}")
+                    base_logger.info(
+                        f"aws request with region aws_service: {aws_service} region: {aws_region}")
                     self.httpdef.auth = AWS4Auth(
                         access_id,
                         secret_token,
@@ -915,12 +1046,12 @@ class HttpDefBase(BaseModelProcessor):
                         aws_service
                     )
                 else:
-                    ## region and aws_service can be extracted from url
-                    ## somehow library is not supporting those
-                    ## with current state, we are not support this use case
-                    ## we may come back
-                    ## all four parameters are required and are to be non empty
-                    raise DothttpAwsAuthException(access_id = access_id)
+                    # region and aws_service can be extracted from url
+                    # somehow library is not supporting those
+                    # with current state, we are not support this use case
+                    # we may come back
+                    # all four parameters are required and are to be non empty
+                    raise DothttpAwsAuthException(access_id=access_id)
 
     def get_current_or_base(self, attr_key) -> Any:
         if getattr(self.http, attr_key):
@@ -953,7 +1084,8 @@ class HttpDefBase(BaseModelProcessor):
         if script_wrap and script_wrap.script:
             script = script_wrap.script[4:-2]
             self.httpdef.test_script = script.strip()
-            self.httpdef.test_script_lang = ScriptType.get_script_type(script_type=script_wrap.lang)
+            self.httpdef.test_script_lang = ScriptType.get_script_type(
+                script_type=script_wrap.lang)
 
     def load_output(self):
         if self.http.output and self.http.output.output:
