@@ -1,5 +1,5 @@
 //HTTP: ram=HTTP2
-MULTISET: (import_list=IMPORT)? allhttps=HTTP+;
+MULTISET: (import_list=IMPORT)? (allhttps=HTTP+)?;
 
 IMPORT: ('import' filename=String ';')* ;
 
@@ -123,7 +123,7 @@ PAYLOAD:
     (
           // reordered to provide max performance
           // most http requests has json input,or urlencoded as input
-        ('json' '(' json=JSON  ')' )
+        ('json'? '('? json=JSON  ')'? )
         | ('data' | 'urlencoded') '(' datajson=JSON (',' type=STRING)? ','? ')'
         | ('data'| 'text') '(' data+=TRIPLE_OR_DOUBLE_STRING ((','|';') type=STRING)? ','?  ')'
         | (fileswrap=FILES)

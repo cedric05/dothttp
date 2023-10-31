@@ -283,19 +283,34 @@ class GetNameReferencesHandler(BaseHandler):
     def execute(self, command: Command, filename):
         with open(filename) as f:
             http_data = f.read()
-            all_names, all_urls = self.parse_n_get(http_data)
+            all_names, all_urls,  imported_names, imported_urls = self.parse_n_get(
+                http_data, filename)
             result = Result(
                 id=command.id,
                 result={
                     "names": all_names,
-                    "urls": all_urls})
+                    "urls": all_urls,
+                    "imports": {
+                        "names": imported_names,
+                        "urls": imported_urls
+                    }
+                })
         return result
 
-    def parse_n_get(self, http_data):
-        model = dothttp_model.model_from_str(http_data)
+    def parse_n_get(self, http_data, filename: str):
+        model: MultidefHttp = dothttp_model.model_from_str(http_data)
         all_names = []
         all_urls = []
-        for index, http in enumerate(model.allhttps):
+        imported_names = []
+        imported_urls = []
+        self.get_for_http(model.allhttps, all_names, all_urls)
+        for new_model, _content in BaseModelProcessor._get_models_from_import(model, filename):
+            self.get_for_http(new_model.allhttps,
+                              imported_names, imported_urls)
+        return all_names, all_urls,  imported_names, imported_urls
+
+    def get_for_http(self, allhttps, all_names, all_urls):
+        for index, http in enumerate(allhttps):
             if http.namewrap:
                 name = http.namewrap.name if http.namewrap else str(index)
                 start = http.namewrap._tx_position
@@ -318,7 +333,6 @@ class GetNameReferencesHandler(BaseHandler):
             }
             all_names.append(name)
             all_urls.append(url)
-        return all_names, all_urls
 
 
 class ContentNameReferencesHandler(GetNameReferencesHandler):
@@ -329,10 +343,25 @@ class ContentNameReferencesHandler(GetNameReferencesHandler):
 
     def execute(self, command, filename):
         http_data = command.params.get("content", "")
-        all_names, all_urls = self.parse_n_get(http_data)
+        context = command.params.get("context", [])
+        all_names, all_urls,  imported_names, imported_urls = self.parse_n_get(
+            http_data, filename)
+        for context_context in context:
+            try:
+                _all_names, _all_urls,  _imported_names, _imported_urls = self.parse_n_get(
+                    context_context, filename)
+                imported_names += _all_names + _imported_names
+                imported_urls += _all_urls + _imported_urls
+            except:
+                pass
         result = Result(
             id=command.id,
             result={
                 "names": all_names,
-                "urls": all_urls})
+                "urls": all_urls,
+                "imports": {
+                    "names": imported_names,
+                    "urls": imported_urls
+                }
+            })
         return result
