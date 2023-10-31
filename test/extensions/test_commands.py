@@ -17,6 +17,7 @@ command_dir = f"{dir_path}/commands"
 class TargetTest(TestBase):
 
     def setUp(self) -> None:
+        self.maxDiff = None
         self.name_handler = GetNameReferencesHandler()
 
     def test_names(self):
@@ -59,8 +60,13 @@ class TargetTest(TestBase):
                                    {'end': 387,
                                     'method': 'POST',
                                     'start': 359,
-                                    'url': 'https://req.dothttp.dev'}]},
-                         result.result)
+                                    'url': 'https://req.dothttp.dev'}],
+                          "imports": {
+            "names": [],
+            "urls": []
+        }
+        },
+            result.result)
 
     def test_content_names2(self):
         filename = f"{command_dir}/names.http"
