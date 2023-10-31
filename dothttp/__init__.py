@@ -522,16 +522,14 @@ class BaseModelProcessor:
         self.model: MultidefHttp = model
 
     def load_imports(self):
-        import_list = []
-        BaseModelProcessor._load_imports(
-            self.model, self.file, self.property_util, import_list)
-        self.model.allhttps += import_list
+        for model, content in BaseModelProcessor._get_models_from_import(self.model, self.file):
+            self.model.allhttps += model.allhttps
+            self.property_util.add_infile_properties(content)
 
-    def _load_imports(
+    @staticmethod
+    def _get_models_from_import(
             model: MultidefHttp,
-            filename: str,
-            property_util: PropertyProvider,
-            import_list: List[Http]):
+            filename: str):
         if not model.import_list:
             return
         for filename_string in model.import_list.filename:
@@ -552,15 +550,13 @@ class BaseModelProcessor:
                 try:
                     imported_model = dothttp_model.model_from_str(
                         imported_content)
-                    import_list += imported_model.allhttps
-                    property_util.add_infile_properties(imported_content)
-                    BaseModelProcessor._load_imports(
-                        imported_model, import_file, property_util, import_list)
+                    yield imported_model, imported_content
                 except TextXSyntaxError as e:
                     raise HttpFileSyntaxException(
                         file=import_file, message=e.args)
                 except Exception as e:
                     raise HttpFileException(message=e.args)
+            yield from BaseModelProcessor._get_models_from_import(imported_model, import_file)
         return
 
     def load_content(self):

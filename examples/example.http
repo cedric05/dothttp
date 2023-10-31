@@ -7,7 +7,11 @@ GET https://req.dothttp.dev/user
 ? projection, name
 ? projection, org
 ? projection, location
+
+{
+    "payload": {{$randomSlug}}
+}
 > {%
     client.global.set("Server", response.headers.valueOf("Server"));
-    client.log('server is :'+ value);
+    client.log('server is :'+ client.global.get('Server'));
 %}
