@@ -522,9 +522,18 @@ class BaseModelProcessor:
         self.model: MultidefHttp = model
 
     def load_imports(self):
-        for model, content in BaseModelProcessor._get_models_from_import(self.model, self.file):
-            self.model.allhttps += model.allhttps
-            self.property_util.add_infile_properties(content)
+        self._load_imports(self.model, self.file,
+                           self.property_util, self.model.allhttps)
+
+    @staticmethod
+    def _load_imports(model: "BaseModelProcessor",
+                      filename: str,
+                      property_util: PropertyProvider,
+                      import_list: []
+                      ):
+        for model, content in BaseModelProcessor._get_models_from_import(model, filename):
+            import_list += model.allhttps
+            property_util.add_infile_properties(content)
 
     @staticmethod
     def _get_models_from_import(
