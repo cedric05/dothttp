@@ -291,7 +291,7 @@ class GetNameReferencesHandler(BaseHandler):
                     "urls": all_urls})
         return result
 
-    def parse_n_get(self, http_data, filename:str):
+    def parse_n_get(self, http_data, filename: str):
         model: MultidefHttp = dothttp_model.model_from_str(http_data)
         all_names = []
         all_urls = []
@@ -334,7 +334,7 @@ class ContentNameReferencesHandler(GetNameReferencesHandler):
 
     def execute(self, command, filename):
         http_data = command.params.get("content", "")
-        all_names, all_urls = self.parse_n_get(http_data)
+        all_names, all_urls = self.parse_n_get(http_data, filename)
         result = Result(
             id=command.id,
             result={
