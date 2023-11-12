@@ -1,6 +1,5 @@
-jsonschema==4.19.1
+jsonschema==4.19.2
 jstyleson==0.0.2
-requests==2.31.0
 textx==3.1.1
 js2py==0.74
 requests_pkcs12==1.22
@@ -8,7 +7,8 @@ parsys-requests-unixsocket==0.3.1
 requests-aws4auth==1.2.3
 requests_ntlm==1.2.0
 RestrictedPython==6.2
-Faker==19.12.0
+Faker==19.13.0
 requests-hawk==1.2.1
 PyYaml==6.0.1
 toml==0.10.2
+requests==2.31.0
