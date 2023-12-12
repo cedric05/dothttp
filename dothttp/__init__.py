@@ -44,7 +44,8 @@ from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
 from .parse_models import MultidefHttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
     MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, \
-    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript, ScriptType, HawkAuth
+    AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript, ScriptType, HawkAuth, AzureAuthCertificate, \
+    AzureAuthDeviceCode, AzureAuthServicePrincipal
 from .property_schema import property_schema
 from .property_util import PropertyProvider
 
@@ -320,6 +321,15 @@ class HttpDef:
                         aws_auth.signing_key.secret_key,
                         aws_auth.service,
                         aws_auth.region))
+            else isinstance(self.auth, (AzureAuthCertificate, AzureAuthDeviceCode, AzureAuthServicePrincipal)):
+                if isinstance(self.auth, AzureAuthCertificate):
+                    auth_wrap = AuthWrap(
+                        azure_auth_certificate=AzureAuthCertificate(
+                            self.auth.tenant_id,
+                            self.auth.client_id,
+                            self.auth.certificate_path,
+                            self.auth.certificate_password))
+                
         certificate = None
         if self.certificate:
             certificate = Certificate(*self.certificate)
@@ -1057,6 +1067,23 @@ class HttpDefBase(BaseModelProcessor):
                     # we may come back
                     # all four parameters are required and are to be non empty
                     raise DothttpAwsAuthException(access_id=access_id)
+            elif azure_auth := auth_wrap.azure_auth:
+                if azure_auth.certificate_path:
+                    auth_instance = AzureAuthCertificate(
+                        tenant_id=self.get_updated_content(azure_auth.tenant_id),
+                        client_id=self.get_updated_content(azure_auth.client_id),
+                        certificate_path=self.get_updated_content(azure_auth.certificate_path),
+                        certificate_password=self.get_updated_content(azure_auth.certificate_password')
+                    )
+                elif azure_auth.client_secret:
+                    auth_instance = AzureAuthServicePrincipal(
+                        tenant_id=self.get_updated_content(azure_auth.tenant_id),
+                        client_id=self.get_updated_content(azure_auth.client_id),
+                        client_secret=self.get_updated_content(azure_auth.client_secret')
+                    )
+                else:
+                    auth_instance = AzureAuthDeviceCode()
+                self.httpdef.auth = auth_instance
 
     def get_current_or_base(self, attr_key) -> Any:
         if getattr(self.http, attr_key):

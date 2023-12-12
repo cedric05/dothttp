@@ -61,6 +61,25 @@ class AuthWrap:
 
 
 @dataclass
+class AzureAuthCertificate:
+    tenant_id: Optional[str] = None
+    client_id: Optional[str] = None
+    certificate_path: Optional[str] = None
+    certificate_password: Optional[str] = None
+
+@dataclass
+class AzureAuthServicePrincipal:
+    tenant_id: Optional[str] = None
+    client_id: Optional[str] = None
+    client_secret: Optional[str] = None
+
+
+class AzureAuthDeviceCode:
+    pass
+
+AzureAuth = Union[AzureAuthCertificate, AzureAuthDeviceCode, AzureAuthServicePrincipal]
+
+@dataclass
 class Query:
     key: str
     value: str
