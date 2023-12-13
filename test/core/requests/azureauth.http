@@ -1,0 +1,12 @@
+@name("azure_sp")
+GET "https://management.azure.com/"
+azurespsecret(tenant_id="{{tenant_id}}", client_id="{{client_id}}", client_secret="{{secret_value}}", scope="{{scope}}")
+
+
+@name("azure_cert")
+GET "https://management.azure.com/"
+azurespcert(tenant_id="{{tenant_id}}", client_id="{{client_id}}", certificate_path="{{certificate_path}}", scope="{{scope}}")
+
+@name("azure_cli")
+GET "https://management.azure.com/"
+azurecli(scope="{{scope}}")

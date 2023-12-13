@@ -45,7 +45,12 @@ HEADER:
 ;
 
 AUTHWRAP:
-    digest_auth = DIGESTAUTH |  basic_auth = BASICAUTH | ntlm_auth = NTLMAUTH | hawk_auth=HAWKAUTH | aws_auth = AWSAUTH 
+    digest_auth = DIGESTAUTH 
+    |  basic_auth = BASICAUTH 
+    | ntlm_auth = NTLMAUTH 
+    | hawk_auth=HAWKAUTH 
+    | aws_auth = AWSAUTH 
+    | azure_auth = AZUREAUTH
 ;
 
 CERTAUTH:
@@ -79,6 +84,37 @@ AWSAUTH:
     'awsauth' '(' ('access_id' '=' ) ? access_id=DotString ',' ('secret_key' '=')? secret_token=DotString   ( ',' ('service'  '=')? service=DotString )? ','? ')'
     | 'awsauth' '(' ('access_id' '=' ) ? access_id=DotString ',' ('secret_key' '=')? secret_token=DotString ','  ('service'  '=')? service=DotString (',' ('region' '=')? region=DotString)? ')'
 ;
+
+AZUREAUTH:
+    azure_spcert_auth = AZURECERTIFICATEAUTH
+    // for service principal
+    | azure_spsecret_auth = AZURESERVICEPRINCIPALAUTH
+    // if you don't have both, use device_code flow
+    // in this case, we use azure cli to get auth_token 
+    | azure_device_auth = AZUREDEVICEAUTH
+    | azure_cli_auth = AZURECLIAUTH
+;
+
+AZURESERVICEPRINCIPALAUTH:
+
+    'azurespsecret' '(' ('tenant_id' '=')? tenant_id=DotString ',' ('client_id' '=')? client_id=DotString ',' ('client_secret' '=')? client_secret=DotString (',' ('scope' '=')?  scope=DotString )? ')'
+
+;
+
+AZURECERTIFICATEAUTH:
+    // for certificate based
+    'azurespcert' '(' ('tenant_id' '=')? tenant_id=DotString ',' ('client_id' '=')? client_id=DotString ',' ('certificate_path' '=')? certificate_path=DotString (',' ('scope' '=')?  scope=DotString )?')'
+
+;
+
+AZUREDEVICEAUTH:
+    'azuredevice' '(' (('scope' '=')?  scope=DotString )? ')'
+;
+
+AZURECLIAUTH:
+    'azurecli' '(' (('scope' '=')?  scope=DotString )?  ')'
+;
+
 
 EXTRA_ARG:
     // there can be more

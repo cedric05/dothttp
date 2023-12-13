@@ -5,7 +5,6 @@ from typing import List, Optional, Union
 
 from dothttp import DotHttpException
 
-
 @dataclass
 class NameWrap:
     name: str
@@ -52,12 +51,69 @@ class NtlmAuthWrap:
 
 
 @dataclass
+class AzureAuthCertificate:
+    tenant_id: str = None
+    client_id: str = None
+    certificate_path: str = None
+    certificate_password: Optional[str] = None
+    scope : Optional[str] = None
+
+@dataclass
+class AzureAuthServicePrincipal:
+    tenant_id: Optional[str] = None
+    client_id: Optional[str] = None
+    client_secret: Optional[str] = None
+    scope : Optional[str] = None
+
+
+@dataclass
+class AzureAuthDeviceCode:
+    scope : Optional[str] = None
+
+
+@dataclass
+class AzureAuthCli:
+    scope : Optional[str] = None
+
+
+class AzureAuthType(enum.Enum):
+    SERVICE_PRINCIPAL = "service_principal"
+    CERTIFICATE = "certificate"
+    DEVICE_CODE = "device_code"
+    CLI = "cli"
+
+    @staticmethod
+    def get_azure_auth_type(auth_type: str):
+        if auth_type == "service_principal":
+            return AzureAuthType.SERVICE_PRINCIPAL
+        elif auth_type == "certificate":
+            return AzureAuthType.CERTIFICATE
+        elif auth_type == "device_code":
+            return AzureAuthType.DEVICE_CODE
+        elif auth_type == "cli":
+            return AzureAuthType.CLI
+        else:
+            raise DotHttpException("unknown auth type")
+
+@dataclass
+class AzureAuthWrap:
+    azure_auth_type: AzureAuthType
+    azure_spsecret_auth: Optional[AzureAuthServicePrincipal] = None
+    azure_spcert_auth: Optional[AzureAuthCertificate] = None
+    azure_device_code: Optional[AzureAuthDeviceCode] = None
+    azure_cli_auth: Optional[AzureAuthCli] = None
+
+
+AzureAuthSP = Union[AzureAuthCertificate, AzureAuthServicePrincipal]
+
+@dataclass
 class AuthWrap:
     digest_auth: Optional[DigestAuth] = None
     basic_auth: Optional[BasicAuth] = None
     aws_auth: Optional[AwsAuthWrap] = None
     ntlm_auth: Optional[NtlmAuthWrap] = None
     hawk_auth: Optional[HawkAuth] = None
+    azure_auth: Optional[AzureAuthWrap] = None
 
 
 @dataclass
