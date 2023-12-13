@@ -299,6 +299,13 @@ class HttpFileFormatter(RequestBase):
                     output_str += f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}", service="{aws_auth.service}")'
                 else:
                     output_str += f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}" )'
+            elif azure_auth := auth_wrap.azure_auth:
+                if sp_auth := azure_auth.azure_spsecret_auth:
+                    output_str += f'{new_line}azurespsecret(tenant_id="{sp_auth.tenant_id}", client_id="{sp_auth.client_id}", client_secret="{sp_auth.client_secret}", scope="{sp_auth.scope}")'
+                elif cert_auth := azure_auth.azure_spcert_auth:
+                    output_str += f'{new_line}azurespcert("tenant_id={cert_auth.tenant_id}", client_id="{cert_auth.client_id}", client_secret="{cert_auth.certificate_path}", scope="{cert_auth.scope}")'
+                else:
+                    output_str += f'{new_line}azurecli( scope = "{azure_auth.scope}")'
         if lines := http.lines:
             def check_for_quotes(line):
                 quote_type, value = quote_or_unquote(line.header.value)

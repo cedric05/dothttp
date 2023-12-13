@@ -1,0 +1,19 @@
+
+# python -m dothttp examples/example.http --property subscriptionId=<subscriptionId> resourceGroupName=<resource group name>  --debug
+@name("azureauth")
+GET https://management.azure.com/
+// azurecli()
+azurespsecret("{{tenantId}}", "{{clientId}}", "{{secretValue}}")
+
+@name('subscriptions'): "azureauth"
+GET /subscriptions/{{subscriptionId}}/
+
+@name('resourcegroups'): "subscriptions"
+GET /resourceGroups/{{resourceGroupName}}/
+
+@name('containerservice'): "resourcegroups"
+GET /providers/Microsoft.ContainerService/
+
+@name('managedClusters'): "containerservice"
+GET /managedClusters
+?"api-version"="2021-07-01"

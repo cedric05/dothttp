@@ -42,12 +42,13 @@ from textx import TextXSyntaxError, metamodel_from_file
 
 from .dsl_jsonparser import json_or_array_to_json
 from .exceptions import *
-from .parse_models import MultidefHttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
+from .parse_models import AzureAuthCli, AzureAuthType, AzureAuthWrap, MultidefHttp, AuthWrap, DigestAuth, BasicAuth, Line, NtlmAuthWrap, Query, Http, NameWrap, UrlWrap, Header, \
     MultiPartFile, FilesWrap, TripleOrDouble, Payload as ParsePayload, Certificate, P12Certificate, ExtraArg, \
     AWS_REGION_LIST, AWS_SERVICES_LIST, AwsAuthWrap, TestScript, ScriptType, HawkAuth, AzureAuthCertificate, \
     AzureAuthDeviceCode, AzureAuthServicePrincipal
 from .property_schema import property_schema
 from .property_util import PropertyProvider
+from .azure_auth import AzureAuth
 
 try:
     import magic
@@ -321,15 +322,9 @@ class HttpDef:
                         aws_auth.signing_key.secret_key,
                         aws_auth.service,
                         aws_auth.region))
-            else isinstance(self.auth, (AzureAuthCertificate, AzureAuthDeviceCode, AzureAuthServicePrincipal)):
-                if isinstance(self.auth, AzureAuthCertificate):
-                    auth_wrap = AuthWrap(
-                        azure_auth_certificate=AzureAuthCertificate(
-                            self.auth.tenant_id,
-                            self.auth.client_id,
-                            self.auth.certificate_path,
-                            self.auth.certificate_password))
-                
+            elif isinstance(self.auth, AzureAuth):
+                auth_wrap = AuthWrap(
+                    azure_auth=self.auth.azure_auth_wrap)                
         certificate = None
         if self.certificate:
             certificate = Certificate(*self.certificate)
@@ -1061,29 +1056,44 @@ class HttpDefBase(BaseModelProcessor):
                         aws_service
                     )
                 else:
-                    # region and aws_service can be extracted from url
+                    # aws service and region can be extracted from url
                     # somehow library is not supporting those
                     # with current state, we are not support this use case
                     # we may come back
                     # all four parameters are required and are to be non empty
                     raise DothttpAwsAuthException(access_id=access_id)
             elif azure_auth := auth_wrap.azure_auth:
-                if azure_auth.certificate_path:
-                    auth_instance = AzureAuthCertificate(
-                        tenant_id=self.get_updated_content(azure_auth.tenant_id),
-                        client_id=self.get_updated_content(azure_auth.client_id),
-                        certificate_path=self.get_updated_content(azure_auth.certificate_path),
-                        certificate_password=self.get_updated_content(azure_auth.certificate_password')
-                    )
-                elif azure_auth.client_secret:
-                    auth_instance = AzureAuthServicePrincipal(
-                        tenant_id=self.get_updated_content(azure_auth.tenant_id),
-                        client_id=self.get_updated_content(azure_auth.client_id),
-                        client_secret=self.get_updated_content(azure_auth.client_secret')
-                    )
-                else:
-                    auth_instance = AzureAuthDeviceCode()
-                self.httpdef.auth = auth_instance
+                azure_auth: AzureAuthWrap = azure_auth
+                if sp_auth := azure_auth.azure_spsecret_auth:
+                    azure_auth_wrap = AzureAuthWrap(azure_spsecret_auth=AzureAuthServicePrincipal(
+                        tenant_id=self.get_updated_content(sp_auth.tenant_id),
+                        client_id=self.get_updated_content(sp_auth.client_id),
+                        client_secret=self.get_updated_content(sp_auth.client_secret),
+                        scope = self.get_updated_content(sp_auth.scope or "https://management.azure.com/.default")
+                    ), azure_auth_type=AzureAuthType.SERVICE_PRINCIPAL)
+                elif cert_auth := azure_auth.azure_spcert_auth:
+                    azure_auth_wrap = AzureAuthWrap(azure_spcert_auth=AzureAuthCertificate(
+                        tenant_id=self.get_updated_content(cert_auth.tenant_id),
+                        client_id=self.get_updated_content(cert_auth.client_id),
+                        certificate_path=self.get_updated_content(cert_auth.certificate_path),
+                        scope=self.get_updated_content(cert_auth.scope or "https://management.azure.com/.default")
+                    ), azure_auth_type=AzureAuthType.CERTIFICATE)
+                elif azure_auth.azure_cli_auth:
+                    azure_auth_wrap = AzureAuthWrap(
+                        azure_cli_auth=AzureAuthCli(
+                            scope=self.get_updated_content(
+                                azure_auth.azure_cli_auth.scope or "https://management.azure.com/.default"
+                                )
+                    ), azure_auth_type=AzureAuthType.CLI)
+                elif azure_auth.auth.azure_device_code:
+                    azure_auth_wrap = AzureAuthWrap(
+                        azure_device_code=AzureAuthDeviceCode(
+                            scope=self.get_updated_content(
+                                azure_auth.azure_device_code.scope or "https://management.azure.com/.default"
+                                )
+                    ), azure_auth_type=AzureAuthType.DEVICE_CODE)
+                
+                self.httpdef.auth = AzureAuth(azure_auth_wrap)
 
     def get_current_or_base(self, attr_key) -> Any:
         if getattr(self.http, attr_key):
