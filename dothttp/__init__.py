@@ -48,7 +48,11 @@ from .parse_models import AzureAuthCli, AzureAuthType, AzureAuthWrap, MultidefHt
     AzureAuthDeviceCode, AzureAuthServicePrincipal
 from .property_schema import property_schema
 from .property_util import PropertyProvider
-from .azure_auth import AzureAuth
+try:
+    from .azure_auth import AzureAuth
+except:
+    # this is for dothttp-wasm, where msal most likely not installed
+    AzureAuth = None
 
 try:
     import magic
