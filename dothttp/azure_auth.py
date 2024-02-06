@@ -104,8 +104,11 @@ class AzureAuth(AuthBase):
                 request_logger.debug(
                     "azure cli token store cached not availabile or expired")
                 # get token from cli by invoking az account get-access-token
+                cmd = "az"
+                if os.name == "nt":
+                    cmd = "az.cmd"
                 result = subprocess.run(
-                    ["az", "account", "get-access-token", "--scope", scope], capture_output=True, text=True)
+                    [cmd, "account", "get-access-token", "--scope", scope], capture_output=True, text=True)
                 result_json = json.loads(result.stdout)
                 access_token = result_json['accessToken']
                 # Convert the expiresOn field to seconds since the Epoch

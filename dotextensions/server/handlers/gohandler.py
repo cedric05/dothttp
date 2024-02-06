@@ -134,6 +134,18 @@ class TypeFromPos(BaseHandler):
                     if self.is_in_between(
                             pick_http.authwrap.digest_auth, position):
                         return DothttpTypes.NTLM_AUTH
+                elif pick_http.authwrap.azure_auth:
+                    if self.is_in_between(
+                            pick_http.authwrap.azure_auth, position):
+                        return DothttpTypes.AZURE_AUTH
+                elif pick_http.authwrap.aws_auth:
+                    if self.is_in_between(
+                            pick_http.authwrap.aws_auth, position):
+                        return DothttpTypes.AWS_AUTH
+                elif pick_http.authwrap.hawk_auth:
+                    if self.is_in_between(
+                            pick_http.authwrap.hawk_auth, position):
+                        return DothttpTypes.HAWK_AUTH
             if certificate := pick_http.certificate:
                 if self.is_in_between(certificate, position):
                     return DothttpTypes.CERTIFICATE
