@@ -10,9 +10,12 @@ on:
 
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
-
+    environment:
+      name: pypi
+      url: https://pypi.org/p/dothttp-req
+    permissions:
+      id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
@@ -28,14 +31,14 @@ jobs:
         # for integration tests
         docker run -d -p 8000:80 kennethreitz/httpbin 
         python -m unittest
-    - name: Install dependencies
+    - name: Build Distribution
       run: |
+        # install prerequisites
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
-    - name: Build and publish
-      env:
-        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
-        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
-      run: |
+
+        # build distribution
         python setup.py sdist bdist_wheel
-        twine upload dist/*
+    # retrieve your distributions here
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
