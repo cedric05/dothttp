@@ -9,6 +9,10 @@ import typing
 from dataclasses import dataclass, field
 import unittest
 import uuid
+import urllib
+import urllib.parse
+import cryptography
+from cryptography import *
 
 import js2py
 from js2py.base import JsObjectWrapper
@@ -57,6 +61,9 @@ allowed_global = {
     'csv': csv,
     'uuid': uuid,
     'base64': base64,
+    'urllib': urllib,
+    'open': open,
+    'cryptography': cryptography
 }
 allowed_global.update(safe_globals)
 
