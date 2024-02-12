@@ -22,7 +22,7 @@ msal = "==1.26.0"
 
 [dev-packages]
 python-magic = "*"
-waitress = "==2.1.1"
+waitress = "==3.0.0"
 flask = "==3.0.2"
 pyperf = "==2.6.2"
 pytest-benchmark = "*"
