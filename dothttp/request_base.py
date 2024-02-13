@@ -419,9 +419,6 @@ class RequestCompiler(RequestBase):
 
     def run(self):
         self.load_def()
-        execution_cls = js3py.ScriptExecutionJs if self.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT else js3py.ScriptExecutionPython
-        script_execution = execution_cls(self.httpdef, self.property_util)
-        script_execution.pre_request_script()
         resp = self.get_response()
         self.print_req_info(resp.request)
         for hist_resp in resp.history:
@@ -437,7 +434,7 @@ class RequestCompiler(RequestBase):
         self.print_req_info(resp, '<')
         self.write_to_output(resp)
         request_logger.debug(f'request executed completely')
-        script_result = script_execution.execute_test_script(resp=resp)
+        script_result = self.script_execution.execute_test_script(resp=resp)
         self.print_script_result(script_result)
         return resp
 

@@ -118,7 +118,9 @@ AZURECLIAUTH:
 
 EXTRA_ARG:
     // there can be more
-    clear=CLEAR_SESSION | insecure=INSECURE
+    clear=CLEAR_SESSION 
+    | insecure=INSECURE
+    | no_parent_script=CLEAR_PARENT_SCRIPT
 ;
 
 NAMED_ARG:
@@ -128,6 +130,10 @@ NAMED_ARG:
 
 CLEAR_SESSION:
     '@clear'
+;
+
+CLEAR_PARENT_SCRIPT:
+    '@no_parent_script'
 ;
 
 INSECURE:

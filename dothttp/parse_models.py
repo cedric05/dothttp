@@ -3,7 +3,7 @@ import os
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
 
-from dothttp import DotHttpException
+from .exceptions import DotHttpException
 
 @dataclass
 class NameWrap:
@@ -197,6 +197,8 @@ class ExtraArg:
     clear: Optional[str] = ''
     # allows insecure
     insecure: Optional[str] = ''
+    # ignore parent script
+    no_parent_script: Optional[str] = ''
 
 
 @dataclass
