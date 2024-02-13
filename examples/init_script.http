@@ -1,0 +1,24 @@
+# this request reads file, base64 encodes and sends request
+@name("init and pre request example"): "example"
+GET "/ram"
+
+@name("uses parent request but not script"): "example"
+@no_parent_script
+GET "/laxman"
+
+
+
+@name("example")
+GET https://req.dothttp.dev/user
+
+text('hai')
+> {%
+
+def init_set_value():
+    with open('/tmp/haha', 'r') as f:
+        client.properties.set("ram", base64.b64encode(f.read().encode()).decode())
+
+def pre_setup():
+    client.request.payload.set_data(client.properties.get("ram", "not available"))
+
+%} python

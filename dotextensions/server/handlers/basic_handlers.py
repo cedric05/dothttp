@@ -3,7 +3,8 @@ from typing import List
 
 from requests import RequestException
 
-from dothttp import DotHttpException, Config, HttpDef, MultidefHttp, BaseModelProcessor, UndefinedHttpToExtend, js3py
+from dothttp.exceptions import DotHttpException
+from dothttp import Config, HttpDef, MultidefHttp, BaseModelProcessor, UndefinedHttpToExtend, js3py
 from dothttp.request_base import CurlCompiler, RequestCompiler, HttpFileFormatter, dothttp_model
 from dothttp.__version__ import __version__
 from dothttp.parse_models import ScriptType
@@ -108,9 +109,6 @@ class RunHttpFileHandler(BaseHandler):
 
     def get_request_result(self, command, comp: RequestCompiler):
         comp.load_def()
-        execution_cls = js3py.ScriptExecutionJs if comp.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT else js3py.ScriptExecutionPython
-        script_execution = execution_cls(comp.httpdef, comp.property_util)
-        script_execution.pre_request_script()
         resp = comp.get_response()
         if output := comp.httpdef.output:
             # body = f"Output stored in {output}"
@@ -119,7 +117,7 @@ class RunHttpFileHandler(BaseHandler):
             except Exception as e:
                 output = f"Not!. unhandled error happened : {e}"
                 logger.warning("unable to write because", exc_info=True)
-        script_result = script_execution.execute_test_script(resp).as_json()
+        script_result = comp.script_execution.execute_test_script(resp).as_json()
         body = resp.text
         response_data = {
             "response": {

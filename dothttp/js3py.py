@@ -10,6 +10,8 @@ from dataclasses import dataclass, field
 import unittest
 import uuid
 import urllib
+import json
+import yaml
 import urllib.parse
 import cryptography
 from cryptography import *
@@ -27,9 +29,7 @@ from RestrictedPython.Eval import default_guarded_getiter
 from operator import getitem
 from faker import Faker
 
-from dothttp.exceptions import DotHttpException, PreRequestScriptException, ScriptException
-
-
+from .exceptions import DotHttpException, PreRequestScriptException, ScriptException
 from .property_util import PropertyProvider
 from . import MIME_TYPE_JSON, HttpDef, request_logger
 from .utils import get_real_file_path
@@ -63,6 +63,8 @@ allowed_global = {
     'base64': base64,
     'urllib': urllib,
     'open': open,
+    'json': json,
+    'yaml': yaml,
     'cryptography': cryptography
 }
 allowed_global.update(safe_globals)
@@ -157,20 +159,35 @@ class Properties(dict):
 class Client:
     request: HttpDef
     properties: Properties
+    env_properties: Properties
+    infile_properties: Properties
     response: Response = None
 
 
 class ScriptExecutionEnvironmentBase:
     def __init__(self, httpdef: HttpDef, prop: PropertyProvider) -> None:
         self.client = Client(
-            request=httpdef, properties=Properties(
-                prop.get_all_properties_variables()))
+            request=httpdef, 
+            properties=Properties(prop.get_all_properties_variables()),
+            infile_properties={ key:value.value for key, value in prop.infile_properties.items()},
+            env_properties=dict(prop.env_properties)
+            )
+
+    def _init_request_script(self) -> None:
+        pass
 
     def _pre_request_script(self) -> None:
         pass
 
     def _execute_test_script(self, resp: Response) -> ScriptResult:
         raise NotImplementedError()
+
+    def init_request_script(self):
+        try:
+            self._init_request_script()
+        except Exception as exc:
+            request_logger.error("unknown exception happened", exc_info=True)
+            raise PreRequestScriptException(payload=str(exc))
 
     def pre_request_script(self):
         try:
@@ -260,6 +277,13 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
             exec(byte_code, script_gloabal, self.local)
         except Exception as exc:
             raise ScriptException(payload=str(exc))
+
+    def _init_request_script(self) -> None:
+        # just for variables initialization
+        for key, func in self.local.items():
+            if (key.startswith('init')) and isinstance(
+                    func, types.FunctionType):
+                func()
 
     def _pre_request_script(self) -> None:
         for key, func in self.local.items():

@@ -10,7 +10,6 @@ from dothttp import HttpNtlmAuth
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType, Variable
 from dothttp import json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
     request_logger, Payload, APPLICATION_JSON, CONTENT_TYPE, AWS4Auth, dothttp_model
-from dothttp.parse_models import NtlmAuthWrap
 from dothttp.request_base import RequestCompiler
 from dothttp.utils import json_to_urlencoded_array
 from . import logger
