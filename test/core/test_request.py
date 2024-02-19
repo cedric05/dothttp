@@ -5,10 +5,10 @@ import unittest
 from unittest import skip
 
 
-from dothttp import HttpNtlmAuth
+from dothttp.parse import HttpNtlmAuth
 
 from dothttp.exceptions import *
-from dothttp.request_base import DOTHTTP_COOKIEJAR, CurlCompiler, HttpFileFormatter, RequestBase
+from dothttp.parse.request_base import DOTHTTP_COOKIEJAR, CurlCompiler, HttpFileFormatter, RequestBase
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

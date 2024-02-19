@@ -1,7 +1,7 @@
 import json
 from typing import Union, Dict, List
 
-from dothttp.utils import triple_or_double_tostring
+from ..utils.common import triple_or_double_tostring
 
 
 def json_or_array_to_json(model, update_content_func) -> Union[Dict, List]:

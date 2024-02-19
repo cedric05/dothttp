@@ -33,7 +33,7 @@ except ImportError:
     validate = None
 
 try:
-    from .azure_auth import AzureAuth
+    from ..auth.azure_auth import AzureAuth
 except:
     # this is for dothttp-wasm, where msal most likely not installed
     AzureAuth = None

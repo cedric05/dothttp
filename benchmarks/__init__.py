@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 import os
 
-from dothttp import Config
-from dothttp.request_base import RequestCompiler
+from dothttp.parse import Config
+from dothttp.parse.request_base import RequestCompiler
 
 
 def run_model():

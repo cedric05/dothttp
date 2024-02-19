@@ -2,7 +2,7 @@ import asyncio
 import logging
 import sys
 
-from dothttp.log_utils import setup_logging as root_logging_setup
+from dothttp.utils.log_utils import setup_logging as root_logging_setup
 from dothttp.__version__ import __version__
 from .server import AsyncCmdServer, CmdServer, HttpServer
 

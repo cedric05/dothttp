@@ -14,14 +14,16 @@ from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
-from .js3py import ScriptResult
-from . import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME, TEXT_PLAIN, CONTENT_TYPE
-from . import eprint, Config, HttpDefBase, js3py, AWS4Auth
-from .curl_utils import to_curl
+from ..script import js3py
+
+from ..script.js3py import ScriptResult
+from ..parse import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME, TEXT_PLAIN, CONTENT_TYPE
+from ..parse import eprint, Config, HttpDefBase, AWS4Auth
+from ..utils.curl_utils import to_curl
 from .dsl_jsonparser import json_or_array_to_json
-from .json_utils import JSONEncoder
-from .parse_models import MultidefHttp, Http, HttpFileType, ScriptType
-from .utils import quote_or_unquote, apply_quote_or_unquote
+from ..utils.json_utils import JSONEncoder
+from ..models.parse_models import MultidefHttp, Http, HttpFileType, ScriptType
+from ..utils.common import quote_or_unquote, apply_quote_or_unquote
 
 JSON_ENCODER = JSONEncoder(indent=4)
 
@@ -46,13 +48,14 @@ curl_logger = logging.getLogger("curl")
 if os.path.exists(__file__):
     dir_path = os.path.join(
         os.path.dirname(
-            os.path.abspath(__file__)),
+            os.path.dirname(os.path.abspath(__file__))
+            ),
         'http.tx')
 else:
     dir_path = os.path.join(
         os.path.dirname(
             os.path.dirname(
-                os.path.abspath(__file__))),
+                os.path.dirname(os.path.abspath(__file__)))),
         'http.tx')
 dothttp_model = metamodel_from_file(dir_path)
 

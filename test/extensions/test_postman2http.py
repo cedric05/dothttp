@@ -2,7 +2,7 @@ import json
 import os
 import sys
 
-from dothttp.parse_models import HttpFileType
+from dothttp.models.parse_models import HttpFileType
 
 from dotextensions.server.handlers.postman2http import ImportPostmanCollection
 from dotextensions.server.models import Command

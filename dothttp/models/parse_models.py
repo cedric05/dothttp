@@ -3,7 +3,7 @@ import os
 from dataclasses import dataclass, field
 from typing import List, Optional, Union
 
-from .exceptions import DotHttpException
+from ..exceptions import DotHttpException
 
 @dataclass
 class NameWrap:

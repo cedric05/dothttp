@@ -11,7 +11,7 @@ from random import Random
 from types import FunctionType
 from typing import Dict, Union, List
 
-from .exceptions import HttpFileException, PropertyNotFoundException
+from ..exceptions import HttpFileException, PropertyNotFoundException
 
 base_logger = logging.getLogger('dothttp')
 

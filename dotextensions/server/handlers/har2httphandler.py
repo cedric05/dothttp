@@ -6,9 +6,9 @@ from typing import List, Iterator
 
 import requests
 
-from dothttp import HttpDef, APPLICATION_JSON, FORM_URLENCODED, MultidefHttp, Payload, Http, MULTIPART_FORM_INPUT
-from dothttp.parse_models import HttpFileType
-from dothttp.request_base import HttpFileFormatter
+from dothttp.parse import HttpDef, APPLICATION_JSON, FORM_URLENCODED, MultidefHttp, Payload, Http, MULTIPART_FORM_INPUT
+from dothttp.models.parse_models import HttpFileType
+from dothttp.parse.request_base import HttpFileFormatter
 from . import logger
 from ..models import Command, Result, BaseHandler
 from ..models.har import Harfromdict, HarRequest

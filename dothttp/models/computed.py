@@ -8,8 +8,8 @@ from requests.auth import HTTPBasicAuth, HTTPDigestAuth, AuthBase
 
 from .parse_models import *
 from .parse_models import Payload as ParsePayload
-from .constants import *
-from .utils import json_to_urlencoded_array, APPLICATION_JSON
+from ..utils.constants import *
+from ..utils.common import json_to_urlencoded_array, APPLICATION_JSON
 
 @dataclass
 class Config:

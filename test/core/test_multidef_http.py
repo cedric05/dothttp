@@ -1,6 +1,6 @@
 import requests
 
-from dothttp import PropertyNotFoundException
+from dothttp.parse import PropertyNotFoundException
 from test import TestBase
 from test.core.test_request import dir_path
 

@@ -1,8 +1,8 @@
 import os
 from typing import Union, Any
 
-from dothttp import MultidefHttp, BaseModelProcessor, Http
-from dothttp.request_base import dothttp_model
+from dothttp.parse import MultidefHttp, BaseModelProcessor, Http
+from dothttp.parse.request_base import dothttp_model
 from ..models import Command, Result, BaseHandler, DothttpTypes
 
 
