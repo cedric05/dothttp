@@ -5,7 +5,7 @@ import tempfile
 
 from dotextensions.server.handlers.har2httphandler import Har2HttpHandler
 from dotextensions.server.models import Command
-from dothttp.parse_models import HttpFileType
+from dothttp.models.parse_models import HttpFileType
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

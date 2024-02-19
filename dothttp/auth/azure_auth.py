@@ -15,8 +15,8 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.serialization import pkcs12
 
-from .exceptions import DothttpAzureAuthException
-from .parse_models import AzureAuthWrap, AzureAuthType, AzureAuthSP, AzureAuthCertificate
+from ..exceptions import DothttpAzureAuthException
+from ..models.parse_models import AzureAuthWrap, AzureAuthType, AzureAuthSP, AzureAuthCertificate
 
 AZURE_CLI_TOKEN_STORE_PATH = os.path.expanduser('~/.dothttp.azure-cli.pkl')
 
@@ -72,57 +72,63 @@ class AzureAuth(AuthBase):
             pass
     
     def __call__(self, r: PreparedRequest) -> PreparedRequest:
-        if self.azure_auth_wrap.azure_auth_type == AzureAuthType.SERVICE_PRINCIPAL:
-            self.acquire_token_silently_or_ondemand(
-                r, self.azure_auth_wrap.azure_spsecret_auth)
-            self.save_token_cache()
-        elif self.azure_auth_wrap.azure_auth_type == AzureAuthType.CERTIFICATE:
-            self.acquire_token_silently_or_ondemand(
-                r, self.azure_auth_wrap.azure_spcert_auth)
-            self.save_token_cache()
-        # For device code and cli authentication, we use the access token directly
-        # in future we can use msal to get the access token for device code
-        elif self.azure_auth_wrap.azure_auth_type in [AzureAuthType.CLI, AzureAuthType.DEVICE_CODE]:
-            access_token = None
-            expires_on = None
-            # Try to load the access token and its expiry time from a file
-            scope = self.azure_auth_wrap.azure_cli_auth.scope if self.azure_auth_wrap.azure_cli_auth else self.azure_auth_wrap.azure_device_code.scope
+        try:
+            if self.azure_auth_wrap.azure_auth_type == AzureAuthType.SERVICE_PRINCIPAL:
+                self.acquire_token_silently_or_ondemand(
+                    r, self.azure_auth_wrap.azure_spsecret_auth)
+                self.save_token_cache()
+            elif self.azure_auth_wrap.azure_auth_type == AzureAuthType.CERTIFICATE:
+                self.acquire_token_silently_or_ondemand(
+                    r, self.azure_auth_wrap.azure_spcert_auth)
+                self.save_token_cache()
+            # For device code and cli authentication, we use the access token directly
+            # in future we can use msal to get the access token for device code
+            elif self.azure_auth_wrap.azure_auth_type in [AzureAuthType.CLI, AzureAuthType.DEVICE_CODE]:
+                self.acquire_token_from_azure_cli(r)
+        except (KeyError, Exception) as ex:
+            raise DothttpAzureAuthException(message = f"unable to acquire access_token. Failed with error {ex}")
+        return r
 
-            if os.path.exists(AZURE_CLI_TOKEN_STORE_PATH):
-                request_logger.debug("azure cli token already exists, using")
-                with open(AZURE_CLI_TOKEN_STORE_PATH, 'rb') as token_file:
-                    data = pickle.load(token_file)
-                    scope_wise_store = data.get(scope, {})
-                    access_token = scope_wise_store.get('access_token', None)
-                    expires_on = scope_wise_store.get('expires_on', None)
+    def new_method(self, r):
+        access_token = None
+        expires_on = None
+            # Try to load the access token and its expiry time from a file
+        scope = self.azure_auth_wrap.azure_cli_auth.scope if self.azure_auth_wrap.azure_cli_auth else self.azure_auth_wrap.azure_device_code.scope
+
+        if os.path.exists(AZURE_CLI_TOKEN_STORE_PATH):
+            request_logger.debug("azure cli token already exists, using")
+            with open(AZURE_CLI_TOKEN_STORE_PATH, 'rb') as token_file:
+                data = pickle.load(token_file)
+                scope_wise_store = data.get(scope, {})
+                access_token = scope_wise_store.get('access_token', None)
+                expires_on = scope_wise_store.get('expires_on', None)
             # Get the current time in seconds since the Epoch
-            current_time = time.time()
+        current_time = time.time()
 
 
             # If the file does not exist or the token has expired, get a new access token
-            if not access_token or not expires_on or current_time >= expires_on:
-                request_logger.debug(
+        if not access_token or not expires_on or current_time >= expires_on:
+            request_logger.debug(
                     "azure cli token store cached not availabile or expired")
                 # get token from cli by invoking az account get-access-token
-                cmd = "az"
-                if os.name == "nt":
-                    cmd = "az.cmd"
-                result = subprocess.run(
+            cmd = "az"
+            if os.name == "nt":
+                cmd = "az.cmd"
+            result = subprocess.run(
                     [cmd, "account", "get-access-token", "--scope", scope], capture_output=True, text=True)
-                result_json = json.loads(result.stdout)
-                access_token = result_json['accessToken']
+            result_json = json.loads(result.stdout)
+            access_token = result_json['accessToken']
                 # Convert the expiresOn field to seconds since the Epoch
-                expires_on = time.mktime(time.strptime(result_json['expiresOn'], '%Y-%m-%d %H:%M:%S.%f'))
+            expires_on = time.mktime(time.strptime(result_json['expiresOn'], '%Y-%m-%d %H:%M:%S.%f'))
                 # Save the new access token and its expiry time to the file
-                with open(AZURE_CLI_TOKEN_STORE_PATH, 'wb') as token_file:
-                    scope_wise_store = dict()
-                    scope_wise_store[scope] = {
+            with open(AZURE_CLI_TOKEN_STORE_PATH, 'wb') as token_file:
+                scope_wise_store = dict()
+                scope_wise_store[scope] = {
                         'access_token': access_token, 'expires_on': expires_on}
-                    pickle.dump(scope_wise_store, token_file)
-            request_logger.debug(
+                pickle.dump(scope_wise_store, token_file)
+        request_logger.debug(
                 "computed or fetched azure cli token access bearer token and appeneded")
-            r.headers["Authorization"] = f"Bearer {access_token}"
-        return r
+        r.headers["Authorization"] = f"Bearer {access_token}"
 
     def acquire_token_silently_or_ondemand(self, r, auth_wrap: AzureAuthSP):
         kwargs = {

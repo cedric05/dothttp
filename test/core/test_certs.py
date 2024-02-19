@@ -2,8 +2,8 @@ import os
 import sys
 from unittest import skip
 
-from dothttp import PropertyNotFoundException
-from dothttp.request_base import CurlCompiler
+from dothttp.parse import PropertyNotFoundException
+from dothttp.parse.request_base import CurlCompiler
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

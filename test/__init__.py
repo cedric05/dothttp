@@ -1,7 +1,7 @@
 import unittest
 from typing import Union
 
-from dothttp.request_base import Config, RequestCompiler, CurlCompiler, HttpFileFormatter
+from dothttp.parse.request_base import Config, RequestCompiler, CurlCompiler, HttpFileFormatter
 
 
 class TestBase(unittest.TestCase):

@@ -1,6 +1,6 @@
 import os
 
-from dothttp import UndefinedHttpToExtend, ParameterException
+from dothttp.parse import UndefinedHttpToExtend, ParameterException
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

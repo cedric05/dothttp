@@ -5,7 +5,7 @@ from urllib.parse import parse_qs
 
 from requests import PreparedRequest
 
-from dothttp import property_util
+from dothttp.utils import property_util
 from test import TestBase
 from test.core.test_request import dir_path
 

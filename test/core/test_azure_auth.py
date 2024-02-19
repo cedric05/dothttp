@@ -4,10 +4,10 @@ from unittest.mock import MagicMock, patch
 
 from requests import PreparedRequest
 
-from dothttp.azure_auth import AzureAuth
-from dothttp.parse_models import AzureAuthServicePrincipal
-from dothttp.parse_models import AzureAuthWrap, AzureAuthType
-from dothttp.request_base import HttpFileFormatter  # replace with your actual module
+from dothttp.auth.azure_auth import AzureAuth
+from dothttp.models.parse_models import AzureAuthServicePrincipal
+from dothttp.models.parse_models import AzureAuthWrap, AzureAuthType
+from dothttp.parse.request_base import HttpFileFormatter  # replace with your actual module
 from test import TestBase
 
 dir_path = os.path.dirname(os.path.realpath(__file__))

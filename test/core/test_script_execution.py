@@ -1,11 +1,11 @@
 from unittest import TestCase
 
 from requests import Response
-from dothttp import HttpDef
-from dothttp import js3py
-from dothttp.js3py import ScriptExecutionPython
-from dothttp.parse_models import ScriptType
-from dothttp.property_util import PropertyProvider
+from dothttp.parse import HttpDef
+from dothttp.script import js3py
+from dothttp.script.js3py import ScriptExecutionPython
+from dothttp.models.parse_models import ScriptType
+from dothttp.utils.property_util import PropertyProvider
 from test import TestBase
 from test.core.test_request import dir_path
 

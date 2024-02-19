@@ -5,13 +5,13 @@ import urllib.parse
 from typing import Dict
 
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
-from dothttp import HttpNtlmAuth
+from dothttp.parse import HttpNtlmAuth
 
 from dotextensions.server.postman2_1 import FormParameterType, File, Mode, AuthType, Variable
-from dothttp import json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
+from dothttp.parse import json_or_array_to_json, UndefinedHttpToExtend, ParameterException, HttpDef, \
     request_logger, Payload, APPLICATION_JSON, CONTENT_TYPE, AWS4Auth, dothttp_model
-from dothttp.request_base import RequestCompiler
-from dothttp.utils import json_to_urlencoded_array
+from dothttp.parse.request_base import RequestCompiler
+from dothttp.utils.common import json_to_urlencoded_array
 from . import logger
 from .basic_handlers import RunHttpFileHandler
 from ..models import Command, Result

@@ -2,10 +2,10 @@ import os
 import tempfile
 import unittest
 
-from dothttp import dothttp_model
+from dothttp.parse import dothttp_model
 from dothttp.exceptions import HttpFileException, HttpFileSyntaxException
-from dothttp.parse_models import MultidefHttp, ImportStmt, FileName
-from dothttp import BaseModelProcessor, PropertyProvider
+from dothttp.models.parse_models import MultidefHttp, ImportStmt, FileName
+from dothttp.parse import BaseModelProcessor, PropertyProvider
 
 
 class TestBaseModelProcessor(unittest.TestCase):

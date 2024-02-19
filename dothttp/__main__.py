@@ -4,9 +4,9 @@ import sys
 
 from requests.exceptions import RequestException
 
-from dothttp.log_utils import setup_logging
+from .utils.log_utils import setup_logging
 from .exceptions import DotHttpException
-from .request_base import CurlCompiler, RequestCompiler, HttpFileFormatter, Config, eprint
+from .parse.request_base import CurlCompiler, RequestCompiler, HttpFileFormatter, Config, eprint
 
 logger = logging.getLogger('dothttp')
 

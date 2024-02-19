@@ -6,7 +6,7 @@ from unittest import skip
 from dotextensions.server.handlers.basic_handlers import RunHttpFileHandler, GetNameReferencesHandler, \
     ContentNameReferencesHandler
 from dotextensions.server.models import Command
-from dothttp.request_base import DOTHTTP_COOKIEJAR, RequestBase
+from dothttp.parse.request_base import DOTHTTP_COOKIEJAR, RequestBase
 from test import TestBase
 from test.core.test_certs import http_base, cert_base
 

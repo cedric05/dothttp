@@ -7,11 +7,11 @@ from urllib.parse import unquote, urljoin
 
 import requests
 
-from dothttp import MultidefHttp, Http, NameWrap, UrlWrap, Line, Query, Header, AuthWrap, BasicAuth, DigestAuth, \
+from dothttp.parse import MultidefHttp, Http, NameWrap, UrlWrap, Line, Query, Header, AuthWrap, BasicAuth, DigestAuth, \
     MultiPartFile, FilesWrap, TripleOrDouble, Certificate
-from dothttp.parse_models import NtlmAuthWrap, Payload, AwsAuthWrap, HttpFileType, HawkAuth
-from dothttp.request_base import HttpFileFormatter
-from dothttp.utils import APPLICATION_JSON
+from dothttp.models.parse_models import NtlmAuthWrap, Payload, AwsAuthWrap, HttpFileType, HawkAuth
+from dothttp.parse.request_base import HttpFileFormatter
+from dothttp.utils.common import APPLICATION_JSON
 from . import logger
 from ..models import Command, Result, BaseHandler
 from ..postman import Items, Auth, URLClass, POSTMAN_2, postman_collection_from_dict, AuthType, Variable, FormParameterType as FormParameterType2_0

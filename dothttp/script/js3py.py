@@ -29,10 +29,10 @@ from RestrictedPython.Eval import default_guarded_getiter
 from operator import getitem
 from faker import Faker
 
-from .exceptions import DotHttpException, PreRequestScriptException, ScriptException
-from .property_util import PropertyProvider
-from . import MIME_TYPE_JSON, HttpDef, request_logger
-from .utils import get_real_file_path
+from ..exceptions import DotHttpException, PreRequestScriptException, ScriptException
+from ..utils.property_util import PropertyProvider
+from ..parse import MIME_TYPE_JSON, HttpDef, request_logger
+from ..utils.common import get_real_file_path
 
 
 def write_guard(x):
@@ -72,7 +72,7 @@ allowed_global.update(safe_globals)
 # disable python imports
 # js2py.disable_pyimport() # so that few libraries can be imported
 
-with open(get_real_file_path("postScript.js", __file__)) as f:
+with open(get_real_file_path("../postScript.js", __file__)) as f:
     js_template = f.read()
 
 

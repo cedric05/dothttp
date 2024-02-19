@@ -1,4 +1,4 @@
-from dothttp import HttpFileException
+from dothttp.parse import HttpFileException
 
 from test import TestBase
 from test.core.test_request import dir_path

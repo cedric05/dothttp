@@ -4,10 +4,11 @@ from typing import List
 from requests import RequestException
 
 from dothttp.exceptions import DotHttpException
-from dothttp import Config, HttpDef, MultidefHttp, BaseModelProcessor, UndefinedHttpToExtend, js3py
-from dothttp.request_base import CurlCompiler, RequestCompiler, HttpFileFormatter, dothttp_model
+from dothttp.script import js3py
+from dothttp.parse import BaseModelProcessor, Config, HttpDef, MultidefHttp, UndefinedHttpToExtend
+from dothttp.parse.request_base import CurlCompiler, RequestCompiler, HttpFileFormatter, dothttp_model
 from dothttp.__version__ import __version__
-from dothttp.parse_models import ScriptType
+from dothttp.models.parse_models import ScriptType
 from . import logger
 from ..models import Command, Result, BaseHandler
 
