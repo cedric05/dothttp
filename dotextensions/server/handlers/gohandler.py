@@ -3,6 +3,7 @@ from typing import Any, Union
 
 from dothttp.parse import BaseModelProcessor, Http, MultidefHttp
 from dothttp.parse.request_base import dothttp_model
+
 from ..models import BaseHandler, Command, DothttpTypes, Result
 
 

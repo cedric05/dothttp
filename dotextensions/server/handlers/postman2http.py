@@ -32,6 +32,7 @@ from dothttp.parse import (
 )
 from dothttp.parse.request_base import HttpFileFormatter
 from dothttp.utils.common import APPLICATION_JSON
+
 from ..models import BaseHandler, Command, Result
 from ..postman import POSTMAN_2, Auth, AuthType
 from ..postman import FormParameterType as FormParameterType2_0
