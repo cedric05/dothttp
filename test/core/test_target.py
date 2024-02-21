@@ -1,34 +1,27 @@
-from dothttp.parse import HttpFileException
-
 from test import TestBase
 from test.core.test_request import dir_path
+
+from dothttp.parse import HttpFileException
 
 base_dir = f"{dir_path}/target"
 
 
 class TestTarget(TestBase):
-
     def test_target_default(self):
-        request = self.get_request(
-            file=f"{base_dir}/default_target.http"
-        )
+        request = self.get_request(file=f"{base_dir}/default_target.http")
         self.assertEqual("http://localhost:8000/get", request.url)
 
     def test_target_first_one_with_index(self):
-        request = self.get_request(
-            file=f"{base_dir}/default_target.http", target='1'
-        )
+        request = self.get_request(file=f"{base_dir}/default_target.http", target="1")
         self.assertEqual("http://localhost:8000/get", request.url)
 
     def test_target_second_one_with_index(self):
-        request = self.get_request(
-            file=f"{base_dir}/default_target.http", target=2
-        )
+        request = self.get_request(file=f"{base_dir}/default_target.http", target=2)
         self.assertEqual("http://localhost:8000/post", request.url)
 
     def test_invalid_names(self):
         with self.assertRaises(HttpFileException):
-            self.get_request(**{'file': f"{base_dir}/fails.http", 'target': 2})
+            self.get_request(**{"file": f"{base_dir}/fails.http", "target": 2})
 
     def test_target_with_names(self):
         # target with name
@@ -36,15 +29,14 @@ class TestTarget(TestBase):
             file=f"{base_dir}/target_with_names_for_few.http", target="first"
         )
         self.assertEqual(
-            "https://req.dothttp.dev/get",
-            first_target.url,
-            "first target")
+            "https://req.dothttp.dev/get", first_target.url, "first target"
+        )
         self.assertEqual("GET", first_target.method)
 
         # target second one with name
         second_target = self.get_request(
-            file=f"{base_dir}/target_with_names_for_few.http",
-            target="secondone")
+            file=f"{base_dir}/target_with_names_for_few.http", target="secondone"
+        )
         self.assertEqual("https://req.dothttp.dev/post", second_target.url)
         self.assertEqual("hi=hi2", second_target.body)
         self.assertEqual("POST", second_target.method)
@@ -61,18 +53,14 @@ class TestTarget(TestBase):
         first_target_with_name = self.get_request(
             file=f"{base_dir}/target_with_names_for_few.http", target=1
         )
-        self.assertEqual(
-            "https://req.dothttp.dev/get",
-            first_target_with_name.url)
+        self.assertEqual("https://req.dothttp.dev/get", first_target_with_name.url)
         self.assertEqual("GET", first_target_with_name.method)
 
         # target second one with index
         second_target_with_name = self.get_request(
             file=f"{base_dir}/target_with_names_for_few.http", target=2
         )
-        self.assertEqual(
-            "https://req.dothttp.dev/post",
-            second_target_with_name.url)
+        self.assertEqual("https://req.dothttp.dev/post", second_target_with_name.url)
         self.assertEqual("POST", second_target_with_name.method)
 
         # target fourth one with index

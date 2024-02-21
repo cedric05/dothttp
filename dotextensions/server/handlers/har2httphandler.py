@@ -2,17 +2,25 @@ import json
 import os
 import urllib.parse
 from pathlib import Path
-from typing import List, Iterator
+from typing import Iterator, List
 
 import requests
 
-from dothttp.parse import HttpDef, APPLICATION_JSON, FORM_URLENCODED, MultidefHttp, Payload, Http, MULTIPART_FORM_INPUT
 from dothttp.models.parse_models import HttpFileType
+from dothttp.parse import (
+    APPLICATION_JSON,
+    FORM_URLENCODED,
+    MULTIPART_FORM_INPUT,
+    Http,
+    HttpDef,
+    MultidefHttp,
+    Payload,
+)
 from dothttp.parse.request_base import HttpFileFormatter
-from . import logger
-from ..models import Command, Result, BaseHandler
+from ..models import BaseHandler, Command, Result
 from ..models.har import Harfromdict, HarRequest
 from ..utils import get_alternate_filename
+from . import logger
 
 
 def from_har(har_format: Iterator[HarRequest]) -> List[Http]:
@@ -28,14 +36,17 @@ def from_har(har_format: Iterator[HarRequest]) -> List[Http]:
             http_def.method = request.method or "GET"
             if headers := request.headers:
                 http_def.headers = dict(
-                    map(lambda header: (header.name, header.value),
+                    map(
+                        lambda header: (header.name, header.value),
                         # chrome har export
                         # is generating
                         # headers with name
                         # ":method" : "GET"
                         # ":path": "/get"
                         # don't know why
-                        filter(lambda header: not header.name.startswith(":"), headers)))
+                        filter(lambda header: not header.name.startswith(":"), headers),
+                    )
+                )
             if queryString := request.queryString:
                 http_def.query = {}
                 for query in queryString:
@@ -64,10 +75,10 @@ def from_har(har_format: Iterator[HarRequest]) -> List[Http]:
                         value = param.fileName or param.value
                         if param.contentType:
                             payload.files.append(
-                                (param.name, (None, value, param.contentType)))
+                                (param.name, (None, value, param.contentType))
+                            )
                         else:
-                            payload.files.append(
-                                (param.name, (None, value, None)))
+                            payload.files.append((param.name, (None, value, None)))
                         payload.data = postData.params
             http_def.name = request.comment
         except Exception as e:
@@ -91,35 +102,33 @@ class Har2HttpHandler(BaseHandler):
         filetype = HttpFileType.get_from_filetype(params.get("filetype", None))
         if filename:
             if not isinstance(filename, str):
-                return Result.to_error(
-                    command, "filename is not instance of string")
-            if not (os.path.isfile(filename) or (filename.startswith(
-                    "http://") or filename.startswith("https://"))):
-                return Result.to_error(
-                    command, "filename not existent or invalid link")
+                return Result.to_error(command, "filename is not instance of string")
+            if not (
+                os.path.isfile(filename)
+                or (filename.startswith("http://") or filename.startswith("https://"))
+            ):
+                return Result.to_error(command, "filename not existent or invalid link")
         if har_data:
             if not isinstance(har_data, (dict, list)):
                 return Result.to_error(command, "har is not instance of dict")
-        if (filename and har_data):
+        if filename and har_data:
             return Result.to_error(
-                command, "confused on which to pick filename or link")
+                command, "confused on which to pick filename or link"
+            )
         if not filename and not har_data:
-            return Result.to_error(
-                command, "link, har_data or filename is must")
+            return Result.to_error(command, "link, har_data or filename is must")
 
         if directory:
             if not isinstance(directory, str):
-                return Result.to_error(
-                    command, "directory is not instance of string")
+                return Result.to_error(command, "directory is not instance of string")
             if not os.path.isdir(directory):
                 return Result.to_error(command, "directory not existent")
 
         if filename:
             if filename.startswith("http"):
                 response = requests.get(filename)
-                if response.headers.get('content-type') != APPLICATION_JSON:
-                    return Result.to_error(
-                        command, "content-type should be json")
+                if response.headers.get("content-type") != APPLICATION_JSON:
+                    return Result.to_error(command, "content-type should be json")
                 har_data = response.json()
             else:
                 with open(filename) as f:
@@ -127,7 +136,8 @@ class Har2HttpHandler(BaseHandler):
                         har_data = json.load(f)
                     except BaseException:
                         return Result.to_error(
-                            command, "har file should be of json format")
+                            command, "har file should be of json format"
+                        )
         if isinstance(har_data, dict):
             har = Harfromdict(har_data)
             if not har.log or not har.log.entries:
@@ -138,18 +148,17 @@ class Har2HttpHandler(BaseHandler):
             har_requests = (HarRequest.from_dict(req) for req in har_data)
         http_list = from_har(har_requests)
         save_filename = Path(directory).joinpath(
-            f"imported.{filetype.file_exts[0]}" if not save_filename else save_filename)
+            f"imported.{filetype.file_exts[0]}" if not save_filename else save_filename
+        )
         if os.path.exists(save_filename):
             save_filename = get_alternate_filename(save_filename)
         save_filename.parent.mkdir(parents=True, exist_ok=True)
-        with open(save_filename, 'w') as f:
+        with open(save_filename, "w") as f:
             output = HttpFileFormatter.format(
-                MultidefHttp(
-                    allhttps=http_list,
-                    import_list=[]),
-                filetype=filetype)
+                MultidefHttp(allhttps=http_list, import_list=[]), filetype=filetype
+            )
             f.write(output)
         return Result.get_result(
-            command, {
-                "http": output, "filename": str(save_filename)})
+            command, {"http": output, "filename": str(save_filename)}
+        )
         # return Result.to_error(command, "har file has not requests")

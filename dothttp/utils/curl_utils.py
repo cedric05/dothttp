@@ -22,4 +22,4 @@ def to_curl(url, method, bodydata=None):
         elif v:
             flat_parts.append(quote(v))
 
-    return f'curl -X {method} --url {url} \\\n' + ' \\\n'.join(flat_parts)
+    return f"curl -X {method} --url {url} \\\n" + " \\\n".join(flat_parts)

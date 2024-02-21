@@ -3,14 +3,24 @@ from typing import List
 
 from requests import RequestException
 
-from dothttp.exceptions import DotHttpException
-from dothttp.script import js3py
-from dothttp.parse import BaseModelProcessor, Config, HttpDef, MultidefHttp, UndefinedHttpToExtend
-from dothttp.parse.request_base import CurlCompiler, RequestCompiler, HttpFileFormatter, dothttp_model
 from dothttp.__version__ import __version__
+from dothttp.exceptions import DotHttpException
 from dothttp.models.parse_models import ScriptType
+from dothttp.parse import (
+    BaseModelProcessor,
+    Config,
+    HttpDef,
+    MultidefHttp,
+    UndefinedHttpToExtend,
+)
+from dothttp.parse.request_base import (
+    CurlCompiler,
+    HttpFileFormatter,
+    RequestCompiler,
+    dothttp_model,
+)
+from ..models import BaseHandler, Command, Result
 from . import logger
-from ..models import Command, Result, BaseHandler
 
 
 class ContextConfig(Config):
@@ -24,9 +34,7 @@ class VersionHandler(BaseHandler):
         return VersionHandler.name
 
     def run(self, command: Command) -> Result:
-        return Result(id=command.id,
-                      result={
-                          "version": __version__})
+        return Result(id=command.id, result={"version": __version__})
 
 
 class RunHttpFileHandler(BaseHandler):
@@ -41,30 +49,33 @@ class RunHttpFileHandler(BaseHandler):
             if config.curl:
                 req = self.get_curl_comp(config)
                 result = req.get_curl_output()
-                result = Result(id=command.id, result={
-                    "body": result,
-                    "headers": {
-                        "Content-Type": mimetypes.types_map['.sh'],
-                    }
-                })
+                result = Result(
+                    id=command.id,
+                    result={
+                        "body": result,
+                        "headers": {
+                            "Content-Type": mimetypes.types_map[".sh"],
+                        },
+                    },
+                )
             else:
                 comp = self.get_request_comp(config)
                 result = self.get_request_result(command, comp)
         except DotHttpException as exc:
-            logger.error(f'dothttp exception happened {exc}', exc_info=True)
-            result = Result(id=command.id,
-                            result={
-                                "error_message": exc.message, "error": True})
+            logger.error(f"dothttp exception happened {exc}", exc_info=True)
+            result = Result(
+                id=command.id, result={"error_message": exc.message, "error": True}
+            )
         except RequestException as exc:
-            logger.error(f'exception from requests {exc}', exc_info=True)
-            result = Result(id=command.id,
-                            result={
-                                "error_message": str(exc), "error": True})
+            logger.error(f"exception from requests {exc}", exc_info=True)
+            result = Result(
+                id=command.id, result={"error_message": str(exc), "error": True}
+            )
         except Exception as exc:
-            logger.error(f'unknown error happened {exc}', exc_info=True)
-            result = Result(id=command.id,
-                            result={
-                                "error_message": str(exc), "error": True})
+            logger.error(f"unknown error happened {exc}", exc_info=True)
+            result = Result(
+                id=command.id, result={"error_message": str(exc), "error": True}
+            )
 
         return result
 
@@ -75,14 +86,10 @@ class RunHttpFileHandler(BaseHandler):
         params = command.params
         filename = params.get("file")
         envs = params.get("env", [])
-        target = params.get("target", '1')
+        target = params.get("target", "1")
         nocookie = params.get("nocookie", False)
         curl = params.get("curl", False)
-        properties = [
-            f"{i}={j}" for i,
-            j in params.get(
-                'properties',
-                {}).items()]
+        properties = [f"{i}={j}" for i, j in params.get("properties", {}).items()]
         content = params.get("content", None)
         contexts = params.get("contexts")
         property_file = params.get("property-file", None)
@@ -104,7 +111,8 @@ class RunHttpFileHandler(BaseHandler):
             format=False,
             info=False,
             target=target,
-            content=content)
+            content=content,
+        )
         config.contexts = contexts
         return config
 
@@ -124,29 +132,29 @@ class RunHttpFileHandler(BaseHandler):
             "response": {
                 "body": body,  # for binary out, it will fail, check for alternatives
                 "output_file": output or "",
-                **self._get_resp_data(resp)
+                **self._get_resp_data(resp),
             },
             "script_result": script_result,
         }
         if resp.history:
-            response_data["history"] = [self._get_resp_data(
-                hist_item) for hist_item in resp.history]
+            response_data["history"] = [
+                self._get_resp_data(hist_item) for hist_item in resp.history
+            ]
         # will be used for response
         data = {}
-        data.update(response_data['response'])  # deprecated
+        data.update(response_data["response"])  # deprecated
         data.update(response_data)
-        if not comp.args.no_cookie and 'cookie' in resp.request.headers:
+        if not comp.args.no_cookie and "cookie" in resp.request.headers:
             # redirects can add cookies
-            comp.httpdef.headers['cookie'] = resp.request.headers['cookie']
+            comp.httpdef.headers["cookie"] = resp.request.headers["cookie"]
         try:
             data.update({"http": self.get_http_from_req(comp.httpdef)})
         except Exception as e:
-            logger.error(
-                "ran into error regenerating http def from parsed object")
+            logger.error("ran into error regenerating http def from parsed object")
             data.update(
-                {"http": f"ran into error \n Exception: `{e}` message:{e.args}"})
-        result = Result(id=command.id,
-                        result=data)
+                {"http": f"ran into error \n Exception: `{e}` message:{e.args}"}
+            )
+        result = Result(id=command.id, result=data)
         return result
 
     def _get_resp_data(self, resp):
@@ -154,7 +162,7 @@ class RunHttpFileHandler(BaseHandler):
             "headers": {key: value for key, value in resp.headers.items()},
             "status": resp.status_code,
             "method": resp.request.method,
-            "url": resp.url
+            "url": resp.url,
         }
 
     def get_request_comp(self, config):
@@ -162,9 +170,7 @@ class RunHttpFileHandler(BaseHandler):
 
     @staticmethod
     def get_http_from_req(request: HttpDef):
-        http_def = MultidefHttp(
-            import_list=[], allhttps=[
-                request.get_http_from_req()])
+        http_def = MultidefHttp(import_list=[], allhttps=[request.get_http_from_req()])
         return HttpFileFormatter.format(http_def)
 
 
@@ -189,8 +195,7 @@ class ContentBase(BaseModelProcessor):
         ##
         # context has varibles defined
         # for resolving purpose, including them into content
-        self.content = self.content + CONTEXT_SEP + CONTEXT_SEP.join(
-            self.args.contexts)
+        self.content = self.content + CONTEXT_SEP + CONTEXT_SEP.join(self.args.contexts)
 
     def select_target(self):
         try:
@@ -207,7 +212,9 @@ class ContentBase(BaseModelProcessor):
                     self.model.allhttps = self.model.allhttps + model.allhttps
                     if model.import_list and model.import_list.filename:
                         if self.model.import_list and self.model.import_list.filename:
-                            self.model.import_list.filename += model.import_list.filename
+                            self.model.import_list.filename += (
+                                model.import_list.filename
+                            )
                         else:
                             self.model.import_list = model.import_list
                         self.load_imports()
@@ -217,8 +224,7 @@ class ContentBase(BaseModelProcessor):
                     # contexts, can not always be correct syntax
                     # in such scenarios, don't complain, try to resolve with
                     # next contexts
-                    logger.info(
-                        "ignoring exception, context is not looking good")
+                    logger.info("ignoring exception, context is not looking good")
             raise ex
 
 
@@ -270,30 +276,29 @@ class GetNameReferencesHandler(BaseHandler):
         try:
             result = self.execute(command, filename)
         except DotHttpException as ex:
-            result = Result(id=command.id,
-                            result={
-                                "error_message": ex.message, "error": True})
+            result = Result(
+                id=command.id, result={"error_message": ex.message, "error": True}
+            )
         except Exception as e:
-            result = Result(id=command.id,
-                            result={
-                                "error_message": str(e), "error": True})
+            result = Result(
+                id=command.id, result={"error_message": str(e), "error": True}
+            )
         return result
 
     def execute(self, command: Command, filename):
         with open(filename) as f:
             http_data = f.read()
-            all_names, all_urls,  imported_names, imported_urls = self.parse_n_get(
-                http_data, filename)
+            all_names, all_urls, imported_names, imported_urls = self.parse_n_get(
+                http_data, filename
+            )
             result = Result(
                 id=command.id,
                 result={
                     "names": all_names,
                     "urls": all_urls,
-                    "imports": {
-                        "names": imported_names,
-                        "urls": imported_urls
-                    }
-                })
+                    "imports": {"names": imported_names, "urls": imported_urls},
+                },
+            )
         return result
 
     def parse_n_get(self, http_data, filename: str):
@@ -303,10 +308,11 @@ class GetNameReferencesHandler(BaseHandler):
         imported_names = []
         imported_urls = []
         self.get_for_http(model.allhttps, all_names, all_urls)
-        for new_model, _content in BaseModelProcessor._get_models_from_import(model, filename):
-            self.get_for_http(new_model.allhttps,
-                              imported_names, imported_urls)
-        return all_names, all_urls,  imported_names, imported_urls
+        for new_model, _content in BaseModelProcessor._get_models_from_import(
+            model, filename
+        ):
+            self.get_for_http(new_model.allhttps, imported_names, imported_urls)
+        return all_names, all_urls, imported_names, imported_urls
 
     def get_for_http(self, allhttps, all_names, all_urls):
         for index, http in enumerate(allhttps):
@@ -319,16 +325,16 @@ class GetNameReferencesHandler(BaseHandler):
                 end = http._tx_position_end
                 name = str(index + 1)
             name = {
-                'name': name,
-                'method': http.urlwrap.method,
-                'start': start,
-                'end': end
+                "name": name,
+                "method": http.urlwrap.method,
+                "start": start,
+                "end": end,
             }
             url = {
-                'url': http.urlwrap.url,
-                'method': http.urlwrap.method or 'GET',
-                'start': http.urlwrap._tx_position,
-                'end': http.urlwrap._tx_position_end,
+                "url": http.urlwrap.url,
+                "method": http.urlwrap.method or "GET",
+                "start": http.urlwrap._tx_position,
+                "end": http.urlwrap._tx_position_end,
             }
             all_names.append(name)
             all_urls.append(url)
@@ -343,12 +349,17 @@ class ContentNameReferencesHandler(GetNameReferencesHandler):
     def execute(self, command, filename):
         http_data = command.params.get("content", "")
         context = command.params.get("context", [])
-        all_names, all_urls,  imported_names, imported_urls = self.parse_n_get(
-            http_data, filename)
+        all_names, all_urls, imported_names, imported_urls = self.parse_n_get(
+            http_data, filename
+        )
         for context_context in context:
             try:
-                _all_names, _all_urls,  _imported_names, _imported_urls = self.parse_n_get(
-                    context_context, filename)
+                (
+                    _all_names,
+                    _all_urls,
+                    _imported_names,
+                    _imported_urls,
+                ) = self.parse_n_get(context_context, filename)
                 imported_names += _all_names + _imported_names
                 imported_urls += _all_urls + _imported_urls
             except:
@@ -358,9 +369,7 @@ class ContentNameReferencesHandler(GetNameReferencesHandler):
             result={
                 "names": all_names,
                 "urls": all_urls,
-                "imports": {
-                    "names": imported_names,
-                    "urls": imported_urls
-                }
-            })
+                "imports": {"names": imported_names, "urls": imported_urls},
+            },
+        )
         return result

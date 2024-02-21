@@ -4,7 +4,7 @@ MIME_TYPE_JSON = "application/json"
 FORM_URLENCODED = "application/x-www-form-urlencoded"
 MULTIPART_FORM_INPUT = "multipart/form-data"
 TEXT_PLAIN = "text/plain"
-CONTENT_TYPE = 'content-type'
+CONTENT_TYPE = "content-type"
 
 UNIX_SOCKET_SCHEME = "http+unix"
 
@@ -30,6 +30,7 @@ try:
     from jsonschema import validate
 except ImportError:
     import json
+
     validate = None
 
 try:
@@ -47,4 +48,3 @@ try:
     from requests_hawk import HawkAuth as RequestsHawkAuth
 except BaseException:
     RequestsHawkAuth = None
-

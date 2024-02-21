@@ -6,24 +6,32 @@ APPLICATION_JSON = "application/json"
 CONTENT_TYPE = "content-type"
 
 
-def get_real_file_path(path='http.tx', current_file=__file__, ):
+def get_real_file_path(
+    path="http.tx",
+    current_file=__file__,
+):
     if os.path.exists(current_file):
         tx_model_path = os.path.join(
-            os.path.dirname(
-                os.path.abspath(current_file)), path)
+            os.path.dirname(os.path.abspath(current_file)), path
+        )
     else:
         tx_model_path = os.path.join(
-            os.path.dirname(
-                os.path.dirname(
-                    os.path.abspath(current_file))),
-            path)
+            os.path.dirname(os.path.dirname(os.path.abspath(current_file))), path
+        )
     return tx_model_path
 
 
 def triple_or_double_tostring(list_of_triple_or_double, update_content_func):
     return "".join(
-        [update_content_func(i.triple[3:-3]) if i.triple else update_content_func(i.str) for i in
-         list_of_triple_or_double])
+        [
+            (
+                update_content_func(i.triple[3:-3])
+                if i.triple
+                else update_content_func(i.str)
+            )
+            for i in list_of_triple_or_double
+        ]
+    )
 
 
 def quote_or_unquote(line: str):
@@ -47,7 +55,7 @@ def json_to_urlencoded_array(data):
     # but by doing encoding and decoding is not approach
     result = []
     for k, vs in to_key_val_list(data):
-        if isinstance(vs, (str, bytes)) or not hasattr(vs, '__iter__'):
+        if isinstance(vs, (str, bytes)) or not hasattr(vs, "__iter__"):
             vs = [vs]
         for v in vs:
             if v is not None:

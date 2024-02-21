@@ -24,14 +24,11 @@ class Result:
     @staticmethod
     def to_error(command: Command, error_message: str):
         return Result(
-            id=command.id,
-            result={
-                "error": True,
-                "error_message": error_message})
+            id=command.id, result={"error": True, "error_message": error_message}
+        )
 
 
 class BaseHandler:
-
     def get_method(self):
         raise NotImplementedError
 

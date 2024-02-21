@@ -1,3 +1,3 @@
 import logging
 
-logger = logging.getLogger('handler')
+logger = logging.getLogger("handler")

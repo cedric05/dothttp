@@ -1,12 +1,11 @@
 import json
 import os
 import sys
-
-from dothttp.models.parse_models import HttpFileType
+from test import TestBase
 
 from dotextensions.server.handlers.postman2http import ImportPostmanCollection
 from dotextensions.server.models import Command
-from test import TestBase
+from dothttp.models.parse_models import HttpFileType
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 postman_dir = f"{dir_path}/postman"
@@ -18,17 +17,14 @@ class FileExecute(TestBase):
         self.maxDiff = 10000
         self.execute_handler = ImportPostmanCollection()
 
-    def compare(self,
-                link,
-                file_to_compare, filetype=HttpFileType.Httpfile.file_type):
+    def compare(self, link, file_to_compare, filetype=HttpFileType.Httpfile.file_type):
         print(f"running for ${link} comparing with file ${file_to_compare}")
-        response = self.execute_handler.run(Command(
-            method=ImportPostmanCollection.name,
-            params={
-                "link": link,
-                "filetype": filetype
-            },
-            id=1)
+        response = self.execute_handler.run(
+            Command(
+                method=ImportPostmanCollection.name,
+                params={"link": link, "filetype": filetype},
+                id=1,
+            )
         )
         # -------------------------------------------------------------------------------------
         # # For Linux
@@ -45,22 +41,24 @@ class FileExecute(TestBase):
         # with open(os.path.join(fixtures_dir, file_to_compare), 'w') as f:
         #     json.dump(response.result, f)
         # -------------------------------------------------------------------------------------
-        with open(os.path.join(fixtures_dir, file_to_compare), 'r') as f:
+        with open(os.path.join(fixtures_dir, file_to_compare), "r") as f:
             if sys.platform.startswith("windows"):
                 self.assertEqual(json.load(f), response.result)
             else:
-                if ('error' in response.result):
+                if "error" in response.result:
                     return self.assertEqual(json.load(f), response.result)
                 result_normalize = {}
                 for file in response.result["files"]:
-                    result_normalize[file.replace(
-                        '/', "\\")] = response.result["files"][file]
+                    result_normalize[file.replace("/", "\\")] = response.result[
+                        "files"
+                    ][file]
                 self.assertEqual(json.load(f), {"files": result_normalize})
 
     def test_base(self):
         self.compare(
             link="https://raw.githubusercontent.com/postmanlabs/newman/v5.2.2/test/integration/dynamic-var-replacement.postman_collection.json",
-            file_to_compare="fixtures.json")
+            file_to_compare="fixtures.json",
+        )
 
     def test_more(self):
         links = [
@@ -103,13 +101,10 @@ class FileExecute(TestBase):
             f"{postman_dir}/descriptionobject.postman_collection.json",
             f"{postman_dir}/ntlm.postman_collection.json",
             f"{postman_dir}/multipart.postmancollection.json",
-            f"{postman_dir}/dottedhost.postman_collection.json"]
+            f"{postman_dir}/dottedhost.postman_collection.json",
+        ]
         for link in links:
-            self.compare(
-                link,
-                os.path.join(
-                    fixtures_dir,
-                    os.path.basename(link)))
+            self.compare(link, os.path.join(fixtures_dir, os.path.basename(link)))
         #
 
     def test_notebook(self):
@@ -118,6 +113,7 @@ class FileExecute(TestBase):
         self.compare(
             collection,
             os.path.join(
-                fixtures_dir,
-                "multi-level-folders-v2.postman_collection.httpbook.json"),
-            filetype=HttpFileType.Notebookfile.file_type)
+                fixtures_dir, "multi-level-folders-v2.postman_collection.httpbook.json"
+            ),
+            filetype=HttpFileType.Notebookfile.file_type,
+        )

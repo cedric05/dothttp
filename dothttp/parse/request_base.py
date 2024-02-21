@@ -4,26 +4,34 @@ import os
 from http.cookiejar import LWPCookieJar
 from pprint import pprint
 from typing import Union
-from urllib.parse import urlparse, unquote, urlunparse
+from urllib.parse import unquote, urlparse, urlunparse
 
 import jstyleson as json
-from requests import PreparedRequest, Session, Response
+from requests import PreparedRequest, Response, Session
+
 # this is bad, loading private stuff. find a better way
-from requests.auth import HTTPBasicAuth, HTTPDigestAuth, CONTENT_TYPE_FORM_URLENCODED
+from requests.auth import CONTENT_TYPE_FORM_URLENCODED, HTTPBasicAuth, HTTPDigestAuth
 from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
-from ..script import js3py
-
-from ..script.js3py import ScriptResult
-from ..parse import APPLICATION_JSON, MIME_TYPE_JSON, UNIX_SOCKET_SCHEME, TEXT_PLAIN, CONTENT_TYPE
-from ..parse import eprint, Config, HttpDefBase, AWS4Auth
+from ..models.parse_models import Http, HttpFileType, MultidefHttp, ScriptType
+from ..parse import (
+    APPLICATION_JSON,
+    CONTENT_TYPE,
+    MIME_TYPE_JSON,
+    TEXT_PLAIN,
+    UNIX_SOCKET_SCHEME,
+    AWS4Auth,
+    Config,
+    HttpDefBase,
+    eprint,
+)
+from ..script import ScriptResult
+from ..utils.common import apply_quote_or_unquote, quote_or_unquote
 from ..utils.curl_utils import to_curl
-from .dsl_jsonparser import json_or_array_to_json
 from ..utils.json_utils import JSONEncoder
-from ..models.parse_models import MultidefHttp, Http, HttpFileType, ScriptType
-from ..utils.common import quote_or_unquote, apply_quote_or_unquote
+from .dsl_jsonparser import json_or_array_to_json
 
 JSON_ENCODER = JSONEncoder(indent=4)
 
@@ -40,23 +48,20 @@ except ImportError:
     # in wasm phase, it will not be available, and can be ignored
     pass
 
-DOTHTTP_COOKIEJAR = os.path.expanduser('~/.dothttp.cookiejar')
+DOTHTTP_COOKIEJAR = os.path.expanduser("~/.dothttp.cookiejar")
 base_logger = logging.getLogger("dothttp")
 request_logger = logging.getLogger("request")
 curl_logger = logging.getLogger("curl")
 
 if os.path.exists(__file__):
     dir_path = os.path.join(
-        os.path.dirname(
-            os.path.dirname(os.path.abspath(__file__))
-            ),
-        'http.tx')
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "http.tx"
+    )
 else:
     dir_path = os.path.join(
-        os.path.dirname(
-            os.path.dirname(
-                os.path.dirname(os.path.abspath(__file__)))),
-        'http.tx')
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "http.tx",
+    )
 dothttp_model = metamodel_from_file(dir_path)
 
 
@@ -67,7 +72,8 @@ def get_new_session():
     session = Session()
     if requests_unixsocket:
         from requests_unixsocket.adapters import UnixAdapter
-        session.mount('http+unix://', UnixAdapter())
+
+        session.mount("http+unix://", UnixAdapter())
     return session
 
 
@@ -87,13 +93,12 @@ class RequestBase(HttpDefBase):
         """
         if self.args.no_cookie:
             cookie = None
-            request_logger.debug(f'cookies set to `{self.args.no_cookie}`')
+            request_logger.debug(f"cookies set to `{self.args.no_cookie}`")
         else:
             if RequestBase.global_cookie_jar:
                 return RequestBase.global_cookie_jar
             cookie = LWPCookieJar(DOTHTTP_COOKIEJAR)
-            request_logger.debug(
-                f'cookie {cookie} loaded from {DOTHTTP_COOKIEJAR}')
+            request_logger.debug(f"cookie {cookie} loaded from {DOTHTTP_COOKIEJAR}")
             try:
                 if not os.path.exists(DOTHTTP_COOKIEJAR):
                     cookie.save()
@@ -141,16 +146,15 @@ class RequestBase(HttpDefBase):
 
 
 class CurlCompiler(RequestBase):
-
     def run(self):
         curl_req = self.get_curl_output()
         output = self.get_output()
-        if 'b' in output.mode:
+        if "b" in output.mode:
             curl_req = curl_req.encode()
         output.write(curl_req)
         if output.fileno() != 1:
             output.close()
-        curl_logger.debug(f'curl request generation completed successfully')
+        curl_logger.debug(f"curl request generation completed successfully")
 
     def get_curl_output(self):
         prep = self.get_request()
@@ -165,11 +169,10 @@ class CurlCompiler(RequestBase):
             elif isinstance(auth, AWS4Auth):
                 for header_key, header_value in prep.headers.items():
                     # include only aws headers
-                    if header_key.startswith(
-                            "x-amz") or header_key.lower().startswith("authorization"):
-                        parts += [('-H',
-                                   '{0}: {1}'.format(header_key,
-                                                     header_value))]
+                    if header_key.startswith("x-amz") or header_key.lower().startswith(
+                        "authorization"
+                    ):
+                        parts += [("-H", "{0}: {1}".format(header_key, header_value))]
 
         if certificate := self.httpdef.certificate:
             parts.append(("--cert", f"{certificate[0]}"))
@@ -186,39 +189,42 @@ class CurlCompiler(RequestBase):
         if self.http.payload:
             contenttype = None
             if self.http.payload.file:
-                payload_parts += [('--data', "@" +
-                                   self.get_updated_content(self.http.payload.file))]
+                payload_parts += [
+                    ("--data", "@" + self.get_updated_content(self.http.payload.file))
+                ]
             elif self.http.payload.fileswrap:
                 if payload.files:
                     for file in payload.files:
                         if isinstance(file[1][1], str):
-                            payload_parts.append(
-                                ('--form', file[0] + "=" + file[1][1]))
+                            payload_parts.append(("--form", file[0] + "=" + file[1][1]))
                         else:
                             payload_parts.append(
-                                ('--form', file[0] + "=@" + file[1][1].name))
+                                ("--form", file[0] + "=@" + file[1][1].name)
+                            )
             elif self.http.payload.json:
                 dumps = json.dumps(payload.json, indent=4)
                 contenttype = APPLICATION_JSON
-                payload_parts += [('-d', dumps)]
+                payload_parts += [("-d", dumps)]
             elif self.http.payload.datajson:
-                payload_parts += [('-d', prep.body)]
+                payload_parts += [("-d", prep.body)]
                 contenttype = CONTENT_TYPE_FORM_URLENCODED
             else:
-                payload_parts += [('-d', payload.data)]
+                payload_parts += [("-d", payload.data)]
                 contenttype = TEXT_PLAIN
-            if payload.header and contenttype and CONTENT_TYPE not in self.httpdef.headers:
-                self.httpdef.headers['content-type'] = payload.header
+            if (
+                payload.header
+                and contenttype
+                and CONTENT_TYPE not in self.httpdef.headers
+            ):
+                self.httpdef.headers["content-type"] = payload.header
         # there few headers which set dynamically (basically auth)
         # so set headers in the end
         # if isinstance(self.httpdef.headers, AWS4Auth):
         for k, v in sorted(self.httpdef.headers.items()):
-            parts += [('-H', '{0}: {1}'.format(k, v))]
+            parts += [("-H", "{0}: {1}".format(k, v))]
 
-        if 'cookie' in prep.headers:
-            parts += [('-H',
-                       '{0}: {1}'.format('cookie',
-                                         prep.headers['cookie']))]
+        if "cookie" in prep.headers:
+            parts += [("-H", "{0}: {1}".format("cookie", prep.headers["cookie"]))]
 
         url = prep.url
 
@@ -233,8 +239,7 @@ class CurlCompiler(RequestBase):
             # scheme will be changed to 'http:/'
             # netlock will be added by '--unix-socket /var/run/docker.sock'
             #
-            url = urlunparse(
-                ["http", "localhost", path, params, query, fragment])
+            url = urlunparse(["http", "localhost", path, params, query, fragment])
 
         parts += payload_parts
         curl_req = to_curl(url=url, method=prep.method, bodydata=parts)
@@ -246,7 +251,6 @@ class CurlCompiler(RequestBase):
 # this is just to record history or finalized version of http file (not to
 # be used for any other purpose)
 class HttpFileFormatter(RequestBase):
-
     def get_updated_content(self, content):
         return content
 
@@ -266,7 +270,11 @@ class HttpFileFormatter(RequestBase):
         if http.namewrap and http.namewrap.name:
             quote_type, name = quote_or_unquote(http.namewrap.name)
             output_str += f"@name({quote_type}{name}{quote_type})"
-            output_str += f" : {apply_quote_or_unquote(http.namewrap.base)}{new_line}" if http.namewrap.base else new_line
+            output_str += (
+                f" : {apply_quote_or_unquote(http.namewrap.base)}{new_line}"
+                if http.namewrap.base
+                else new_line
+            )
         if http.extra_args:
             for extra_arg in http.extra_args:
                 if extra_arg.clear:
@@ -278,14 +286,14 @@ class HttpFileFormatter(RequestBase):
         if certificate := http.certificate:
             if hasattr(certificate, "cert") and certificate.cert:
                 if certificate.cert and certificate.key:
-                    output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)}, key={apply_quote_or_unquote(certificate.key)})'
+                    output_str += f"{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)}, key={apply_quote_or_unquote(certificate.key)})"
                 elif certificate.cert:
-                    output_str += f'{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)})'
+                    output_str += f"{new_line}certificate(cert={apply_quote_or_unquote(certificate.cert)})"
             if hasattr(certificate, "p12_file") and certificate.p12_file:
                 if certificate.p12_file and certificate.password:
-                    output_str += f'{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)}, password={apply_quote_or_unquote(certificate.password)})'
+                    output_str += f"{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)}, password={apply_quote_or_unquote(certificate.password)})"
                 else:
-                    output_str += f'{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)})'
+                    output_str += f"{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)})"
         if auth_wrap := http.authwrap:
             if basic_auth := auth_wrap.basic_auth:
                 output_str += f'{new_line}basicauth("{basic_auth.username}", "{basic_auth.password}")'
@@ -310,6 +318,7 @@ class HttpFileFormatter(RequestBase):
                 else:
                     output_str += f'{new_line}azurecli( scope = "{azure_auth.scope}")'
         if lines := http.lines:
+
             def check_for_quotes(line):
                 quote_type, value = quote_or_unquote(line.header.value)
                 return f'"{line.header.key}": {quote_type}{value}{quote_type}'
@@ -318,23 +327,35 @@ class HttpFileFormatter(RequestBase):
                 map(
                     check_for_quotes,
                     filter(
-                        lambda line: line.header and line.header.value and line.header.key and isinstance(
-                            line.header.value,
-                            str),
-                        lines)))
+                        lambda line: line.header
+                        and line.header.value
+                        and line.header.key
+                        and isinstance(line.header.value, str),
+                        lines,
+                    ),
+                )
+            )
             if headers:
                 output_str += f"\n{headers}"
 
-            query = new_line.join(map(query_to_http, filter(
-                lambda line: line.query and isinstance(line.query.value, str), lines)))
+            query = new_line.join(
+                map(
+                    query_to_http,
+                    filter(
+                        lambda line: line.query and isinstance(line.query.value, str),
+                        lines,
+                    ),
+                )
+            )
             if query:
-                output_str += f'\n{query}'
+                output_str += f"\n{query}"
         if payload := http.payload:
             p = ""
             mime_type = payload.type
             if payload.data:
                 data = "".join(
-                    [i.triple[3:-3] if i.triple else i.str for i in payload.data])
+                    [i.triple[3:-3] if i.triple else i.str for i in payload.data]
+                )
                 if '"' in data and "'" not in data:
                     data = f"'{data}'"
                 elif '"' not in data and "'" in data:
@@ -346,24 +367,26 @@ class HttpFileFormatter(RequestBase):
                 p = f'text({data}{(" ," + mime_type) if mime_type else ""})'
             if datajson := payload.datajson:
                 parsed_data = json_or_array_to_json(datajson, lambda a: a)
-                p = f'urlencoded({json.dumps(parsed_data, indent=4)})'
+                p = f"urlencoded({json.dumps(parsed_data, indent=4)})"
             elif filetype := payload.file:
                 p = f'< "{filetype}"  {(" ;" + mime_type) if mime_type else ""}'
             elif json_data := payload.json:
                 parsed_data = json_or_array_to_json(json_data, lambda a: a)
-                p = f'json({JSON_ENCODER.encode(parsed_data)})'
+                p = f"json({JSON_ENCODER.encode(parsed_data)})"
             elif files_wrap := payload.fileswrap:
+
                 def function(multipart):
                     quote, _ = quote_or_unquote(multipart.path)
-                    multipart_content_type = f' ; {quote}{multipart.type}{quote}' if multipart.type else ""
-                    return f'{quote}{multipart.name}{quote} < {quote}{multipart.path}{quote}{multipart_content_type}'
+                    multipart_content_type = (
+                        f" ; {quote}{multipart.type}{quote}" if multipart.type else ""
+                    )
+                    return f"{quote}{multipart.name}{quote} < {quote}{multipart.path}{quote}{multipart_content_type}"
 
-                p2 = ",\n\t".join(map(function,
-                                      files_wrap.files))
+                p2 = ",\n\t".join(map(function, files_wrap.files))
                 p = f"multipart({new_line}\t{p2}{new_line})"
-            output_str += f'{new_line}{p}'
+            output_str += f"{new_line}{p}"
         if output := http.output:
-            output_str += f'{new_line}>> {output.output}'
+            output_str += f"{new_line}>> {output.output}"
         if http.script_wrap and http.script_wrap.script:
             if http.script_wrap.lang == ScriptType.PYTHON.value:
                 script_lang = " python"
@@ -372,8 +395,13 @@ class HttpFileFormatter(RequestBase):
             if http.script_wrap.script.startswith("> {%"):
                 script_syntax = http.script_wrap.script
             else:
-                script_syntax = "> {%" + new_line * 2 + \
-                    http.script_wrap.script + new_line * 2 + "%}"
+                script_syntax = (
+                    "> {%"
+                    + new_line * 2
+                    + http.script_wrap.script
+                    + new_line * 2
+                    + "%}"
+                )
             output_str += new_line * 2 + script_syntax + script_lang + new_line * 3
         else:
             output_str += new_line * 3
@@ -383,12 +411,14 @@ class HttpFileFormatter(RequestBase):
     def apply_httpbook(model: MultidefHttp):
         arr = []
         for http in model.allhttps:
-            arr.append({
-                "kind": 2,
-                "language": "dothttp-vscode",
-                "value": HttpFileFormatter.format_http(http),
-                "outputs": []
-            })
+            arr.append(
+                {
+                    "kind": 2,
+                    "language": "dothttp-vscode",
+                    "value": HttpFileFormatter.format_http(http),
+                    "outputs": [],
+                }
+            )
         return json.dumps(arr)
 
     @staticmethod
@@ -409,34 +439,32 @@ class HttpFileFormatter(RequestBase):
         if self.args.stdout:
             print(formatted)
         else:
-            with open(self.args.file, 'w') as f:
+            with open(self.args.file, "w") as f:
                 f.write(formatted)
 
 
 def query_to_http(line):
     quote_type = quote_or_unquote(line.query.value)[0]
-    return f'? {quote_type}{line.query.key}{quote_type}= {quote_type}{line.query.value}{quote_type}'
+    return f"? {quote_type}{line.query.key}{quote_type}= {quote_type}{line.query.value}{quote_type}"
 
 
 class RequestCompiler(RequestBase):
-
     def run(self):
         self.load_def()
         resp = self.get_response()
         self.print_req_info(resp.request)
         for hist_resp in resp.history:
-            self.print_req_info(hist_resp, '<')
+            self.print_req_info(hist_resp, "<")
             request_logger.debug(
                 f"server with url response {hist_resp}, status_code "
-                f"{hist_resp.status_code}, url: {hist_resp.url}")
+                f"{hist_resp.status_code}, url: {hist_resp.url}"
+            )
         if 400 <= resp.status_code:
-            request_logger.error(
-                f"server with url response {resp.status_code}")
-            eprint(
-                f"server responded with non 2XX code. code: {resp.status_code}")
-        self.print_req_info(resp, '<')
+            request_logger.error(f"server with url response {resp.status_code}")
+            eprint(f"server responded with non 2XX code. code: {resp.status_code}")
+        self.print_req_info(resp, "<")
         self.write_to_output(resp)
-        request_logger.debug(f'request executed completely')
+        request_logger.debug(f"request executed completely")
         script_result = self.script_execution.execute_test_script(resp=resp)
         self.print_script_result(script_result)
         return resp
@@ -456,21 +484,28 @@ class RequestCompiler(RequestBase):
             print("\n##TESTS:\n")
             for test in script_result.tests:
                 print(
-                    f"Test: {test.name}  {'success' if test.success else 'failure!!'}")
+                    f"Test: {test.name}  {'success' if test.success else 'failure!!'}"
+                )
                 if test.result:
                     print(f"result={test.result}")
                 if test.error:
                     print(f"{test.error}")
         print("\n------------")
         # TODO print tests output individually
-        request_logger.debug(f'script execution result {script_result}')
+        request_logger.debug(f"script execution result {script_result}")
 
     def write_to_output(self, resp):
         output = self.get_output()
-        if hasattr(output, 'mode') and 'b' in output.mode:
-            def func(data): return output.write(data)
+        if hasattr(output, "mode") and "b" in output.mode:
+
+            def func(data):
+                return output.write(data)
+
         else:
-            def func(data): return output.write(data.decode())
+
+            def func(data):
+                return output.write(data.decode())
+
         for data in resp.iter_content(1024):
             func(data)
         try:
@@ -478,7 +513,8 @@ class RequestCompiler(RequestBase):
                 output.close()
         except BaseException:
             request_logger.warning(
-                "not able to close, mostly happens while testing in pycharm")
+                "not able to close, mostly happens while testing in pycharm"
+            )
             eprint("output file close failed")
 
     def get_response(self):
@@ -486,15 +522,21 @@ class RequestCompiler(RequestBase):
         request = self.get_request()
         session.cookies = request._cookies
         if self.httpdef.p12:
-            session.mount(request.url,
-                          Pkcs12Adapter(pkcs12_filename=self.httpdef.p12[0],
-                                        pkcs12_password=self.httpdef.p12[1]))
+            session.mount(
+                request.url,
+                Pkcs12Adapter(
+                    pkcs12_filename=self.httpdef.p12[0],
+                    pkcs12_password=self.httpdef.p12[1],
+                ),
+            )
         try:
-            resp: Response = session.send(request, cert=self.httpdef.certificate,
-                                          verify=not self.httpdef.allow_insecure,
-                                          proxies=self.httpdef.proxy
-                                          # stream=True
-                                          )
+            resp: Response = session.send(
+                request,
+                cert=self.httpdef.certificate,
+                verify=not self.httpdef.allow_insecure,
+                proxies=self.httpdef.proxy,
+                # stream=True
+            )
         except UnicodeEncodeError:
             # for Chinese, smiley all other default encode converts into latin-1
             # as latin-1 didn't consist of those characters it will fail
@@ -505,9 +547,9 @@ class RequestCompiler(RequestBase):
             resp: Response = session.send(
                 request,
                 cert=self.httpdef.certificate,
-                verify=not self.httpdef.allow_insecure)
-        if not self.args.no_cookie and isinstance(
-                session.cookies, LWPCookieJar):
+                verify=not self.httpdef.allow_insecure,
+            )
+        if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
             try:
                 session.cookies.save()  # lwpCookie has .save method
             except BaseException:
@@ -516,15 +558,15 @@ class RequestCompiler(RequestBase):
             session.close()
         return resp
 
-    def print_req_info(
-            self, request: Union[PreparedRequest, Response], prefix=">"):
+    def print_req_info(self, request: Union[PreparedRequest, Response], prefix=">"):
         if not (self.args.debug or self.args.info):
             return
-        if hasattr(request, 'method'):
-            print(f'{prefix} {request.method} {request.url}')
+        if hasattr(request, "method"):
+            print(f"{prefix} {request.method} {request.url}")
         else:
             print(
-                f"{prefix} {request.status_code} {status_code[request.status_code][0].capitalize()}")
+                f"{prefix} {request.status_code} {status_code[request.status_code][0].capitalize()}"
+            )
         for header in request.headers:
-            print(f'{prefix} {header}: {request.headers[header]}')
-        print('-------------------------------------------\n')
+            print(f"{prefix} {header}: {request.headers[header]}")
+        print("-------------------------------------------\n")

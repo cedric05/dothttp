@@ -1,8 +1,8 @@
 import os
 
+from ..models import BaseHandler, Command, Result
 from . import logger
-from .basic_handlers import RunHttpFileHandler, ContentExecuteHandler
-from ..models import Command, Result, BaseHandler
+from .basic_handlers import ContentExecuteHandler, RunHttpFileHandler
 
 
 class Http2Har(BaseHandler):
@@ -17,13 +17,16 @@ class Http2Har(BaseHandler):
         # for more information
         params = command.params
         filename = params.get("file")
-        content = params.get('content')
+        content = params.get("content")
         result = Result(id=command.id)
-        if not (filename and os.path.exists(filename)
-                and os.path.isfile(filename)) and not content:
+        if (
+            not (filename and os.path.exists(filename) and os.path.isfile(filename))
+            and not content
+        ):
             result.result = {
                 "error_message": "filename or content is mandatory",
-                "error": True}
+                "error": True,
+            }
             return result
         try:
             if filename:
@@ -35,8 +38,8 @@ class Http2Har(BaseHandler):
             request_compiler_obj.load()
             request_compiler_obj.load_def()
             result.result = {
-                "target": {
-                    config.target: request_compiler_obj.httpdef.get_har()}}
+                "target": {config.target: request_compiler_obj.httpdef.get_har()}
+            }
             return result
         except Exception as e:
             logger.error("unknown error happened", exc_info=True)
