@@ -4,6 +4,7 @@ import sys
 
 from dothttp.__version__ import __version__
 from dothttp.utils.log_utils import setup_logging as root_logging_setup
+
 from .server import AsyncCmdServer, CmdServer, HttpServer
 
 
