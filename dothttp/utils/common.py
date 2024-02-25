@@ -18,7 +18,7 @@ def get_real_file_path(
             )
         )
     else:
-        tx_model_path = os.normpath(os.path.normpath(os.path.join(
+        tx_model_path = os.path.normpath(os.path.normpath(os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(current_file))), path
         )))
     return tx_model_path
