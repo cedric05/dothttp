@@ -9,7 +9,7 @@ requests_ntlm==1.2.0
 RestrictedPython==7.0
 Faker==23.1.0
 requests-hawk==1.2.1
-msal==1.26.0
+msal==1.27.0
 PyYaml==6.0.1
 toml==0.10.2
 requests==2.31.0
