@@ -508,7 +508,7 @@ class ScriptType(enum.Enum):
 
     @staticmethod
     def get_script_type(script_type: LangOption):
-        if script_type == "python":
-            return ScriptType.PYTHON
-        else:
+        if script_type == "javascript":
             return ScriptType.JAVA_SCRIPT
+        else:
+            return ScriptType.PYTHON

@@ -12,6 +12,7 @@ GET https://req.dothttp.dev/user
     "payload": {{$randomSlug}}
 }
 > {%
-    client.global.set("Server", response.headers.valueOf("Server"));
-    client.log('server is :'+ client.global.get('Server'));
+
+def test_has_key_in_json():
+    assert client.response.status_code == 200, "Non 200 status code"
 %}

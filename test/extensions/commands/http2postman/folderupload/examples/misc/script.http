@@ -12,4 +12,4 @@ client.test("check json", function(){
 // were able to check json response
 client.global.set("outputval", response.body);
 
-%}
+%} javascript

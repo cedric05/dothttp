@@ -140,8 +140,8 @@ class TypePositionTest(TestBase):
             (
                 (1215, "script.http"),
                 {
-                    "start": 1189,
-                    "end": 1436,
+                    "start": 1211,
+                    "end": 1469,
                     "type": "script",
                     "target": "isEquals check",
                     "target_base": None,

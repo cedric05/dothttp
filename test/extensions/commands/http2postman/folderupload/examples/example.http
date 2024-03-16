@@ -10,4 +10,4 @@ GET https://req.dothttp.dev/user
 data("hai")
 > {%
     client.global.set("hai", response.headers.valueOf("hai"));
-%}
+%} javascript

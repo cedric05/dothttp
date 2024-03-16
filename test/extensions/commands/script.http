@@ -12,7 +12,7 @@ client.test("check json", function(){
 // were able to check json response
 client.global.set("outputval", response.body);
 
-%}
+%} javascript
 
 @name("json_payload")
 POST http://localhost:8000/post
@@ -30,7 +30,7 @@ client.test("check headers", function(){
 // were able to check json response
 client.global.set("outputval", response.body.json.token);
 client.log("this is sample log");
-%}
+%} javascript
 
 
 
@@ -63,7 +63,7 @@ client.test("checks payload output recursive",  function(){
 
 });
 
-%}
+%} javascript
 
 
 @name("delete property")
@@ -75,7 +75,7 @@ const value = client.global.get("setPropertyByfile");
 console.log("value is `" + value+"`");
 client.global.clear("setPropertyByfile");
 
-%}
+%} javascript
 
 
 @name("script error")
@@ -85,7 +85,7 @@ GET http://localhost:8000/robots.txt
 
 client.log(response.body.test.out);
 
-%}
+%} javascript
 
 
 
@@ -100,4 +100,4 @@ var bin = atob(b64);
 
 console.log("value is `" + bin+"`");
 
-%}
+%} javascript
