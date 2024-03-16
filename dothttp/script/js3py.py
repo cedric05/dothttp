@@ -15,12 +15,9 @@ from dataclasses import dataclass, field
 from operator import getitem
 
 import cryptography
-import js2py
 import yaml
 from cryptography import *
 from faker import Faker
-from js2py.base import JsObjectWrapper
-from js2py.internals.simplex import JsException
 from requests import Response
 from RestrictedPython import compile_restricted, safe_globals
 from RestrictedPython.Eval import default_guarded_getiter
@@ -31,6 +28,13 @@ from ..exceptions import DotHttpException, PreRequestScriptException, ScriptExce
 from ..parse import MIME_TYPE_JSON, HttpDef, request_logger
 from ..utils.common import get_real_file_path
 from ..utils.property_util import PropertyProvider
+
+try:
+    import js2py
+    from js2py.base import JsObjectWrapper
+    from js2py.internals.simplex import JsException
+except:
+    pass
 
 
 def write_guard(x):

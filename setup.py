@@ -45,7 +45,9 @@ setup(
     options={"bdist_wheel": {"universal": False}},
     packages=find_packages(exclude=EXCLUDE),
     install_requires=requirements(),
-    extras_require={},
+    extras_require={
+        "js": ["js2py"]
+    },
     long_description=read("README.md"),
     long_description_content_type=("text/markdown"),
     classifiers=[
