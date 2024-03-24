@@ -35,7 +35,7 @@ LINE:
 
 HEADER: 
     'header' '(' key=DotString ',' value=DotString ')'
-    | key=DotString ':' value=DotString
+    | key=StringOrAnyNonWhiteSpace ':' value=StringOrAnyNonWhiteSpace
     | /-H|--header/  key=/'[\w-]+/ ':' value=/\S(.*\S)?'/ SLASH?
     | /-H|--header/  key=/"[\w-]+/ ':' value=/\S(.*\S)?"/ SLASH?
     | /-H|--header/  key=/[\w-]+/ ':' value=/\S(.*\S)?/ SLASH?
@@ -257,6 +257,10 @@ DotString:
     STRING | /\w+/
 ;
 // allow only alphanumeric or string in double/single quotes
+
+StringOrAnyNonWhiteSpace:
+    STRING | /(\S)+/
+;
 
 TRIPLE_QUOTE_STRING:
         /"""[\S\s]*?"""/ | /'''[\S\s]*?'''/
