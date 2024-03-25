@@ -99,7 +99,7 @@ class AzureAuth(AuthBase):
             )
         return r
 
-    def new_method(self, r):
+    def acquire_token_from_azure_cli(self, r):
         access_token = None
         expires_on = None
         # Try to load the access token and its expiry time from a file
