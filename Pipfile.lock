@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "e31cf8f61d4295e1eeeac83c853675089fccf18815abb06832c3c4f770ed309b"
+            "sha256": "d3d5ded96e940ef14f8a71f098a963b2c42c58df24186b09c4a41e7d22af54ed"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -287,11 +287,12 @@
         },
         "msal": {
             "hashes": [
-                "sha256:3109503c038ba6b307152b0e8d34f98113f2e7a78986e28d0baf5b5303afda52",
-                "sha256:572d07149b83e7343a85a3bcef8e581167b4ac76befcbbb6eef0c0e19643cdc0"
+                "sha256:3064f80221a21cd535ad8c3fafbb3a3582cd9c7e9af0bb789ae14f726a0ca99b",
+                "sha256:80bbabe34567cb734efd2ec1869b2d98195c927455369d8077b3c542088c5c9d"
             ],
             "index": "pypi",
-            "version": "==1.27.0"
+            "markers": "python_version >= '3.7'",
+            "version": "==1.28.0"
         },
         "parsys-requests-unixsocket": {
             "hashes": [
@@ -412,6 +413,7 @@
                 "sha256:942c5a758f98d790eaed1a29cb6eefc7ffb0d1cf7af05c3d2791656dbd6ad1e1"
             ],
             "index": "pypi",
+            "markers": "python_version >= '3.7'",
             "version": "==2.31.0"
         },
         "requests-aws4auth": {
