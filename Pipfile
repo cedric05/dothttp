@@ -12,18 +12,18 @@ requests-pkcs12 = "==1.24"
 parsys-requests-unixsocket = "==0.3.1"
 requests-aws4auth = "==1.2.3"
 requests-ntlm = "==1.2.0"
-restrictedpython = "==7.0"
-faker = "==24.1.0"
+restrictedpython = "==7.1"
+faker = "==24.7.1"
 requests-hawk = "==1.2.1"
 pyyaml = "==6.0.1"
 toml = "==0.10.2"
-msal = "==1.27.0"
+msal = "==1.28.0"
 
 [dev-packages]
 python-magic = "*"
 waitress = "==3.0.0"
-flask = "==3.0.2"
-pyperf = "==2.6.2"
+flask = "==3.0.3"
+pyperf = "==2.6.3"
 pytest-benchmark = "*"
 
 [requires]

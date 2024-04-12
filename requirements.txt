@@ -5,10 +5,10 @@ requests_pkcs12==1.24
 parsys-requests-unixsocket==0.3.1
 requests-aws4auth==1.2.3
 requests_ntlm==1.2.0
-RestrictedPython==7.0
-Faker==24.1.0
+RestrictedPython==7.1
+Faker==24.7.1
 requests-hawk==1.2.1
-msal==1.27.0
+msal==1.28.0
 PyYaml==6.0.1
 toml==0.10.2
 requests==2.31.0
