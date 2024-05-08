@@ -62,6 +62,11 @@ def load_private_key_and_thumbprint(cert_path, password=None):
     return private_key_bytes, thumbprint
 
 
+# Azure Cli Auth uses the 'az' command to generate an access_token.
+# In Windows, Azure Cli checks for an azure-cli package update availability and, if an update is found, it prompts for input.
+# When using 'cmd' in Windows, it opens a new terminal, which lets Azure Cli think that a tty is available and prompts for input,
+# leading to hanging requests.
+# It is advised to set `az config set auto-upgrade.enable=no` and update Azure Cli manually for Dothttp to work properly.
 class AzureAuth(AuthBase):
     def __init__(self, azure_auth_wrap: AzureAuthWrap):
         self.azure_auth_wrap = azure_auth_wrap
