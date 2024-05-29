@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 jsonschema = "==4.22.0"
 jstyleson = "==0.0.2"
-requests = "==2.31.0"
+requests = "==2.32.2"
 textx = "==4.0.1"
 requests-pkcs12 = "==1.24"
 parsys-requests-unixsocket = "==0.3.1"
