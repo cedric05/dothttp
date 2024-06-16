@@ -17,6 +17,7 @@ from dothttp.parse import (
     Payload,
 )
 from dothttp.parse.request_base import HttpFileFormatter
+
 from ..models import BaseHandler, Command, Result
 from ..models.har import Harfromdict, HarRequest
 from ..utils import get_alternate_filename

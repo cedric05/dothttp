@@ -13,7 +13,6 @@ from dotextensions.server.postman2_1 import (
     Mode,
     Variable,
 )
-
 from dothttp.parse import (
     APPLICATION_JSON,
     CONTENT_TYPE,
@@ -29,6 +28,7 @@ from dothttp.parse import (
 )
 from dothttp.parse.request_base import RequestCompiler
 from dothttp.utils.common import json_to_urlencoded_array
+
 from ..models import Command, Result
 from ..postman2_1 import (
     POSTMAN_2_1,

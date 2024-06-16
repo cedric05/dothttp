@@ -8,6 +8,7 @@ from json import JSONDecodeError
 from typing import Dict
 
 from dothttp.__version__ import __version__ as version
+
 from .handlers.basic_handlers import (
     ContentExecuteHandler,
     ContentNameReferencesHandler,
