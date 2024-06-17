@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "33f271f60393887abbb2f82fffd1b27b38bf2d91913d7fc96265d596ca8d2169"
+            "sha256": "ec8967ebfd6c855d8171ff932e462cba3514732115a5ddd91d7bd1d441a9a2bb"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -279,11 +279,12 @@
         },
         "msal": {
             "hashes": [
-                "sha256:3064f80221a21cd535ad8c3fafbb3a3582cd9c7e9af0bb789ae14f726a0ca99b",
-                "sha256:80bbabe34567cb734efd2ec1869b2d98195c927455369d8077b3c542088c5c9d"
+                "sha256:563c2d70de77a2ca9786aab84cb4e133a38a6897e6676774edc23d610bfc9e7b",
+                "sha256:d72bbfe2d5c2f2555f4bc6205be4450ddfd12976610dd9a16a9ab0f05c68b64d"
             ],
             "index": "pypi",
-            "version": "==1.28.0"
+            "markers": "python_version >= '3.7'",
+            "version": "==1.28.1"
         },
         "parsys-requests-unixsocket": {
             "hashes": [
