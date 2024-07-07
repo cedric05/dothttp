@@ -36,7 +36,7 @@ class CertUnitTest(TestBase):
         )
         resp_200 = req_comp_success.get_response()
         self.assertEqual(
-            400, resp_200.status_code, "with empty cert, status_code is 400"
+            200, resp_200.status_code, "when cert supplied, it should return 200"
         )
 
     def test_certificate_available2(self):

@@ -530,9 +530,13 @@ class RequestCompiler(RequestBase):
                 ),
             )
         try:
+            if self.httpdef.certificate:
+                cert = tuple(self.httpdef.certificate)
+            else:
+                cert = None
             resp: Response = session.send(
                 request,
-                cert=self.httpdef.certificate,
+                cert=cert,
                 verify=not self.httpdef.allow_insecure,
                 proxies=self.httpdef.proxy,
                 # stream=True
