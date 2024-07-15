@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-jsonschema = "==4.22.0"
+jsonschema = "==4.23.0"
 jstyleson = "==0.0.2"
 requests = "==2.32.3"
 textx = "==4.0.1"
