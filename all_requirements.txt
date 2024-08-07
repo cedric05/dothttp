@@ -1,5 +1,0 @@
--r requirements.txt
--r test_requirements.txt
--r ./benchmarks/requirements.txt
-python-magic
-js2py==0.74
