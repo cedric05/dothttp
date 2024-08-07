@@ -338,13 +338,13 @@ test-randomorder = ["pytest-randomly"]
 
 [[package]]
 name = "faker"
-version = "26.0.0"
+version = "26.1.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Faker-26.0.0-py3-none-any.whl", hash = "sha256:886ee28219be96949cd21ecc96c4c742ee1680e77f687b095202c8def1a08f06"},
-    {file = "Faker-26.0.0.tar.gz", hash = "sha256:0f60978314973de02c00474c2ae899785a42b2cf4f41b7987e93c132a2b8a4a9"},
+    {file = "Faker-26.1.0-py3-none-any.whl", hash = "sha256:e8c5ef795223e945d9166aea3c0ecaf85ac54b4ade2af068d8e3c6524c2c0aa7"},
+    {file = "Faker-26.1.0.tar.gz", hash = "sha256:33921b6fc3b83dd75fd42ec7f47ec87b50c00d3c5380fa7d8a507dab848b8229"},
 ]
 
 [package.dependencies]
@@ -891,13 +891,13 @@ dev = ["twine (>=3.4.2)", "wheel (>=0.37.0)"]
 
 [[package]]
 name = "restrictedpython"
-version = "7.1"
+version = "7.2"
 description = "RestrictedPython is a defined subset of the Python language which allows to provide a program input into a trusted environment."
 optional = false
-python-versions = ">=3.7, <3.13"
+python-versions = "<3.13,>=3.7"
 files = [
-    {file = "RestrictedPython-7.1-py3-none-any.whl", hash = "sha256:56d0c73e5de1757702053383601b0fcd3fb2e428039ee1df860409ad67b17d2b"},
-    {file = "RestrictedPython-7.1.tar.gz", hash = "sha256:875aeb51c139d78e34cef8605dc65309b449168060dd08551a1fe9edb47cb9a5"},
+    {file = "RestrictedPython-7.2-py3-none-any.whl", hash = "sha256:139cb41da6e57521745a566d05825f7a09e6a884f7fa922568cff0a70b84ce6b"},
+    {file = "RestrictedPython-7.2.tar.gz", hash = "sha256:4d1d30f709a6621ca7c4236f08b67b732a651c8099145f137078c7dd4bed3d21"},
 ]
 
 [package.extras]
@@ -1196,4 +1196,4 @@ js = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8, <3.13"
-content-hash = "800a61bd639a59eec0cf881431575537221f5cbc2b9a3d6707556cfb2b995b6b"
+content-hash = "774065c429b733a6334a67f4e925973e4ea88b134b0e6f93d4ea9e354b13053c"
