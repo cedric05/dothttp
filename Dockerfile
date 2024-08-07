@@ -1,13 +1,14 @@
 FROM python:3.11
 LABEL io.whalebrew.config.networks '["host"]'
-ADD requirements.txt /app/
+ADD pyproject.toml /app/
 WORKDIR /app
-RUN pip install -r requirements.txt
+RUN pip install poetry
+RUN poetry config virtualenvs.create false 
+RUN poetry install --all-extras --no-root
 COPY dothttp /app/dothttp
 COPY dotextensions /app/dotextensions
-COPY setup.py README.md  /app/
-RUN ls && python setup.py install
-RUN pip install flask flask-cors waitress
+COPY README.md /app/
+RUN poetry install
 ENTRYPOINT ["python"]
 CMD ["-m", "waitress", "--port", "5000", "dotextensions.server.agent:app"]
 EXPOSE 5000
