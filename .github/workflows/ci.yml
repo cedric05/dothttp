@@ -17,12 +17,13 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.11
+      - uses: Gr1N/setup-poetry@v8
       - name: Install dependencies
         run: |
           sudo apt-get install tar
-          pip install python-magic
+          poetry config virtualenvs.create false 
           # can use single requirement file referring all three
-          pip install -r all_requirements.txt
+          poetry install --all-extras --no-root
       - name: Run tests
         run: |
           docker run -d -p 8000:80 kennethreitz/httpbin 
