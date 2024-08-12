@@ -34,7 +34,7 @@ restrictedpython = "7.2"
 faker = "26.1.0"
 requests-hawk = "1.2.1"
 msal = "1.30.0"
-pyyaml = "6.0.1"
+pyyaml = "6.0.2"
 toml = "0.10.2"
 requests = "2.32.3"
 
