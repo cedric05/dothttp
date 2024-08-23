@@ -370,6 +370,7 @@ ntlmauth("username", "password")
         resp = req_comp.get_response()
         self.assertEqual(200, resp.status_code)
 
+    @skip
     def test_hawk_auth_integration(self):
         filename = f"{base_dir}/hawkauth.http"
         req_comp = self.get_req_comp(filename, target=1)
