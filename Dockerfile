@@ -8,7 +8,6 @@ RUN poetry install --all-extras --no-root
 COPY dothttp /app/dothttp
 COPY dotextensions /app/dotextensions
 COPY README.md /app/
-RUN poetry install
 ENTRYPOINT ["python"]
 CMD ["-m", "waitress", "--port", "5000", "dotextensions.server.agent:app"]
 EXPOSE 5000
