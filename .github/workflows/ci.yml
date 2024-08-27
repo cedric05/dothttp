@@ -26,8 +26,14 @@ jobs:
           poetry install --all-extras --no-root
       - name: Run tests
         run: |
-          docker run -d -p 8000:80 kennethreitz/httpbin 
-          python -m unittest
+          # current dothttp prints to terminal, which is not good for pytest.
+          # although, for test cases, we should ask those who prints to return
+          pytest -s --html=report.html --self-contained-html
+      - name: Upload test report
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-report
+          path: report.html
 # benchmark is not working for long time.
 # TODO
       # - name: Run benchmark
