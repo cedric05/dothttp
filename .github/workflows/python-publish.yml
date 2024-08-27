@@ -32,8 +32,7 @@ jobs:
         # unit tests need python-magic
         # package in pypi woudn't need python-magic
         # for integration tests
-        docker run -d -p 8000:80 kennethreitz/httpbin 
-        python -m unittest
+        pytest -s
     - name: Build Distribution
       run: |
         # install prerequisites
