@@ -19,6 +19,7 @@ from dothttp.parse.request_base import (
     RequestCompiler,
     dothttp_model,
 )
+
 from ..models import BaseHandler, Command, Result
 from . import logger
 

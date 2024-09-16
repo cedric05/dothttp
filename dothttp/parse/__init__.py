@@ -357,10 +357,9 @@ class BaseModelProcessor:
 class HttpDefBase(BaseModelProcessor):
     def __init__(self, args: Config):
         super().__init__(args)
-        self.httpdef = HttpDef()
-        self._loaded = False
+        self._loaded = True
 
-    def load_query(self):
+    def load_query(self, httpdef: HttpDef):
         params: DefaultDict[List] = defaultdict(list)
         for parent in self.parents_http:
             for line in parent.lines:
@@ -374,19 +373,19 @@ class HttpDefBase(BaseModelProcessor):
                     self.get_updated_content(query.value)
                 )
         request_logger.debug(f"computed query params from `{self.file}` are `{params}`")
-        self.httpdef.query = params
+        httpdef.query = params
 
     def remove_quotes(self, header, s="'"):
         if header.key.startswith(s) and header.value.endswith(s):
             header.key = header.key[1:]
             header.value = header.value[:-1]
 
-    def load_proxy(self):
+    def load_proxy(self, httpdef: HttpDef):
         proxy_dict = dict()
         for http_parent in self.parents_http:
             HttpDefBase._load_proxy_details(http_parent, proxy_dict, self.property_util)
         HttpDefBase._load_proxy_details(self.http, proxy_dict, self.property_util)
-        self.httpdef.proxy = proxy_dict
+        httpdef.proxy = proxy_dict
 
     def _load_proxy_details(
         http: Http, property_util: PropertyProvider, proxy_dict: Dict[str, str]
@@ -406,7 +405,7 @@ class HttpDefBase(BaseModelProcessor):
                         else None
                     )
 
-    def load_headers(self):
+    def load_headers(self, httpdef: HttpDef):
         """
             entrypoints
                 1. dev defines headers in http file
@@ -421,14 +420,14 @@ class HttpDefBase(BaseModelProcessor):
         headers = CaseInsensitiveDict()
         headers.update(self.default_headers)
         for parent in self.parents_http:
-            self.load_headers_to_dict(parent, headers)
-        self.load_headers_to_dict(self.http, headers)
+            self._load_headers_to_dict(parent, headers)
+        self._load_headers_to_dict(self.http, headers)
         request_logger.debug(
             f"computed query params from `{self.file}` are `{headers}`"
         )
-        self.httpdef.headers = headers
+        httpdef.headers = headers
 
-    def load_headers_to_dict(self, http, headers):
+    def _load_headers_to_dict(self, http, headers):
         if not http:
             return
         for line in http.lines:
@@ -439,14 +438,14 @@ class HttpDefBase(BaseModelProcessor):
                     self.get_updated_content(header.key)
                 ] = self.get_updated_content(header.value)
 
-    def load_certificate(self):
+    def load_certificate(self, httpdef: HttpDef):
         request_logger.debug(f"url is {self.http.certificate}")
         certificate: Union[Certificate, P12Certificate] = self.get_current_or_base(
             "certificate"
         )
         if certificate:
             if certificate.cert:
-                self.httpdef.certificate = [
+                httpdef.certificate = [
                     self.get_updated_content(certificate.cert),
                     (
                         self.get_updated_content(certificate.key)
@@ -455,12 +454,12 @@ class HttpDefBase(BaseModelProcessor):
                     ),
                 ]
             elif certificate.p12_file:
-                self.httpdef.p12 = [
+                httpdef.p12 = [
                     self.get_updated_content(certificate.p12_file),
                     self.get_updated_content(certificate.password),
                 ]
 
-    def load_extra_flags(self):
+    def load_extra_flags(self, httpdef: HttpDef):
         # flags are extendable
         # once its marked as allow insecure
         # user would want all child to have same effect
@@ -472,15 +471,15 @@ class HttpDefBase(BaseModelProcessor):
         if extra_args:
             for flag in extra_args:
                 if flag.clear:
-                    self.httpdef.session_clear = True
+                    httpdef.session_clear = True
                 elif flag.insecure:
-                    self.httpdef.allow_insecure = True
+                    httpdef.allow_insecure = True
 
         for current_flag in self.http.extra_args:
             if current_flag.no_parent_script:
-                self.httpdef.no_parent_script = True
+                httpdef.no_parent_script = True
 
-    def load_url(self):
+    def load_url(self, httpdef: HttpDef):
         request_logger.debug(f"url is {self.http.urlwrap.url}")
         url_path = self.get_updated_content(self.http.urlwrap.url)
         if self.parents_http:
@@ -503,29 +502,29 @@ class HttpDefBase(BaseModelProcessor):
                 else:
                     url = urljoin(base_url, url_path)
                 url_path = url
-            self.httpdef.url = url_path
+            httpdef.url = url_path
         else:
-            self.httpdef.url = url_path
-        if self.httpdef.url and not (
-            self.httpdef.url.startswith("https://")
-            or self.httpdef.url.startswith("http://")
-            or self.httpdef.url.startswith("http+unix://")
+            httpdef.url = url_path
+        if httpdef.url and not (
+            httpdef.url.startswith("https://")
+            or httpdef.url.startswith("http://")
+            or httpdef.url.startswith("http+unix://")
         ):
-            self.httpdef.url = "http://" + self.httpdef.url
+            httpdef.url = "http://" + httpdef.url
 
-    def load_method(self):
+    def load_method(self, httpdef):
         if method := self.http.urlwrap.method:
             request_logger.debug(f"method defined in `{self.file}` is {method}")
-            self.httpdef.method = method
+            httpdef.method = method
             return
         request_logger.debug(f"method not defined in `{self.file}`. defaults to `GET`")
         if self.http.payload:
-            self.httpdef.method = "POST"
+            httpdef.method = "POST"
         else:
-            self.httpdef.method = "GET"
+            httpdef.method = "GET"
 
-    def load_payload(self):
-        self.httpdef.payload = self._load_payload()
+    def load_payload(self, httpdef: HttpDef):
+        httpdef.payload = self._load_payload()
 
     def _load_payload(self):
         """
@@ -648,21 +647,21 @@ class HttpDefBase(BaseModelProcessor):
         else:
             return sys.stdout
 
-    def load_auth(self):
+    def load_auth(self, httpdef: HttpDef):
         auth_wrap: AuthWrap = self.get_current_or_base("authwrap")
         if auth_wrap:
             if basic_auth := auth_wrap.basic_auth:
-                self.httpdef.auth = HTTPBasicAuth(
+                httpdef.auth = HTTPBasicAuth(
                     self.get_updated_content(basic_auth.username),
                     self.get_updated_content(basic_auth.password),
                 )
             elif digest_auth := auth_wrap.digest_auth:
-                self.httpdef.auth = HTTPDigestAuth(
+                httpdef.auth = HTTPDigestAuth(
                     self.get_updated_content(digest_auth.username),
                     self.get_updated_content(digest_auth.password),
                 )
             elif ntlm_auth := auth_wrap.ntlm_auth:
-                self.httpdef.auth = HttpNtlmAuth(
+                httpdef.auth = HttpNtlmAuth(
                     self.get_updated_content(ntlm_auth.username),
                     self.get_updated_content(ntlm_auth.password),
                 )
@@ -671,7 +670,7 @@ class HttpDefBase(BaseModelProcessor):
                     algorithm = hawk_auth.algorithm
                 else:
                     algorithm = "sha256"
-                self.httpdef.auth = RequestsHawkAuth(
+                httpdef.auth = RequestsHawkAuth(
                     id=self.get_updated_content(hawk_auth.id),
                     key=self.get_updated_content(hawk_auth.key),
                     algorithm=self.get_updated_content(algorithm),
@@ -685,7 +684,7 @@ class HttpDefBase(BaseModelProcessor):
                     aws_service = self.get_updated_content(aws_auth_wrap.service)
                 if aws_auth_wrap.region:
                     aws_region = self.get_updated_content(aws_auth_wrap.region)
-                parsed_url = urlparse(self.httpdef.url)
+                parsed_url = urlparse(httpdef.url)
                 hostname = parsed_url.hostname
                 if hostname.endswith(".amazonaws.com"):
                     # s3.amazonaws.com
@@ -779,7 +778,7 @@ class HttpDefBase(BaseModelProcessor):
                     base_logger.info(
                         f"aws request with region aws_service: {aws_service} region: {aws_region}"
                     )
-                    self.httpdef.auth = AWS4Auth(
+                    httpdef.auth = AWS4Auth(
                         access_id, secret_token, aws_region, aws_service
                     )
                 else:
@@ -841,7 +840,7 @@ class HttpDefBase(BaseModelProcessor):
                         azure_auth_type=AzureAuthType.DEVICE_CODE,
                     )
 
-                self.httpdef.auth = AzureAuth(azure_auth_wrap)
+                httpdef.auth = AzureAuth(azure_auth_wrap)
 
     def get_current_or_base(self, attr_key) -> Any:
         if getattr(self.http, attr_key):
@@ -851,52 +850,55 @@ class HttpDefBase(BaseModelProcessor):
                 if getattr(parent, attr_key):
                     return getattr(parent, attr_key)
 
-    def load_def(self):
-        if self._loaded:
-            return
-        self.httpdef.name = self.args.target or "1"
-        self.load_extra_flags()
-        self.load_test_script()
+    def load_def(self, httpdef: HttpDef = None):
+        if not httpdef:
+            httpdef = HttpDef()
+        self.httpdef = httpdef
+        httpdef.name = self.args.target or "1"
+        self.load_extra_flags(httpdef)
+        self.load_test_script(httpdef)
         # run prerequest script
         # as it will set some variables
-        self.run_prerequest_script()
+        script_execution = self.run_prerequest_script(httpdef)
 
-        self.load_method()
-        self.load_url()
-        self.load_headers()
-        self.load_query()
-        self.load_payload()
-        self.load_auth()
-        self.load_proxy()
-        self.load_certificate()
-        self.load_output()
-        self._loaded = True
-        self.script_execution.pre_request_script()
+        self.load_method(httpdef)
+        self.load_url(httpdef)
+        self.load_headers(httpdef)
+        self.load_query(httpdef)
+        self.load_payload(httpdef)
+        self.load_auth(httpdef)
+        self.load_proxy(httpdef)
+        self.load_certificate(httpdef)
+        self.load_output(httpdef)
+        script_execution.pre_request_script()
+        self.script_execution = script_execution
+        return httpdef
 
-    def run_prerequest_script(self):
+    def run_prerequest_script(self, httpdef):
         execution_cls = (
             ScriptExecutionJs
-            if self.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT
+            if httpdef.test_script_lang == ScriptType.JAVA_SCRIPT
             else ScriptExecutionPython
         )
-        self.script_execution = execution_cls(self.httpdef, self.property_util)
-        self.script_execution.init_request_script()
-        for key, value in self.script_execution.client.properties.updated.items():
+        script_execution = execution_cls(httpdef, self.property_util)
+        script_execution.init_request_script()
+        for key, value in script_execution.client.properties.updated.items():
             self.property_util.add_command_property(key, value)
+        return script_execution
 
-    def load_test_script(self):
-        self.httpdef.test_script = ""
-        if self.httpdef.no_parent_script:
+    def load_test_script(self, httpdef: HttpDef):
+        httpdef.test_script = ""
+        if httpdef.no_parent_script:
             script_wrap: TestScript = self.http.script_wrap
         else:
             script_wrap: TestScript = self.get_current_or_base("script_wrap")
         if script_wrap and script_wrap.script:
             script = script_wrap.script[4:-2]
-            self.httpdef.test_script = script.strip()
-            self.httpdef.test_script_lang = ScriptType.get_script_type(
+            httpdef.test_script = script.strip()
+            httpdef.test_script_lang = ScriptType.get_script_type(
                 script_type=script_wrap.lang
             )
 
-    def load_output(self):
+    def load_output(self, httpdef: HttpDef):
         if self.http.output and self.http.output.output:
-            self.httpdef.output = self.http.output.output
+            httpdef.output = self.http.output.output

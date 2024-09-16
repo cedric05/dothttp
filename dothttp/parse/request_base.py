@@ -15,6 +15,7 @@ from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
+from ..models.computed import HttpDef
 from ..models.parse_models import Http, HttpFileType, MultidefHttp, ScriptType
 from ..parse import (
     APPLICATION_JSON,
@@ -83,6 +84,7 @@ class RequestBase(HttpDefBase):
 
     def __init__(self, args: Config):
         super().__init__(args)
+        self.httpdef = HttpDef()
         self._cookie: Union[LWPCookieJar, None] = None
 
     def get_cookie(self):
@@ -132,7 +134,7 @@ class RequestBase(HttpDefBase):
     def get_request(self):
         # httpdef has to be loaded
         # according to httpdef, prepared_request is built
-        self.load_def()
+        self.load_def(self.httpdef)
         prep = self.httpdef.get_prepared_request()
         # cookie is separately prepared
         if not self.httpdef.session_clear:
@@ -450,7 +452,7 @@ def query_to_http(line):
 
 class RequestCompiler(RequestBase):
     def run(self):
-        self.load_def()
+        self.load_def(self.httpdef)
         resp = self.get_response()
         self.print_req_info(resp.request)
         for hist_resp in resp.history:
