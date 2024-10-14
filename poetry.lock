@@ -1021,17 +1021,17 @@ dev = ["twine (>=3.4.2)", "wheel (>=0.37.0)"]
 
 [[package]]
 name = "restrictedpython"
-version = "7.2"
+version = "7.4"
 description = "RestrictedPython is a defined subset of the Python language which allows to provide a program input into a trusted environment."
 optional = false
-python-versions = "<3.13,>=3.7"
+python-versions = "<3.14,>=3.8"
 files = [
-    {file = "RestrictedPython-7.2-py3-none-any.whl", hash = "sha256:139cb41da6e57521745a566d05825f7a09e6a884f7fa922568cff0a70b84ce6b"},
-    {file = "RestrictedPython-7.2.tar.gz", hash = "sha256:4d1d30f709a6621ca7c4236f08b67b732a651c8099145f137078c7dd4bed3d21"},
+    {file = "RestrictedPython-7.4-py3-none-any.whl", hash = "sha256:f431c76f848f6f6d50ae21457cb503642db60889a273e4be439cf7ca4cbaf999"},
+    {file = "restrictedpython-7.4.tar.gz", hash = "sha256:81b62924713dbd280917fceaecaf210fef7a49dddf1a08c8c214a3613fbeb425"},
 ]
 
 [package.extras]
-docs = ["Sphinx", "sphinx-rtd-theme"]
+docs = ["Sphinx", "furo"]
 test = ["pytest", "pytest-mock"]
 
 [[package]]
@@ -1341,4 +1341,4 @@ js = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8, <3.13"
-content-hash = "3d77d557545e216026a1ab66a1c97f044e2c6154d8b28d8c75fab7cbf494c609"
+content-hash = "93a9cf48263254ea2bccffc60425447fea348b54c5311b906fc8ec40932c90b0"
