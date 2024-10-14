@@ -352,17 +352,18 @@ test = ["pytest (>=6)"]
 
 [[package]]
 name = "faker"
-version = "28.4.1"
+version = "30.3.0"
 description = "Faker is a Python package that generates fake data for you."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "Faker-28.4.1-py3-none-any.whl", hash = "sha256:e59c01d1e8b8e20a83255ab8232c143cb2af3b4f5ab6a3f5ce495f385ad8ab4c"},
-    {file = "faker-28.4.1.tar.gz", hash = "sha256:4294d169255a045990720d6f3fa4134b764a4cdf46ef0d3c7553d2506f1adaa1"},
+    {file = "Faker-30.3.0-py3-none-any.whl", hash = "sha256:e8a15fd1b0f72992b008f5ea94c70d3baa0cb51b0d5a0e899c17b1d1b23d2771"},
+    {file = "faker-30.3.0.tar.gz", hash = "sha256:8760fbb34564fbb2f394345eef24aec5b8f6506b6cfcefe8195ed66dd1032bdb"},
 ]
 
 [package.dependencies]
 python-dateutil = ">=2.4"
+typing-extensions = "*"
 
 [[package]]
 name = "flask"
@@ -1239,6 +1240,17 @@ files = [
 ]
 
 [[package]]
+name = "typing-extensions"
+version = "4.12.2"
+description = "Backported and Experimental Type Hints for Python 3.8+"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "typing_extensions-4.12.2-py3-none-any.whl", hash = "sha256:04e5ca0351e0f3f85c6853954072df659d0d13fac324d0072316b67d7794700d"},
+    {file = "typing_extensions-4.12.2.tar.gz", hash = "sha256:1a7ead55c7e559dd4dee8856e3a88b41225abfe1ce8df57b7c13915fe121ffb8"},
+]
+
+[[package]]
 name = "tzdata"
 version = "2024.1"
 description = "Provider of IANA time zone data"
@@ -1341,4 +1353,4 @@ js = []
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8, <3.13"
-content-hash = "3d77d557545e216026a1ab66a1c97f044e2c6154d8b28d8c75fab7cbf494c609"
+content-hash = "e4f8c19d56bf3721e69b3afa920026dd92558ed6f71b24c423ff5b30ac171a4d"
