@@ -53,6 +53,8 @@ def jsonmodel_to_json(model, update_content_func):
         return [jsonmodel_to_json(value, update_content_func) for value in array.values]
     elif model == "null":
         return None
+    elif expr := model.expr:
+        return eval(expr)
 
 
 def get_json_data(var_value, update_content_func):

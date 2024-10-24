@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "dothttp-req"
-version = "0.0.43a20"
+version = "0.0.43a23"
 description = "Dothttp is Simple http client for testing and development"
 authors = ["Prasanth <kesavarapu.siva@gmail.com>"]
 license = "MIT"
@@ -30,8 +30,8 @@ requests-pkcs12 = "1.25"
 parsys-requests-unixsocket = "0.3.2"
 requests-aws4auth = "1.3.1"
 requests-ntlm = "1.3.0"
-restrictedpython = "7.2"
-faker = "28.4.1"
+restrictedpython = "7.4"
+faker = "30.6.0"
 requests-hawk = "1.2.1"
 msal = "1.31.0"
 pyyaml = "6.0.2"
@@ -44,7 +44,7 @@ flask = "3.0.2"
 python-magic = "^0.4.27"
 js2py = "0.74"
 flask-cors = "^5.0.0"
-pytest = "^8.3.2"
+pytest = "^8.3.3"
 pytest-html = "^4.1.1"
 
 [tool.poetry.extras]
