@@ -104,7 +104,6 @@ class PropertyProvider:
 
     random = Random()
     var_regex = re.compile(r"{{(?P<var>.*?)}}", re.DOTALL)
-    jinja2_regex = re.compile(r'\[%(?P<var>.*?)%\]', re.DOTALL)
     rand_map: Dict[str, FunctionType] = {
         "$randomStr": get_random_str,
         "$randomInt": get_random_int,

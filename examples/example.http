@@ -1,5 +1,5 @@
 @name("fetch 100 users, skip first 50")
-GET https://req.dothttp.dev/user
+POST https://req.dothttp.dev/user
 "Authorization": "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
 "content-type": "application/json"
 ? ("fetch", "100") #
@@ -9,7 +9,8 @@ GET https://req.dothttp.dev/user
 ? projection, location
 
 {
-    "payload": {{$randomSlug}}
+    "payload": {{$randomSlug}},
+    "time": (3*60) // three minutes in seconds
 }
 > {%
 

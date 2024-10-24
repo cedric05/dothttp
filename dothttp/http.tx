@@ -207,7 +207,23 @@ Array:
 ;
 
 Value:
-    strs += TRIPLE_OR_DOUBLE_STRING | var=VarString |  flt=Float | int=Int | bl=Bool | object=Object | array=Array | null="null"
+    strs += TRIPLE_OR_DOUBLE_STRING | var=VarString |  flt=Float | int=Int | bl=Bool | object=Object | array=Array | null="null" | expr=Expression
+;
+
+Expression:
+    Term (('+' | '-') Term)*
+;
+
+Term:
+    Factor (('*' | '/') Factor)*
+;
+
+Factor:
+    Number | '(' Expression ')'
+;
+
+Number:
+    /\d+/
 ;
 
 
