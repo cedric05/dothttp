@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.13
 LABEL io.whalebrew.config.networks '["host"]'
 ADD pyproject.toml /app/
 WORKDIR /app
