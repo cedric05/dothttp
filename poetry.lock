@@ -1380,5 +1380,5 @@ js = []
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.8, <3.13"
-content-hash = "84721bdf711ca8474f106a3a5331afbf27740dc299f6c81a1deb2917a5f0e2db"
+python-versions = ">=3.8,<3.14"
+content-hash = "81e661f421fd226d59753202083b842023674e6f959213da7e74d9b9a57c715b"

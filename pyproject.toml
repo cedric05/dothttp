@@ -22,7 +22,7 @@ dothttp = 'dothttp.__main__:main'
 
 
 [tool.poetry.dependencies]
-python = ">=3.8, <3.13"
+python = ">=3.8,<3.14"
 jsonschema = "4.23.0"
 jstyleson = "0.0.2"
 textx = "4.1.0"
