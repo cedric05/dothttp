@@ -344,12 +344,14 @@ class ImportPostmanCollection(BaseHandler):
                 secretKey = aws_auth.get("secretKey")
                 region = aws_auth.get("region", "us-east-1")
                 service = aws_auth.get("service", "")
+                session_token = aws_auth.get("session_token", "")
                 auth_wrap = AuthWrap(
                     aws_auth=AwsAuthWrap(
                         access_id=accessKey,
                         secret_token=secretKey,
                         region=region,
                         service=service,
+                        session_token=session_token
                     )
                 )
         return auth_wrap, lines

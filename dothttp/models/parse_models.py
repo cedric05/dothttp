@@ -41,8 +41,9 @@ class HawkAuth:
 class AwsAuthWrap:
     access_id: str
     secret_token: str
-    service: str
+    service: Union[str, None]
     region: Union[str, None]
+    session_token: Union[str, None]
 
 
 @dataclass

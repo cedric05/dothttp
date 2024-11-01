@@ -83,6 +83,7 @@ BASICAUTH:
 AWSAUTH:
     'awsauth' '(' ('access_id' '=' ) ? access_id=DotString ',' ('secret_key' '=')? secret_token=DotString   ( ',' ('service'  '=')? service=DotString )? ','? ')'
     | 'awsauth' '(' ('access_id' '=' ) ? access_id=DotString ',' ('secret_key' '=')? secret_token=DotString ','  ('service'  '=')? service=DotString (',' ('region' '=')? region=DotString)? ')'
+    | 'awsauth' '(' ('access_id' '=' ) ? access_id=DotString ',' ('secret_key' '=')? secret_token=DotString ','  ('service'  '=')? service=DotString ',' ('region' '=')? region=DotString ',' ('session_token' '=') ?  session_token=DotString ')'
 ;
 
 AZUREAUTH:

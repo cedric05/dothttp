@@ -299,6 +299,7 @@ class Http2Postman(RunHttpFileHandler):
                     ),
                     ApikeyElement(key="region", value=auth.region, type="string"),
                     ApikeyElement(key="service", value=auth.service, type="string"),
+                    ApikeyElement(key="session_token", value=auth.session_token, type="string"),
                 ]
         if http.headers:
             request.header = list(
