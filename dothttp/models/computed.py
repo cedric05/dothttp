@@ -282,6 +282,7 @@ class HttpDef:
                         aws_auth.signing_key.secret_key,
                         aws_auth.service,
                         aws_auth.region,
+                        aws_auth.session_token
                     )
                 )
             elif isinstance(self.auth, AzureAuth):

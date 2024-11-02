@@ -1,732 +1,797 @@
 {
-  "collection": {
-    "auth": null,
+ "collection": {
+  "auth": null,
+  "event": null,
+  "info": {
+   "_postman_id": null,
+   "description": null,
+   "name": "awsauth.http",
+   "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+   "version": null
+  },
+  "item": [
+   {
+    "description": null,
     "event": null,
-    "info": {
-      "_postman_id": null,
-      "description": null,
-      "name": "awsauth.http",
-      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-      "version": null
-    },
-    "item": [
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "simple",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "us-east-1"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "simple",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3.amazonaws.com"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "resolve properties",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "{{access_id}}"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "{{secret_key}}"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "{{region}}"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "resolve properties",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3.amazonaws.com"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "resolve properties with default",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "{{access_id=dummy}}"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "{{secret_key=dummy}}"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "{{region=us-east-1}}"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "resolve properties with default",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3.amazonaws.com"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "extend",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "{{access_id=dummy}}"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "{{secret_key=dummy}}"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "{{region=us-east-1}}"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "extend",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3.amazonaws.com/"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "extend2",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "us-east-1"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "extend2",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3.amazonaws.com/some"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "extend3",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "{{access_id}}"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "{{secret_key}}"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "{{region}}"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "extend3",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3.amazonaws.com/some2"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "default us-east-1 region optional",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "us-east-1"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "default us-east-1 region optional",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3.amazonaws.com/some3"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "region from url and s3",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "eu-west-1"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "region from url and s3",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3.eu-west-1.amazonaws.com/some3"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "service from url and region defaulted to us-east-1",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "us-east-1"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "service from url and region defaulted to us-east-1",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3.amazonaws.com/"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "region and service from url with bucket id",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "us-east-1"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "region and service from url with bucket id",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://bucketid.s3.us-east-1.amazonaws.com/"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "region and service with legacy url",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "us-east-1"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "region and service with legacy url",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3-us-east-1.amazonaws.com/"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "fix region and service from url",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "us-east-1"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "fix region and service from url",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3-us-east-1.amazonaws.com/"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      },
-      {
-        "description": null,
-        "event": null,
-        "id": null,
-        "name": "fix region and service from url2",
-        "protocolProfileBehavior": null,
-        "request": {
-          "auth": {
-            "apikey": null,
-            "awsv4": [
-              {
-                "key": "accessKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "secretKey",
-                "type": "string",
-                "value": "dummy"
-              },
-              {
-                "key": "region",
-                "type": "string",
-                "value": "us-east-1"
-              },
-              {
-                "key": "service",
-                "type": "string",
-                "value": "s3"
-              }
-            ],
-            "basic": null,
-            "bearer": null,
-            "digest": null,
-            "edgegrid": null,
-            "hawk": null,
-            "noauth": null,
-            "ntlm": null,
-            "oauth1": null,
-            "oauth2": null,
-            "type": "awsv4"
-          },
-          "body": null,
-          "certificate": null,
-          "description": "fix region and service from url2",
-          "header": null,
-          "method": "GET",
-          "proxy": null,
-          "url": "http://s3.us-east-1.amazonaws.com/"
-        },
-        "response": null,
-        "variable": null,
-        "auth": null,
-        "item": null
-      }
-    ],
+    "id": null,
+    "name": "simple",
     "protocolProfileBehavior": null,
-    "variable": null
-  }
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "us-east-1"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "simple",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3.amazonaws.com"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "resolve properties",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "{{access_id}}"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "{{secret_key}}"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "{{region}}"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "resolve properties",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3.amazonaws.com"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "resolve properties with default",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "{{access_id=dummy}}"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "{{secret_key=dummy}}"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "{{region=us-east-1}}"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "resolve properties with default",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3.amazonaws.com"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "extend",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "{{access_id=dummy}}"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "{{secret_key=dummy}}"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "{{region=us-east-1}}"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "extend",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3.amazonaws.com/"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "extend2",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "us-east-1"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "extend2",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3.amazonaws.com/some"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "extend3",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "{{access_id}}"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "{{secret_key}}"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "{{region}}"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "extend3",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3.amazonaws.com/some2"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "default us-east-1 region optional",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "us-east-1"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "default us-east-1 region optional",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3.amazonaws.com/some3"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "region from url and s3",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "eu-west-1"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "region from url and s3",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3.eu-west-1.amazonaws.com/some3"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "service from url and region defaulted to us-east-1",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "us-east-1"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "service from url and region defaulted to us-east-1",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3.amazonaws.com/"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "region and service from url with bucket id",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "us-east-1"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "region and service from url with bucket id",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://bucketid.s3.us-east-1.amazonaws.com/"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "region and service with legacy url",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "us-east-1"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "region and service with legacy url",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3-us-east-1.amazonaws.com/"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "fix region and service from url",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "us-east-1"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "fix region and service from url",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3-us-east-1.amazonaws.com/"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   },
+   {
+    "description": null,
+    "event": null,
+    "id": null,
+    "name": "fix region and service from url2",
+    "protocolProfileBehavior": null,
+    "request": {
+     "auth": {
+      "apikey": null,
+      "awsv4": [
+       {
+        "key": "accessKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "secretKey",
+        "type": "string",
+        "value": "dummy"
+       },
+       {
+        "key": "region",
+        "type": "string",
+        "value": "us-east-1"
+       },
+       {
+        "key": "service",
+        "type": "string",
+        "value": "s3"
+       },
+       {
+        "key": "session_token",
+        "type": "string",
+        "value": null
+       }
+      ],
+      "basic": null,
+      "bearer": null,
+      "digest": null,
+      "edgegrid": null,
+      "hawk": null,
+      "noauth": null,
+      "ntlm": null,
+      "oauth1": null,
+      "oauth2": null,
+      "type": "awsv4"
+     },
+     "body": null,
+     "certificate": null,
+     "description": "fix region and service from url2",
+     "header": null,
+     "method": "GET",
+     "proxy": null,
+     "url": "http://s3.us-east-1.amazonaws.com/"
+    },
+    "response": null,
+    "variable": null,
+    "auth": null,
+    "item": null
+   }
+  ],
+  "protocolProfileBehavior": null,
+  "variable": null
+ }
 }

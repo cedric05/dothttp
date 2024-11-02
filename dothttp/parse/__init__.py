@@ -679,12 +679,15 @@ class HttpDefBase(BaseModelProcessor):
             elif aws_auth_wrap := auth_wrap.aws_auth:
                 access_id = self.get_updated_content(aws_auth_wrap.access_id)
                 secret_token = self.get_updated_content(aws_auth_wrap.secret_token)
+                session_token = None
                 aws_service = None
                 aws_region = None
                 if aws_auth_wrap.service:
                     aws_service = self.get_updated_content(aws_auth_wrap.service)
                 if aws_auth_wrap.region:
                     aws_region = self.get_updated_content(aws_auth_wrap.region)
+                if aws_auth_wrap.session_token:
+                    session_token = self.get_updated_content(aws_auth_wrap.session_token)
                 parsed_url = urlparse(self.httpdef.url)
                 hostname = parsed_url.hostname
                 if hostname.endswith(".amazonaws.com"):
@@ -780,7 +783,7 @@ class HttpDefBase(BaseModelProcessor):
                         f"aws request with region aws_service: {aws_service} region: {aws_region}"
                     )
                     self.httpdef.auth = AWS4Auth(
-                        access_id, secret_token, aws_region, aws_service
+                        access_id, secret_token, aws_region, aws_service, session_token = session_token
                     )
                 else:
                     # aws service and region can be extracted from url

@@ -37,17 +37,17 @@ awsauth(access_id="dummy", secret_key="dummy", service="ec2")
 
 @name("service from url and region defaulted to us-east-1")
 GET "http://s3.amazonaws.com/"
-awsauth(access_id="dummy", secret_key="dummy" )
+awsauth(access_id="dummy", secret_key="dummy")
 
 
 @name("region and service from url with bucket id")
 GET "http://bucketid.s3.us-east-1.amazonaws.com/"
-awsauth(access_id="dummy", secret_key="dummy" )
+awsauth(access_id="dummy", secret_key="dummy")
 
 
 @name("region and service with legacy url")
 GET "http://s3-us-east-1.amazonaws.com/"
-awsauth(access_id="dummy", secret_key="dummy" )
+awsauth(access_id="dummy", secret_key="dummy")
 
 
 @name("fix region and service from url")

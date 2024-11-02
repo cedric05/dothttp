@@ -304,12 +304,15 @@ class HttpFileFormatter(RequestBase):
             elif hawk_auth := auth_wrap.hawk_auth:
                 output_str += f'{new_line}hawkauth("{hawk_auth.hawk_id}", "{hawk_auth.key}", "{hawk_auth.algorithm}")'
             elif aws_auth := auth_wrap.aws_auth:
-                if aws_auth.service and aws_auth.region:
-                    output_str += f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}", service="{aws_auth.service}", region="{aws_auth.region}")'
-                elif aws_auth.service:
-                    output_str += f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}", service="{aws_auth.service}")'
-                else:
-                    output_str += f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}" )'
+                aws_auth_str =f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}"'
+                if aws_auth.service:
+                    aws_auth_str += f', service="{aws_auth.service}"'
+                if aws_auth.region:
+                    aws_auth_str += f', region="{aws_auth.region}"'
+                if aws_auth.session_token:
+                    aws_auth_str += f', session_token="{aws_auth.session_token}"'
+                aws_auth_str += ')'
+                output_str += aws_auth_str
             elif azure_auth := auth_wrap.azure_auth:
                 if sp_auth := azure_auth.azure_spsecret_auth:
                     output_str += f'{new_line}azurespsecret(tenant_id="{sp_auth.tenant_id}", client_id="{sp_auth.client_id}", client_secret="{sp_auth.client_secret}", scope="{sp_auth.scope}")'

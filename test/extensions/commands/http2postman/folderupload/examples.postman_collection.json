@@ -1,1668 +1,1713 @@
 {
-  "collection": {
-    "auth": null,
+ "collection": {
+  "auth": null,
+  "event": null,
+  "info": {
+   "_postman_id": null,
+   "description": null,
+   "name": "examples",
+   "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+   "version": null
+  },
+  "item": [
+   {
+    "description": null,
     "event": null,
-    "info": {
-      "_postman_id": null,
-      "description": null,
-      "name": "examples",
-      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-      "version": null
-    },
+    "id": null,
+    "name": "examples",
+    "protocolProfileBehavior": null,
+    "request": null,
+    "response": null,
+    "variable": null,
+    "auth": null,
     "item": [
-      {
+     {
+      "description": null,
+      "event": null,
+      "id": null,
+      "name": "auth",
+      "protocolProfileBehavior": null,
+      "request": null,
+      "response": null,
+      "variable": null,
+      "auth": null,
+      "item": [
+       {
         "description": null,
         "event": null,
         "id": null,
-        "name": "examples",
+        "name": "basic.http",
         "protocolProfileBehavior": null,
         "request": null,
         "response": null,
-        "variable": null,
+        "variable": [],
         "auth": null,
         "item": [
-          {
-            "description": null,
-            "event": null,
-            "id": null,
-            "name": "auth",
-            "protocolProfileBehavior": null,
-            "request": null,
-            "response": null,
-            "variable": null,
-            "auth": null,
-            "item": [
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "basic.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "basic auth",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": null,
-                        "basic": [
-                          {
-                            "key": "username",
-                            "type": "string",
-                            "value": "foo"
-                          },
-                          {
-                            "key": "password",
-                            "type": "string",
-                            "value": "bar"
-                          }
-                        ],
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "basic"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "basic auth",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://httpbin.org/basic-auth/foo/bar"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "digest.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "digest",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": null,
-                        "basic": null,
-                        "bearer": null,
-                        "digest": [
-                          {
-                            "key": "username",
-                            "type": "string",
-                            "value": "username"
-                          },
-                          {
-                            "key": "password",
-                            "type": "string",
-                            "value": "password"
-                          }
-                        ],
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "digest"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "digest",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "https://httpbin.org/digest-auth/20202/username/password/md5"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": null,
-            "event": null,
-            "id": null,
-            "name": "basic",
-            "protocolProfileBehavior": null,
-            "request": null,
-            "response": null,
-            "variable": null,
-            "auth": null,
-            "item": [
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "multidef.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "get",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": null,
-                      "certificate": null,
-                      "description": "get",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "https://httpbin.org/get"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "second",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": null,
-                      "certificate": null,
-                      "description": "second",
-                      "header": null,
-                      "method": "POST",
-                      "proxy": null,
-                      "url": "https://httpbin.org/post"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "urlparamsnheader.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "1",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": {
-                        "disabled": null,
-                        "file": null,
-                        "formdata": null,
-                        "graphql": null,
-                        "mode": "raw",
-                        "options": {
-                          "language": "json"
-                        },
-                        "raw": "{\"key\": \"value\"}",
-                        "urlencoded": null
-                      },
-                      "certificate": null,
-                      "description": "1",
-                      "header": [
-                        {
-                          "description": null,
-                          "disabled": false,
-                          "key": "content-type",
-                          "value": "application/json"
-                        },
-                        {
-                          "description": null,
-                          "disabled": false,
-                          "key": "content-type",
-                          "value": "application/json"
-                        }
-                      ],
-                      "method": "POST",
-                      "proxy": null,
-                      "url": {
-                        "hash": null,
-                        "host": "httpbin.org",
-                        "path": "/post",
-                        "port": null,
-                        "protocol": "https",
-                        "query": [
-                          {
-                            "description": null,
-                            "disabled": false,
-                            "key": "key1",
-                            "value": "value2"
-                          },
-                          {
-                            "description": null,
-                            "disabled": false,
-                            "key": "key2",
-                            "value": "value2"
-                          },
-                          {
-                            "description": null,
-                            "disabled": false,
-                            "key": "key3",
-                            "value": "value2 with spaces"
-                          },
-                          {
-                            "description": null,
-                            "disabled": false,
-                            "key": "key4",
-                            "value": "value2 with single quotes"
-                          }
-                        ],
-                        "raw": "https://httpbin.org/post",
-                        "variable": null
-                      }
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": null,
-            "event": null,
-            "id": null,
-            "name": "misc",
-            "protocolProfileBehavior": null,
-            "request": null,
-            "response": null,
-            "variable": null,
-            "auth": null,
-            "item": [
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "awsauth.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "simple",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": [
-                          {
-                            "key": "accessKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "secretKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "region",
-                            "type": "string",
-                            "value": "us-east-1"
-                          },
-                          {
-                            "key": "service",
-                            "type": "string",
-                            "value": "s3"
-                          }
-                        ],
-                        "basic": null,
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "awsv4"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "simple",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://s3.amazonaws.com"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "resolve properties",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": [
-                          {
-                            "key": "accessKey",
-                            "type": "string",
-                            "value": "{{access_id}}"
-                          },
-                          {
-                            "key": "secretKey",
-                            "type": "string",
-                            "value": "{{secret_key}}"
-                          },
-                          {
-                            "key": "region",
-                            "type": "string",
-                            "value": "{{region}}"
-                          },
-                          {
-                            "key": "service",
-                            "type": "string",
-                            "value": "s3"
-                          }
-                        ],
-                        "basic": null,
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "awsv4"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "resolve properties",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://s3.amazonaws.com"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "extend3",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": [
-                          {
-                            "key": "accessKey",
-                            "type": "string",
-                            "value": "{{access_id}}"
-                          },
-                          {
-                            "key": "secretKey",
-                            "type": "string",
-                            "value": "{{secret_key}}"
-                          },
-                          {
-                            "key": "region",
-                            "type": "string",
-                            "value": "{{region}}"
-                          },
-                          {
-                            "key": "service",
-                            "type": "string",
-                            "value": "s3"
-                          }
-                        ],
-                        "basic": null,
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "awsv4"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "extend3",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://s3.amazonaws.com/some2"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "default us-east-1 region optional",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": [
-                          {
-                            "key": "accessKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "secretKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "region",
-                            "type": "string",
-                            "value": "us-east-1"
-                          },
-                          {
-                            "key": "service",
-                            "type": "string",
-                            "value": "s3"
-                          }
-                        ],
-                        "basic": null,
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "awsv4"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "default us-east-1 region optional",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://s3.amazonaws.com/some3"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "service from url and region defaulted to us-east-1",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": [
-                          {
-                            "key": "accessKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "secretKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "region",
-                            "type": "string",
-                            "value": "us-east-1"
-                          },
-                          {
-                            "key": "service",
-                            "type": "string",
-                            "value": "s3"
-                          }
-                        ],
-                        "basic": null,
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "awsv4"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "service from url and region defaulted to us-east-1",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://s3.amazonaws.com/"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "region and service from url with bucket id",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": [
-                          {
-                            "key": "accessKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "secretKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "region",
-                            "type": "string",
-                            "value": "us-east-1"
-                          },
-                          {
-                            "key": "service",
-                            "type": "string",
-                            "value": "s3"
-                          }
-                        ],
-                        "basic": null,
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "awsv4"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "region and service from url with bucket id",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://bucketid.s3.us-east-1.amazonaws.com/"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "region and service with legacy url",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": [
-                          {
-                            "key": "accessKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "secretKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "region",
-                            "type": "string",
-                            "value": "us-east-1"
-                          },
-                          {
-                            "key": "service",
-                            "type": "string",
-                            "value": "s3"
-                          }
-                        ],
-                        "basic": null,
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "awsv4"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "region and service with legacy url",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://s3-us-east-1.amazonaws.com/"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "fix region and service from url",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": [
-                          {
-                            "key": "accessKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "secretKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "region",
-                            "type": "string",
-                            "value": "us-east-1"
-                          },
-                          {
-                            "key": "service",
-                            "type": "string",
-                            "value": "s3"
-                          }
-                        ],
-                        "basic": null,
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "awsv4"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "fix region and service from url",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://s3-us-east-1.amazonaws.com/"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "fix region and service from url2",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": [
-                          {
-                            "key": "accessKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "secretKey",
-                            "type": "string",
-                            "value": "dummy"
-                          },
-                          {
-                            "key": "region",
-                            "type": "string",
-                            "value": "us-east-1"
-                          },
-                          {
-                            "key": "service",
-                            "type": "string",
-                            "value": "s3"
-                          }
-                        ],
-                        "basic": null,
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "awsv4"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "fix region and service from url2",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://s3.us-east-1.amazonaws.com/"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "extend.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "base",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": null,
-                        "basic": [
-                          {
-                            "key": "username",
-                            "type": "string",
-                            "value": "username"
-                          },
-                          {
-                            "key": "password",
-                            "type": "string",
-                            "value": "password"
-                          }
-                        ],
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "basic"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "base",
-                      "header": [
-                        {
-                          "description": null,
-                          "disabled": false,
-                          "key": "header1",
-                          "value": "headervalue1"
-                        }
-                      ],
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "https://httpbin.org/"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "sub",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": {
-                        "apikey": null,
-                        "awsv4": null,
-                        "basic": [
-                          {
-                            "key": "username",
-                            "type": "string",
-                            "value": "username"
-                          },
-                          {
-                            "key": "password",
-                            "type": "string",
-                            "value": "password"
-                          }
-                        ],
-                        "bearer": null,
-                        "digest": null,
-                        "edgegrid": null,
-                        "hawk": null,
-                        "noauth": null,
-                        "ntlm": null,
-                        "oauth1": null,
-                        "oauth2": null,
-                        "type": "basic"
-                      },
-                      "body": null,
-                      "certificate": null,
-                      "description": "sub",
-                      "header": [
-                        {
-                          "description": null,
-                          "disabled": false,
-                          "key": "header1",
-                          "value": "headervalue1"
-                        },
-                        {
-                          "description": null,
-                          "disabled": false,
-                          "key": "header2",
-                          "value": "headervalue2"
-                        }
-                      ],
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "https://httpbin.org/basic-auth/username/password"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "graphql.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "1",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": {
-                        "disabled": null,
-                        "file": null,
-                        "formdata": null,
-                        "graphql": null,
-                        "mode": "raw",
-                        "options": {
-                          "language": "json"
-                        },
-                        "raw": "{\"query\": \"{\\n          company {\\n            ceo\\n            coo\\n            cto_propulsion\\n            cto\\n            \\n            founded\\n            founder\\n            launch_sites\\n            name\\n            summary\\n            test_sites\\n            valuation\\n            vehicles\\n          }\\n        }\\n  \", \"variables\": null}",
-                        "urlencoded": null
-                      },
-                      "certificate": null,
-                      "description": "1",
-                      "header": [
-                        {
-                          "description": null,
-                          "disabled": false,
-                          "key": "content-type",
-                          "value": "application/json"
-                        }
-                      ],
-                      "method": "POST",
-                      "proxy": null,
-                      "url": "https://api.spacex.land/graphql"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "script.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "text payload",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": null,
-                      "certificate": null,
-                      "description": "text payload",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http://httpbin.org/robots.txt"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "unix_socket.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "docker base",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": null,
-                      "certificate": null,
-                      "description": "docker base",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": "http+unix://%2Fvar%2Frun%2Fdocker.sock"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "varibles.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "1",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": null,
-                      "certificate": null,
-                      "description": "1",
-                      "header": null,
-                      "method": "GET",
-                      "proxy": null,
-                      "url": {
-                        "hash": null,
-                        "host": "httpbin.org",
-                        "path": "/{{var=get}}",
-                        "port": null,
-                        "protocol": "https",
-                        "query": [
-                          {
-                            "description": null,
-                            "disabled": false,
-                            "key": "path",
-                            "value": "{{var}}"
-                          }
-                        ],
-                        "raw": "https://httpbin.org/{{var=get}}",
-                        "variable": null
-                      }
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  },
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "2",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": {
-                        "disabled": null,
-                        "file": null,
-                        "formdata": null,
-                        "graphql": null,
-                        "mode": "raw",
-                        "options": {
-                          "language": "json"
-                        },
-                        "raw": "{\"firstname\": \"{{name=john}}\", \"lastname\": \"{{lastname=doe}}\", \"location\": \"hyderabad\", \"full name\": \"{{name}} {{lastname}}\"}",
-                        "urlencoded": null
-                      },
-                      "certificate": null,
-                      "description": "2",
-                      "header": [
-                        {
-                          "description": null,
-                          "disabled": false,
-                          "key": "content-type",
-                          "value": "application/json"
-                        }
-                      ],
-                      "method": "POST",
-                      "proxy": null,
-                      "url": "https://httpbin.org/post"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "xmlpayload.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "xml payload",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": {
-                        "disabled": null,
-                        "file": null,
-                        "formdata": null,
-                        "graphql": null,
-                        "mode": "raw",
-                        "options": null,
-                        "raw": "\n<?xml version='1.0' encoding='us-ascii'?>\n\n<!--  A SAMPLE set of slides  -->\n\n<slideshow\n    title=\"Sample Slide Show\"\n    date=\"Date of publication\"\n    author=\"Yours Truly\"\n    >\n\n    <!-- TITLE SLIDE -->\n    <slide type=\"all\">\n        <title>Wake up to WonderWidgets!</title>\n    </slide>\n\n    <!-- OVERVIEW -->\n    <slide type=\"all\">\n        <title>Overview</title>\n        <item>Why <em>WonderWidgets</em> are great</item>\n        <item/>\n        <item>Who <em>buys</em> WonderWidgets</item>\n    </slide>\n\n</slideshow>\n",
-                        "urlencoded": null
-                      },
-                      "certificate": null,
-                      "description": "xml payload",
-                      "header": [
-                        {
-                          "description": null,
-                          "disabled": false,
-                          "key": "Content-Type",
-                          "value": "application/xml"
-                        }
-                      ],
-                      "method": "POST",
-                      "proxy": null,
-                      "url": "https://httpbin.org/post"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": null,
-            "event": null,
-            "id": null,
-            "name": "payload",
-            "protocolProfileBehavior": null,
-            "request": null,
-            "response": null,
-            "variable": null,
-            "auth": null,
-            "item": [
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "fileinput.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "1",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": {
-                        "disabled": null,
-                        "file": {
-                          "content": "",
-                          "src": "C:\\Users\\john\\documents\\movie.mkv"
-                        },
-                        "formdata": null,
-                        "graphql": null,
-                        "mode": "file",
-                        "options": null,
-                        "raw": null,
-                        "urlencoded": null
-                      },
-                      "certificate": null,
-                      "description": "1",
-                      "header": null,
-                      "method": "POST",
-                      "proxy": null,
-                      "url": "https://req.dothttp.dev"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "json.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "1",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": {
-                        "disabled": null,
-                        "file": null,
-                        "formdata": null,
-                        "graphql": null,
-                        "mode": "raw",
-                        "options": {
-                          "language": "json"
-                        },
-                        "raw": "{\"name\": \"john don\", \"age\": 20}",
-                        "urlencoded": null
-                      },
-                      "certificate": null,
-                      "description": "1",
-                      "header": [
-                        {
-                          "description": null,
-                          "disabled": false,
-                          "key": "content-type",
-                          "value": "application/json"
-                        }
-                      ],
-                      "method": "POST",
-                      "proxy": null,
-                      "url": "https://httpbin.org/post"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "multipart.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "1",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": {
-                        "disabled": null,
-                        "file": null,
-                        "formdata": [
-                          {
-                            "contentType": "text/plain",
-                            "description": null,
-                            "disabled": null,
-                            "key": "name",
-                            "type": "text",
-                            "value": "value",
-                            "src": null
-                          },
-                          {
-                            "contentType": "text/plain",
-                            "description": null,
-                            "disabled": null,
-                            "key": "name2",
-                            "type": "text",
-                            "value": "test.md",
-                            "src": null
-                          },
-                          {
-                            "contentType": "application/json",
-                            "description": null,
-                            "disabled": null,
-                            "key": "name3",
-                            "type": "text",
-                            "value": "{\"jsondata\" : \"jsonvalue\"}",
-                            "src": null
-                          }
-                        ],
-                        "graphql": null,
-                        "mode": "formdata",
-                        "options": null,
-                        "raw": null,
-                        "urlencoded": null
-                      },
-                      "certificate": null,
-                      "description": "1",
-                      "header": null,
-                      "method": "POST",
-                      "proxy": null,
-                      "url": "https://req.dothttp.dev"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "text.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "1",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": {
-                        "disabled": null,
-                        "file": null,
-                        "formdata": null,
-                        "graphql": null,
-                        "mode": "raw",
-                        "options": null,
-                        "raw": "this is text payload",
-                        "urlencoded": null
-                      },
-                      "certificate": null,
-                      "description": "1",
-                      "header": null,
-                      "method": "POST",
-                      "proxy": null,
-                      "url": {
-                        "hash": null,
-                        "host": "httpbin.org",
-                        "path": "/post",
-                        "port": null,
-                        "protocol": "https",
-                        "query": [
-                          {
-                            "description": null,
-                            "disabled": false,
-                            "key": "key1",
-                            "value": "value2"
-                          },
-                          {
-                            "description": null,
-                            "disabled": false,
-                            "key": "key2",
-                            "value": "value2"
-                          }
-                        ],
-                        "raw": "https://httpbin.org/post",
-                        "variable": null
-                      }
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              },
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "urlencode.http",
-                "protocolProfileBehavior": null,
-                "request": null,
-                "response": null,
-                "variable": [],
-                "auth": null,
-                "item": [
-                  {
-                    "description": null,
-                    "event": null,
-                    "id": null,
-                    "name": "1",
-                    "protocolProfileBehavior": null,
-                    "request": {
-                      "auth": null,
-                      "body": {
-                        "disabled": null,
-                        "file": null,
-                        "formdata": null,
-                        "graphql": null,
-                        "mode": "urlencoded",
-                        "options": null,
-                        "raw": null,
-                        "urlencoded": [
-                          {
-                            "description": null,
-                            "disabled": null,
-                            "key": "name",
-                            "value": "john"
-                          },
-                          {
-                            "description": null,
-                            "disabled": null,
-                            "key": "age",
-                            "value": 20
-                          },
-                          {
-                            "description": null,
-                            "disabled": null,
-                            "key": "lastname",
-                            "value": "doe"
-                          }
-                        ]
-                      },
-                      "certificate": null,
-                      "description": "1",
-                      "header": null,
-                      "method": "POST",
-                      "proxy": null,
-                      "url": "https://httpbin.org/post"
-                    },
-                    "response": null,
-                    "variable": null,
-                    "auth": null,
-                    "item": null
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "description": null,
-            "event": null,
-            "id": null,
-            "name": "example.http",
-            "protocolProfileBehavior": null,
-            "request": null,
-            "response": null,
-            "variable": [
-              {
-                "description": null,
-                "disabled": false,
-                "id": null,
-                "key": "username",
-                "name": null,
-                "system": null,
-                "type": null,
-                "value": "username"
-              },
-              {
-                "description": null,
-                "disabled": false,
-                "id": null,
-                "key": "password",
-                "name": null,
-                "system": null,
-                "type": null,
-                "value": "password"
-              },
-              {
-                "description": null,
-                "disabled": true,
-                "id": null,
-                "key": "x-requested-by",
-                "name": null,
-                "system": null,
-                "type": null,
-                "value": "dothttp"
-              },
-              {
-                "description": null,
-                "disabled": true,
-                "id": null,
-                "key": "name",
-                "name": null,
-                "system": null,
-                "type": null,
-                "value": "prasanth"
-              }
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "basic auth",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": null,
+            "basic": [
+             {
+              "key": "username",
+              "type": "string",
+              "value": "foo"
+             },
+             {
+              "key": "password",
+              "type": "string",
+              "value": "bar"
+             }
             ],
-            "auth": null,
-            "item": [
-              {
-                "description": null,
-                "event": null,
-                "id": null,
-                "name": "fetch 100 users, skip first 50",
-                "protocolProfileBehavior": null,
-                "request": {
-                  "auth": null,
-                  "body": {
-                    "disabled": null,
-                    "file": null,
-                    "formdata": null,
-                    "graphql": null,
-                    "mode": "raw",
-                    "options": null,
-                    "raw": "hai",
-                    "urlencoded": null
-                  },
-                  "certificate": null,
-                  "description": "fetch 100 users, skip first 50",
-                  "header": [
-                    {
-                      "description": null,
-                      "disabled": false,
-                      "key": "Authorization",
-                      "value": "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
-                    },
-                    {
-                      "description": null,
-                      "disabled": false,
-                      "key": "content-type",
-                      "value": "hai"
-                    }
-                  ],
-                  "method": "GET",
-                  "proxy": null,
-                  "url": {
-                    "hash": null,
-                    "host": "req.dothttp.dev",
-                    "path": "/user",
-                    "port": null,
-                    "protocol": "https",
-                    "query": [
-                      {
-                        "description": null,
-                        "disabled": false,
-                        "key": "fetch",
-                        "value": "100"
-                      },
-                      {
-                        "description": null,
-                        "disabled": false,
-                        "key": "skip",
-                        "value": "50"
-                      },
-                      {
-                        "description": null,
-                        "disabled": false,
-                        "key": "projection",
-                        "value": "name"
-                      },
-                      {
-                        "description": null,
-                        "disabled": false,
-                        "key": "projection",
-                        "value": "org"
-                      },
-                      {
-                        "description": null,
-                        "disabled": false,
-                        "key": "projection",
-                        "value": "location"
-                      }
-                    ],
-                    "raw": "https://req.dothttp.dev/user",
-                    "variable": null
-                  }
-                },
-                "response": null,
-                "variable": null,
-                "auth": null,
-                "item": null
-              }
-            ]
-          }
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "basic"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "basic auth",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://httpbin.org/basic-auth/foo/bar"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
         ]
-      }
-    ],
-    "protocolProfileBehavior": null,
-    "variable": null
-  }
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "digest.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "digest",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": null,
+            "basic": null,
+            "bearer": null,
+            "digest": [
+             {
+              "key": "username",
+              "type": "string",
+              "value": "username"
+             },
+             {
+              "key": "password",
+              "type": "string",
+              "value": "password"
+             }
+            ],
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "digest"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "digest",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "https://httpbin.org/digest-auth/20202/username/password/md5"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": null,
+      "event": null,
+      "id": null,
+      "name": "basic",
+      "protocolProfileBehavior": null,
+      "request": null,
+      "response": null,
+      "variable": null,
+      "auth": null,
+      "item": [
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "multidef.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "get",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": null,
+           "certificate": null,
+           "description": "get",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "https://httpbin.org/get"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "second",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": null,
+           "certificate": null,
+           "description": "second",
+           "header": null,
+           "method": "POST",
+           "proxy": null,
+           "url": "https://httpbin.org/post"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "urlparamsnheader.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "1",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": {
+             "language": "json"
+            },
+            "raw": "{\"key\": \"value\"}",
+            "urlencoded": null
+           },
+           "certificate": null,
+           "description": "1",
+           "header": [
+            {
+             "description": null,
+             "disabled": false,
+             "key": "content-type",
+             "value": "application/json"
+            },
+            {
+             "description": null,
+             "disabled": false,
+             "key": "content-type",
+             "value": "application/json"
+            }
+           ],
+           "method": "POST",
+           "proxy": null,
+           "url": {
+            "hash": null,
+            "host": "httpbin.org",
+            "path": "/post",
+            "port": null,
+            "protocol": "https",
+            "query": [
+             {
+              "description": null,
+              "disabled": false,
+              "key": "key1",
+              "value": "value2"
+             },
+             {
+              "description": null,
+              "disabled": false,
+              "key": "key2",
+              "value": "value2"
+             },
+             {
+              "description": null,
+              "disabled": false,
+              "key": "key3",
+              "value": "value2 with spaces"
+             },
+             {
+              "description": null,
+              "disabled": false,
+              "key": "key4",
+              "value": "value2 with single quotes"
+             }
+            ],
+            "raw": "https://httpbin.org/post",
+            "variable": null
+           }
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": null,
+      "event": null,
+      "id": null,
+      "name": "misc",
+      "protocolProfileBehavior": null,
+      "request": null,
+      "response": null,
+      "variable": null,
+      "auth": null,
+      "item": [
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "awsauth.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "simple",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": [
+             {
+              "key": "accessKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "secretKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "region",
+              "type": "string",
+              "value": "us-east-1"
+             },
+             {
+              "key": "service",
+              "type": "string",
+              "value": "s3"
+             },
+             {
+              "key": "session_token",
+              "type": "string",
+              "value": null
+             }
+            ],
+            "basic": null,
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "awsv4"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "simple",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://s3.amazonaws.com"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "resolve properties",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": [
+             {
+              "key": "accessKey",
+              "type": "string",
+              "value": "{{access_id}}"
+             },
+             {
+              "key": "secretKey",
+              "type": "string",
+              "value": "{{secret_key}}"
+             },
+             {
+              "key": "region",
+              "type": "string",
+              "value": "{{region}}"
+             },
+             {
+              "key": "service",
+              "type": "string",
+              "value": "s3"
+             },
+             {
+              "key": "session_token",
+              "type": "string",
+              "value": null
+             }
+            ],
+            "basic": null,
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "awsv4"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "resolve properties",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://s3.amazonaws.com"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "extend3",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": [
+             {
+              "key": "accessKey",
+              "type": "string",
+              "value": "{{access_id}}"
+             },
+             {
+              "key": "secretKey",
+              "type": "string",
+              "value": "{{secret_key}}"
+             },
+             {
+              "key": "region",
+              "type": "string",
+              "value": "{{region}}"
+             },
+             {
+              "key": "service",
+              "type": "string",
+              "value": "s3"
+             },
+             {
+              "key": "session_token",
+              "type": "string",
+              "value": null
+             }
+            ],
+            "basic": null,
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "awsv4"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "extend3",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://s3.amazonaws.com/some2"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "default us-east-1 region optional",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": [
+             {
+              "key": "accessKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "secretKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "region",
+              "type": "string",
+              "value": "us-east-1"
+             },
+             {
+              "key": "service",
+              "type": "string",
+              "value": "s3"
+             },
+             {
+              "key": "session_token",
+              "type": "string",
+              "value": null
+             }
+            ],
+            "basic": null,
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "awsv4"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "default us-east-1 region optional",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://s3.amazonaws.com/some3"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "service from url and region defaulted to us-east-1",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": [
+             {
+              "key": "accessKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "secretKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "region",
+              "type": "string",
+              "value": "us-east-1"
+             },
+             {
+              "key": "service",
+              "type": "string",
+              "value": "s3"
+             },
+             {
+              "key": "session_token",
+              "type": "string",
+              "value": null
+             }
+            ],
+            "basic": null,
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "awsv4"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "service from url and region defaulted to us-east-1",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://s3.amazonaws.com/"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "region and service from url with bucket id",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": [
+             {
+              "key": "accessKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "secretKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "region",
+              "type": "string",
+              "value": "us-east-1"
+             },
+             {
+              "key": "service",
+              "type": "string",
+              "value": "s3"
+             },
+             {
+              "key": "session_token",
+              "type": "string",
+              "value": null
+             }
+            ],
+            "basic": null,
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "awsv4"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "region and service from url with bucket id",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://bucketid.s3.us-east-1.amazonaws.com/"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "region and service with legacy url",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": [
+             {
+              "key": "accessKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "secretKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "region",
+              "type": "string",
+              "value": "us-east-1"
+             },
+             {
+              "key": "service",
+              "type": "string",
+              "value": "s3"
+             },
+             {
+              "key": "session_token",
+              "type": "string",
+              "value": null
+             }
+            ],
+            "basic": null,
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "awsv4"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "region and service with legacy url",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://s3-us-east-1.amazonaws.com/"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "fix region and service from url",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": [
+             {
+              "key": "accessKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "secretKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "region",
+              "type": "string",
+              "value": "us-east-1"
+             },
+             {
+              "key": "service",
+              "type": "string",
+              "value": "s3"
+             },
+             {
+              "key": "session_token",
+              "type": "string",
+              "value": null
+             }
+            ],
+            "basic": null,
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "awsv4"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "fix region and service from url",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://s3-us-east-1.amazonaws.com/"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "fix region and service from url2",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": [
+             {
+              "key": "accessKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "secretKey",
+              "type": "string",
+              "value": "dummy"
+             },
+             {
+              "key": "region",
+              "type": "string",
+              "value": "us-east-1"
+             },
+             {
+              "key": "service",
+              "type": "string",
+              "value": "s3"
+             },
+             {
+              "key": "session_token",
+              "type": "string",
+              "value": null
+             }
+            ],
+            "basic": null,
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "awsv4"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "fix region and service from url2",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://s3.us-east-1.amazonaws.com/"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "extend.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "base",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": null,
+            "basic": [
+             {
+              "key": "username",
+              "type": "string",
+              "value": "username"
+             },
+             {
+              "key": "password",
+              "type": "string",
+              "value": "password"
+             }
+            ],
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "basic"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "base",
+           "header": [
+            {
+             "description": null,
+             "disabled": false,
+             "key": "header1",
+             "value": "headervalue1"
+            }
+           ],
+           "method": "GET",
+           "proxy": null,
+           "url": "https://httpbin.org/"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "sub",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": {
+            "apikey": null,
+            "awsv4": null,
+            "basic": [
+             {
+              "key": "username",
+              "type": "string",
+              "value": "username"
+             },
+             {
+              "key": "password",
+              "type": "string",
+              "value": "password"
+             }
+            ],
+            "bearer": null,
+            "digest": null,
+            "edgegrid": null,
+            "hawk": null,
+            "noauth": null,
+            "ntlm": null,
+            "oauth1": null,
+            "oauth2": null,
+            "type": "basic"
+           },
+           "body": null,
+           "certificate": null,
+           "description": "sub",
+           "header": [
+            {
+             "description": null,
+             "disabled": false,
+             "key": "header1",
+             "value": "headervalue1"
+            },
+            {
+             "description": null,
+             "disabled": false,
+             "key": "header2",
+             "value": "headervalue2"
+            }
+           ],
+           "method": "GET",
+           "proxy": null,
+           "url": "https://httpbin.org/basic-auth/username/password"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "graphql.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "1",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": {
+             "language": "json"
+            },
+            "raw": "{\"query\": \"{\\n          company {\\n            ceo\\n            coo\\n            cto_propulsion\\n            cto\\n            \\n            founded\\n            founder\\n            launch_sites\\n            name\\n            summary\\n            test_sites\\n            valuation\\n            vehicles\\n          }\\n        }\\n  \", \"variables\": null}",
+            "urlencoded": null
+           },
+           "certificate": null,
+           "description": "1",
+           "header": [
+            {
+             "description": null,
+             "disabled": false,
+             "key": "content-type",
+             "value": "application/json"
+            }
+           ],
+           "method": "POST",
+           "proxy": null,
+           "url": "https://api.spacex.land/graphql"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "script.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "text payload",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": null,
+           "certificate": null,
+           "description": "text payload",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http://httpbin.org/robots.txt"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "unix_socket.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "docker base",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": null,
+           "certificate": null,
+           "description": "docker base",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": "http+unix://%2Fvar%2Frun%2Fdocker.sock"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "varibles.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "1",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": null,
+           "certificate": null,
+           "description": "1",
+           "header": null,
+           "method": "GET",
+           "proxy": null,
+           "url": {
+            "hash": null,
+            "host": "httpbin.org",
+            "path": "/{{var=get}}",
+            "port": null,
+            "protocol": "https",
+            "query": [
+             {
+              "description": null,
+              "disabled": false,
+              "key": "path",
+              "value": "{{var}}"
+             }
+            ],
+            "raw": "https://httpbin.org/{{var=get}}",
+            "variable": null
+           }
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         },
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "2",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": {
+             "language": "json"
+            },
+            "raw": "{\"firstname\": \"{{name=john}}\", \"lastname\": \"{{lastname=doe}}\", \"location\": \"hyderabad\", \"full name\": \"{{name}} {{lastname}}\"}",
+            "urlencoded": null
+           },
+           "certificate": null,
+           "description": "2",
+           "header": [
+            {
+             "description": null,
+             "disabled": false,
+             "key": "content-type",
+             "value": "application/json"
+            }
+           ],
+           "method": "POST",
+           "proxy": null,
+           "url": "https://httpbin.org/post"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "xmlpayload.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "xml payload",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": null,
+            "raw": "\n<?xml version='1.0' encoding='us-ascii'?>\n\n<!--  A SAMPLE set of slides  -->\n\n<slideshow\n    title=\"Sample Slide Show\"\n    date=\"Date of publication\"\n    author=\"Yours Truly\"\n    >\n\n    <!-- TITLE SLIDE -->\n    <slide type=\"all\">\n        <title>Wake up to WonderWidgets!</title>\n    </slide>\n\n    <!-- OVERVIEW -->\n    <slide type=\"all\">\n        <title>Overview</title>\n        <item>Why <em>WonderWidgets</em> are great</item>\n        <item/>\n        <item>Who <em>buys</em> WonderWidgets</item>\n    </slide>\n\n</slideshow>\n",
+            "urlencoded": null
+           },
+           "certificate": null,
+           "description": "xml payload",
+           "header": [
+            {
+             "description": null,
+             "disabled": false,
+             "key": "Content-Type",
+             "value": "application/xml"
+            }
+           ],
+           "method": "POST",
+           "proxy": null,
+           "url": "https://httpbin.org/post"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": null,
+      "event": null,
+      "id": null,
+      "name": "payload",
+      "protocolProfileBehavior": null,
+      "request": null,
+      "response": null,
+      "variable": null,
+      "auth": null,
+      "item": [
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "fileinput.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "1",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": {
+            "disabled": null,
+            "file": {
+             "content": "",
+             "src": "C:\\Users\\john\\documents\\movie.mkv"
+            },
+            "formdata": null,
+            "graphql": null,
+            "mode": "file",
+            "options": null,
+            "raw": null,
+            "urlencoded": null
+           },
+           "certificate": null,
+           "description": "1",
+           "header": null,
+           "method": "POST",
+           "proxy": null,
+           "url": "https://req.dothttp.dev"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "json.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "1",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": {
+             "language": "json"
+            },
+            "raw": "{\"name\": \"john don\", \"age\": 20}",
+            "urlencoded": null
+           },
+           "certificate": null,
+           "description": "1",
+           "header": [
+            {
+             "description": null,
+             "disabled": false,
+             "key": "content-type",
+             "value": "application/json"
+            }
+           ],
+           "method": "POST",
+           "proxy": null,
+           "url": "https://httpbin.org/post"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "multipart.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "1",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": [
+             {
+              "contentType": "text/plain",
+              "description": null,
+              "disabled": null,
+              "key": "name",
+              "type": "text",
+              "value": "value",
+              "src": null
+             },
+             {
+              "contentType": "text/plain",
+              "description": null,
+              "disabled": null,
+              "key": "name2",
+              "type": "text",
+              "value": "test.md",
+              "src": null
+             },
+             {
+              "contentType": "application/json",
+              "description": null,
+              "disabled": null,
+              "key": "name3",
+              "type": "text",
+              "value": "{\"jsondata\" : \"jsonvalue\"}",
+              "src": null
+             }
+            ],
+            "graphql": null,
+            "mode": "formdata",
+            "options": null,
+            "raw": null,
+            "urlencoded": null
+           },
+           "certificate": null,
+           "description": "1",
+           "header": null,
+           "method": "POST",
+           "proxy": null,
+           "url": "https://req.dothttp.dev"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "text.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "1",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "raw",
+            "options": null,
+            "raw": "this is text payload",
+            "urlencoded": null
+           },
+           "certificate": null,
+           "description": "1",
+           "header": null,
+           "method": "POST",
+           "proxy": null,
+           "url": {
+            "hash": null,
+            "host": "httpbin.org",
+            "path": "/post",
+            "port": null,
+            "protocol": "https",
+            "query": [
+             {
+              "description": null,
+              "disabled": false,
+              "key": "key1",
+              "value": "value2"
+             },
+             {
+              "description": null,
+              "disabled": false,
+              "key": "key2",
+              "value": "value2"
+             }
+            ],
+            "raw": "https://httpbin.org/post",
+            "variable": null
+           }
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       },
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "urlencode.http",
+        "protocolProfileBehavior": null,
+        "request": null,
+        "response": null,
+        "variable": [],
+        "auth": null,
+        "item": [
+         {
+          "description": null,
+          "event": null,
+          "id": null,
+          "name": "1",
+          "protocolProfileBehavior": null,
+          "request": {
+           "auth": null,
+           "body": {
+            "disabled": null,
+            "file": null,
+            "formdata": null,
+            "graphql": null,
+            "mode": "urlencoded",
+            "options": null,
+            "raw": null,
+            "urlencoded": [
+             {
+              "description": null,
+              "disabled": null,
+              "key": "name",
+              "value": "john"
+             },
+             {
+              "description": null,
+              "disabled": null,
+              "key": "age",
+              "value": 20
+             },
+             {
+              "description": null,
+              "disabled": null,
+              "key": "lastname",
+              "value": "doe"
+             }
+            ]
+           },
+           "certificate": null,
+           "description": "1",
+           "header": null,
+           "method": "POST",
+           "proxy": null,
+           "url": "https://httpbin.org/post"
+          },
+          "response": null,
+          "variable": null,
+          "auth": null,
+          "item": null
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "description": null,
+      "event": null,
+      "id": null,
+      "name": "example.http",
+      "protocolProfileBehavior": null,
+      "request": null,
+      "response": null,
+      "variable": [
+       {
+        "description": null,
+        "disabled": false,
+        "id": null,
+        "key": "username",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": "username"
+       },
+       {
+        "description": null,
+        "disabled": false,
+        "id": null,
+        "key": "password",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": "password"
+       },
+       {
+        "description": null,
+        "disabled": true,
+        "id": null,
+        "key": "x-requested-by",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": "dothttp"
+       },
+       {
+        "description": null,
+        "disabled": true,
+        "id": null,
+        "key": "name",
+        "name": null,
+        "system": null,
+        "type": null,
+        "value": "prasanth"
+       }
+      ],
+      "auth": null,
+      "item": [
+       {
+        "description": null,
+        "event": null,
+        "id": null,
+        "name": "fetch 100 users, skip first 50",
+        "protocolProfileBehavior": null,
+        "request": {
+         "auth": null,
+         "body": {
+          "disabled": null,
+          "file": null,
+          "formdata": null,
+          "graphql": null,
+          "mode": "raw",
+          "options": null,
+          "raw": "hai",
+          "urlencoded": null
+         },
+         "certificate": null,
+         "description": "fetch 100 users, skip first 50",
+         "header": [
+          {
+           "description": null,
+           "disabled": false,
+           "key": "Authorization",
+           "value": "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
+          },
+          {
+           "description": null,
+           "disabled": false,
+           "key": "content-type",
+           "value": "hai"
+          }
+         ],
+         "method": "GET",
+         "proxy": null,
+         "url": {
+          "hash": null,
+          "host": "req.dothttp.dev",
+          "path": "/user",
+          "port": null,
+          "protocol": "https",
+          "query": [
+           {
+            "description": null,
+            "disabled": false,
+            "key": "fetch",
+            "value": "100"
+           },
+           {
+            "description": null,
+            "disabled": false,
+            "key": "skip",
+            "value": "50"
+           },
+           {
+            "description": null,
+            "disabled": false,
+            "key": "projection",
+            "value": "name"
+           },
+           {
+            "description": null,
+            "disabled": false,
+            "key": "projection",
+            "value": "org"
+           },
+           {
+            "description": null,
+            "disabled": false,
+            "key": "projection",
+            "value": "location"
+           }
+          ],
+          "raw": "https://req.dothttp.dev/user",
+          "variable": null
+         }
+        },
+        "response": null,
+        "variable": null,
+        "auth": null,
+        "item": null
+       }
+      ]
+     }
+    ]
+   }
+  ],
+  "protocolProfileBehavior": null,
+  "variable": null
+ }
 }
