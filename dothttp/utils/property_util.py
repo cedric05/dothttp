@@ -124,6 +124,8 @@ class PropertyProvider:
         + ")(?P<length>:\\d*)?"
     )
 
+    env_string_regex = re.compile(r".*?(?P<category>ENV_[A-Z]*)")
+
     def __init__(self, property_file=""):
         self.command_properties = {}
         self.env_properties = {}
@@ -182,7 +184,7 @@ class PropertyProvider:
                     key
                     for key in self.infile_properties
                     if self.infile_properties[key].value is not None
-                    or PropertyProvider.is_random_key(key)
+                    or PropertyProvider.is_special_keyword(key)
                 )
             )
         )
@@ -194,7 +196,7 @@ class PropertyProvider:
         return d
 
     @staticmethod
-    def is_random_key(key):
+    def is_special_keyword(key):
         return any(
             key.startswith(rand_category_name)
             for rand_category_name in PropertyProvider.rand_map
@@ -243,7 +245,7 @@ class PropertyProvider:
                     p.text.append(prop)
                 else:
                     p = Property(
-                        [prop], key, PropertyProvider.resolve_random(value, match)
+                        [prop], key, PropertyProvider.resolve_special(value, match)
                     )
             else:
                 # if result is randomType
@@ -268,7 +270,7 @@ class PropertyProvider:
         return p
 
     @staticmethod
-    def resolve_random(prop, match):
+    def resolve_special(prop, match):
         if match:
             groups = match.groupdict()
             category = groups["category"]
@@ -285,8 +287,8 @@ class PropertyProvider:
         return match
 
     def resolve_property_string(self, key: str):
-        if PropertyProvider.is_random_key(key):
-            return PropertyProvider.resolve_random(
+        if PropertyProvider.is_special_keyword(key):
+            return PropertyProvider.resolve_special(
                 key, PropertyProvider.get_random_match(key)
             )
         prop_values = (
