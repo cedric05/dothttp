@@ -306,12 +306,13 @@ class HttpFileFormatter(RequestBase):
             elif aws_auth := auth_wrap.aws_auth:
                 aws_auth_str =f'{new_line}awsauth(access_id="{aws_auth.access_id}", secret_key="{aws_auth.secret_token}"'
                 if aws_auth.service:
-                    aws_auth_str += f", service={aws_auth.service}"
+                    aws_auth_str += f', service="{aws_auth.service}"'
                 if aws_auth.region:
-                    aws_auth_str += f", region={aws_auth.region}"
+                    aws_auth_str += f', region="{aws_auth.region}"'
                 if aws_auth.session_token:
-                    aws_auth_str += f", session_token={aws_auth.session_token}"
-                aws_auth_str += ")"
+                    aws_auth_str += f', session_token="{aws_auth.session_token}"'
+                aws_auth_str += ')'
+                output_str += aws_auth_str
             elif azure_auth := auth_wrap.azure_auth:
                 if sp_auth := azure_auth.azure_spsecret_auth:
                     output_str += f'{new_line}azurespsecret(tenant_id="{sp_auth.tenant_id}", client_id="{sp_auth.client_id}", client_secret="{sp_auth.client_secret}", scope="{sp_auth.scope}")'
