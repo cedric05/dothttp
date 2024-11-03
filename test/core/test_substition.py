@@ -216,3 +216,6 @@ class SubstitutionTest(TestBase):
         request_data = json.loads(system_command_request.body)
         self.assertEquals(request_data, {"sub": "hello\n"}, "grand parent has insecure flag is set")
 
+
+    def test_substitution_from_env_variable(self):
+        pass

@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import re
 import string
 import subprocess
@@ -125,8 +126,6 @@ class PropertyProvider:
         + ")(?P<length>:\\d*)?"
     )
 
-    env_string_regex = re.compile(r".*?(?P<category>ENV_[A-Z]*)")
-
     def __init__(self, property_file=""):
         self.command_line_properties = {}
         self.env_properties = {}
@@ -135,11 +134,11 @@ class PropertyProvider:
         self._resolvable_properties = set()
         self.system_command_properties = {}
         self.is_running_system_command_enabled = False
-    
+
     def enable_system_command(self):
         self.is_running_system_command_enabled = True
-    
-    def add_system_command_properties(self, system_command_dict:dict):
+
+    def add_system_command_properties(self, system_command_dict: dict):
         self.system_command_properties.update(system_command_dict)
 
     def add_command_line_property(self, key: str, value: str):
@@ -158,7 +157,8 @@ class PropertyProvider:
         self.env_properties[key] = value
 
     def add_infile_properties(self, content):
-        self.update_in_file_properties_for_content(content, self.infile_properties)
+        self.update_in_file_properties_for_content(
+            content, self.infile_properties)
 
     def get_properties_for_content(self, content):
         infile_properties: Dict[str, Property] = {}
@@ -189,6 +189,7 @@ class PropertyProvider:
             set(self.env_properties.keys())
             .union(set(self.command_line_properties.keys()))
             .union(set(self.system_command_properties.keys()))
+            .union(set((key.strip("DOTHTTP_ENV_") for key in os.environ.keys() if key.startswith("DOTHTTP_ENV_"))))
             .union(
                 set(
                     key.strip()
@@ -215,7 +216,8 @@ class PropertyProvider:
         return ret
 
     def get_updated_content(self, content, type="str"):
-        content_prop_needed, props_needed = self.check_properties_for_content(content)
+        content_prop_needed, props_needed = self.check_properties_for_content(
+            content)
         for var in props_needed:
             # command line props take preference
             func = (
@@ -257,7 +259,8 @@ class PropertyProvider:
                     p.text.append(prop)
                 else:
                     p = Property(
-                        [prop], key, PropertyProvider.resolve_special(value, match)
+                        [prop], key, PropertyProvider.resolve_special(
+                            value, match)
                     )
             else:
                 # if result is randomType
@@ -304,13 +307,16 @@ class PropertyProvider:
             return None
         else:
             if not self.is_running_system_command_enabled:
-                base_logger.error(f"system command is disabled, by adding '@insecure'")
+                base_logger.error(
+                    f"system command is disabled, by adding '@insecure'")
                 return 'running system command is disabled, enable it by adding @insecure'
             try:
-                result = subprocess.run(command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                result = subprocess.run(
+                    command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
                 return result.stdout
             except subprocess.CalledProcessError as e:
-                base_logger.error(f"Error while executing system command: {command} with error: {e}")   
+                base_logger.error(
+                    f"Error while executing system command: {command} with error: {e}")
                 return ''
 
     def resolve_property_string(self, key: str):
@@ -318,19 +324,21 @@ class PropertyProvider:
             return PropertyProvider.resolve_special(
                 key, PropertyProvider.get_random_match(key)
             )
-        prop_values = (
-            self.command_line_properties.get(key),
-            self.env_properties.get(key),
-            self.infile_properties[key].value,
-            self.resolve_system_command_prop(key)
-        )
-        for prop_value in prop_values:
+
+        def find_according_to_category(key):
+            yield self.command_line_properties.get(key)
+            yield self.env_properties.get(key)
+            yield self.infile_properties[key].value
+            yield os.environ.get(f"DOTHTTP_ENV_{key}")
+            yield self.resolve_system_command_prop(key)
+
+        for prop_value in find_according_to_category(key):
             if prop_value is not None:
                 if isinstance(prop_value, HttpFileException):
                     raise prop_value
                 else:
                     base_logger.debug(
-                        f"property `{key}` resolved with value `${prop_value}`"
+                        f"property `{key}` resolved with value `{prop_value}`"
                     )
                     return prop_value
 
