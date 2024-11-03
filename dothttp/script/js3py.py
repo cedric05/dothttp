@@ -15,6 +15,8 @@ from dataclasses import dataclass, field
 from operator import getitem
 
 import cryptography
+import jsonschema
+import requests
 import yaml
 from cryptography import *
 from faker import Faker
@@ -38,7 +40,7 @@ except:
 
 
 def write_guard(x):
-    if isinstance(x, Client):
+    if isinstance(x, (Client, HttpDef, Properties, dict, list)):
         return x
     else:
         raise Exception("not allowed")
@@ -53,6 +55,7 @@ allowed_global = {
     "__metaclass__": type,
     "__name__": "test_script",
     "math": math,
+    "type": type,
     "hashlib": hashlib,
     "faker": Faker(),
     "unittest": unittest,
@@ -69,6 +72,8 @@ allowed_global = {
     "json": json,
     "yaml": yaml,
     "cryptography": cryptography,
+    "jsonschema": jsonschema,
+    "requests": requests,
 }
 allowed_global.update(safe_globals)
 

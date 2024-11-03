@@ -1,7 +1,9 @@
 import json
 import logging
+import os
 import re
 import string
+import subprocess
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -125,14 +127,22 @@ class PropertyProvider:
     )
 
     def __init__(self, property_file=""):
-        self.command_properties = {}
+        self.command_line_properties = {}
         self.env_properties = {}
         self.infile_properties: Dict[str, Property] = {}
         self.property_file = property_file
         self._resolvable_properties = set()
+        self.system_command_properties = {}
+        self.is_running_system_command_enabled = False
 
-    def add_command_property(self, key: str, value: str):
-        self.command_properties[key] = value
+    def enable_system_command(self):
+        self.is_running_system_command_enabled = True
+
+    def add_system_command_properties(self, system_command_dict: dict):
+        self.system_command_properties.update(system_command_dict)
+
+    def add_command_line_property(self, key: str, value: str):
+        self.command_line_properties[key] = value
 
     def add_env_property_from_dict(self, env: dict):
         # TODO fix this, this could be json.dumps and
@@ -147,7 +157,8 @@ class PropertyProvider:
         self.env_properties[key] = value
 
     def add_infile_properties(self, content):
-        self.update_in_file_properties_for_content(content, self.infile_properties)
+        self.update_in_file_properties_for_content(
+            content, self.infile_properties)
 
     def get_properties_for_content(self, content):
         infile_properties: Dict[str, Property] = {}
@@ -161,8 +172,8 @@ class PropertyProvider:
     def check_properties_for_content(self, content):
         content_prop_needed = self.get_properties_for_content(content)
         props_needed = set(content_prop_needed.keys())
-
-        missing_props = props_needed - self.available_properties_list()
+        available_properties = self.available_properties_list()
+        missing_props = props_needed - available_properties
         if len(missing_props) != 0:
             raise PropertyNotFoundException(
                 var=missing_props,
@@ -176,13 +187,15 @@ class PropertyProvider:
     def available_properties_list(self):
         return (
             set(self.env_properties.keys())
-            .union(set(self.command_properties.keys()))
+            .union(set(self.command_line_properties.keys()))
+            .union(set(self.system_command_properties.keys()))
+            .union(set((key.strip("DOTHTTP_ENV_") for key in os.environ.keys() if key.startswith("DOTHTTP_ENV_"))))
             .union(
                 set(
-                    key
+                    key.strip()
                     for key in self.infile_properties
                     if self.infile_properties[key].value is not None
-                    or PropertyProvider.is_random_key(key)
+                    or PropertyProvider.is_special_keyword(key)
                 )
             )
         )
@@ -190,18 +203,21 @@ class PropertyProvider:
     def get_all_properties_variables(self):
         # TODO
         d = dict()
-        d.update(self.command_properties)
+        d.update(self.command_line_properties)
         return d
 
     @staticmethod
-    def is_random_key(key):
-        return any(
+    def is_special_keyword(key):
+        key = key.strip()
+        ret = any(
             key.startswith(rand_category_name)
             for rand_category_name in PropertyProvider.rand_map
         )
+        return ret
 
     def get_updated_content(self, content, type="str"):
-        content_prop_needed, props_needed = self.check_properties_for_content(content)
+        content_prop_needed, props_needed = self.check_properties_for_content(
+            content)
         for var in props_needed:
             # command line props take preference
             func = (
@@ -243,7 +259,8 @@ class PropertyProvider:
                     p.text.append(prop)
                 else:
                     p = Property(
-                        [prop], key, PropertyProvider.resolve_random(value, match)
+                        [prop], key, PropertyProvider.resolve_special(
+                            value, match)
                     )
             else:
                 # if result is randomType
@@ -268,7 +285,7 @@ class PropertyProvider:
         return p
 
     @staticmethod
-    def resolve_random(prop, match):
+    def resolve_special(prop, match):
         if match:
             groups = match.groupdict()
             category = groups["category"]
@@ -284,23 +301,44 @@ class PropertyProvider:
         match = PropertyProvider.random_string_regex.match(prop)
         return match
 
+    def resolve_system_command_prop(self, key):
+        command = self.system_command_properties.get(key)
+        if command is None:
+            return None
+        else:
+            if not self.is_running_system_command_enabled:
+                base_logger.error(
+                    f"system command is disabled, by adding '@insecure'")
+                return 'running system command is disabled, enable it by adding @insecure'
+            try:
+                result = subprocess.run(
+                    command, shell=True, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                return result.stdout
+            except subprocess.CalledProcessError as e:
+                base_logger.error(
+                    f"Error while executing system command: {command} with error: {e}")
+                return ''
+
     def resolve_property_string(self, key: str):
-        if PropertyProvider.is_random_key(key):
-            return PropertyProvider.resolve_random(
+        if PropertyProvider.is_special_keyword(key):
+            return PropertyProvider.resolve_special(
                 key, PropertyProvider.get_random_match(key)
             )
-        prop_values = (
-            self.command_properties.get(key),
-            self.env_properties.get(key),
-            self.infile_properties[key].value,
-        )
-        for prop_value in prop_values:
+
+        def find_according_to_category(key):
+            yield self.command_line_properties.get(key)
+            yield self.env_properties.get(key)
+            yield self.infile_properties[key].value
+            yield os.environ.get(f"DOTHTTP_ENV_{key}")
+            yield self.resolve_system_command_prop(key)
+
+        for prop_value in find_according_to_category(key):
             if prop_value is not None:
                 if isinstance(prop_value, HttpFileException):
                     raise prop_value
                 else:
                     base_logger.debug(
-                        f"property `{key}` resolved with value `${prop_value}`"
+                        f"property `{key}` resolved with value `{prop_value}`"
                     )
                     return prop_value
 

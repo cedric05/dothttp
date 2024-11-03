@@ -24,5 +24,11 @@
     "true": true,
     "false": false,
     "float": 1.23
+  },
+  "$commands":{
+    "command1": "echo 'hello'",
+    "command2": "echo 'world'",
+    // print without new line using python
+    "pythontest": "python -c 'print(\"pythontest\")'"
   }
 }

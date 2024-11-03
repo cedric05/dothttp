@@ -1,0 +1,4 @@
+POST "https://req.dothttp.dev"
+json({
+    "sub": "{{env}}"
+})
