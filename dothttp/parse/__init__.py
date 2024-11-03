@@ -164,6 +164,7 @@ class BaseModelProcessor:
             props = {}
         self.default_headers.update(props.get("headers", {}))
         self.property_util.add_env_property_from_dict(props.get("*", {}))
+        self.property_util.add_system_command_properties(props.get("$commands", {}))
         if self.env:
             for env_name in self.env:
                 self.property_util.add_env_property_from_dict(props.get(env_name, {}))
@@ -204,7 +205,7 @@ class BaseModelProcessor:
                 base_logger.debug(
                     f"detected command line property {key} value: {value}"
                 )
-                self.property_util.add_command_property(key, value)
+                self.property_util.add_command_line_property(key, value)
             except BaseException:
                 raise CommandLinePropError(prop=prop)
 
@@ -859,6 +860,9 @@ class HttpDefBase(BaseModelProcessor):
             return
         self.httpdef.name = self.args.target or "1"
         self.load_extra_flags()
+        if self.httpdef.allow_insecure:
+            self.property_util.enable_system_command()
+            base_logger.info("allowing running system commands")
         self.load_test_script()
         # run prerequest script
         # as it will set some variables
@@ -885,7 +889,7 @@ class HttpDefBase(BaseModelProcessor):
         self.script_execution = execution_cls(self.httpdef, self.property_util)
         self.script_execution.init_request_script()
         for key, value in self.script_execution.client.properties.updated.items():
-            self.property_util.add_command_property(key, value)
+            self.property_util.add_command_line_property(key, value)
 
     def load_test_script(self):
         self.httpdef.test_script = ""

@@ -183,7 +183,7 @@ def pre_request():
     client.properties.setdefault("new", "value")
 """
         props = PropertyProvider()
-        props.add_command_property("ram", "raju")
+        props.add_command_line_property("ram", "raju")
         script_exe = ScriptExecutionPython(httpdef, props)
         script_exe.pre_request_script()
         self.assertEquals({"ram": "ranga"}, httpdef.headers)
