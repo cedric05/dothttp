@@ -1,0 +1,47 @@
+POST "https://req.dothttp.dev"
+json(
+    {
+        // this should print warning
+        "sub": "{{command1}}"
+    }
+)
+
+@insecure
+POST "https://req.dothttp.dev"
+json(
+    {
+        // this should execute command and print
+        "sub": "{{command2}}"
+    }
+)
+
+@name('base')
+@insecure
+POST "https://req.dothttp.dev"
+json(
+    {
+        // this should execute command and print
+        "sub": "{{command1}}"
+    }
+)
+
+
+@name('parent'):"base" 
+POST "https://req.dothttp.dev"
+json(
+    {
+        // this should execute command and print
+        "sub": "{{command1}}"
+    }
+)
+
+
+
+@name('child'):"parent" 
+POST "https://req.dothttp.dev"
+json(
+    {
+        // this should execute command and print
+        "sub": "{{command1}}"
+    }
+)

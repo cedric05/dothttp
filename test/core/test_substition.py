@@ -182,3 +182,37 @@ class SubstitutionTest(TestBase):
             properties=["host=ramba.com"],
         )
         self.assertEqual("https://ramba.com/", req.url)
+
+    
+    def test_system_command(self):
+        # test system command not substitution as insecure flag is not set
+        system_command_request: PreparedRequest = self.get_request(
+            file=f"{base_dir}/system_command.http", target="1"
+        )
+        request_data = json.loads(system_command_request.body)
+        self.assertNotEqual(request_data, {"sub": "hello\n"}, "insecure flag is not set")
+
+        # test system command substitution as insecure flag is set
+        system_command_request: PreparedRequest = self.get_request(
+            file=f"{base_dir}/system_command.http", target="2"
+        )
+        request_data = json.loads(system_command_request.body)
+        self.assertEquals(request_data, {"sub": "world\n"}, "insecure flag is set")
+
+
+        # test system command substitution as insecure flag is base
+        system_command_request: PreparedRequest = self.get_request(
+            file=f"{base_dir}/system_command.http", target="parent"
+        )
+        request_data = json.loads(system_command_request.body)
+        self.assertEquals(request_data, {"sub": "hello\n"}, "parent has insecure flag is set")
+
+
+
+        # test system command substitution as insecure flag is grand parent
+        system_command_request: PreparedRequest = self.get_request(
+            file=f"{base_dir}/system_command.http", target="child"
+        )
+        request_data = json.loads(system_command_request.body)
+        self.assertEquals(request_data, {"sub": "hello\n"}, "grand parent has insecure flag is set")
+
