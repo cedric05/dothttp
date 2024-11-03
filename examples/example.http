@@ -13,9 +13,17 @@ POST https://httpbin.org/post
     "lastName": {{lastName='Doe'}},
     "age": {{age=25}},
     "fullName": "{{firstName}} {{lastName}}",
-    "ageInDays": (25*365)
+    "ageInDays": (25*365),
 }
 > {%
+
+def pre_request():
+    log('Pre-request hook')
+    resp = requests.get('https://httpbin.org/get')
+    json_response = resp.json()
+    log(f"pre request response is {json_response}")
+    ip = json_response['origin']
+    client.request.payload.json['origin'] = ip
 
 def test_has_key_in_json():
     assert client.response.status_code == 200, "Non 200 status code"
@@ -28,10 +36,19 @@ def test_schema_validation():
             "firstName": {"type": "string"},
             "age": {"type": "number"},
             "fullName": {"type": "string"},
-            "ageInDays": {"type": "number"}
+            "ageInDays": {"type": "number"},
+            "origin": {"type": "string"}
         }
     }
     response = client.response.json()
     jsonschema.validate(response['json'], schema)
     log('Schema validation passed')
+
+
+def test_check_response_has_origin():
+    response = client.response.json()
+    if 'origin' in response['json']:
+        log('Origin key is present in response')
+    else:
+        log('Origin key is not present in response')
 %} python
