@@ -218,4 +218,12 @@ class SubstitutionTest(TestBase):
 
 
     def test_substitution_from_env_variable(self):
-        pass
+        # add env variable DOTHTTP_ENV_env to os.environ
+        # test if substitution works 
+        import os
+        os.environ["DOTHTTP_ENV_env"] = "env1"
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}//environmet_variable.http",
+        )
+        self.assertEqual(json.loads(req.body), {"sub": "env1"})
+        del os.environ["DOTHTTP_ENV_env"]
