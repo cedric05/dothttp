@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from operator import getitem
 
 import cryptography
+import jsonschema
 import yaml
 from cryptography import *
 from faker import Faker
@@ -69,6 +70,7 @@ allowed_global = {
     "json": json,
     "yaml": yaml,
     "cryptography": cryptography,
+    "jsonschema": jsonschema,
 }
 allowed_global.update(safe_globals)
 

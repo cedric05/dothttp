@@ -1,5 +1,5 @@
 @name("fetch 100 users, skip first 50")
-POST https://req.dothttp.dev/user
+POST https://httpbin.org/post
 "Authorization": "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
 "content-type": "application/json"
 ? ("fetch", "100") #
@@ -9,11 +9,29 @@ POST https://req.dothttp.dev/user
 ? projection, location
 
 {
-    "payload": {{$randomSlug}},
-    "time": (3*60) // three minutes in seconds
+    "firstName": {{firstName='John'}},
+    "lastName": {{lastName='Doe'}},
+    "age": {{age=25}},
+    "fullName": "{{firstName}} {{lastName}}",
+    "ageInDays": (25*365)
 }
 > {%
 
 def test_has_key_in_json():
     assert client.response.status_code == 200, "Non 200 status code"
-%}
+
+def test_schema_validation():
+    schema = {
+        "type": "object",
+        "properties":{
+            "lastName": {"type": "string"},
+            "firstName": {"type": "string"},
+            "age": {"type": "number"},
+            "fullName": {"type": "string"},
+            "ageInDays": {"type": "number"}
+        }
+    }
+    response = client.response.json()
+    jsonschema.validate(response['json'], schema)
+    log('Schema validation passed')
+%} python
