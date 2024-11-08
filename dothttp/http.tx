@@ -177,7 +177,7 @@ PAYLOAD:
 ;
 
 TRIPLE_OR_DOUBLE_STRING:
-    triple = TRIPLE_QUOTE_STRING | str = STRING
+    triple = TRIPLE_QUOTE_STRING | str = STRING | str = DotString
 ;
 
 
