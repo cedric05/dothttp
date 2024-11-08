@@ -13,7 +13,9 @@ POST https://httpbin.org/post
     "lastName": {{lastName='Doe'}},
     "age": {{age=25}},
     "fullName": "{{firstName}} {{lastName}}",
-    "ageInDays": (25*365),
+    ageInDays: (25*365),
+    // sample without no quotes
+    description: sampleOne
 }
 > {%
 

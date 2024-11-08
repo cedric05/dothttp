@@ -177,7 +177,7 @@ PAYLOAD:
 ;
 
 TRIPLE_OR_DOUBLE_STRING:
-    triple = TRIPLE_QUOTE_STRING | str = STRING | str = DotString
+    triple = TRIPLE_QUOTE_STRING | str = STRING | str = ID 
 ;
 
 
@@ -208,7 +208,7 @@ Array:
 ;
 
 Value:
-    strs += TRIPLE_OR_DOUBLE_STRING | var=VarString |  flt=Float | int=Int | bl=Bool | object=Object | array=Array | null="null" | expr=Expression
+    null="null" |strs += TRIPLE_OR_DOUBLE_STRING | var=VarString |  flt=Float | int=Int | bl=Bool | object=Object | array=Array | expr=Expression
 ;
 
 Expression:

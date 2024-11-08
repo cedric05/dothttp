@@ -5,6 +5,10 @@ json({
 "null": null,
 "bool": false,
 "bool2": true,
-"float":1.121212,
-"float2":1
+"float" : 1.121212,
+"float2":1,
+testWithNoQuotes: true,
+testNoQuotesAnd_Number1: true,
+testWithQuotesAndEqual = true,
+
 })
