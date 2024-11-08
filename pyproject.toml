@@ -10,7 +10,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 exclude = ["test", "test.core", "test.extensions", "benchmarks"]
-packages = [{'include'='dotextensions'}, {'include'='dothttp'}, {'include'='dothttp_req'}]
+packages = [{'include'='dotextensions'}, {'include'='dothttp'}, {'include'='dothttp_req'}, {'include'='dothttp_test'}]
 repository = "https://github.com/cedric05/dothttp"
 
 [tool.poetry.urls]
