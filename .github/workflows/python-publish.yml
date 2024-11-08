@@ -32,7 +32,7 @@ jobs:
         # unit tests need python-magic
         # package in pypi woudn't need python-magic
         # for integration tests
-        pytest -s
+        pytest
     - name: Build Distribution
       run: |
         # install prerequisites

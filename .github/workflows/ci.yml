@@ -28,7 +28,7 @@ jobs:
         run: |
           # current dothttp prints to terminal, which is not good for pytest.
           # although, for test cases, we should ask those who prints to return
-          pytest -s --html=report.html --self-contained-html
+          pytest
       - name: Upload test report
         uses: actions/upload-artifact@v4
         with:

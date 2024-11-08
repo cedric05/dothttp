@@ -199,11 +199,13 @@ class ScriptExecutionEnvironmentBase:
     def pre_request_script(self):
         try:
             self._pre_request_script()
+        except PreRequestScriptException:
+            raise
         except Exception as exc:
             request_logger.error("unknown exception happened", exc_info=True)
-            raise PreRequestScriptException(payload=str(exc))
+            raise PreRequestScriptException(payload=str(exc), function="''")
 
-    def execute_test_script(self, resp):
+    def execute_test_script(self, resp) -> ScriptResult:
         if not self.client.request.test_script:
             return ScriptResult(stdout="", error="", properties={}, tests=[])
         try:
@@ -235,7 +237,7 @@ class ScriptExecutionJs(ScriptExecutionEnvironmentBase):
                 js_template.replace("JS_CODE_REPLACE", self.client.request.test_script)
             )
         except JsException as exc:
-            raise ScriptException(payload=str(exc))
+            raise ScriptException(payload=str(exc), function="''")
         content_type = resp.headers.get("content-type", "text/plain")
         # in some cases mimetype can have charset
         # like text/plain; charset=utf-8
@@ -279,7 +281,7 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
             )
             exec(byte_code, script_gloabal, self.local)
         except Exception as exc:
-            raise ScriptException(payload=str(exc))
+            raise ScriptException(payload=str(exc), function="test_script.py")
 
     def _init_request_script(self) -> None:
         # just for variables initialization
@@ -288,9 +290,13 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
                 func()
 
     def _pre_request_script(self) -> None:
-        for key, func in self.local.items():
-            if (key.startswith("pre")) and isinstance(func, types.FunctionType):
-                func()
+        for key, pre_request_func in self.local.items():
+            if (key.startswith("pre")) and isinstance(pre_request_func, types.FunctionType):
+                try:
+                    pre_request_func()
+                except Exception as exc:
+                    request_logger.error(f"pre request script failed {exc}")
+                    raise PreRequestScriptException(function=key, payload=str(exc))
 
     def _execute_test_script(self, resp: Response) -> ScriptResult:
         script_result = ScriptResult(stdout="", error="", properties={}, tests=[])
@@ -306,7 +312,7 @@ class ScriptExecutionPython(ScriptExecutionEnvironmentBase):
                         test_result.result = func()
                         test_result.success = True
                     except BaseException as exc:
-                        test_result.error = str(exc)
+                        test_result.error = f"\n\nTest function with name `{key}` failed with error `{exc}`\n\n"
                         test_result.success = False
                         request_logger.error(f"test execution failed {exc}")
                     script_result.tests.append(test_result)
