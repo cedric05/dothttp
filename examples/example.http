@@ -15,7 +15,7 @@ POST https://httpbin.org/post
     "fullName": "{{firstName}} {{lastName}}",
     ageInDays: (25*365),
     // sample without no quotes
-    description: sampleOne
+    description: sampleOneWithNoQuotesInValue
 }
 > {%
 

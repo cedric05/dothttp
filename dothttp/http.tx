@@ -208,7 +208,7 @@ Array:
 ;
 
 Value:
-    null="null" |strs += TRIPLE_OR_DOUBLE_STRING | var=VarString |  flt=Float | int=Int | bl=Bool | object=Object | array=Array | expr=Expression
+    flt=Float | int=Int | bl=Bool |  null="null" |strs += TRIPLE_OR_DOUBLE_STRING | var=VarString  | object=Object | array=Array | expr=Expression
 ;
 
 Expression:

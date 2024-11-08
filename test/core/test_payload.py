@@ -27,8 +27,20 @@ class PayLoadTest(TestBase):
         )
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual(
-            b'{"string": "simple", "list": ["dothttp", "azure"], "null": null, "bool": "false", "bool2": "true", "float": 1.121212, "float2": 1, "testWithNoQuotes": "true", "testNoQuotesAnd_Number1": "true", "testWithQuotesAndEqual": "true"}',
-            req.body,
+            {
+                "string": "simple", 
+                "list": ["dothttp", "azure"],
+                "null": None, 
+                "bool": False, 
+                "bool2": True, 
+                "float": 1.121212,
+                "float2": 1, 
+                "number": 0, 
+                "testWithNoQuotes": True,
+                "testNoQuotesAnd_Number1": True, 
+                "testWithQuotesAndEqual": True
+            },
+            json.loads(req.body),
             "incorrect method",
         )
 
