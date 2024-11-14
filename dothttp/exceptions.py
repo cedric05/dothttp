@@ -109,3 +109,8 @@ class DothttpAwsAuthException(DotHttpException):
 @exception_wrapper("AzureAuth exception: {message}")
 class DothttpAzureAuthException(DotHttpException):
     pass
+
+
+@exception_wrapper("Certificate error: if you trust server provided certificate and not in cert chain, use `@insecure`")
+class DothttpUnSignedCertException(DotHttpException):
+    pass

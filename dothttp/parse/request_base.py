@@ -10,11 +10,13 @@ import jstyleson as json
 from requests import PreparedRequest, Response, Session
 
 # this is bad, loading private stuff. find a better way
+from requests.exceptions import SSLError
 from requests.auth import CONTENT_TYPE_FORM_URLENCODED, HTTPBasicAuth, HTTPDigestAuth
 from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
 
+from ..exceptions import DothttpUnSignedCertException
 from ..models.parse_models import Http, HttpFileType, MultidefHttp, ScriptType
 from ..parse import (
     APPLICATION_JSON,
@@ -556,6 +558,21 @@ class RequestCompiler(RequestBase):
                 cert=self.httpdef.certificate,
                 verify=not self.httpdef.allow_insecure,
             )
+        # in case of ssl self signed error, try to catch it and add more info
+        # to user
+        except SSLError as e:
+            # figure out if it is self signed error
+            # there can be multiple reasons for ssl error
+            # 1. self signed certificate
+            # 2. expired certificate
+            # 3. certificate not matching
+            # 4. certificate not trusted
+            # 5. certificate not in chain
+            if "SSL: CERTIFICATE_VERIFY_FAILED" in str(e):
+                eprint(
+                    "self signed certificate error, to ignore use --allow-insecure flag"
+                )
+                raise DothttpUnSignedCertException()
         if not self.args.no_cookie and isinstance(session.cookies, LWPCookieJar):
             try:
                 session.cookies.save()  # lwpCookie has .save method
