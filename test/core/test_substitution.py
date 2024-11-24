@@ -227,3 +227,10 @@ class SubstitutionTest(TestBase):
         )
         self.assertEqual(json.loads(req.body), {"sub": "env1"})
         del os.environ["DOTHTTP_ENV_env"]
+
+    
+    def test_math_expresssion_substitution(self):
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/math_expression.http",
+        )
+        self.assertEqual(json.loads(req.body), {"secondsInDay": "864000"})

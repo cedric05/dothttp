@@ -1,1 +1,3 @@
-__version__ = "0.0.43a27"
+import importlib.metadata 
+module_name = "dothttp-req"
+__version__ = importlib.metadata.version(module_name)
