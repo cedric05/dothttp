@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from operator import getitem
 
 import cryptography
+import xmltodict
 import jsonschema
 import requests
 import yaml
@@ -74,6 +75,7 @@ allowed_global = {
     "cryptography": cryptography,
     "jsonschema": jsonschema,
     "requests": requests,
+    "xmltodict": xmltodict,
 }
 allowed_global.update(safe_globals)
 

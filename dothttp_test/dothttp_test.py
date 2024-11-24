@@ -112,7 +112,7 @@ def test_httpdef(httpdeftest: HttpDefTest):
 
     resp = comp.get_response()
 
-    logging.warning(f"resp={resp}")
+    logging.info(f"resp={resp}")
 
     script_result = comp.script_execution.execute_test_script(resp)
 

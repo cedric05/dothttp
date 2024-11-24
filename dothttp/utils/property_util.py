@@ -14,6 +14,8 @@ from types import FunctionType
 from typing import Dict, List, Union
 
 from ..exceptions import HttpFileException, PropertyNotFoundException
+import ast
+import operator
 
 base_logger = logging.getLogger("dothttp")
 
@@ -89,6 +91,25 @@ def get_random_slug(length):
 def get_timestamp(*_args):
     return int(datetime.timestamp(datetime.now()))
 
+math_operators = {
+    '+': operator.add,
+    '-': operator.sub,
+    '*': operator.mul,
+    '/': operator.truediv,
+    '%': operator.mod,
+    '**': operator.pow
+}
+
+def evaluate_expression(expression: str) -> str:
+    try:
+        tree = ast.parse(expression, mode='eval')
+        code = compile(tree, '<string>', 'eval')
+        result = eval(code, {"__builtins__": None}, math_operators)
+        return str(result)
+    except Exception as e:
+        base_logger.error(f"Error evaluating expression `{expression}`: {e}")
+        return expression
+
 
 class PropertyProvider:
     """
@@ -125,6 +146,8 @@ class PropertyProvider:
         + "|".join("\\" + key for key in rand_map)
         + ")(?P<length>:\\d*)?"
     )
+
+    expression_regex = re.compile(r"\$expr:(?P<expression>.*)")
 
     def __init__(self, property_file=""):
         self.command_line_properties = {}
@@ -213,7 +236,7 @@ class PropertyProvider:
             key.startswith(rand_category_name)
             for rand_category_name in PropertyProvider.rand_map
         )
-        return ret
+        return ret or key.startswith("$expr:")
 
     def get_updated_content(self, content, type="str"):
         content_prop_needed, props_needed = self.check_properties_for_content(
@@ -251,7 +274,6 @@ class PropertyProvider:
                 # like ranga=" ramprasad" --> we should replace with "
                 # ramprasad"
                 value = value[1:-1]
-
             match = PropertyProvider.get_random_match(value)
             if match:
                 if key in cache:
@@ -321,8 +343,13 @@ class PropertyProvider:
 
     def resolve_property_string(self, key: str):
         if PropertyProvider.is_special_keyword(key):
+            match = PropertyProvider.get_random_match(key)
+            if not match:
+                match = PropertyProvider.expression_regex.match(key)
+                if match:
+                    return evaluate_expression(match.groupdict()["expression"])
             return PropertyProvider.resolve_special(
-                key, PropertyProvider.get_random_match(key)
+                key, match
             )
 
         def find_according_to_category(key):
