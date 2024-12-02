@@ -44,7 +44,7 @@ flask = "3.0.2"
 python-magic = "^0.4.27"
 js2py = "0.74"
 flask-cors = "^5.0.0"
-pytest = "^8.3.3"
+pytest = "^8.3.4"
 pytest-html = "^4.1.1"
 
 [tool.poetry.extras]
