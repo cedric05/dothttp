@@ -260,8 +260,9 @@ class PropertyProvider:
         if "=" in prop:
             key_values = prop.split("=")
             if len(key_values) != 2:
+                prop_name = key_values[0]
                 raise HttpFileException(
-                    message="default property should not have multiple `=`"
+                    message=f"Property `{prop_name}` should not contain multiple `=` signs"
                 )
             key, value = key_values
             # strip white space for keys
