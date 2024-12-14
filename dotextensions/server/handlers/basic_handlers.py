@@ -44,23 +44,8 @@ class RunHttpFileHandler(BaseHandler):
         return RunHttpFileHandler.name
 
     def run(self, command: Command) -> Result:
-        config = self.get_config(command)
         try:
-            if config.curl:
-                req = self.get_curl_comp(config)
-                result = req.get_curl_output()
-                result = Result(
-                    id=command.id,
-                    result={
-                        "body": result,
-                        "headers": {
-                            "Content-Type": mimetypes.types_map[".sh"],
-                        },
-                    },
-                )
-            else:
-                comp = self.get_request_comp(config)
-                result = self.get_request_result(command, comp)
+            result = self.execute(command)
         except DotHttpException as exc:
             logger.error(f"dothttp exception happened {exc}", exc_info=True)
             result = Result(
@@ -76,7 +61,25 @@ class RunHttpFileHandler(BaseHandler):
             result = Result(
                 id=command.id, result={"error_message": str(exc), "error": True}
             )
+        return result
 
+    def execute(self, command):
+        config = self.get_config(command)
+        if config.curl:
+            req = self.get_curl_comp(config)
+            result = req.get_curl_output()
+            result = Result(
+                    id=command.id,
+                    result={
+                        "body": result,
+                        "headers": {
+                            "Content-Type": mimetypes.types_map[".sh"],
+                        },
+                    },
+                )
+        else:
+            comp = self.get_request_comp(config)
+            result = self.get_request_result(command, comp)
         return result
 
     def get_curl_comp(self, config):
@@ -253,6 +256,43 @@ class ContentExecuteHandler(RunHttpFileHandler):
     def get_curl_comp(self, config):
         return ContentCurlCompiler(config)
 
+    def run(self, command: Command) -> Result:
+        """
+        When handling content, if an exception is raised, the response is not in the usual format.
+        Instead, it returns an error message. It is better to respond with a structured response.
+        """
+        try:
+            return self.execute(command)
+        except DotHttpException as exc:
+            logger.error(f"dothttp exception happened {exc}", exc_info=True)
+            error_result = exc.message
+        except RequestException as exc:
+            logger.error(f"exception from requests {exc}", exc_info=True)
+            error_result = str(exc)
+        except Exception as exc:
+            logger.error(f"unknown error happened {exc}", exc_info=True)
+            error_result = str(exc)
+        response = {
+            "body": error_result,
+            "status": 0,
+            "method": "REQUEST_EXECUTION_ERROR",
+            "url": "REQUEST_EXECUTION_ERROR",
+            "headers": {
+                "Content-Type": "text/plain",
+            },
+            "output_file":"",
+            "error": True,
+            "error_message": error_result,
+            "contentType": "text/plain",
+        }
+        result = {
+            "response": response,
+            "script_result": {"stdout": "", "error": "", "properties":{}, "tests":[]},
+            "http": "REQUEST_EXECUTION_ERROR",
+            "filenameExtension": ".txt",
+        }
+        result.update(response)
+        return Result(id=command.id, result=result) 
 
 class FormatHttpFileHandler(BaseHandler):
     method = "/file/format"
