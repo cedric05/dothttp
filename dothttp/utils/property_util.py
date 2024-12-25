@@ -258,7 +258,7 @@ class PropertyProvider:
     def validate_n_gen(prop, cache: Dict[str, Property]):
         p: Union[Property, None] = None
         if "=" in prop:
-            # instead of spliting with `=` split with first `=`
+            # consider only first `=`
             key, value = prop.split("=", 1)
             # strip white space for keys
             key = key.strip()
@@ -266,7 +266,12 @@ class PropertyProvider:
             # strip white space for values
             value = value.strip()
             if value and value[0] == value[-1] and value[0] in {"'", '"'}:
+                # strip "'" "'" if it has any
+                # like ranga=" ramprasad" --> we should replace with "
+                # ramprasad"
                 value = value[1:-1]
+            if value and value[0:2] in {"f'", '"f'}:
+                value = value[2:-1]
                 resolved_properties = {key: cache[key].value for key in cache if type(cache[key].value) == str}
                 value = value.format(**resolved_properties)
             match = PropertyProvider.get_random_match(value)
