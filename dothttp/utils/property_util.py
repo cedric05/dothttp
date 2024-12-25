@@ -254,17 +254,11 @@ class PropertyProvider:
                 content = content.replace("{{" + text_to_replace + "}}", value)
         return content
 
-    @staticmethod
-    def validate_n_gen(prop, cache: Dict[str, Property]):
+    def validate_n_gen(self, prop, cache: Dict[str, Property]):
         p: Union[Property, None] = None
         if "=" in prop:
-            key_values = prop.split("=")
-            if len(key_values) != 2:
-                prop_name = key_values[0]
-                raise HttpFileException(
-                    message=f"Property `{prop_name}` should not contain multiple `=` signs"
-                )
-            key, value = key_values
+            # consider only first `=`
+            key, value = prop.split("=", 1)
             # strip white space for keys
             key = key.strip()
 
@@ -275,6 +269,22 @@ class PropertyProvider:
                 # like ranga=" ramprasad" --> we should replace with "
                 # ramprasad"
                 value = value[1:-1]
+            elif value and (value.startswith("p'") and value.endswith("'") or value.startswith('p"') and value.endswith('"')):
+                # lets substitute property with property
+                value = value[2:-1]
+                prop_handler = self
+                class PropertyResolver:
+                    # hassle of creating class is to make it work with format_map
+                    # instead of format which can be used with dict and can cause memory leak
+                    def __getitem__(self, key):
+                        if key in prop_handler.command_line_properties:
+                            return prop_handler.command_line_properties[key]
+                        if key in prop_handler.env_properties:
+                            return prop_handler.env_properties[key]
+                        if key in cache and isinstance(cache[key].value, str):
+                            return cache[key].value
+                        raise KeyError(key)
+                value = value.format_map(PropertyResolver())
             match = PropertyProvider.get_random_match(value)
             if match:
                 if key in cache:

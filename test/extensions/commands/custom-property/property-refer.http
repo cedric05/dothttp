@@ -1,0 +1,19 @@
+POST "http://localhost:8000/post"
+/*
+{{firstName="John"}}
+{{lastName="Doe"}}
+{{fullName=p"{firstName} {lastName}"}}
+*/
+json({
+	"fullName": "{{fullName}}"
+})
+
+
+@name('env-property-refer')
+POST "http://localhost:8000/post"
+/*
+{{fullNameWithPrefix=p"{prefix} {firstName} {lastName}"}}
+*/
+json({
+	"fullName": "{{fullNameWithPrefix}}"
+})
