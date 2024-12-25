@@ -258,23 +258,17 @@ class PropertyProvider:
     def validate_n_gen(prop, cache: Dict[str, Property]):
         p: Union[Property, None] = None
         if "=" in prop:
-            key_values = prop.split("=")
-            if len(key_values) != 2:
-                prop_name = key_values[0]
-                raise HttpFileException(
-                    message=f"Property `{prop_name}` should not contain multiple `=` signs"
-                )
-            key, value = key_values
+            # instead of spliting with `=` split with first `=`
+            key, value = prop.split("=", 1)
             # strip white space for keys
             key = key.strip()
 
             # strip white space for values
             value = value.strip()
             if value and value[0] == value[-1] and value[0] in {"'", '"'}:
-                # strip "'" "'" if it has any
-                # like ranga=" ramprasad" --> we should replace with "
-                # ramprasad"
                 value = value[1:-1]
+                resolved_properties = {key: cache[key].value for key in cache if type(cache[key].value) == str}
+                value = value.format(**resolved_properties)
             match = PropertyProvider.get_random_match(value)
             if match:
                 if key in cache:

@@ -1,0 +1,9 @@
+{
+    "dothttp.conf.diagnostics": true,
+    "dothttp.conf.notebook.numofresponses": 0,
+    "python.testing.pytestArgs": [
+        "."
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+}

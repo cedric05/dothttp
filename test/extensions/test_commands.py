@@ -381,5 +381,16 @@ awsauth(access_id="dummy", secret_key="dummy", service="s3", region="eu-east-1")
         print(result)
 
 
+    def test_property_sub(self):
+        http_file = f"{command_dir}/custom-property/property-refer.http"
+        result = self.execute_file(
+            http_file,
+        )
+        self.assertEqual(200, result.result["status"])
+        body = json.loads(result.result["body"])
+        self.assertEqual({'fullName': 'John Doe'}, body["json"])
+        print(result)
+
+
 if __name__ == "__main__":
     unittest.main()

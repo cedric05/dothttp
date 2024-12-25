@@ -1,0 +1,9 @@
+POST "http://localhost:8000/post"
+/*
+{{firstName="John"}}
+{{lastName="Doe"}}
+{{fullName="{firstName} {lastName}"}}
+*/
+json({
+	"fullName": "{{fullName}}"
+})
