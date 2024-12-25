@@ -2,7 +2,7 @@ POST "http://localhost:8000/post"
 /*
 {{firstName="John"}}
 {{lastName="Doe"}}
-{{fullName=f"{firstName} {lastName}"}}
+{{fullName=p"{firstName} {lastName}"}}
 */
 json({
 	"fullName": "{{fullName}}"
@@ -12,7 +12,7 @@ json({
 @name('env-property-refer')
 POST "http://localhost:8000/post"
 /*
-{{fullNameWithPrefix=f"{prefix} {firstName} {lastName}"}}
+{{fullNameWithPrefix=p"{prefix} {firstName} {lastName}"}}
 */
 json({
 	"fullName": "{{fullNameWithPrefix}}"

@@ -269,7 +269,8 @@ class PropertyProvider:
                 # like ranga=" ramprasad" --> we should replace with "
                 # ramprasad"
                 value = value[1:-1]
-            elif value and (value.startswith("f'") and value.endswith("'") or value.startswith('f"') and value.endswith('"')):
+            elif value and (value.startswith("p'") and value.endswith("'") or value.startswith('p"') and value.endswith('"')):
+                # lets substitute property with property
                 value = value[2:-1]
                 prop_handler = self
                 class PropertyResolver:
