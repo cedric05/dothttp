@@ -391,6 +391,32 @@ awsauth(access_id="dummy", secret_key="dummy", service="s3", region="eu-east-1")
         self.assertEqual({'fullName': 'John Doe'}, body["json"])
         print(result)
 
+    def test_property_sub(self):
+        http_file = f"{command_dir}/custom-property/property-refer.http"
+        result = self.execute_file(
+            http_file,
+            properties={
+                "prefix": "Mr."
+            },
+        )
+        self.assertEqual(200, result.result["status"])
+        body = json.loads(result.result["body"])
+        self.assertEqual({'fullName': 'John Doe'}, body["json"])
+
+    def test_property_sub_from_command_line_props(self):
+        http_file = f"{command_dir}/custom-property/property-refer.http"
+        result = self.execute_file(
+            http_file,
+            properties={
+                "prefix": "Mr."
+            },
+            target='env-property-refer'
+        )
+        self.assertEqual(200, result.result["status"])
+        body = json.loads(result.result["body"])
+        self.assertEqual({'fullName': 'Mr. John Doe'}, body["json"])
+
+
 
 if __name__ == "__main__":
     unittest.main()

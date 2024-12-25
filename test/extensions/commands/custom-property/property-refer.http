@@ -7,3 +7,13 @@ POST "http://localhost:8000/post"
 json({
 	"fullName": "{{fullName}}"
 })
+
+
+@name('env-property-refer')
+POST "http://localhost:8000/post"
+/*
+{{fullNameWithPrefix=f"{prefix} {firstName} {lastName}"}}
+*/
+json({
+	"fullName": "{{fullNameWithPrefix}}"
+})

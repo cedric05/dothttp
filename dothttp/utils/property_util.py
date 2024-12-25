@@ -254,8 +254,7 @@ class PropertyProvider:
                 content = content.replace("{{" + text_to_replace + "}}", value)
         return content
 
-    @staticmethod
-    def validate_n_gen(prop, cache: Dict[str, Property]):
+    def validate_n_gen(self, prop, cache: Dict[str, Property]):
         p: Union[Property, None] = None
         if "=" in prop:
             # consider only first `=`
@@ -270,10 +269,21 @@ class PropertyProvider:
                 # like ranga=" ramprasad" --> we should replace with "
                 # ramprasad"
                 value = value[1:-1]
-            if value and value[0:2] in {"f'", '"f'}:
+            elif value and (value.startswith("f'") and value.endswith("'") or value.startswith('f"') and value.endswith('"')):
                 value = value[2:-1]
-                resolved_properties = {key: cache[key].value for key in cache if type(cache[key].value) == str}
-                value = value.format(**resolved_properties)
+                prop_handler = self
+                class PropertyResolver:
+                    # hassle of creating class is to make it work with format_map
+                    # instead of format which can be used with dict and can cause memory leak
+                    def __getitem__(self, key):
+                        if key in prop_handler.command_line_properties:
+                            return prop_handler.command_line_properties[key]
+                        if key in prop_handler.env_properties:
+                            return prop_handler.env_properties[key]
+                        if key in cache and isinstance(cache[key].value, str):
+                            return cache[key].value
+                        raise KeyError(key)
+                value = value.format_map(PropertyResolver())
             match = PropertyProvider.get_random_match(value)
             if match:
                 if key in cache:
