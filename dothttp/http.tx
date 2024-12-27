@@ -1,5 +1,9 @@
-//HTTP: ram=HTTP2
-MULTISET: (import_list=IMPORT)? (allhttps=HTTP+)?;
+
+MULTISET: (import_list=IMPORT)? (var_list=VAR*)? (allhttps=HTTP+)?;
+
+VAR:
+    "var" name=ID "=" value=Value
+;
 
 IMPORT: ('import' filename=String ';')* ;
 
