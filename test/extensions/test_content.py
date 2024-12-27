@@ -138,3 +138,66 @@ class FileExecute(TestBase):
 """,
             result.result["body"],
         )
+
+    def test_execute_content_context_with_var_normal(self):
+        # tests to pick first context if multiple contexts are there
+        result = self.execute_and_result(
+            """
+            @name('test')
+            POST "http://localhost:8000/post"
+            json({
+                "a":{{a}},
+                "b":"{{b}}",
+            })
+
+            """,
+            target="test",
+            contexts=[
+                # as it is not single file
+                # there can be multiple targets
+                # defined with same name
+                # in such scenario
+                # only first one will be picked
+                """
+                var a = 10
+                """,
+                """
+                var b = 20
+                """
+            ],
+            curl=False,
+        )
+        self.assertEqual(
+            {
+                "a": 10,
+                "b": '20',
+            },
+            json.loads(result.result["body"])["json"],
+        )
+
+
+    def test_execute_content_context_with_var_with_json(self):
+        # tests to pick first context if multiple contexts are there
+        result = self.execute_and_result(
+            """
+            @name('test')
+            POST "http://localhost:8000/post"
+            json({
+                "c" : {{c}}
+            })
+
+            """,
+            target="test",
+            contexts=[
+                """
+                var c = {"ram":"ranga", "raja":[1, true, false, null]}
+                """
+            ],
+            curl=False,
+        )
+        self.assertEqual(
+            {
+                "c" : {"ram":"ranga", "raja":[1, True, False, None]}
+            },
+            json.loads(result.result["body"])["json"],
+        )

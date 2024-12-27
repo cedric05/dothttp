@@ -1,8 +1,8 @@
 
-MULTISET: (import_list=IMPORT)? (var_list=VAR*)? (allhttps=HTTP+)?;
+MULTISET: (import_list=IMPORT)? (variables=VAR*)? (allhttps=HTTP+)?;
 
 VAR:
-    "var" name=ID "=" value=Value
+    "var" name=ID ("=" value=Value)?
 ;
 
 IMPORT: ('import' filename=String ';')* ;

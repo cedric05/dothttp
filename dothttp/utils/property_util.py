@@ -251,7 +251,7 @@ class PropertyProvider:
             value = func(var)
             base_logger.debug(f"using `{value}` for property {var}")
             for text_to_replace in content_prop_needed[var].text:
-                content = content.replace("{{" + text_to_replace + "}}", value)
+                content = content.replace("{{" + text_to_replace + "}}", str(value))
         return content
 
     def validate_n_gen(self, prop, cache: Dict[str, Property]):

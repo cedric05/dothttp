@@ -45,7 +45,7 @@ from ..script import ScriptExecutionJs, ScriptExecutionPython
 from ..utils.common import get_real_file_path, triple_or_double_tostring
 from ..utils.constants import *
 from ..utils.property_util import PropertyProvider
-from .dsl_jsonparser import json_or_array_to_json
+from .dsl_jsonparser import json_or_array_to_json, jsonmodel_to_json
 
 
 def install_unix_socket_scheme():
@@ -236,6 +236,7 @@ class BaseModelProcessor:
             model, filename
         ):
             import_list += model.allhttps
+            BaseModelProcessor.load_properties_from_var(model, property_util)
             property_util.add_infile_properties(content)
 
     @staticmethod
@@ -352,7 +353,15 @@ class BaseModelProcessor:
         self._load_props_from_content(self.content, self.property_util)
 
     def _load_props_from_content(self, content, property_util: PropertyProvider):
+        self.load_properties_from_var(self.model, property_util)
         property_util.add_infile_properties(content)
+    
+    @staticmethod
+    def load_properties_from_var(model, property_util):
+        for variable in model.variables:
+            if variable.value:
+                var_value = jsonmodel_to_json(variable.value, lambda k:k)
+                property_util.infile_properties[variable.name] = Property([''], variable.name, var_value)
 
 
 class HttpDefBase(BaseModelProcessor):

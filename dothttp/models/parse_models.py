@@ -7,6 +7,11 @@ from ..exceptions import DotHttpException
 
 
 @dataclass
+class Variable:
+    name: str
+    value: Union[None, str]
+
+@dataclass
 class NameWrap:
     name: str
     base: Optional[str] = None
@@ -240,6 +245,7 @@ class ImportStmt:
 @dataclass
 class MultidefHttp:
     import_list: Optional[ImportStmt]
+    variables : List[Variable]
     allhttps: List[Http]
 
 

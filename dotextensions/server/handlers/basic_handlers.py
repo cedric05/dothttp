@@ -201,34 +201,29 @@ class ContentBase(BaseModelProcessor):
         self.content = self.content + CONTEXT_SEP + CONTEXT_SEP.join(self.args.contexts)
 
     def select_target(self):
-        try:
-            # first try to resolve target from current context
-            super().select_target()
-        except UndefinedHttpToExtend as ex:
-            # if it weren't able to figure out context, try to resolve from
-            # contexts
-            for context in self.args.contexts:
-                try:
-                    # if model is generated, try to figure out target
-                    model: MultidefHttp = dothttp_model.model_from_str(context)
-                    # by including targets in to model
-                    self.model.allhttps = self.model.allhttps + model.allhttps
-                    if model.import_list and model.import_list.filename:
-                        if self.model.import_list and self.model.import_list.filename:
-                            self.model.import_list.filename += (
-                                model.import_list.filename
-                            )
-                        else:
-                            self.model.import_list = model.import_list
-                        self.load_imports()
-                    self.content += context + "\n\n" + context
-                    return super(ContentBase, self).select_target()
-                except Exception as e:
-                    # contexts, can not always be correct syntax
-                    # in such scenarios, don't complain, try to resolve with
-                    # next contexts
-                    logger.info("ignoring exception, context is not looking good")
-            raise ex
+        for context in self.args.contexts:
+            try:
+                # if model is generated, try to figure out target
+                model: MultidefHttp = dothttp_model.model_from_str(context)
+                # by including targets in to model
+                self.load_properties_from_var(model, self.property_util)
+                self.model.allhttps = self.model.allhttps + model.allhttps
+                if model.import_list and model.import_list.filename:
+                    if self.model.import_list and self.model.import_list.filename:
+                        self.model.import_list.filename += (
+                            model.import_list.filename
+                        )
+                    else:
+                        self.model.import_list = model.import_list
+                    self.load_imports()
+                self.content += context + "\n\n" + context
+                
+            except Exception as e:
+                # contexts, can not always be correct syntax
+                # in such scenarios, don't complain, try to resolve with
+                # next contexts
+                logger.info("ignoring exception, context is not looking good")
+        return super(ContentBase, self).select_target()
 
 
 class ContentRequestCompiler(ContentBase, RequestCompiler):
