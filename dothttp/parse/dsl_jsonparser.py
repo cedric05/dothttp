@@ -1,7 +1,7 @@
 import json
 from typing import Dict, List, Optional, Union
 
-from ..utils.property_util import PropertyProvider
+from ..utils.property_util import PropertyProvider, get_no_replace_property_provider
 from ..utils.common import triple_or_double_tostring
 
 
@@ -53,13 +53,15 @@ class JsonParser:
 # Supporting function
 def json_or_array_to_json(model, property_util: Optional[PropertyProvider]=None) -> Union[Dict, List]:
     if property_util is None:
-        property_util = PropertyProvider()
+        # This is a hack to ignore replacement of variables where it is not needed
+        property_util = get_no_replace_property_provider()
     parser = JsonParser(property_util)
     return parser.json_or_array_to_json(model)
 
 
 def jsonmodel_to_json(model, property_util: Optional[PropertyProvider]=None) -> Union[Dict, List]:
     if property_util is None:
-        property_util = PropertyProvider()
+        # This is a hack to ignore replacement of variables where it is not needed
+        property_util = get_no_replace_property_provider()
     parser = JsonParser(property_util)
     return parser.jsonmodel_to_json(model)

@@ -29,6 +29,7 @@ from dothttp.parse import (
 )
 from dothttp.parse.request_base import RequestCompiler
 from dothttp.utils.common import json_to_urlencoded_array
+from dothttp.utils.property_util import get_no_replace_property_provider
 from ..models import Command, Result
 from ..postman2_1 import (
     POSTMAN_2_1,
@@ -63,6 +64,7 @@ class PostManCompiler(RequestCompiler):
     def __init__(self, config, model):
         self.model = model
         super(PostManCompiler, self).__init__(config)
+        self.property_util = get_no_replace_property_provider()
 
     def load_content(self):
         return

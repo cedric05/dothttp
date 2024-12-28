@@ -393,3 +393,10 @@ class PropertyProvider:
                 return val
         else:
             return val
+
+
+def get_no_replace_property_provider():
+    property_util = PropertyProvider()
+    property_util.get_updated_content = lambda x: x
+    property_util.get_updated_obj_content = lambda x: x
+    return property_util
