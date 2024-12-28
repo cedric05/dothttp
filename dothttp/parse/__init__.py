@@ -360,7 +360,7 @@ class BaseModelProcessor:
     def load_properties_from_var(model, property_util):
         for variable in model.variables:
             if variable.value:
-                var_value = jsonmodel_to_json(variable.value, lambda k:k)
+                var_value = jsonmodel_to_json(variable.value)
                 property_util.infile_properties[variable.name] = Property([''], variable.name, var_value)
 
 
@@ -561,7 +561,7 @@ class HttpDefBase(BaseModelProcessor):
             request_logger.debug(f"payload for request is `{content}`")
             return Payload(content, header=mimetype)
         elif data_json := self.http.payload.datajson:
-            d = json_or_array_to_json(data_json, self.get_updated_content)
+            d = json_or_array_to_json(data_json, self.property_util)
             if isinstance(d, list):
                 raise PayloadDataNotValidException(
                     payload=f"data should be json/str, current: {d}"
@@ -572,7 +572,7 @@ class HttpDefBase(BaseModelProcessor):
         elif upload_filename := self.http.payload.file:
             return self.load_payload_fileinput(upload_filename)
         elif json_data := self.http.payload.json:
-            d = json_or_array_to_json(json_data, self.get_updated_content)
+            d = json_or_array_to_json(json_data, self.property_util)
             return Payload(json=d, header=MIME_TYPE_JSON)
         elif files_wrap := self.http.payload.fileswrap:
             files = []

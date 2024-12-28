@@ -371,12 +371,12 @@ class HttpFileFormatter(RequestBase):
                     data = "'" + data.replace("'", "\\'") + "'"
                 p = f'text({data}{(" ," + mime_type) if mime_type else ""})'
             if datajson := payload.datajson:
-                parsed_data = json_or_array_to_json(datajson, lambda a: a)
+                parsed_data = json_or_array_to_json(datajson)
                 p = f"urlencoded({json.dumps(parsed_data, indent=4)})"
             elif filetype := payload.file:
                 p = f'< "{filetype}"  {(" ;" + mime_type) if mime_type else ""}'
             elif json_data := payload.json:
-                parsed_data = json_or_array_to_json(json_data, lambda a: a)
+                parsed_data = json_or_array_to_json(json_data)
                 p = f"json({JSON_ENCODER.encode(parsed_data)})"
             elif files_wrap := payload.fileswrap:
 

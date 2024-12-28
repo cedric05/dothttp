@@ -242,17 +242,19 @@ class PropertyProvider:
         content_prop_needed, props_needed = self.check_properties_for_content(
             content)
         for var in props_needed:
-            # command line props take preference
-            func = (
-                self.resolve_property_string
-                if type == "str"
-                else self.resolve_property_object
-            )
-            value = func(var)
-            base_logger.debug(f"using `{value}` for property {var}")
-            for text_to_replace in content_prop_needed[var].text:
-                content = content.replace("{{" + text_to_replace + "}}", str(value))
+            if type == "str":
+                value = self.resolve_property_string(var)
+                for text_to_replace in content_prop_needed[var].text:
+                    content = content.replace(
+                        "{{" + text_to_replace + "}}", str(value)
+                    )
+            else:
+                content = self.resolve_property_object(var)
+            base_logger.debug(f"using `{content}` for property {var}")
         return content
+    
+    def get_updated_obj_content(self, content):
+        return self.get_updated_content(content, "obj")
 
     def validate_n_gen(self, prop, cache: Dict[str, Property]):
         p: Union[Property, None] = None
@@ -380,10 +382,14 @@ class PropertyProvider:
                     )
                     return prop_value
 
-    def resolve_property_object(self, key: str) -> object:
-        val = self.resolve_property_string(key)
-        try:
-            return json.loads(val)
-        except JSONDecodeError:
-            base_logger.debug(f"property `{key}` value non json decodable")
+    def resolve_property_object(self, content: str) -> object:
+        val = self.resolve_property_string(content)
+        # if val is string then try to convert to json
+        if isinstance(val, str):
+            try:
+                return json.loads(val)
+            except JSONDecodeError:
+                base_logger.debug(f"property `{content}` value non json decodable")
+                return val
+        else:
             return val

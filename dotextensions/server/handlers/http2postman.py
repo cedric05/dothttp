@@ -349,14 +349,14 @@ class Http2Postman(RunHttpFileHandler):
                     # json to key value pairs
                     json_to_urlencoded_array(
                         # textx object to json
-                        json_or_array_to_json(payload.data, lambda k: k)
+                        json_or_array_to_json(payload.data)
                     )
                 ]
                 request.body = body
             elif json_payload := payload.json:
                 body.mode = Mode.RAW
                 body.options = {"language": "json"}
-                body.raw = json.dumps(json_or_array_to_json(json_payload, lambda x: x))
+                body.raw = json.dumps(json_or_array_to_json(json_payload))
                 if not request.header:
                     request.header = []
                 request.header.append(

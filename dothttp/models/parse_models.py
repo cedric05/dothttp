@@ -245,8 +245,8 @@ class ImportStmt:
 @dataclass
 class MultidefHttp:
     import_list: Optional[ImportStmt]
-    variables : List[Variable]
     allhttps: List[Http]
+    variables : List[Variable] = field(default_factory=lambda: [])
 
 
 # one can get list of services and regions from

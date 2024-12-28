@@ -5,10 +5,12 @@ import time
 @pytest.fixture(scope='session', autouse=True)
 def start_httpbin_container():
     # Setup: Start the Docker container
-    container_id = subprocess.check_output(
-        ["docker", "run", "-d", "-p", "8000:80", "kennethreitz/httpbin"]
-    ).decode().strip()
-    
+    try:
+        container_id = subprocess.check_output(
+            ["docker", "run", "-d", "-p", "8000:80", "kennethreitz/httpbin"]
+        ).decode().strip()
+    except:
+        pass
     # Wait for the container to be ready
     time.sleep(5)  # Adjust the sleep time as needed
 
