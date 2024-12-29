@@ -3,7 +3,7 @@ import logging
 import os
 from http.cookiejar import LWPCookieJar
 from pprint import pprint
-from typing import Union
+from typing import Optional, Union
 from urllib.parse import unquote, urlparse, urlunparse
 
 import jstyleson as json
@@ -15,6 +15,8 @@ from requests.auth import CONTENT_TYPE_FORM_URLENCODED, HTTPBasicAuth, HTTPDiges
 from requests.status_codes import _codes as status_code
 from requests_pkcs12 import Pkcs12Adapter
 from textx import metamodel_from_file
+
+from ..utils.property_util import PropertyProvider, Property
 
 from ..exceptions import DothttpUnSignedCertException
 from ..models.parse_models import Http, HttpFileType, MultidefHttp, ScriptType
@@ -262,9 +264,25 @@ class HttpFileFormatter(RequestBase):
         self.prop_cache = {}
 
     @staticmethod
-    def format_http(http: Http):
+    def format_http(http: Http, property_util: Optional[PropertyProvider]=None):
         output_str = ""
         new_line = "\n"
+
+        if property_util:
+            total_props = {}
+            total_props.update(property_util.infile_properties)
+            total_props.update(property_util.env_properties)
+            total_props.update(property_util.system_command_properties)
+            total_props.update(property_util.command_line_properties)
+            for key, value in total_props.items():
+                if isinstance(value, Property):
+                    if value.value:
+                        output_str += f" var {key} = {value.value} ;"
+                    else:
+                        output_str += f" var {key} ;"
+                else:
+                    output_str += f" var {key} = {value}{new_line} ;"
+                output_str += new_line
         if getattr(http, "description", None):
             for line in http.description.splitlines():
                 output_str += "// " + line + new_line
@@ -413,7 +431,7 @@ class HttpFileFormatter(RequestBase):
         return output_str
 
     @staticmethod
-    def apply_httpbook(model: MultidefHttp):
+    def apply_httpbook(model: MultidefHttp, property_util: Optional[PropertyProvider]=None):
         arr = []
         for http in model.allhttps:
             arr.append(
@@ -427,20 +445,20 @@ class HttpFileFormatter(RequestBase):
         return json.dumps(arr)
 
     @staticmethod
-    def apply_http(model: MultidefHttp):
+    def apply_http(model: MultidefHttp, property_util=None):
         output_str = ""
         for http in model.allhttps:
-            output_str = output_str + HttpFileFormatter.format_http(http)
+            output_str = output_str + HttpFileFormatter.format_http(http, property_util)
         return output_str
 
     @staticmethod
-    def format(model: MultidefHttp, filetype=HttpFileType.Httpfile):
+    def format(model: MultidefHttp, filetype=HttpFileType.Httpfile, property_util=None):
         if filetype == HttpFileType.Httpfile:
-            return HttpFileFormatter.apply_http(model)
-        return HttpFileFormatter.apply_httpbook(model)
+            return HttpFileFormatter.apply_http(model, property_util)
+        return HttpFileFormatter.apply_httpbook(model, property_util)
 
     def run(self):
-        formatted = self.format(self.model)
+        formatted = self.format(self.model, property_util=self.property_util)
         if self.args.stdout:
             print(formatted)
         else:

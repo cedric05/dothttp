@@ -150,12 +150,11 @@ class PropertyProvider:
     expression_regex = re.compile(r"\$expr:(?P<expression>.*)")
 
     def __init__(self, property_file=""):
-        self.command_line_properties = {}
-        self.env_properties = {}
         self.infile_properties: Dict[str, Property] = {}
-        self.property_file = property_file
-        self._resolvable_properties = set()
+        self.env_properties = {}
         self.system_command_properties = {}
+        self.command_line_properties = {}
+        self.property_file = property_file
         self.is_running_system_command_enabled = False
 
     def enable_system_command(self):
@@ -335,6 +334,10 @@ class PropertyProvider:
     def get_random_match(prop):
         match = PropertyProvider.random_string_regex.match(prop)
         return match
+    
+    def add_infile_property_from_var(self, key, value):
+        # with var, we support overriding
+        self.infile_properties[key] = Property([''], key, value)
 
     def resolve_system_command_prop(self, key):
         command = self.system_command_properties.get(key)

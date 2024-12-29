@@ -357,13 +357,39 @@ class BaseModelProcessor:
         property_util.add_infile_properties(content)
     
     @staticmethod
-    def load_properties_from_var(model, property_util):
+    def load_properties_from_var(model:MultidefHttp, property_util: PropertyProvider):
         ## this has to taken care by property util
         ## but it will complicate the code
         for variable in model.variables:
             if variable.value:
                 var_value = jsonmodel_to_json(variable.value)
-                property_util.infile_properties[variable.name] = Property([''], variable.name, var_value)
+                property_util.add_infile_property_from_var(variable.name, var_value)
+            elif variable.func:
+                func_name = f"${variable.func.name}"
+                if func_name in property_util.rand_map:
+                    func = property_util.rand_map[func_name]
+                    if variable.func.args:
+                        args = variable.func.args
+                        var_value = func(args)
+                    else:
+                        var_value = func()
+                else:
+                    var_value = variable.func.name
+                property_util.add_infile_property_from_var(variable.name, var_value)
+            elif variable.inter:
+                class PropertyResolver:
+                    # hassle of creating class is to make it work with format_map
+                    # instead of format which can be used with dict and can cause memory leak
+                    def __getitem__(self, key):
+                        if key in property_util.command_line_properties:
+                            return property_util.command_line_properties[key]
+                        if key in property_util.env_properties:
+                            return property_util.env_properties[key]
+                        if key in property_util.infile_properties and property_util.infile_properties[key].value is not None:
+                            return property_util.infile_properties[key].value
+                        raise KeyError(key)
+                var_value = variable.inter[2:-1].format_map(PropertyResolver())
+                property_util.add_infile_property_from_var(variable.name, var_value)
 
 
 class HttpDefBase(BaseModelProcessor):

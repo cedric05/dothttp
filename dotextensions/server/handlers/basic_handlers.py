@@ -151,7 +151,7 @@ class RunHttpFileHandler(BaseHandler):
             # redirects can add cookies
             comp.httpdef.headers["cookie"] = resp.request.headers["cookie"]
         try:
-            data.update({"http": self.get_http_from_req(comp.httpdef)})
+            data.update({"http": self.get_http_from_req(comp.httpdef, comp.property_util)})
         except Exception as e:
             logger.error("ran into error regenerating http def from parsed object")
             data.update(
@@ -172,9 +172,9 @@ class RunHttpFileHandler(BaseHandler):
         return RequestCompiler(config)
 
     @staticmethod
-    def get_http_from_req(request: HttpDef):
+    def get_http_from_req(request: HttpDef, property_util: "PropertyProvider"):
         http_def = MultidefHttp(import_list=[], allhttps=[request.get_http_from_req()])
-        return HttpFileFormatter.format(http_def)
+        return HttpFileFormatter.format(http_def, property_util=property_util)
 
 
 CONTEXT_SEP = """

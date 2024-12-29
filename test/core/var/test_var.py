@@ -2,9 +2,7 @@ import json
 from test import TestBase
 from test.core.test_request import dir_path
 
-from requests import PreparedRequest
-
-from dothttp.parse import HttpFileException
+from urllib.parse import urlparse
 
 base_dir = f"{dir_path}/var"
 
@@ -150,3 +148,20 @@ class VarSubstitutionTest(TestBase):
             json.loads(req.body),
             "incorrect body",
         )
+
+
+    def test_var_templating(self):
+        req = self.get_request(f"{base_dir}/templating.http")
+        self.assertEqual(
+            {
+                "a":10,
+                "b": "10 +  10 = 20"
+            },
+            json.loads(req.body),
+            "incorrect body",
+        )
+        # parse url and get query c
+        parsed = urlparse(req.url)
+        # c=randomstrs 
+        # total 12 = 10 (generated) + 2 (c=)
+        self.assertEqual(len(parsed.query), 12)

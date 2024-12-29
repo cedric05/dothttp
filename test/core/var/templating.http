@@ -1,0 +1,10 @@
+var a = 10;
+var c = randomStr(10);
+var b = $"{a} +  {a} = 20";
+
+POST "http://localhost:8000/post"
+? "c" = "{{c}}"
+json({
+  "a": {{a}},
+  "b": {{b}},
+})
