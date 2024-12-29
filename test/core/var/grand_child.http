@@ -1,0 +1,15 @@
+import "./child.http";
+
+POST "https://httpbin.org/post"
+? a = "{{a}}"
+json(
+    {
+        "a": "{{a}}",
+        "b": "{{b}}",
+        "c": "{{c}}",
+        "d": {{d}},
+        "d2": "{{d}}",
+        "jsonData": {{jsonData}},
+        "secInDay": "{{secInDay}}",
+    }
+)

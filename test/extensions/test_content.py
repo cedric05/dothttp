@@ -159,10 +159,10 @@ class FileExecute(TestBase):
                 # in such scenario
                 # only first one will be picked
                 """
-                var a = 10
+                var a = 10;
                 """,
                 """
-                var b = 20
+                var b = 20;
                 """
             ],
             curl=False,
@@ -190,7 +190,7 @@ class FileExecute(TestBase):
             target="test",
             contexts=[
                 """
-                var c = {"ram":"ranga", "raja":[1, true, false, null]}
+                var c = {"ram":"ranga", "raja":[1, true, false, null]};
                 """
             ],
             curl=False,

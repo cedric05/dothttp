@@ -1,0 +1,28 @@
+var jsonData = {
+    "secInDay": (24 * 60 * 60),
+    "secInHour": (60 * 60),
+    "true": true,
+    "false": false,
+    "nested" : [
+        1, 2, 4.4, "string", true, false, null, {
+            "key": "value"
+        }
+    ], 
+    "nestedObject": {
+        "key": {
+            "key": "value"
+        }
+    }
+};
+
+var okay = "okay";
+
+POST "http://localhost:8000/post"
+json({
+    jsonData: {{jsonData}},
+    {{okay}}: "okay",
+    "nested": {
+        "jsonData": {{jsonData}},
+        {{okay}}: "okay"
+    }
+})
