@@ -280,10 +280,9 @@ GET "http://localhost:8000/cookies/set/dev/ram"
         )
         self.assertEqual(200, result.result["status"])
 
-    # @skip("""
-    # skipping as certificate has expired
-    # https://github.com/chromium/badssl.com/issues/482
-    # """)
+    @skip("""
+    can be skipped as path may vary
+    """)
     def test_cert_with_no_key(self):
         filename = f"{http_base}/no-password.http"
         cert_file = f"{cert_base}/no-password.pem"
@@ -292,7 +291,7 @@ GET "http://localhost:8000/cookies/set/dev/ram"
         )
         self.assertEqual(200, req_comp_success.result["status"])
         self.assertEqual(
-            f"""var cert = '/workspaces/dothttp/test/core/root_cert/certs/no-password.pem' ;
+            f"""var cert = '/home/runner/work/dothttp/dothttp/test/core/root_cert/certs/no-password.pem' ;
 var key ;
 var p12 ;
 var file = '' ;
@@ -306,10 +305,9 @@ certificate(cert="{cert_file}")
             req_comp_success.result["http"],
         )
 
-    # @skip("""
-    # skipping as certificate has expired
-    # https://github.com/chromium/badssl.com/issues/482
-    # """)
+    @skip("""
+    can be skipped as path may vary
+    """)
     def test_cert_key(self):
         filename = f"{http_base}/no-password.http"
         cert_file = f"{cert_base}/cert.crt"
@@ -321,8 +319,8 @@ certificate(cert="{cert_file}")
         )
         self.assertEqual(200, req_comp2.result["status"])
         self.assertEqual(
-            f"""var cert = '/workspaces/dothttp/test/core/root_cert/certs/cert.crt' ;
-var key = '/workspaces/dothttp/test/core/root_cert/certs/key.key' ;
+            f"""var cert = '/home/runner/work/dothttp/dothttp/test/core/root_cert/certs/cert.crt' ;
+var key = '/home/runner/work/dothttp/dothttp/test/core/root_cert/certs/key.key' ;
 var p12 ;
 @name("with-key-and-cert")
 @clear
@@ -336,10 +334,9 @@ certificate(cert="{cert_file}", key="{key_file}")
             req_comp2.result["http"],
         )
 
-    # @skip("""
-    # skipping as certificate has expired
-    # https://github.com/chromium/badssl.com/issues/482
-    # """)
+    @skip("""
+    can be skipped as path may vary
+    """)
     def test_p12(self):
         filename = f"{http_base}/no-password.http"
         p12 = f"{cert_base}/badssl.com-client.p12"
@@ -352,7 +349,7 @@ certificate(cert="{cert_file}", key="{key_file}")
         self.assertEqual(
             f"""var cert ;
 var key ;
-var p12 = '/workspaces/dothttp/test/core/root_cert/certs/badssl.com-client.p12' ;
+var p12 = '/home/runner/work/dothttp/dothttp/test/core/root_cert/certs/badssl.com-client.p12' ;
 var password = 'badssl.com' ;
 @name("with-p12")
 @clear
