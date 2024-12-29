@@ -1,0 +1,8 @@
+import "./par.http";
+var a = 10;
+
+
+POST "https://httpbin.org/post"
+json({
+  "a": {{a}}
+})

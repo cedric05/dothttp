@@ -358,6 +358,8 @@ class BaseModelProcessor:
     
     @staticmethod
     def load_properties_from_var(model, property_util):
+        ## this has to taken care by property util
+        ## but it will complicate the code
         for variable in model.variables:
             if variable.value:
                 var_value = jsonmodel_to_json(variable.value)
