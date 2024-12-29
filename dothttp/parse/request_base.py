@@ -277,11 +277,17 @@ class HttpFileFormatter(RequestBase):
             for key, value in total_props.items():
                 if isinstance(value, Property):
                     if value.value:
-                        output_str += f" var {key} = {value.value} ;"
+                        if isinstance(value.value, str):
+                            output_str += f"var {key} = '{value.value}' ;"
+                        else:
+                            output_str += f"var {key} = {value.value} ;"
                     else:
-                        output_str += f" var {key} ;"
+                        output_str += f"var {key} ;"
                 else:
-                    output_str += f" var {key} = {value}{new_line} ;"
+                    if isinstance(value, str):
+                        output_str += f"var {key} = '{value}' ;"
+                    else:
+                        output_str += f"var {key} = {value} ;"
                 output_str += new_line
         if getattr(http, "description", None):
             for line in http.description.splitlines():
