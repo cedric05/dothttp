@@ -1,3 +1,8 @@
+var firstName = "John";
+var lastName = "Doe";
+var age = 25;
+var fullName = $"{firstName} {lastName}";
+
 @name("fetch 100 users, skip first 50")
 POST https://httpbin.org/post
 "Authorization": "Basic dXNlcm5hbWU6cGFzc3dvcmQ="
@@ -9,10 +14,10 @@ POST https://httpbin.org/post
 ? projection, location
 
 {
-    "firstName": {{firstName='John'}},
-    "lastName": {{lastName='Doe'}},
-    "age": {{age=25}},
-    "fullName": "{{firstName}} {{lastName}}",
+    "firstName": {{firstName}},
+    "lastName": {{lastName}},
+    "age": {{age}},
+    "fullName": "{{fullName}}",
     ageInDays: (25*365),
     // sample without no quotes
     description: sampleOneWithNoQuotesInValue

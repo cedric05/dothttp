@@ -2,6 +2,7 @@ import os
 from typing import Any, Union
 
 from dothttp.parse import BaseModelProcessor, Http, MultidefHttp
+from dothttp.parse.dsl_jsonparser import jsonmodel_to_json
 from dothttp.parse.request_base import dothttp_model
 from ..models import BaseHandler, Command, DothttpTypes, Result
 
@@ -69,6 +70,24 @@ class TypeFromPos(BaseHandler):
                         return {
                             "type": DothttpTypes.IMPORT.value,
                             "filename": import_file.value,
+                        }
+            elif model.variables:
+                for index, variable in enumerate(model.variables):
+                    if self.is_in_between(variable, position):
+                        value = None
+                        try:
+                            if variable.value:
+                                value = jsonmodel_to_json(variable.value)
+                            elif variable.inter:
+                                value = variable.inter
+                            elif variable.func:
+                                value = variable.func
+                        except:
+                            pass
+                        return {
+                            "type": DothttpTypes.VARIABLE.value,
+                            "name": variable.name,
+                            "value": value,
                         }
             for index, pick_http in enumerate(model.allhttps):
                 if self.is_in_between(pick_http, position):

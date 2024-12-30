@@ -32,6 +32,41 @@ class TypePositionTest(TestBase):
             {"base_start": None, "target": "1", "target_base": None, "type": "url"},
             result,
         )
+    
+    def test_content_var(self):
+        params = {
+            "content": """var a = 10;
+var b = 100;
+var b  = $"{a} + {a} = {b}";
+var d = { "a": a, "b": b };
+POST "https://httpbin.org/post"
+? a = "{{a}}"
+? b = "{{b}}"
+json({
+    "a": {{d}}
+})
+""",
+            "position":9,
+            "source":"hover"
+        }
+        result = self.execute_n_get(params)
+        self.assertEqual(
+            {'name': 'a', 'type': 'variable', 'value': 10},
+            result,
+        )
+        params["position"] = 20
+        result = self.execute_n_get(params)
+        self.assertEqual(
+            {'name': 'b', 'type': 'variable', 'value': 100},
+            result,
+        )
+        params["position"] = 30
+        result = self.execute_n_get(params)
+        self.assertEqual(
+            {'name': 'b', 'type': 'variable', 'value': '$"{a} + {a} = {b}"'},
+            result,
+        )
+    
 
     def test_more1(self):
         for params, result in [

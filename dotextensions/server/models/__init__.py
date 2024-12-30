@@ -38,6 +38,7 @@ class BaseHandler:
 
 class DothttpTypes(Enum):
     NAME = "name"
+    VARIABLE = "variable"
     EXTRA_ARGS = "extra_args"
     URL = "url"
     BASIC_AUTH = "basic_auth"
