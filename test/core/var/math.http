@@ -1,0 +1,9 @@
+var  secInDay = (24 * 60 * 60);
+var  secInHour = (60 * 60);
+
+
+POST "http://localhost:8000/post"
+json({
+    "secInDay": "{{secInDay}}",
+    "secInHour": {{secInHour}}
+})

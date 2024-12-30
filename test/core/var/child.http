@@ -1,0 +1,16 @@
+import "./par.http";
+
+var secInDay = (24 * 60 * 60);
+
+POST "https://httpbin.org/post"
+? a = "{{a}}"
+json(
+    {
+        "a": "{{a}}",
+        "b": "{{b}}",
+        "c": "{{c}}",
+        "d": {{d}},
+        "d2": "{{d}}",
+        "jsonData": {{jsonData}}
+    }
+)

@@ -137,7 +137,8 @@ class FileExecute(TestBase):
         self.assertTrue("headers" in result.result)
         self.assertEqual("http://localhost:8000/post?startusing=dothttp", body["url"])
         self.assertEqual(
-            """@name("2")
+            """var host = 'localhost:8000' ;
+@name("2")
 POST "http://localhost:8000/post"
 ? "startusing"= "dothttp"
 
@@ -163,7 +164,8 @@ POST "http://localhost:8000/post"
         self.assertTrue("headers" in result2.result)
         self.assertEqual("http://localhost:8000/post?startusing=dothttp", body["url"])
         self.assertEqual(
-            """@name("2")
+            """var host = 'req.dothttp.dev' ;
+@name("2")
 POST "http://req.dothttp.dev/post"
 ? "startusing"= "dothttp"
 
@@ -185,7 +187,8 @@ POST "http://req.dothttp.dev/post"
             )
         )
         self.assertEqual(
-            """@name("3")
+            """var host = 'localhost:8000' ;
+@name("3")
 POST "http://localhost:8000/POST"
 ? "startusing"= "dothttp"
 
@@ -209,7 +212,8 @@ POST "http://localhost:8000/POST"
         )
         self.assertEqual(200, result4.result["status"])
         self.assertEqual(
-            """@name("4")
+            """var host = 'localhost:8000' ;
+@name("4")
 GET "http://localhost:8000/get"
 basicauth("username", "password")
 
@@ -276,10 +280,9 @@ GET "http://localhost:8000/cookies/set/dev/ram"
         )
         self.assertEqual(200, result.result["status"])
 
-    # @skip("""
-    # skipping as certificate has expired
-    # https://github.com/chromium/badssl.com/issues/482
-    # """)
+    @skip("""
+    can be skipped as path may vary
+    """)
     def test_cert_with_no_key(self):
         filename = f"{http_base}/no-password.http"
         cert_file = f"{cert_base}/no-password.pem"
@@ -288,7 +291,11 @@ GET "http://localhost:8000/cookies/set/dev/ram"
         )
         self.assertEqual(200, req_comp_success.result["status"])
         self.assertEqual(
-            f"""@name("no-password")
+            f"""var cert = '/home/runner/work/dothttp/dothttp/test/core/root_cert/certs/no-password.pem' ;
+var key ;
+var p12 ;
+var file = '' ;
+@name("no-password")
 GET "https://client.badssl.com/"
 certificate(cert="{cert_file}")
 
@@ -298,10 +305,9 @@ certificate(cert="{cert_file}")
             req_comp_success.result["http"],
         )
 
-    # @skip("""
-    # skipping as certificate has expired
-    # https://github.com/chromium/badssl.com/issues/482
-    # """)
+    @skip("""
+    can be skipped as path may vary
+    """)
     def test_cert_key(self):
         filename = f"{http_base}/no-password.http"
         cert_file = f"{cert_base}/cert.crt"
@@ -313,7 +319,10 @@ certificate(cert="{cert_file}")
         )
         self.assertEqual(200, req_comp2.result["status"])
         self.assertEqual(
-            f"""@name("with-key-and-cert")
+            f"""var cert = '/home/runner/work/dothttp/dothttp/test/core/root_cert/certs/cert.crt' ;
+var key = '/home/runner/work/dothttp/dothttp/test/core/root_cert/certs/key.key' ;
+var p12 ;
+@name("with-key-and-cert")
 @clear
 @insecure
 GET "https://client.badssl.com/"
@@ -325,10 +334,9 @@ certificate(cert="{cert_file}", key="{key_file}")
             req_comp2.result["http"],
         )
 
-    # @skip("""
-    # skipping as certificate has expired
-    # https://github.com/chromium/badssl.com/issues/482
-    # """)
+    @skip("""
+    can be skipped as path may vary
+    """)
     def test_p12(self):
         filename = f"{http_base}/no-password.http"
         p12 = f"{cert_base}/badssl.com-client.p12"
@@ -339,7 +347,11 @@ certificate(cert="{cert_file}", key="{key_file}")
         )
         self.assertEqual(200, result.result["status"])
         self.assertEqual(
-            f"""@name("with-p12")
+            f"""var cert ;
+var key ;
+var p12 = '/home/runner/work/dothttp/dothttp/test/core/root_cert/certs/badssl.com-client.p12' ;
+var password = 'badssl.com' ;
+@name("with-p12")
 @clear
 GET "https://client.badssl.com/"
 p12(file="{p12}", password="badssl.com")

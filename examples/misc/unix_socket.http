@@ -1,4 +1,4 @@
-@name("docker base")
+@name("simple")
 # docker base
 GET "http+unix://%2Fvar%2Frun%2Fdocker.sock"
 

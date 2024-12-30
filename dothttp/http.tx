@@ -1,5 +1,18 @@
-//HTTP: ram=HTTP2
-MULTISET: (import_list=IMPORT)? (allhttps=HTTP+)?;
+
+MULTISET: (import_list=IMPORT)? (variables=VAR*)? (allhttps=HTTP+)?;
+
+
+VAR:
+    "var" name=ID ("=" (  func=FunctionCall | inter=InterpolatedString | value=Value ))? ';'
+;
+
+InterpolatedString: 
+    '$"' /[^"]*/ '"'
+;
+
+FunctionCall: 
+    name=ID ('(' args=INT ')')?
+;
 
 IMPORT: ('import' filename=String ';')* ;
 
@@ -208,7 +221,7 @@ Array:
 ;
 
 Value:
-    flt=Float | int=Int | bl=Bool |  null="null" |strs += TRIPLE_OR_DOUBLE_STRING | var=VarString  | object=Object | array=Array | expr=Expression
+    flt=Float | int=Int | bl=Bool |  null="null" | strs += TRIPLE_OR_DOUBLE_STRING | var=VarString  | object=Object | array=Array | expr=Expression
 ;
 
 Expression:

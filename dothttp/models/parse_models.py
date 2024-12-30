@@ -7,6 +7,11 @@ from ..exceptions import DotHttpException
 
 
 @dataclass
+class Variable:
+    name: str
+    value: Union[None, str]
+
+@dataclass
 class NameWrap:
     name: str
     base: Optional[str] = None
@@ -241,6 +246,7 @@ class ImportStmt:
 class MultidefHttp:
     import_list: Optional[ImportStmt]
     allhttps: List[Http]
+    variables : List[Variable] = field(default_factory=lambda: [])
 
 
 # one can get list of services and regions from
