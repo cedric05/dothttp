@@ -15,6 +15,9 @@ from .handlers.basic_handlers import (
     GetNameReferencesHandler,
     RunHttpFileHandler,
     VersionHandler,
+    GetHoveredResolvedParamContentHandler,
+    GetHoveredResolvedParamFileHandler
+    
 )
 from .handlers.gohandler import TypeFromPos
 from .handlers.har2httphandler import Har2HttpHandler
@@ -39,6 +42,9 @@ handlers: Dict[str, BaseHandler] = {
         Har2HttpHandler(),
         Http2Postman(),
         VersionHandler(),
+        GetHoveredResolvedParamContentHandler(),
+        GetHoveredResolvedParamFileHandler()
+
     )
 }
 
