@@ -19,7 +19,8 @@ from dothttp.parse.request_base import (
     RequestCompiler,
     dothttp_model,
 )
-from ..models import BaseHandler, Command, Result
+from ..models import BaseHandler, Command, DothttpTypes, Result
+from .gohandler import TypeFromPos
 from . import logger
 
 
@@ -299,6 +300,60 @@ class FormatHttpFileHandler(BaseHandler):
         result = Result(id=command.id, result=command.params)
         return result
 
+class ResolveBase():
+
+    def get_resolved(self, command: Command) -> Result:
+        pos = command.params.get('position')
+        config = self.get_config(command)
+        comp: RequestCompiler = self.get_request_comp(config)
+        comp.load_def()
+        type_dict = TypeFromPos.figure_n_get(comp.model, pos)
+        type_type = type_dict['type']
+        if type_type == DothttpTypes.URL.value:
+            type_dict["resolved"] = comp.httpdef.url
+        elif type_type == DothttpTypes.NAME.value:
+            type_dict["resolved"] = comp.httpdef.name
+        # header
+        # query is pending
+        elif type_type == DothttpTypes.VARIABLE.value:
+            variable_name = type_dict["name"]
+            value = comp.property_util.resolve_property_string(variable_name)
+            type_dict["resolved"] = value
+        # elif type_type == DothttpTypes.HEADER:
+        #     return Result(id=command.id, result={"resolved": comp.httpdef.headerwrap.header})
+        elif type_type == DothttpTypes.PAYLOAD_DATA.value:
+            type_dict["resolved"] = comp.httpdef.payload.data
+        elif type_type == DothttpTypes.PAYLOAD_ENCODED.value:
+            type_dict["resolved"] = comp.httpdef.payload.data
+        elif type_type == DothttpTypes.PAYLOAD_JSON.value:
+            type_dict["resolved"] = comp.httpdef.payload.json
+        elif type_type == DothttpTypes.PAYLOAD_MULTIPART.value:
+            type_dict["resolved"] = comp.httpdef.payload.files
+        elif type_type == DothttpTypes.PAYLOAD_FILE.value:
+            type_dict["resolved"] = comp.httpdef.payload.filename
+        else:
+            type_dict["resolved"] = ""
+        return Result(id=command.id, result=type_dict)
+
+# return resolved string instead of model object
+class GetHoveredResolvedParamFileHandler(RunHttpFileHandler, ResolveBase):
+    method = "/file/resolve"
+
+    def get_method(self):
+        return GetHoveredResolvedParamFileHandler.method
+    
+    def run(self, command):
+        return self.get_resolved(command)
+
+
+class GetHoveredResolvedParamContentHandler(ContentExecuteHandler, ResolveBase):
+    method = "/content/resolve"
+
+    def get_method(self):
+        return GetHoveredResolvedParamContentHandler.method
+
+    def run(self, command):
+        return self.get_resolved(command)
 
 class GetNameReferencesHandler(BaseHandler):
     name = "/file/names"

@@ -7,6 +7,8 @@ from unittest import skip
 
 from dotextensions.server.handlers.basic_handlers import (
     ContentNameReferencesHandler,
+    GetHoveredResolvedParamContentHandler,
+    GetHoveredResolvedParamFileHandler,
     GetNameReferencesHandler,
     RunHttpFileHandler,
 )
@@ -39,7 +41,8 @@ class TargetTest(TestBase):
                     {"end": 77, "method": "GET", "name": "test", "start": 0},
                     {"end": 207, "method": "POST", "name": "test2", "start": 79},
                     {"end": 337, "method": "POST", "name": "test3", "start": 209},
-                    {"end": 398, "method": "POST", "name": "test4.test", "start": 339},
+                    {"end": 398, "method": "POST",
+                        "name": "test4.test", "start": 339},
                 ],
                 "urls": [
                     {
@@ -105,6 +108,114 @@ class TargetTest(TestBase):
         self.assertTrue(result.result["error"])
 
 
+class ResovleTest(TestBase):
+    def test_hover_url(self):
+        resolve_handler = GetHoveredResolvedParamFileHandler()
+        result = resolve_handler.run(
+            Command(
+                method=GetHoveredResolvedParamFileHandler.name,
+                params={"file": f"{command_dir}/simple.http", "position": 7},
+                id=1,
+            )
+        )
+        self.assertEquals(
+            result.result["resolved"], "http://localhost:8000/get")
+
+    def test_hover_url_content(self):
+        resolve_handler = GetHoveredResolvedParamContentHandler()
+        with open(f"{command_dir}/simple.http") as f:
+            result = resolve_handler.run(
+                Command(
+                    method=resolve_handler.name,
+                    params={"content": f.read(), "position": 7},
+                    id=1,
+                )
+            )
+            self.assertEquals(
+                result.result["resolved"], "http://localhost:8000/get")
+
+    def test_hover_json_content(self):
+        resolve_handler = GetHoveredResolvedParamContentHandler()
+        content = """
+var numOfHours = 3;
+var numOfSeconds = (numOfHours * 60 * 60);
+POST "http://localhost:8000/post"
+json({
+    "totalSeconds" : {{numOfSeconds}}
+})
+"""
+        index = content.find("totalSeconds")
+        result = resolve_handler.run(
+            Command(
+                method=resolve_handler.name,
+                params={"content": content, "position": index},
+                id=1,
+            )
+        )
+        expected = {'totalSeconds': 10800}
+        self.assertEquals(expected, result.result["resolved"])
+
+        index2 = content.find("numOfHours * 60 * 60")
+        result2 = resolve_handler.run(
+            Command(
+                method=resolve_handler.name,
+                params={"content": content, "position": index2},
+                id=2,
+            )
+        )
+        self.assertEquals(10800, result2.result["resolved"])
+
+
+    def test_hover_import_content(self):
+        resolve_handler = GetHoveredResolvedParamContentHandler()
+        names_http_file = f"{command_dir}/names.http"
+        content = f'import "{names_http_file}";' + """
+        var numOfHours = 3;
+        var numOfSeconds = (numOfHours * 60 * 60);
+        @name("my-test"): "test3"
+        POST "/ram"
+        json({
+            "totalSeconds" : {{numOfSeconds}}
+        })
+        """
+        index = content.find("ram")
+        result = resolve_handler.run(
+            Command(
+                method=resolve_handler.name,
+                params={"content": content, "position": index},
+                id=1,
+            )
+        )
+        expected = "https://req.dothttp.dev/ram"
+        self.assertEquals(expected, result.result["resolved"])
+
+
+    def test_hover_context_content(self):
+        resolve_handler = GetHoveredResolvedParamContentHandler()
+        contexts = ["""@name('test3')
+GET "https://httpbin.org/get"
+"""]
+        content = """
+        var numOfHours = 3;
+        var numOfSeconds = (numOfHours * 60 * 60);
+        @name("my-test"): "test3"
+        POST "/ram"
+        json({
+            "totalSeconds" : {{numOfSeconds}}
+        })
+        """
+        index = content.find("ram")
+        result = resolve_handler.run(
+            Command(
+                method=resolve_handler.name,
+                params={"content": content, "position": index, "contexts": contexts},
+                id=1,
+            )
+        )
+        expected = "https://httpbin.org/get/ram"
+        self.assertEquals(expected, result.result["resolved"])
+
+
 class FileExecute(TestBase):
     def setUp(self) -> None:
         self.execute_handler = RunHttpFileHandler()
@@ -135,7 +246,8 @@ class FileExecute(TestBase):
         self.assertTrue("status" in result.result)
         self.assertEqual(200, result.result["status"])
         self.assertTrue("headers" in result.result)
-        self.assertEqual("http://localhost:8000/post?startusing=dothttp", body["url"])
+        self.assertEqual(
+            "http://localhost:8000/post?startusing=dothttp", body["url"])
         self.assertEqual(
             """var host = 'localhost:8000' ;
 @name("2")
@@ -162,7 +274,8 @@ POST "http://localhost:8000/post"
         self.assertTrue("status" in result2.result)
         self.assertEqual(200, result2.result["status"])
         self.assertTrue("headers" in result2.result)
-        self.assertEqual("http://localhost:8000/post?startusing=dothttp", body["url"])
+        self.assertEqual(
+            "http://localhost:8000/post?startusing=dothttp", body["url"])
         self.assertEqual(
             """var host = 'req.dothttp.dev' ;
 @name("2")
@@ -256,11 +369,13 @@ basicauth("username", "password")
         self.assertEqual(True, result.result["error"])
 
     def test_env(self):
-        result = self.execute_file(f"{command_dir}/isolated/env.http", env=["simple"])
+        result = self.execute_file(
+            f"{command_dir}/isolated/env.http", env=["simple"])
         self.assertEqual(200, result.result["status"])
 
     def test_execute(self):
-        result = self.execute_file(f"{command_dir}/cookie.http", target="set-cookie")
+        result = self.execute_file(
+            f"{command_dir}/cookie.http", target="set-cookie")
         self.assertEqual(
             """@name("set-cookie")
 GET "http://localhost:8000/cookies/set/dev/ram"
@@ -392,7 +507,6 @@ awsauth(access_id="dummy", secret_key="dummy", service="s3", region="eu-east-1")
         self.assertEqual({"prop": "value"}, body["json"])
         print(result)
 
-
     def test_property_sub(self):
         http_file = f"{command_dir}/custom-property/property-refer.http"
         result = self.execute_file(
@@ -427,7 +541,6 @@ awsauth(access_id="dummy", secret_key="dummy", service="s3", region="eu-east-1")
         self.assertEqual(200, result.result["status"])
         body = json.loads(result.result["body"])
         self.assertEqual({'fullName': 'Mr. John Doe'}, body["json"])
-
 
 
 if __name__ == "__main__":

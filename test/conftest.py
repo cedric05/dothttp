@@ -9,13 +9,13 @@ def start_httpbin_container():
         container_id = subprocess.check_output(
             ["docker", "run", "-d", "-p", "8000:80", "kennethreitz/httpbin"]
         ).decode().strip()
+        # Wait for the container to be ready
+        time.sleep(5)  # Adjust the sleep time as needed
+
+        yield
+
+        # Teardown: Stop and remove the Docker container
+        subprocess.run(["docker", "stop", container_id])
+        subprocess.run(["docker", "rm", container_id])
     except:
         pass
-    # Wait for the container to be ready
-    time.sleep(5)  # Adjust the sleep time as needed
-
-    yield
-
-    # Teardown: Stop and remove the Docker container
-    subprocess.run(["docker", "stop", container_id])
-    subprocess.run(["docker", "rm", container_id])

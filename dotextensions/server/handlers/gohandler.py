@@ -61,7 +61,9 @@ class TypeFromPos(BaseHandler):
                 result={"error_message": f"unknown Exception {e}", "error": True},
             )
 
-    def figure_n_get(self, model: MultidefHttp, position: int) -> dict:
+    @staticmethod
+    def figure_n_get(model: MultidefHttp, position: int) -> dict:
+        self = TypeFromPos 
         if self.is_in_between(model, position):
             index = 0
             if model.import_list:
