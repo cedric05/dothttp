@@ -149,12 +149,11 @@ class VarSubstitutionTest(TestBase):
             "incorrect body",
         )
 
-
     def test_var_templating(self):
         req = self.get_request(f"{base_dir}/templating.http")
         self.assertEqual(
             {
-                "a":10,
+                "a": 10,
                 "b": "10 +  10 = 20"
             },
             json.loads(req.body),
@@ -162,6 +161,40 @@ class VarSubstitutionTest(TestBase):
         )
         # parse url and get query c
         parsed = urlparse(req.url)
-        # c=randomstrs 
+        # c=randomstrs
         # total 12 = 10 (generated) + 2 (c=)
         self.assertEqual(len(parsed.query), 12)
+
+    def test_var_json_sub(self):
+        req = self.get_request(f"{base_dir}/var_json_sub.http")
+        expected = {
+            "a": {
+                "b": {
+                    "d": {
+                        "e": {
+                            "a": 10,
+                            "b": 11.1,
+                            "c": 21.1,
+                            "d": "hello world",
+                            "e": "if is a=10, b=11.1 and a + b is 21.1",
+                            "f": True,
+                            "g": None
+                        }
+                    }
+                }
+            }
+        }
+
+        self.assertEqual(expected, json.loads(req.body), "incorrect body")
+
+    def test_var_expression(self):
+        req = self.get_request(f"{base_dir}/expression_var.http")
+        expected = {
+            'difference': 4.8999999999999995,
+            'product': 52.52,
+            'quotient': 1.942307692307692,
+            'sum': 15.3,
+            "test": "This is a test"
+        }
+
+        self.assertEqual(expected, json.loads(req.body), "incorrect body")

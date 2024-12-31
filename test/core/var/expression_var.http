@@ -1,0 +1,29 @@
+# Setting variables
+var num1 = 10.1;
+var num2 = 5.2;
+
+# Addition
+var sum = (num1 + num2);
+
+# Subtraction
+var difference = (num1 - num2);
+
+# Multiplication
+var product = (num1 * num2);
+
+# Division
+var quotient = (num1 / num2);
+
+var test = "This is a test";
+
+# Output the results
+POST http://localhost:8000/post
+json(
+    {
+        "sum": {{sum}},
+        "difference": {{difference}},
+        "product": {{product}},
+        "quotient": {{quotient}},
+        "test": "{{test}}"
+    }
+)

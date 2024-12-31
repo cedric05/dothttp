@@ -362,7 +362,7 @@ class BaseModelProcessor:
         ## but it will complicate the code
         for variable in model.variables:
             if variable.value:
-                var_value = jsonmodel_to_json(variable.value)
+                var_value = jsonmodel_to_json(variable.value, property_util=property_util)
                 property_util.add_infile_property_from_var(variable.name, var_value)
             elif variable.func:
                 func_name = f"${variable.func.name}"

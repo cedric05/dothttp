@@ -213,7 +213,7 @@ TOFILE:
 ;
 
 JSON:
-    array=Array | object=Object
+    array=Array | object=Object | var = VarString
 ;
 
 Array:
@@ -237,7 +237,7 @@ Factor:
 ;
 
 Number:
-    /\d+/
+    /\d+(\.)?\d*/ | ID
 ;
 
 

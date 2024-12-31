@@ -205,7 +205,6 @@ class PropertyProvider:
             )
         return content_prop_needed, props_needed
 
-    @lru_cache
     def available_properties_list(self):
         return (
             set(self.env_properties.keys())

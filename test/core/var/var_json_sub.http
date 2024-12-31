@@ -1,0 +1,32 @@
+var a = 10;
+var b = 11.1;
+var c = (10 + 11.1); 
+var d = "hello world";
+var e = $"if is a={a}, b={b} and a + b is {c}";
+var f = true;
+var g = null;
+var h = {
+    "a": {{a}},
+    "b": {{b}},
+    "c": {{c}},
+    "d": {{d}},
+    "e": {{e}},
+    "f": {{f}},
+    "g": {{g}}
+};
+var e = {
+    "a":{
+        "b": {
+            "d": {
+                "e": {{h}}
+            }
+        }
+    }
+};
+
+POST "https://req.dothttp.dev/"
+json(
+    {{e}}
+)
+
+
