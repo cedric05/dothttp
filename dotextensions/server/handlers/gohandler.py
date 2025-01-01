@@ -81,9 +81,9 @@ class TypeFromPos(BaseHandler):
                             if variable.value:
                                 value = jsonmodel_to_json(variable.value)
                             elif variable.inter:
-                                value = variable.inter
+                                value = str(variable.inter)
                             elif variable.func:
-                                value = variable.func
+                                value = str(variable.func)
                         except:
                             pass
                         return {
