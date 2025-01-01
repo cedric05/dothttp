@@ -4,7 +4,7 @@ var c = (10 + 11.1);
 var d = "hello world";
 var e = $"if is a={a}, b={b} and a + b is {c}";
 var f = true;
-var g = null;
+var g = false;
 var h = {
     "a": {{a}},
     "b": {{b}},

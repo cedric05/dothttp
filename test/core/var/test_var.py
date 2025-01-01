@@ -75,7 +75,7 @@ class VarSubstitutionTest(TestBase):
                 "b": "b",
                 "c": "c",
                 "d": True,
-                "d2": "true",
+                "d2": "True",
                 "jsonData": {
                     "secInDay": 86400,
                 }
@@ -92,7 +92,7 @@ class VarSubstitutionTest(TestBase):
                 "b": "b",
                 "c": "c",
                 "d": True,
-                "d2": "true",
+                "d2": "True",
                 "jsonData": {
                     "secInDay": 86400,
                 },
@@ -111,7 +111,7 @@ class VarSubstitutionTest(TestBase):
                 "b": "b",
                 "c": "c",
                 "d": True,
-                "d2": "true",
+                "d2": "True",
                 "jsonData": {
                     "secInDay": 86400,
                 },
@@ -129,7 +129,7 @@ class VarSubstitutionTest(TestBase):
                 "b": "b",
                 "c": "c",
                 "d": True,
-                "d2": "true",
+                "d2": "True",
                 "jsonData": {
                     "secInDay": 86400,
                 },
@@ -178,7 +178,7 @@ class VarSubstitutionTest(TestBase):
                             "d": "hello world",
                             "e": "if is a=10, b=11.1 and a + b is 21.1",
                             "f": True,
-                            "g": None
+                            "g": False
                         }
                     }
                 }

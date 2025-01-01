@@ -11,7 +11,7 @@ InterpolatedString:
 ;
 
 FunctionCall: 
-    name=ID ('(' args=INT ')')?
+    name=ID '(' (args=INT)? ')'
 ;
 
 IMPORT: ('import' filename=String ';')* ;
