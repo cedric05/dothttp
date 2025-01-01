@@ -216,6 +216,51 @@ GET "https://httpbin.org/get"
         self.assertEquals(expected, result.result["resolved"])
 
 
+
+    def test_hover_context_with_no_target(self):
+        resolve_handler = GetHoveredResolvedParamContentHandler()
+        contexts = ["""@name('test3')
+GET "https://httpbin.org/get"
+"""]
+        content = """
+        var numOfHours = 3;
+        var numOfSeconds = (numOfHours * 60 * 60);
+        @name("my-test"): "test3"
+        POST "/ram"
+        json({
+            "totalSeconds" : {{numOfSeconds}}
+        })
+
+        @name("my-test2"): "test3"
+        POST "/ranga"
+        json({
+            "totalSeconds" : {{numOfSeconds}},
+            "rama": "ranga",
+        })
+        """
+        index = content.find("ranga")
+        result = resolve_handler.run(
+            Command(
+                method=resolve_handler.name,
+                params={"content": content, "position": index, "contexts": contexts},
+                id=1,
+            )
+        )
+        expected = "https://httpbin.org/get/ranga"
+        self.assertEquals(expected, result.result["resolved"])
+
+        index = content.find("rama")
+        result = resolve_handler.run(
+            Command(
+                method=resolve_handler.name,
+                params={"content": content, "position": index, "contexts": contexts},
+                id=1,
+            )
+        )
+        expected = {"totalSeconds": 10800, "rama": "ranga"}
+        self.assertEquals(expected, result.result["resolved"])
+
+
 class FileExecute(TestBase):
     def setUp(self) -> None:
         self.execute_handler = RunHttpFileHandler()

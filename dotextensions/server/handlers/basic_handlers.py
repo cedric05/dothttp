@@ -303,11 +303,21 @@ class FormatHttpFileHandler(BaseHandler):
 class ResolveBase():
 
     def get_resolved(self, command: Command) -> Result:
+        filename = command.params.get('file')
+        content = command.params.get('content')
         pos = command.params.get('position')
+        if filename:
+            model: MultidefHttp = dothttp_model.model_from_file(filename)
+        else:
+            model: MultidefHttp = dothttp_model.model_from_str(content)
+        type_dict = TypeFromPos.figure_n_get(model, pos)
+        if "target" not in type_dict:
+            command.params["target"] = 1
+        else:
+            command.params["target"] = type_dict["target"]
         config = self.get_config(command)
         comp: RequestCompiler = self.get_request_comp(config)
         comp.load_def()
-        type_dict = TypeFromPos.figure_n_get(comp.model, pos)
         type_type = type_dict['type']
         if type_type == DothttpTypes.URL.value:
             type_dict["resolved"] = comp.httpdef.url
