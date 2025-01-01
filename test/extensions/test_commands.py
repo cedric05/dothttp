@@ -165,7 +165,6 @@ json({
         )
         self.assertEquals(10800, result2.result["resolved"])
 
-
     def test_hover_import_content(self):
         resolve_handler = GetHoveredResolvedParamContentHandler()
         names_http_file = f"{command_dir}/names.http"
@@ -189,7 +188,6 @@ json({
         expected = "https://req.dothttp.dev/ram"
         self.assertEquals(expected, result.result["resolved"])
 
-
     def test_hover_context_content(self):
         resolve_handler = GetHoveredResolvedParamContentHandler()
         contexts = ["""@name('test3')
@@ -208,14 +206,13 @@ GET "https://httpbin.org/get"
         result = resolve_handler.run(
             Command(
                 method=resolve_handler.name,
-                params={"content": content, "position": index, "contexts": contexts},
+                params={"content": content,
+                        "position": index, "contexts": contexts},
                 id=1,
             )
         )
         expected = "https://httpbin.org/get/ram"
         self.assertEquals(expected, result.result["resolved"])
-
-
 
     def test_hover_context_with_no_target(self):
         resolve_handler = GetHoveredResolvedParamContentHandler()
@@ -242,7 +239,8 @@ GET "https://httpbin.org/get"
         result = resolve_handler.run(
             Command(
                 method=resolve_handler.name,
-                params={"content": content, "position": index, "contexts": contexts},
+                params={"content": content,
+                        "position": index, "contexts": contexts},
                 id=1,
             )
         )
@@ -253,12 +251,35 @@ GET "https://httpbin.org/get"
         result = resolve_handler.run(
             Command(
                 method=resolve_handler.name,
-                params={"content": content, "position": index, "contexts": contexts},
+                params={"content": content,
+                        "position": index, "contexts": contexts},
                 id=1,
             )
         )
         expected = {"totalSeconds": 10800, "rama": "ranga"}
         self.assertEquals(expected, result.result["resolved"])
+
+    def test_hover_import_relative_content(self):
+        resolve_handler = GetHoveredResolvedParamContentHandler()
+        content = """import "./names.http";
+        var numOfHours = 3;
+        var numOfSeconds = (numOfHours * 60 * 60);
+        @name("my-test"): "test3"
+        POST "/ram"
+        json({
+            "totalSeconds" : {{numOfSeconds}}
+        })
+        """
+        index = content.find("ram")
+        result = resolve_handler.run(
+            Command(
+                method=resolve_handler.name,
+                params={"content": content, "position": index,
+                        "file": f"{command_dir}/names.hnbk"},
+                id=1,
+            )
+        )
+        expected = "https://req.dothttp.dev/ram"
 
 
 class FileExecute(TestBase):

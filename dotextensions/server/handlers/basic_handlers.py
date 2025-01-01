@@ -306,10 +306,10 @@ class ResolveBase():
         filename = command.params.get('file')
         content = command.params.get('content')
         pos = command.params.get('position')
-        if filename:
-            model: MultidefHttp = dothttp_model.model_from_file(filename)
-        else:
+        if content:
             model: MultidefHttp = dothttp_model.model_from_str(content)
+        else:
+            model: MultidefHttp = dothttp_model.model_from_file(filename)
         type_dict = TypeFromPos.figure_n_get(model, pos)
         if "target" not in type_dict:
             command.params["target"] = 1
