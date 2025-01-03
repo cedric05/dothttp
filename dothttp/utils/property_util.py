@@ -110,6 +110,7 @@ def evaluate_expression(expression: str) -> str:
         base_logger.error(f"Error evaluating expression `{expression}`: {e}")
         return expression
 
+property_regex = re.compile(r"{{(?P<var>.*?)}}", re.DOTALL)
 
 class PropertyProvider:
     """
@@ -126,7 +127,7 @@ class PropertyProvider:
     """
 
     random = Random()
-    var_regex = re.compile(r"{{(?P<var>.*?)}}", re.DOTALL)
+    var_regex = property_regex
     rand_map: Dict[str, FunctionType] = {
         "$randomStr": get_random_str,
         "$randomInt": get_random_int,

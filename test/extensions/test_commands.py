@@ -258,6 +258,19 @@ GET "https://httpbin.org/get"
         )
         expected = {"totalSeconds": 10800, "rama": "ranga"}
         self.assertEquals(expected, result.result["resolved"])
+        
+        # look for property name and resolve it
+        
+        index = content.find("{{numOfSeconds}}")
+        result = resolve_handler.run(
+            Command(
+                method=resolve_handler.name,
+                params={"content": content,
+                        "position": index, "contexts": contexts},
+                id=1,
+            )
+        )
+        self.assertEquals({'name': 'numOfSeconds', 'value': 10800}, result.result["property_at_pos"])
 
     def test_hover_import_relative_content(self):
         resolve_handler = GetHoveredResolvedParamContentHandler()
@@ -280,6 +293,7 @@ GET "https://httpbin.org/get"
             )
         )
         expected = "https://req.dothttp.dev/ram"
+        self.assertEquals(expected, result.result["resolved"])
 
 
 class FileExecute(TestBase):

@@ -5,6 +5,7 @@ from requests import RequestException
 
 from dothttp.__version__ import __version__
 from dothttp.exceptions import DotHttpException
+from dothttp.utils.property_util import property_regex
 from dothttp.models.parse_models import ScriptType
 from dothttp.parse import (
     BaseModelProcessor,
@@ -309,7 +310,17 @@ class ResolveBase():
         if content:
             model: MultidefHttp = dothttp_model.model_from_str(content)
         else:
-            model: MultidefHttp = dothttp_model.model_from_file(filename)
+            with open(filename) as f:
+                content = f.read()
+                model: MultidefHttp = dothttp_model.model_from_str(content)
+                command.params["content"] = content
+        property_hovered = None
+        matches = property_regex.finditer(content)
+        for match in matches:
+            if match.start() <= pos <= match.end():
+                property_hovered = match.group()[2:-2].split("=")[0].strip()
+                break
+    
         type_dict = TypeFromPos.figure_n_get(model, pos)
         if "target" not in type_dict:
             command.params["target"] = 1
@@ -319,6 +330,12 @@ class ResolveBase():
         comp: RequestCompiler = self.get_request_comp(config)
         comp.load_def()
         type_type = type_dict['type']
+
+        if property_hovered:
+            type_dict["property_at_pos"] = {
+                "name": property_hovered,
+                "value": comp.property_util.resolve_property_string(property_hovered),
+            }
         if type_type == DothttpTypes.URL.value:
             type_dict["resolved"] = comp.httpdef.url
         elif type_type == DothttpTypes.NAME.value:
