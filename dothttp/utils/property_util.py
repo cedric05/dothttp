@@ -157,6 +157,7 @@ class PropertyProvider:
         self.command_line_properties = {}
         self.property_file = property_file
         self.is_running_system_command_enabled = False
+        self.errors = []
 
     def enable_system_command(self):
         self.is_running_system_command_enabled = True
@@ -238,19 +239,23 @@ class PropertyProvider:
         return ret or key.startswith("$expr:")
 
     def get_updated_content(self, content, type="str"):
-        content_prop_needed, props_needed = self.check_properties_for_content(
-            content)
-        for var in props_needed:
-            if type == "str":
-                value = self.resolve_property_string(var)
-                for text_to_replace in content_prop_needed[var].text:
-                    content = content.replace(
-                        "{{" + text_to_replace + "}}", str(value)
-                    )
-            else:
-                content = self.resolve_property_object(var)
-            base_logger.debug(f"using `{content}` for property {var}")
-        return content
+        try:
+            content_prop_needed, props_needed = self.check_properties_for_content(
+                content)
+            for var in props_needed:
+                if type == "str":
+                    value = self.resolve_property_string(var)
+                    for text_to_replace in content_prop_needed[var].text:
+                        content = content.replace(
+                            "{{" + text_to_replace + "}}", str(value)
+                        )
+                else:
+                    content = self.resolve_property_object(var)
+                base_logger.debug(f"using `{content}` for property {var}")
+            return content
+        except PropertyNotFoundException as e:
+            self.errors.append(e)
+            return content
     
     def get_updated_obj_content(self, content):
         return self.get_updated_content(content, "obj")

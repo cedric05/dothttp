@@ -26,9 +26,11 @@ class NegativeScenarios(TestBase):
 
     def test_property_not_found(self):
         with self.assertRaises(PropertyNotFoundException):
-            self.get_request(
+            comp = self.get_request_comp(
                 f"{sub_base_path}/multipleprop.http", prop=f"{sub_base_path}/prop1.json"
             )
+            comp.get_request()
+            raise comp.property_util.errors[0]
 
     def test_commmand_line_not_found(self):
         with self.assertRaises(CommandLinePropError):

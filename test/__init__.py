@@ -17,6 +17,12 @@ class TestBase(unittest.TestCase):
         ).get_request()
 
     @staticmethod
+    def get_request_comp(file, env=None, prop=None, properties=None, target=None):
+        return TestBase.get_req_comp(
+            file, env, prop, properties, target=target
+        )
+
+    @staticmethod
     def get_req_comp(
         file,
         env=None,

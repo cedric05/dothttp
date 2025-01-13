@@ -18,7 +18,9 @@ class CertUnitTest(TestBase):
     def test_fail_no_property_certificate(self):
         with self.assertRaises(PropertyNotFoundException):
             filename = f"{http_base}/no-password.http"
-            self.get_request(filename, target="no-password")
+            comp = self.get_request_comp(filename, target="no-password")
+            comp.get_request()
+            raise comp.property_util.errors[0]
 
     def test_certificate_available(self):
         filename = f"{http_base}/no-password.http"

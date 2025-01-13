@@ -18,7 +18,7 @@ from textx import metamodel_from_file
 
 from ..utils.property_util import PropertyProvider, Property
 
-from ..exceptions import DothttpUnSignedCertException
+from ..exceptions import DothttpMultiExceptions, DothttpUnSignedCertException
 from ..models.parse_models import Http, HttpFileType, MultidefHttp, ScriptType
 from ..parse import (
     APPLICATION_JSON,
@@ -480,6 +480,10 @@ def query_to_http(line):
 class RequestCompiler(RequestBase):
     def run(self):
         self.load_def()
+        if len(self.property_util.errors) > 0:
+            for error in self.errors:
+                eprint(error)
+            raise DothttpMultiExceptions(self.property_util.errors)
         resp = self.get_response()
         self.print_req_info(resp.request)
         for hist_resp in resp.history:

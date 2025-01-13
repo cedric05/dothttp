@@ -5,6 +5,7 @@ def exception_wrapper(
         class exc(cls):
             def __init__(self, **kwargs):
                 self.message = message.format(**kwargs)
+                self.kwargs = kwargs
 
         return exc
 
@@ -15,6 +16,18 @@ def exception_wrapper(
 class DotHttpException(Exception):
     def __str__(self) -> str:
         return self.message
+
+
+class DothttpMultiExceptions(DotHttpException):
+    def __init__(self, exceptions):
+        self.exceptions = exceptions
+
+    @property
+    def message(self):
+        return "\n".join([str(exception) for exception in self.exceptions])
+
+    def __str__(self) -> str:
+        return "\n".join([str(exception) for exception in self.exceptions])
 
 
 @exception_wrapper(

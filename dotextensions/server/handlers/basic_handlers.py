@@ -51,17 +51,20 @@ class RunHttpFileHandler(BaseHandler):
         except DotHttpException as exc:
             logger.error(f"dothttp exception happened {exc}", exc_info=True)
             result = Result(
-                id=command.id, result={"error_message": exc.message, "error": True}
+                id=command.id, result={
+                    "error_message": exc.message, "error": True}
             )
         except RequestException as exc:
             logger.error(f"exception from requests {exc}", exc_info=True)
             result = Result(
-                id=command.id, result={"error_message": str(exc), "error": True}
+                id=command.id, result={
+                    "error_message": str(exc), "error": True}
             )
         except Exception as exc:
             logger.error(f"unknown error happened {exc}", exc_info=True)
             result = Result(
-                id=command.id, result={"error_message": str(exc), "error": True}
+                id=command.id, result={
+                    "error_message": str(exc), "error": True}
             )
         return result
 
@@ -71,14 +74,14 @@ class RunHttpFileHandler(BaseHandler):
             req = self.get_curl_comp(config)
             result = req.get_curl_output()
             result = Result(
-                    id=command.id,
-                    result={
-                        "body": result,
-                        "headers": {
-                            "Content-Type": mimetypes.types_map[".sh"],
-                        },
+                id=command.id,
+                result={
+                    "body": result,
+                    "headers": {
+                        "Content-Type": mimetypes.types_map[".sh"],
                     },
-                )
+                },
+            )
         else:
             comp = self.get_request_comp(config)
             result = self.get_request_result(command, comp)
@@ -94,7 +97,8 @@ class RunHttpFileHandler(BaseHandler):
         target = params.get("target", "1")
         nocookie = params.get("nocookie", False)
         curl = params.get("curl", False)
-        properties = [f"{i}={j}" for i, j in params.get("properties", {}).items()]
+        properties = [f"{i}={j}" for i,
+                      j in params.get("properties", {}).items()]
         content = params.get("content", None)
         contexts = params.get("contexts")
         property_file = params.get("property-file", None)
@@ -123,6 +127,26 @@ class RunHttpFileHandler(BaseHandler):
 
     def get_request_result(self, command, comp: RequestCompiler):
         comp.load_def()
+        if comp.property_util.errors:
+            return Result(
+                id=command.id,
+                result={
+                    "errors": [{"var": list(error.kwargs['var']), "message": str(error)} for error in comp.property_util.errors],
+                    "response": {
+                        "body": "",
+                        "output_file": "",
+                        "status": 0,
+                        "method": "ERROR",
+                        "url": "ERROR",
+                        "headers": {
+                            "Content-Type": "text/plain",
+                        },
+                        "error": True,
+                        "error_message": "errors found",
+                        "contentType": "text/plain",
+                    },
+                },
+            )
         resp = comp.get_response()
         if output := comp.httpdef.output:
             # body = f"Output stored in {output}"
@@ -131,7 +155,8 @@ class RunHttpFileHandler(BaseHandler):
             except Exception as e:
                 output = f"Not!. unhandled error happened : {e}"
                 logger.warning("unable to write because", exc_info=True)
-        script_result = comp.script_execution.execute_test_script(resp).as_json()
+        script_result = comp.script_execution.execute_test_script(
+            resp).as_json()
         body = resp.text
         response_data = {
             "response": {
@@ -140,6 +165,7 @@ class RunHttpFileHandler(BaseHandler):
                 **self._get_resp_data(resp),
             },
             "script_result": script_result,
+            "errors": [error.kwargs for error in comp.property_util.errors],
         }
         if resp.history:
             response_data["history"] = [
@@ -153,9 +179,11 @@ class RunHttpFileHandler(BaseHandler):
             # redirects can add cookies
             comp.httpdef.headers["cookie"] = resp.request.headers["cookie"]
         try:
-            data.update({"http": self.get_http_from_req(comp.httpdef, comp.property_util)})
+            data.update({"http": self.get_http_from_req(
+                comp.httpdef, comp.property_util)})
         except Exception as e:
-            logger.error("ran into error regenerating http def from parsed object")
+            logger.error(
+                "ran into error regenerating http def from parsed object")
             data.update(
                 {"http": f"ran into error \n Exception: `{e}` message:{e.args}"}
             )
@@ -175,7 +203,8 @@ class RunHttpFileHandler(BaseHandler):
 
     @staticmethod
     def get_http_from_req(request: HttpDef, property_util: "PropertyProvider"):
-        http_def = MultidefHttp(import_list=[], allhttps=[request.get_http_from_req()])
+        http_def = MultidefHttp(import_list=[], allhttps=[
+                                request.get_http_from_req()])
         return HttpFileFormatter.format(http_def, property_util=property_util)
 
 
@@ -200,7 +229,8 @@ class ContentBase(BaseModelProcessor):
         ##
         # context has varibles defined
         # for resolving purpose, including them into content
-        self.content = self.content + CONTEXT_SEP + CONTEXT_SEP.join(self.args.contexts)
+        self.content = self.content + CONTEXT_SEP + \
+            CONTEXT_SEP.join(self.args.contexts)
 
     def select_target(self):
         for context in self.args.contexts:
@@ -219,7 +249,7 @@ class ContentBase(BaseModelProcessor):
                         self.model.import_list = model.import_list
                     self.load_imports()
                 self.content += context + "\n\n" + context
-                
+
             except Exception as e:
                 # contexts, can not always be correct syntax
                 # in such scenarios, don't complain, try to resolve with
@@ -277,19 +307,20 @@ class ContentExecuteHandler(RunHttpFileHandler):
             "headers": {
                 "Content-Type": "text/plain",
             },
-            "output_file":"",
+            "output_file": "",
             "error": True,
             "error_message": error_result,
             "contentType": "text/plain",
         }
         result = {
             "response": response,
-            "script_result": {"stdout": "", "error": "", "properties":{}, "tests":[]},
+            "script_result": {"stdout": "", "error": "", "properties": {}, "tests": []},
             "http": "REQUEST_EXECUTION_ERROR",
             "filenameExtension": ".txt",
         }
         result.update(response)
-        return Result(id=command.id, result=result) 
+        return Result(id=command.id, result=result)
+
 
 class FormatHttpFileHandler(BaseHandler):
     method = "/file/format"
@@ -300,6 +331,7 @@ class FormatHttpFileHandler(BaseHandler):
     def run(self, command: Command) -> Result:
         result = Result(id=command.id, result=command.params)
         return result
+
 
 class ResolveBase():
 
@@ -320,7 +352,7 @@ class ResolveBase():
             if match.start() <= pos <= match.end():
                 property_hovered = match.group()[2:-2].split("=")[0].strip()
                 break
-    
+
         type_dict = TypeFromPos.figure_n_get(model, pos)
         if "target" not in type_dict:
             command.params["target"] = 1
@@ -363,12 +395,14 @@ class ResolveBase():
         return Result(id=command.id, result=type_dict)
 
 # return resolved string instead of model object
+
+
 class GetHoveredResolvedParamFileHandler(RunHttpFileHandler, ResolveBase):
     method = "/file/resolve"
 
     def get_method(self):
         return GetHoveredResolvedParamFileHandler.method
-    
+
     def run(self, command):
         return self.get_resolved(command)
 
@@ -382,6 +416,7 @@ class GetHoveredResolvedParamContentHandler(ContentExecuteHandler, ResolveBase):
     def run(self, command):
         return self.get_resolved(command)
 
+
 class GetNameReferencesHandler(BaseHandler):
     name = "/file/names"
 
@@ -394,7 +429,8 @@ class GetNameReferencesHandler(BaseHandler):
             result = self.execute(command, filename)
         except DotHttpException as ex:
             result = Result(
-                id=command.id, result={"error_message": ex.message, "error": True}
+                id=command.id, result={
+                    "error_message": ex.message, "error": True}
             )
         except Exception as e:
             result = Result(
@@ -428,7 +464,8 @@ class GetNameReferencesHandler(BaseHandler):
         for new_model, _content in BaseModelProcessor._get_models_from_import(
             model, filename
         ):
-            self.get_for_http(new_model.allhttps, imported_names, imported_urls)
+            self.get_for_http(new_model.allhttps,
+                              imported_names, imported_urls)
         return all_names, all_urls, imported_names, imported_urls
 
     def get_for_http(self, allhttps, all_names, all_urls):

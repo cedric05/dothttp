@@ -44,7 +44,9 @@ class Multiplefiletest(TestBase):
         # should run as it is not using any vars
         with self.assertRaises(PropertyNotFoundException):
             # should fail with unresolved properties
-            self.get_request(f"{base_dir}/multi.http", target=5)
+            comp = self.get_request_comp(f"{base_dir}/multi.http", target=5)
+            comp.get_request()
+            raise comp.property_util.errors[0]
         # should pass when required properties are sent
         req = self.get_request(
             f"{base_dir}/multi.http",
