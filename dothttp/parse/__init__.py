@@ -182,6 +182,7 @@ class BaseModelProcessor:
         self.content = ""
         self.original_content = self.content = ""
         self.property_util = PropertyProvider(self.property_file)
+        self.errors = []
         self.load()
 
     def load(self):
@@ -277,7 +278,11 @@ class BaseModelProcessor:
             self.original_content = self.content = f.read()
 
     def get_updated_content(self, content) -> str:
-        return self.property_util.get_updated_content(content)
+        try:
+            return self.property_util.get_updated_content(content)
+        except DotHttpException as e:
+            self.errors.append(e)
+            return content
 
     def get_updated_content_object(self, content) -> str:
         return self.property_util.get_updated_content(content, "obj")
