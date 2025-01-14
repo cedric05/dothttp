@@ -379,12 +379,10 @@ class ResolveBase:
         elif type_type == DothttpTypes.VARIABLE.value:
             variable_name = type_dict["name"]
             resolved = comp.property_util.resolve_property_string(variable_name)
-        elif type_type == DothttpTypes.HEADER:
+        elif type_type == DothttpTypes.HEADER.value:
             resolved = {"headers": comp.httpdef.headers}
-        elif type_type == DothttpTypes.QUERY:
+        elif type_type == DothttpTypes.URL_PARAMS.value:
             resolved = {"query": comp.httpdef.query}
-        elif type_type == DothttpTypes.METHOD.value:
-            resolved = comp.httpdef.method
         elif type_type == DothttpTypes.PAYLOAD_DATA.value:
             resolved = comp.httpdef.payload.data
         elif type_type == DothttpTypes.PAYLOAD_ENCODED.value:
