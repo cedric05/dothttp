@@ -1,6 +1,7 @@
 import mimetypes
 from typing import List
 
+from urllib.parse import urlencode
 from requests import RequestException
 
 from dothttp.__version__ import __version__
@@ -380,9 +381,10 @@ class ResolveBase:
             variable_name = type_dict["name"]
             resolved = comp.property_util.resolve_property_string(variable_name)
         elif type_type == DothttpTypes.HEADER.value:
-            resolved = {"headers": comp.httpdef.headers}
+            resolved =  dict(comp.httpdef.headers)
         elif type_type == DothttpTypes.URL_PARAMS.value:
-            resolved = {"query": comp.httpdef.query}
+            # generate url params
+            resolved = urlencode(comp.httpdef.query, doseq=True)
         elif type_type == DothttpTypes.PAYLOAD_DATA.value:
             resolved = comp.httpdef.payload.data
         elif type_type == DothttpTypes.PAYLOAD_ENCODED.value:

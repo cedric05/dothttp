@@ -296,6 +296,52 @@ GET "https://httpbin.org/get"
         self.assertEquals(expected, result.result["resolved"])
 
 
+    def test_hover_query(self):
+        resolve_handler = GetHoveredResolvedParamContentHandler()
+        content = """
+        @name("my-test")
+        POST "https://httpbin.org/post/ram"
+        ? "ram" = "ranga"
+        json({
+            "totalSeconds" : {{numOfSeconds}}
+        })
+        """
+        index = content.find("ranga")
+        result = resolve_handler.run(
+            Command(
+                method=resolve_handler.name,
+                params={"content": content, "position": index,
+                        "file": f"{command_dir}/names.hnbk"},
+                id=1,
+            )
+        )
+        expected = "ram=ranga"
+        self.assertEquals(expected, result.result["resolved"])
+
+
+    def test_hover_headers(self):
+        resolve_handler = GetHoveredResolvedParamContentHandler()
+        content = """
+        @name("my-test")
+        POST "https://httpbin.org/post"
+        "ram" : "ranga"
+        json({
+            "totalSeconds" : {{numOfSeconds}}
+        })
+        """
+        index = content.find("ranga")
+        result = resolve_handler.run(
+            Command(
+                method=resolve_handler.name,
+                params={"content": content, "position": index,
+                        "file": f"{command_dir}/names.hnbk"},
+                id=1,
+            )
+        )
+        expected = {'ram': 'ranga'}
+        self.assertEquals(expected, result.result["resolved"])
+
+
 class FileExecute(TestBase):
     def setUp(self) -> None:
         self.execute_handler = RunHttpFileHandler()
