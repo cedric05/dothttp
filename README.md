@@ -21,6 +21,10 @@ Go through this example for better understanding. for babysteps click [here](#fi
 
 #!/usr/bin/env /home/prasanth/cedric05/dothttp/dist/dothttp-cli
 
+var name=adam; // this is how variable is created;
+var username='username'; 
+var password='password';
+
 # this is comment
 
 // this is also a comment
@@ -58,7 +62,7 @@ basicauth('username', 'password')
    json --> signifies payload is json data
 */
 json({
-    "name": "{{name=adam}}", # name is templated, if spcified via env or property, it will be replaced
+    "name": "{{name}}", # name is templated, if spcified via env or property, it will be replaced
     "org": "dothttp",
     "location": "Hyderabad",
     # "interests": ["exploring", "listening to music"],
