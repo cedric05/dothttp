@@ -213,7 +213,7 @@ TOFILE:
 ;
 
 JSON:
-    array=Array | object=Object | var = VarString | value=Value
+    array=Array | object=Object | var = VarString
 ;
 
 Array:

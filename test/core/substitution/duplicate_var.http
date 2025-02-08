@@ -3,4 +3,4 @@ var b = a;
 
 POST "https://httpbin.org/post"
 
-json("ram")
+json({ b:a})
