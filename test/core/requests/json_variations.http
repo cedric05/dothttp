@@ -1,0 +1,28 @@
+var a = 10;
+@name('json_number')
+POST "https://httpbin.org/post"
+json(1)
+
+@name('json_bool')
+POST "https://httpbin.org/post"
+json(true)
+
+
+@name('json_false')
+POST "https://httpbin.org/post"
+json(false)
+
+
+@name('json_float')
+POST "https://httpbin.org/post"
+json(1.1)
+
+
+@name('json_string')
+POST "https://httpbin.org/post"
+json("ram")
+
+
+@name('json_var')
+POST "https://httpbin.org/post"
+json(a)

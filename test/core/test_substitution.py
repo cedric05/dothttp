@@ -234,3 +234,9 @@ class SubstitutionTest(TestBase):
             f"{base_dir}/math_expression.http",
         )
         self.assertEqual(json.loads(req.body), {"secondsInDay": "864000"})
+
+    def test_duplicate_var(self):
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/duplicate_var.http",
+        )
+        self.assertEqual(json.loads(req.body), {"b": 10})
