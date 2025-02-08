@@ -24,6 +24,8 @@ class JsonParser:
             }
         elif var_value := model.var:
             return self.property_util.get_updated_obj_content(var_value)
+        elif val := model.value:
+            return self.jsonmodel_to_json(val)
 
     def get_key(self, member):
         if member.key:
@@ -32,6 +34,12 @@ class JsonParser:
             return self.property_util.get_updated_obj_content(member.var)
 
     def jsonmodel_to_json(self, model):
+        if id := model.id:
+            try: 
+                return self.property_util.get_updated_obj_content("{{%s}}" % id)
+            except:
+                # in case variable not found, 
+                return id
         if str_value := model.strs:
             return triple_or_double_tostring(str_value, self.property_util.get_updated_content)
         elif var_value := model.var:

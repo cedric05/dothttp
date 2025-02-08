@@ -213,7 +213,7 @@ TOFILE:
 ;
 
 JSON:
-    array=Array | object=Object | var = VarString
+    array=Array | object=Object | var = VarString | value=Value
 ;
 
 Array:
@@ -221,7 +221,7 @@ Array:
 ;
 
 Value:
-    flt=Float | int=Int | bl=Bool |  null="null" | strs += TRIPLE_OR_DOUBLE_STRING | var=VarString  | object=Object | array=Array | expr=Expression
+    flt=Float | int=Int | bl=Bool |  null="null" | id = ID | strs += TRIPLE_OR_DOUBLE_STRING | var=VarString  | object=Object | array=Array | expr=Expression
 ;
 
 Expression:
