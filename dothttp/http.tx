@@ -179,7 +179,7 @@ PAYLOAD:
     (
           // reordered to provide max performance
           // most http requests has json input,or urlencoded as input
-        ('json'? '('? json=JSON  ')'? )
+        ('json' '(' json=JSON  ')' )
         | ('data' | 'urlencoded') '(' datajson=JSON (',' type=STRING)? ','? ')'
         | ('data'| 'text') '(' data+=TRIPLE_OR_DOUBLE_STRING ((','|';') type=STRING)? ','?  ')'
         | (fileswrap=FILES)
@@ -213,7 +213,7 @@ TOFILE:
 ;
 
 JSON:
-    array=Array | object=Object | var = VarString
+    flt=Float | int=Int | bl=Bool |  null="null" | id = ID | strs += TRIPLE_OR_DOUBLE_STRING | var=VarString |  expr=Expression | array=Array | object=Object
 ;
 
 Array:
