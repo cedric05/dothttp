@@ -15,15 +15,17 @@ class JsonParser:
     def json_or_array_to_json(self, model) -> Union[Dict, List]:
         if isinstance(model, Dict) or isinstance(model, List):
             return model
-        if array := model.array:
-            return [self.jsonmodel_to_json(value) for value in array.values]
-        elif json_object := model.object:
+        if json_object := model.object:
             return {
                 self.get_key(member): self.jsonmodel_to_json(member.value)
                 for member in json_object.members
             }
+        elif array := model.array:
+            return [self.jsonmodel_to_json(value) for value in array.values]
         elif var_value := model.var:
             return self.property_util.get_updated_obj_content(var_value)
+        else:
+            return self.get_simple_non_iterative(model)
 
     def get_key(self, member):
         if member.key:
@@ -31,7 +33,13 @@ class JsonParser:
         elif member.var:
             return self.property_util.get_updated_obj_content(member.var)
 
-    def jsonmodel_to_json(self, model):
+    def get_simple_non_iterative(self, model):
+        if id := model.id:
+            try: 
+                return self.property_util.get_updated_obj_content("{{%s}}" % id)
+            except:
+                # in case variable not found, 
+                return id
         if str_value := model.strs:
             return triple_or_double_tostring(str_value, self.property_util.get_updated_content)
         elif var_value := model.var:
@@ -42,13 +50,6 @@ class JsonParser:
             return flt.value
         elif bl := model.bl:
             return bl.value
-        elif json_object := model.object:
-            return {
-                self.get_key(member): self.jsonmodel_to_json(member.value)
-                for member in json_object.members
-            }
-        elif array := model.array:
-            return [self.jsonmodel_to_json(value) for value in array.values]
         elif model == "null":
             return None
         elif expr := model.expr:
@@ -67,6 +68,17 @@ class JsonParser:
             except:
                 base_logger.error(f"error in evaluating expression {expr}, new expression {new_expression}")
                 return 0
+
+    def jsonmodel_to_json(self, model):
+        if json_object := model.object:
+            return {
+                self.get_key(member): self.jsonmodel_to_json(member.value)
+                for member in json_object.members
+            }
+        elif array := model.array:
+            return [self.jsonmodel_to_json(value) for value in array.values]
+        else:
+            return self.get_simple_non_iterative(model)
 
 
 # Supporting function

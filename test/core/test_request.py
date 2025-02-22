@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 import tempfile
@@ -377,6 +378,34 @@ ntlmauth("username", "password")
         resp = req_comp.get_response()
         self.assertEqual(200, resp.status_code)
 
+
+    # @skip("feature is not yet implemented, lot of issues once we enable this")
+    def test_json_str_int_bool(self):
+        # This is an integration test
+        filename = f"{base_dir}/json_variations.http"
+        req_comp = self.get_req_comp(filename, target="json_number")
+        self.assertEqual(json.loads(req_comp.get_request().body), 1)
+
+        req_comp = self.get_req_comp(filename, target="json_bool")
+        self.assertEqual(json.loads(req_comp.get_request().body), True)
+
+
+
+        req_comp = self.get_req_comp(filename, target="json_false")
+        self.assertEqual(json.loads(req_comp.get_request().body), False)
+
+
+        req_comp = self.get_req_comp(filename, target="json_float")
+        self.assertEqual(json.loads(req_comp.get_request().body), 1.1)
+
+
+        req_comp = self.get_req_comp(filename, target="json_string")
+        self.assertEqual(json.loads(req_comp.get_request().body), "ram")
+
+
+
+        req_comp = self.get_req_comp(filename, target="json_var")
+        self.assertEqual(json.loads(req_comp.get_request().body), 10)
 
 if __name__ == "__main__":
     unittest.main()
