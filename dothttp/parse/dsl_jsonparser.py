@@ -15,13 +15,13 @@ class JsonParser:
     def json_or_array_to_json(self, model) -> Union[Dict, List]:
         if isinstance(model, Dict) or isinstance(model, List):
             return model
-        if array := model.array:
-            return [self.jsonmodel_to_json(value) for value in array.values]
-        elif json_object := model.object:
+        if json_object := model.object:
             return {
                 self.get_key(member): self.jsonmodel_to_json(member.value)
                 for member in json_object.members
             }
+        elif array := model.array:
+            return [self.jsonmodel_to_json(value) for value in array.values]
         elif var_value := model.var:
             return self.property_util.get_updated_obj_content(var_value)
         else:
