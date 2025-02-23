@@ -1,0 +1,8 @@
+var details = {"name": "pras"};
+var name = details["name"];
+
+POST "https://httpbin.org/post"
+json({
+    "name": "pras"
+})
+

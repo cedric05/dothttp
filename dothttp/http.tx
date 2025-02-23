@@ -3,11 +3,15 @@ MULTISET: (import_list=IMPORT)? (variables=VAR*)? (allhttps=HTTP+)?;
 
 
 VAR:
-    "var" name=ID ("=" (  func=FunctionCall | inter=InterpolatedString | value=Value ))? ';'
+    "var" name=ID ("=" (  index = Index | func=FunctionCall | inter=InterpolatedString | value=Value ))? ';'
 ;
 
 InterpolatedString: 
     '$"' /[^"]*/ '"'
+;
+
+Index:
+    target=ID ('[' ( (key = ID) | (key=STRING) | (key = INT) ) ']')+
 ;
 
 FunctionCall: 

@@ -86,6 +86,12 @@ class DataFileNotFoundException(HttpFileException):
 class PropertyNotFoundException(PropertyFileException):
     pass
 
+@exception_wrapper(
+    "index `{actual_key}` not found in `{indexed_value}` of target: `{target}`"
+)
+class VariableIndexNotAvailable(PropertyFileException):
+    pass
+
 
 @exception_wrapper("error with command line property format, property `{prop}`")
 class CommandLinePropError(DotHttpException):

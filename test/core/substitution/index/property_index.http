@@ -1,0 +1,8 @@
+var details = {"name": "pras"};
+var name = details[propindex];
+
+POST "https://httpbin.org/post"
+json({
+    "name": "{{name}}"
+})
+

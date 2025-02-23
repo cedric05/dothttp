@@ -1,0 +1,35 @@
+var details = {
+    "name": "pras",
+    "grades": {
+           "math": 90,
+           "science": 80
+    },
+    "parents": {
+           "father": "John",
+           "mother": "Jane",
+           "sibling": {
+                  "brother": "Tom",
+                  "sister": "Alice"
+           }
+    },
+    "attendance":[
+           {
+                  "date": "2020-01-01",
+                  "status": "present"
+           },
+           {
+                  "date": "2020-01-02",
+                  "status": "absent"
+           }
+    ]
+};
+var math_grade = details["grades"]["math"];
+var sibling = details["parents"]["sibling"];
+var attendance_status = details["attendance"][0]["status"];
+POST "https://httpbin.org/post"
+json({
+    "math_grade": {{math_grade}},
+    "sibling": {{sibling}},
+    "attendance_status": {{attendance_status}}
+})
+

@@ -240,3 +240,68 @@ class SubstitutionTest(TestBase):
             f"{base_dir}/duplicate_var.http",
         )
         self.assertEqual(json.loads(req.body), {"b": 10})
+
+    
+    def test_simple_index(self):
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/index/simple_index.http",
+        )
+        self.assertEqual(json.loads(req.body), {"name": "pras"})
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/index/simple_index2.http",
+        )
+        self.assertEqual(json.loads(req.body), {"name": "pras"})
+        
+    def test_properties_index(self):
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/index/property_index.http",
+            properties=["propindex=name"]
+        )
+        self.assertEqual(json.loads(req.body), {"name": "pras"})
+        
+
+    def test_env_index(self):
+        # create a temp file
+        # write env and pass ti to prepared request
+    
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/index/property_index.http",
+            env=["sample"],
+        )
+        self.assertEqual(json.loads(req.body), {"name": 'pras'})
+
+    def test_ref_index(self):
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/index/ref.http",
+        )
+        self.assertEqual(json.loads(req.body),  {"name": 'pras'})
+
+
+    def test_ref_index(self):
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/duplicate_var.http",
+        )
+        self.assertEqual(json.loads(req.body), {"b": 10})
+
+
+    def test_nested_index(self):
+        req: PreparedRequest = self.get_request(
+            f"{base_dir}/index/nested.http",
+        )
+        self.assertEqual(json.loads(req.body), {
+                'attendance_status': 'present',
+                'math_grade': 90,
+                'sibling': {'brother': 'Tom', 'sister': 'Alice'}
+                }
+            )
+
+
+    def test_index_error(self):
+        try:
+            self.get_request(
+                f"{base_dir}/index/property_index.http",
+            )
+        except Exception as e:
+            print(e)
+        else:
+            self.fail("expected error")
