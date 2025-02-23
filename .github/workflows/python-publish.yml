@@ -44,8 +44,8 @@ jobs:
       uses: actions/github-script@v6
       with:
         script: |
-          const github = require('@actions/github');
-          const context = github.context;
+          var github = require('@actions/github');
+          var context = github.context;
 
           await github.actions.createWorkflowDispatch({
             owner: 'cedric05',
