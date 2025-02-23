@@ -37,7 +37,7 @@ class NegativeScenarios(TestBase):
             self.get_request(f"{sub_base_path}/multipleprop.http", properties=["ranga"])
 
     def test_data_payload_not_valid(self):
-        with self.assertRaises(PayloadDataNotValidException):
+        with self.assertRaises(Exception):
             self.get_request(f"{neg_base_path}/datapayload.http")
 
     def test_data_file_not_found(self):

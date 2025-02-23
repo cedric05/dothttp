@@ -395,6 +395,30 @@ class BaseModelProcessor:
                         raise KeyError(key)
                 var_value = variable.inter[2:-1].format_map(PropertyResolver())
                 property_util.add_infile_property_from_var(variable.name, var_value)
+            elif index_sub := variable.index:
+                # index operation applied on target
+                indexed_value = property_util.resolve_property_object(index_sub.target)
+                for key in index_sub.key:
+                    # figure out actual_key
+                    if key in property_util.command_line_properties:
+                        evaulated_key =  property_util.command_line_properties[key]
+                    elif key in property_util.env_properties:
+                        evaulated_key = property_util.env_properties[key]
+                    elif key in property_util.infile_properties and property_util.infile_properties[key].value is not None:
+                        evaulated_key = property_util.infile_properties[key].value
+                    else:
+                        evaulated_key = key
+                    # complain if actual_key is not available in indexed_value
+                    if isinstance(indexed_value, list):
+                        if isinstance(evaulated_key, int):
+                            indexed_value = indexed_value[int(evaulated_key)]
+                            continue
+                    elif isinstance(indexed_value, dict) and evaulated_key in indexed_value:
+                        indexed_value = indexed_value[evaulated_key]
+                        continue
+                    raise VariableIndexNotAvailable(actual_key=evaulated_key, indexed_value=indexed_value, target=index_sub.target)
+                property_util.add_infile_property_from_var(variable.name, indexed_value)
+
 
 
 class HttpDefBase(BaseModelProcessor):
