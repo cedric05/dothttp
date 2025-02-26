@@ -17,13 +17,14 @@ from .handlers.basic_handlers import (
     VersionHandler,
     GetHoveredResolvedParamContentHandler,
     GetHoveredResolvedParamFileHandler
-    
+
 )
 from .handlers.gohandler import TypeFromPos
 from .handlers.har2httphandler import Har2HttpHandler
 from .handlers.http2har import Http2Har
 from .handlers.http2postman import Http2Postman
 from .handlers.postman2http import ImportPostmanCollection
+from .handlers.fs_handlers import CopyHandler, DeleteHandler, RenameHandler, WriteHandler, ReadHandler, CreateDirectoryHandler, FileStatHandler, ReadDirectoryHandler
 from .models import BaseHandler, Command
 
 logger = logging.getLogger("handler")
@@ -43,8 +44,15 @@ handlers: Dict[str, BaseHandler] = {
         Http2Postman(),
         VersionHandler(),
         GetHoveredResolvedParamContentHandler(),
-        GetHoveredResolvedParamFileHandler()
-
+        GetHoveredResolvedParamFileHandler(),
+        CopyHandler(),
+        DeleteHandler(),
+        RenameHandler(),
+        WriteHandler(),
+        ReadHandler(),
+        CreateDirectoryHandler(),
+        FileStatHandler(),
+        ReadDirectoryHandler()
     )
 }
 
@@ -80,7 +88,8 @@ class HttpServer(Base):
         self.app = app
         self.port = port
         for handler in handlers.keys():
-            self.app.route(handler, methods=["POST"])(self.get_handler(handler))
+            self.app.route(handler, methods=["POST"])(
+                self.get_handler(handler))
 
     def run_forever(self):
         self.app.run("localhost", self.port)
@@ -122,7 +131,8 @@ class CmdServer(Base):
                 command = self.get_command(line)
                 self.pool.submit(self.run_respond, command)
             except JSONDecodeError:
-                logger.info(f"input line `{line.strip()}` is not json decodable")
+                logger.info(
+                    f"input line `{line.strip()}` is not json decodable")
                 self.write_result(
                     {
                         "id": 0,
@@ -133,7 +143,8 @@ class CmdServer(Base):
                     }
                 )
             except Exception as e:
-                logger.info(f"unknown exception `{e}` happened ", exc_info=True)
+                logger.info(
+                    f"unknown exception `{e}` happened ", exc_info=True)
                 self.write_result(
                     {
                         "id": 0,
@@ -189,7 +200,8 @@ class AsyncCmdServer(CmdServer):
                 if len(line) != 0:
                     await self.run_respond(command)
             except JSONDecodeError:
-                logger.info(f"input line `{line.strip()}` is not json decodable")
+                logger.info(
+                    f"input line `{line.strip()}` is not json decodable")
                 self.write_result(
                     {
                         "id": 0,
@@ -200,7 +212,8 @@ class AsyncCmdServer(CmdServer):
                     }
                 )
             except Exception as e:
-                logger.info(f"unknown exception `{e}` happened ", exc_info=True)
+                logger.info(
+                    f"unknown exception `{e}` happened ", exc_info=True)
                 self.write_result(
                     {
                         "id": 0,
