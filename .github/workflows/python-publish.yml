@@ -45,16 +45,22 @@ jobs:
       continue-on-error: true
       with:
         script: |
-          await github.actions.createWorkflowDispatch({
+
+          const version = "${{ github.ref }}";
+          // remove prefix from the github.ref
+          const dothttpversion = version.replace(/^refs\/tags\/v/, '');
+          console.log(`dothttpversion: ${dothttpversion}`);
+
+          await github.rest.actions.createWorkflowDispatch({
             owner: 'cedric05',
             repo: 'dotextensions-build',
             workflow_id: 'release.yml',
-            ref: 'main', // or the branch you want to trigger the workflow on
+            ref: 'main',
             inputs: {
-              dothttpversion: '1.0.0', // replace with the actual version
-              dotextensions_version: '1.0.0', // replace with the actual version if needed
-              python_version: '3.12.4', // optional
-              linux_python_version: '3.12.4' // optional
+              dothttpversion: dothttpversion,
+              dotextensions_version: dothttpversion,
+              python_version: '3.12.4',
+              linux_python_version: '3.12.4'
             }
           });
       env:

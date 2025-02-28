@@ -73,7 +73,7 @@ class WriteHandler(BaseHandler):
     def run(self, command):
         source = command.params.get("source")
         content = command.params.get("content")
-        if not source or not content:
+        if not source or content is None:
             return Result.to_error(command, "source and content are required")
         try:
             with open(source, "wb") as f:
