@@ -41,12 +41,10 @@ jobs:
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
     - name: Trigger workflow in dotextensions-build
-      uses: actions/github-script@v6
+      uses: actions/github-script@v7
+      continue-on-error: true
       with:
         script: |
-          var github = require('@actions/github');
-          var context = github.context;
-
           await github.actions.createWorkflowDispatch({
             owner: 'cedric05',
             repo: 'dotextensions-build',

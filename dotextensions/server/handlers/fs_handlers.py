@@ -138,7 +138,6 @@ class ReadDirectoryHandler(BaseHandler):
         try:
             return_data = []
             with os.scandir(source) as it:
-                files = []
                 for entry in it:
                     if entry.is_file():
                         return_data.append([entry.name, "file"])
@@ -150,7 +149,7 @@ class ReadDirectoryHandler(BaseHandler):
             return Result.to_error(command, "FileNotFound")
         except Exception as e:
             return Result.to_error(command, str(e))
-        return Result.get_result(command, {"result": {"operation": "read-directory", "files": files}})
+        return Result.get_result(command, {"result": {"operation": "read-directory", "files": return_data}})
     
 
 class FileStatHandler(BaseHandler):
