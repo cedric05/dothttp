@@ -73,8 +73,10 @@ class WriteHandler(BaseHandler):
     def run(self, command):
         source = command.params.get("source")
         content = command.params.get("content")
-        if not source or content is None:
+        if not source:
             return Result.to_error(command, "source and content are required")
+        if not content:
+            content = ""
         try:
             with open(source, "wb") as f:
                 f.write(base64.b64decode(content))
