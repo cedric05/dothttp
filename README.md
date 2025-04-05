@@ -77,7 +77,7 @@ PUT https://req.dothttp.dev/post
 basicauth("{{username}}, "{{password}}")
 
 # posts with urlencoded
-data({
+urlencoded({
     "name": "Adam A",
     "org": "dothttp",
     "location": "Hyderabad",
@@ -209,7 +209,7 @@ user can specify payload by mentioning below four forms (for various scenarios).
 
   user can also mention its `content-type` with
   `data("ram", "text/plain")`
-- `data({"key": "value"})` for form input.
+- `urlencoded({"key": "value"})` for form input.
 - `json({"key": "value"})` for json payload.
 - `fileinput("path/to/file", "type")` uploads file as payload (type is optional).
 - `files(("photo", "path/to/file/photo.jpg", "image/jpeg"),

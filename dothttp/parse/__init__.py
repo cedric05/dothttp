@@ -44,7 +44,7 @@ from ..property_schema import property_schema
 from ..script import ScriptExecutionJs, ScriptExecutionPython
 from ..utils.common import get_real_file_path, triple_or_double_tostring
 from ..utils.constants import *
-from ..utils.property_util import PropertyProvider
+from ..utils.property_util import PropertyProvider, StringFormatPropertyResolver
 from .dsl_jsonparser import json_or_array_to_json, jsonmodel_to_json
 
 
@@ -382,18 +382,7 @@ class BaseModelProcessor:
                     var_value = variable.func.name
                 property_util.add_infile_property_from_var(variable.name, var_value)
             elif variable.inter:
-                class PropertyResolver:
-                    # hassle of creating class is to make it work with format_map
-                    # instead of format which can be used with dict and can cause memory leak
-                    def __getitem__(self, key):
-                        if key in property_util.command_line_properties:
-                            return property_util.command_line_properties[key]
-                        if key in property_util.env_properties:
-                            return property_util.env_properties[key]
-                        if key in property_util.infile_properties and property_util.infile_properties[key].value is not None:
-                            return property_util.infile_properties[key].value
-                        raise KeyError(key)
-                var_value = variable.inter[2:-1].format_map(PropertyResolver())
+                var_value = variable.inter[2:-1].format_map(StringFormatPropertyResolver(property_util))
                 property_util.add_infile_property_from_var(variable.name, var_value)
             elif index_sub := variable.index:
                 # index operation applied on target

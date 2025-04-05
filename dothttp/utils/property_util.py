@@ -408,3 +408,18 @@ def get_no_replace_property_provider():
     property_util.get_updated_content = lambda x: x
     property_util.get_updated_obj_content = lambda x: x
     return property_util
+
+
+class StringFormatPropertyResolver:
+    def __init__(self, property_util: PropertyProvider):
+        self.property_util = property_util
+    # hassle of creating class is to make it work with format_map
+    # instead of format which can be used with dict and can cause memory leak
+    def __getitem__(self, key):
+        if key in self.property_util.command_line_properties:
+            return self.property_util.command_line_properties[key]
+        if key in self.property_util.env_properties:
+            return self.property_util.env_properties[key]
+        if key in self.property_util.infile_properties and self.property_util.infile_properties[key].value is not None:
+            return self.property_util.infile_properties[key].value
+        raise KeyError(key)
