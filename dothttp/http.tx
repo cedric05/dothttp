@@ -222,7 +222,7 @@ DATAJSON:
 
 
 JSON:
-    flt=Float | int=Int | bl=Bool |  null="null" | id = ID | strs += TRIPLE_OR_DOUBLE_STRING | var=VarString |  expr=Expression | array=Array | object=Object
+    flt=Float | int=Int | bl=Bool |  null="null" | id = ID | inter=InterpolatedString | strs += TRIPLE_OR_DOUBLE_STRING | var=VarString |  expr=Expression | array=Array | object=Object
 ;
 
 Array:
@@ -230,7 +230,7 @@ Array:
 ;
 
 Value:
-    flt=Float | int=Int | bl=Bool |  null="null" | id = ID | strs += TRIPLE_OR_DOUBLE_STRING | var=VarString  | object=Object | array=Array | expr=Expression
+    flt=Float | int=Int | bl=Bool |  null="null" | id = ID | inter=InterpolatedString | strs += TRIPLE_OR_DOUBLE_STRING | var=VarString  | object=Object | array=Array | expr=Expression
 ;
 
 Expression:

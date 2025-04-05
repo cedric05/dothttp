@@ -1,7 +1,7 @@
 import logging
 from typing import Dict, List, Optional, Union
 
-from ..utils.property_util import PropertyProvider, get_no_replace_property_provider
+from ..utils.property_util import PropertyProvider, StringFormatPropertyResolver, get_no_replace_property_provider
 from ..utils.common import triple_or_double_tostring
 from .expression import Token, TokenType
 
@@ -50,6 +50,8 @@ class JsonParser:
             return flt.value
         elif bl := model.bl:
             return bl.value
+        elif inter := model.inter:
+            return inter[2:-1].format_map(StringFormatPropertyResolver(self.property_util))
         elif model == "null":
             return None
         elif expr := model.expr:
