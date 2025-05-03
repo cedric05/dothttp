@@ -2,6 +2,7 @@ var firstName = "John";
 var lastName = "Doe";
 var age = 25;
 var fullName = $"{firstName} {lastName}";
+var sampleOneWithNoQuotesInValue = 'sample description';
 
 @name("fetch 100 users, skip first 50")
 POST https://httpbin.org/post
@@ -13,7 +14,7 @@ POST https://httpbin.org/post
 ? projection, org
 ? projection, location
 
-{
+json({
     "firstName": {{firstName}},
     "lastName": {{lastName}},
     "age": {{age}},
@@ -21,11 +22,13 @@ POST https://httpbin.org/post
     ageInDays: (25*365),
     // sample without no quotes
     description: sampleOneWithNoQuotesInValue
-}
+})
 > {%
 
 def pre_request():
     log('Pre-request hook')
+    pre_request_script= client.request.get_prepared_request()
+    log("pre_request_body", pre_request_script.body)
     resp = requests.get('https://httpbin.org/get')
     json_response = resp.json()
     log(f"pre request response is {json_response}")
