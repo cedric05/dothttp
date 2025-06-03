@@ -341,10 +341,15 @@ class PropertyProvider:
         return match
     
     def add_infile_property_from_var(self, key, value, can_override: bool = True):
-        # with var, we support overriding only when can_override is True
-        if can_override or key not in self.infile_properties:
-            # blindly override if can_override is true
-            # if can_override is false, then we will only override if value is None
+        """
+        Adds a property from a variable to infile_properties.
+        If can_override is True, the property will always be added/updated.
+        If can_override is False, the property will only be added if it doesn't exist
+        or its value is None.
+        """
+        if can_override or (
+            key not in self.infile_properties or self.infile_properties[key].value is None
+        ):
             self.infile_properties[key] = Property([''], key, value)
 
     def resolve_system_command_prop(self, key):

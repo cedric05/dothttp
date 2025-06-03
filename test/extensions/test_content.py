@@ -243,3 +243,26 @@ class FileExecute(TestBase):
         )
         result.load_def()
         self.assertEquals(result.httpdef.payload.json["a"], 10)
+        
+        
+    def test_from_context_with_var(self):
+        # tests to pick first context if multiple contexts are there
+        result = self.get_context_request_comp(
+            """
+            @name('test')
+            POST "http://localhost:8000/post"
+            json({
+                "a" : {{a}}
+            })
+
+            """,
+            target="test",
+            contexts=[
+                """
+                var a = 12;
+                """
+            ],
+            curl=False,
+        )
+        result.load_def()
+        self.assertEquals(result.httpdef.payload.json["a"], 12)
