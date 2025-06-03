@@ -242,7 +242,7 @@ class ContentBase(BaseModelProcessor):
                 # if model is generated, try to figure out target
                 model: MultidefHttp = dothttp_model.model_from_str(context)
                 # by including targets in to model
-                self.load_properties_from_var(model, self.property_util)
+                self.load_properties_from_var(model, self.property_util, can_override=False)
                 self.model.allhttps = self.model.allhttps + model.allhttps
                 if model.import_list and model.import_list.filename:
                     if self.model.import_list and self.model.import_list.filename:

@@ -362,13 +362,13 @@ class BaseModelProcessor:
         property_util.add_infile_properties(content)
     
     @staticmethod
-    def load_properties_from_var(model:MultidefHttp, property_util: PropertyProvider):
+    def load_properties_from_var(model:MultidefHttp, property_util: PropertyProvider, can_override: bool = True):
         ## this has to taken care by property util
         ## but it will complicate the code
         for variable in model.variables:
             if variable.value:
                 var_value = jsonmodel_to_json(variable.value, property_util=property_util)
-                property_util.add_infile_property_from_var(variable.name, var_value)
+                property_util.add_infile_property_from_var(variable.name, var_value, can_override)
             elif variable.func:
                 func_name = f"${variable.func.name}"
                 if func_name in property_util.rand_map:
@@ -380,10 +380,10 @@ class BaseModelProcessor:
                         var_value = func()
                 else:
                     var_value = variable.func.name
-                property_util.add_infile_property_from_var(variable.name, var_value)
+                property_util.add_infile_property_from_var(variable.name, var_value, can_override)
             elif variable.inter:
                 var_value = variable.inter[2:-1].format_map(StringFormatPropertyResolver(property_util))
-                property_util.add_infile_property_from_var(variable.name, var_value)
+                property_util.add_infile_property_from_var(variable.name, var_value, can_override)
             elif index_sub := variable.index:
                 # index operation applied on target
                 indexed_value = property_util.resolve_property_object(index_sub.target)
@@ -406,7 +406,7 @@ class BaseModelProcessor:
                         indexed_value = indexed_value[evaulated_key]
                         continue
                     raise VariableIndexNotAvailable(actual_key=evaulated_key, indexed_value=indexed_value, target=index_sub.target)
-                property_util.add_infile_property_from_var(variable.name, indexed_value)
+                property_util.add_infile_property_from_var(variable.name, indexed_value, can_override)
 
 
 
