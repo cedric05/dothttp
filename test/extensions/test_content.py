@@ -42,6 +42,25 @@ class FileExecute(TestBase):
                 id=1,
             )
         )
+        
+    def get_context_request_comp(
+        self, content, target: Union[str, int] = 1, contexts=None, curl=False
+    ):
+        command = Command(
+                method=ContentExecuteHandler.name,
+                params={
+                    "content": content,
+                    "properties": {"post": "get"},
+                    "target": target,
+                    "contexts": contexts,
+                    "curl": curl,
+                },
+                id=1,
+            )
+        executor = ContentExecuteHandler()
+        config = executor.get_config(command)
+        request_comp = executor.get_request_comp(config)
+        return request_comp
 
     def test_fail_syntax(self):
         result = self.execute_and_result("GET2 http://localhost:8000/post")
@@ -201,3 +220,26 @@ class FileExecute(TestBase):
             },
             json.loads(result.result["body"])["json"],
         )
+        
+    def test_var_override(self):
+        # tests to pick first context if multiple contexts are there
+        result = self.get_context_request_comp(
+            """
+            var a = 10;
+            @name('test')
+            POST "http://localhost:8000/post"
+            json({
+                "a" : {{a}}
+            })
+
+            """,
+            target="test",
+            contexts=[
+                """
+                var a = 12;
+                """
+            ],
+            curl=False,
+        )
+        result.load_def()
+        self.assertEquals(result.httpdef.payload.json["a"], 10)

@@ -340,9 +340,12 @@ class PropertyProvider:
         match = PropertyProvider.random_string_regex.match(prop)
         return match
     
-    def add_infile_property_from_var(self, key, value):
-        # with var, we support overriding
-        self.infile_properties[key] = Property([''], key, value)
+    def add_infile_property_from_var(self, key, value, can_override: bool = True):
+        # with var, we support overriding only when can_override is True
+        if can_override or key not in self.infile_properties:
+            # blindly override if can_override is true
+            # if can_override is false, then we will only override if value is None
+            self.infile_properties[key] = Property([''], key, value)
 
     def resolve_system_command_prop(self, key):
         command = self.system_command_properties.get(key)
