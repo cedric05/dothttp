@@ -35,7 +35,7 @@ requests-hawk = "1.2.1"
 msal = "1.32.3"
 pyyaml = "6.0.2"
 toml = "0.10.2"
-requests = "2.32.3"
+requests = "2.32.4"
 xmltodict = "^0.14.2"
 
 [tool.poetry.group.dev.dependencies]
