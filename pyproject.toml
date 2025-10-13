@@ -40,7 +40,7 @@ xmltodict = "^0.15.0"
 
 [tool.poetry.group.dev.dependencies]
 waitress = "3.0.0"
-flask = "3.0.3"
+flask = "3.1.2"
 python-magic = "^0.4.27"
 js2py = "0.74"
 flask-cors = "^5.0.0"
