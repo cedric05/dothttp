@@ -1036,14 +1036,14 @@ dev = ["twine (>=3.4.2)", "wheel (>=0.37.0)"]
 
 [[package]]
 name = "restrictedpython"
-version = "7.4"
+version = "8.1"
 description = "RestrictedPython is a defined subset of the Python language which allows to provide a program input into a trusted environment."
 optional = false
-python-versions = "<3.14,>=3.8"
+python-versions = "<3.15,>=3.9"
 groups = ["main"]
 files = [
-    {file = "RestrictedPython-7.4-py3-none-any.whl", hash = "sha256:f431c76f848f6f6d50ae21457cb503642db60889a273e4be439cf7ca4cbaf999"},
-    {file = "restrictedpython-7.4.tar.gz", hash = "sha256:81b62924713dbd280917fceaecaf210fef7a49dddf1a08c8c214a3613fbeb425"},
+    {file = "restrictedpython-8.1-py3-none-any.whl", hash = "sha256:4769449c6cdb10f2071649ba386902befff0eff2a8fd6217989fa7b16aeae926"},
+    {file = "restrictedpython-8.1.tar.gz", hash = "sha256:4a69304aceacf6bee74bdf153c728221d4e3109b39acbfe00b3494927080d898"},
 ]
 
 [package.extras]
@@ -1432,4 +1432,4 @@ js = []
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9,<3.14"
-content-hash = "6f8c23f8e3014b16594e47ded8ec3d30b73b3da6938f22f275c7a4546f72e37d"
+content-hash = "94cf5d3135876f9d6275f177100b4d5cac9027b59a650fee2ccbed3ca47afa24"
