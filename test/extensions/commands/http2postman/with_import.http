@@ -1,0 +1,5 @@
+import './awsauth.http';
+
+
+@name('sample') : "simple"
+GET '/some'

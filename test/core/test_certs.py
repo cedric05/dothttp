@@ -1,5 +1,6 @@
 import os
 import sys
+import pytest
 from test import TestBase
 from unittest import skip
 
@@ -22,6 +23,7 @@ class CertUnitTest(TestBase):
             comp.get_request()
             raise comp.property_util.errors[0]
 
+    @pytest.mark.skip("badssl failure, need updates")
     def test_certificate_available(self):
         filename = f"{http_base}/no-password.http"
         cert_file = f"{cert_base}/no-password.pem"
@@ -41,6 +43,7 @@ class CertUnitTest(TestBase):
             200, resp_200.status_code, "when cert supplied, it should return 200"
         )
 
+    @pytest.mark.skip("badssl failure, need updates")
     def test_certificate_available2(self):
         # insecure is added just to test curl output
         filename = f"{http_base}/no-password.http"
@@ -63,6 +66,7 @@ class CertUnitTest(TestBase):
         self.assertTrue(req_comp2.http.certificate, "certificate should be available")
         self.assertEqual(200, resp_200.status_code, "with cert, status_code ==200")
 
+    @pytest.mark.skip("badssl failure, need updates")
     def test_p12(self):
         filename = f"{http_base}/no-password.http"
         p12 = f"{cert_base}/badssl.com-client.p12"
@@ -75,6 +79,7 @@ class CertUnitTest(TestBase):
         self.assertTrue(req_comp2.http.certificate, "certificate should be available")
         self.assertEqual(200, resp_200.status_code, "with cert, status_code ==200")
 
+    @pytest.mark.skip("badssl failure, need updates")
     def test_p12_curl(self):
         filename = f"{http_base}/no-password.http"
         p12 = f"{cert_base}/badssl.com-client.p12"
