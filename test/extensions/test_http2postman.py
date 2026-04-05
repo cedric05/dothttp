@@ -163,3 +163,9 @@ class Testhttp2postman(TestBase):
             http2postman_dir.joinpath("hawk.postman_collection.json"),
             os.path.join(http2postman_dir, "hawkauth.http"),
         )
+
+    def test_import(self):
+        self.execute_n_get(
+            http2postman_dir.joinpath("with_import.postman_collection.json"),
+            os.path.join(http2postman_dir, "with_import.http"),
+        )

@@ -235,7 +235,8 @@ class Http2Postman(RunHttpFileHandler):
 
                 except BaseException:
                     pass
-        for index, http in enumerate(http_list.allhttps):
+        enumerate_list = list(http_list.allhttps)
+        for index, http in enumerate(enumerate_list):
             try:
                 name = http.namewrap.name if http.namewrap else str(index + 1)
                 config.target = name
