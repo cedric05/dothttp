@@ -1,0 +1,26 @@
+FROM python:3.11-slim
+
+# Install system dependencies (minimal set for faster builds)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    netcat-openbsd \
+    libmagic1 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install poetry
+RUN pip install --no-cache-dir poetry
+
+# Set working directory
+WORKDIR /app
+
+# Copy poetry files
+COPY pyproject.toml poetry.lock* ./
+
+# Configure poetry to not create virtual environments (we're in a container)
+RUN poetry config virtualenvs.create false
+
+# Install dependencies including dev dependencies (pytest, etc.)
+RUN poetry install --no-root
+
+# The actual code will be mounted as a volume at runtime
+CMD ["poetry", "run", "pytest"]

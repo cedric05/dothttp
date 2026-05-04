@@ -21,6 +21,11 @@ from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 from requests.structures import CaseInsensitiveDict
 from textx import TextXSyntaxError, metamodel_from_file
 
+try:
+    import magic
+except ImportError:
+    magic = None
+
 from ..exceptions import *
 from ..models.computed import *
 from ..models.parse_models import (
@@ -42,7 +47,7 @@ from ..models.parse_models import (
 )
 from ..property_schema import property_schema
 from ..script import ScriptExecutionJs, ScriptExecutionPython
-from ..utils.common import get_real_file_path, triple_or_double_tostring
+from ..utils.common import get_real_file_path, triple_or_double_tostring, single_triple_or_double_tostring
 from ..utils.constants import *
 from ..utils.property_util import PropertyProvider, StringFormatPropertyResolver
 from .dsl_jsonparser import json_or_array_to_json, jsonmodel_to_json
@@ -422,12 +427,12 @@ class HttpDefBase(BaseModelProcessor):
             for line in parent.lines:
                 if query := line.query:
                     params[self.get_updated_content(query.key)].append(
-                        self.get_updated_content(query.value)
+                        single_triple_or_double_tostring(query.value, self.get_updated_content)
                     )
         for line in self.http.lines:
             if query := line.query:
                 params[self.get_updated_content(query.key)].append(
-                    self.get_updated_content(query.value)
+                    single_triple_or_double_tostring(query.value, self.get_updated_content)
                 )
         request_logger.debug(f"computed query params from `{self.file}` are `{params}`")
         self.httpdef.query = params

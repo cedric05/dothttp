@@ -32,7 +32,7 @@ from ..parse import (
     eprint,
 )
 from ..script import ScriptResult
-from ..utils.common import apply_quote_or_unquote, quote_or_unquote
+from ..utils.common import apply_quote_or_unquote, quote_or_unquote, single_triple_or_double_tostring
 from ..utils.curl_utils import to_curl
 from ..utils.json_utils import JSONEncoder
 from .dsl_jsonparser import json_or_array_to_json
@@ -371,7 +371,7 @@ class HttpFileFormatter(RequestBase):
                 map(
                     query_to_http,
                     filter(
-                        lambda line: line.query and isinstance(line.query.value, str),
+                        lambda line: line.query and (isinstance(line.query.value, str) or hasattr(line.query.value, 'triple') or hasattr(line.query.value, 'str')),
                         lines,
                     ),
                 )
@@ -473,8 +473,13 @@ class HttpFileFormatter(RequestBase):
 
 
 def query_to_http(line):
-    quote_type = quote_or_unquote(line.query.value)[0]
-    return f"? {quote_type}{line.query.key}{quote_type}= {quote_type}{line.query.value}{quote_type}"
+    # Handle TRIPLE_OR_DOUBLE_STRING object
+    if hasattr(line.query.value, 'triple') or hasattr(line.query.value, 'str'):
+        value_str = single_triple_or_double_tostring(line.query.value, lambda x: x)
+    else:
+        value_str = line.query.value
+    quote_type = quote_or_unquote(value_str)[0]
+    return f"? {quote_type}{line.query.key}{quote_type}= {quote_type}{value_str}{quote_type}"
 
 
 class RequestCompiler(RequestBase):

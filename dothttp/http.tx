@@ -169,13 +169,13 @@ METHODTYPE:
     | "SEARCH"
 ;
 
-QUERY: 
-    'query' '(' key=DotString ',' value=DotString ')'
+QUERY:
+    'query' '(' key=DotString ',' value=TRIPLE_OR_DOUBLE_STRING ')'
     |('?' | "&") (
-          '(' key=DotString ',' value=DotString ')' 
-        | key=DotString ',' value=DotString 
-        | key=DotString ':' value=DotString 
-        | key=DotString '=' value=DotString
+          '(' key=DotString ',' value=TRIPLE_OR_DOUBLE_STRING ')'
+        | key=DotString ',' value=TRIPLE_OR_DOUBLE_STRING
+        | key=DotString ':' value=TRIPLE_OR_DOUBLE_STRING
+        | key=DotString '=' value=TRIPLE_OR_DOUBLE_STRING
     )
 ;
 

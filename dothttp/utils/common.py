@@ -37,6 +37,17 @@ def triple_or_double_tostring(list_of_triple_or_double, update_content_func):
     )
 
 
+def single_triple_or_double_tostring(triple_or_double, update_content_func):
+    """Convert a single TRIPLE_OR_DOUBLE_STRING object to string"""
+    if hasattr(triple_or_double, 'triple') and triple_or_double.triple:
+        return update_content_func(triple_or_double.triple[3:-3])
+    elif hasattr(triple_or_double, 'str') and triple_or_double.str:
+        return update_content_func(triple_or_double.str)
+    else:
+        # This shouldn't happen with proper grammar, but handle edge cases
+        return update_content_func(str(triple_or_double))
+
+
 def quote_or_unquote(line: str):
     if '"' in line and "'" in line:
         return '"', line.replace("'", "\\'")
