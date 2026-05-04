@@ -103,6 +103,7 @@ class TestFsHandlers(unittest.TestCase):
         with open(source, "r") as f:
             self.assertEqual(f.read(), content)
 
+    @unittest.skipIf(os.getuid() == 0, "Test requires non-root user")
     def test_write_handler_error(self):
         handler = WriteHandler()
         source = "/source_w2.txt"
