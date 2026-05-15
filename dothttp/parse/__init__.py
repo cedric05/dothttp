@@ -46,7 +46,7 @@ from ..models.parse_models import (
     TestScript,
 )
 from ..property_schema import property_schema
-from ..script import ScriptExecutionJs, ScriptExecutionPython
+from ..script import ScriptExecutionPython
 from ..utils.common import get_real_file_path, triple_or_double_tostring, single_triple_or_double_tostring
 from ..utils.constants import *
 from ..utils.property_util import PropertyProvider, StringFormatPropertyResolver
@@ -941,12 +941,7 @@ class HttpDefBase(BaseModelProcessor):
         self.script_execution.pre_request_script()
 
     def run_prerequest_script(self):
-        execution_cls = (
-            ScriptExecutionJs
-            if self.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT
-            else ScriptExecutionPython
-        )
-        self.script_execution = execution_cls(self.httpdef, self.property_util)
+        self.script_execution = ScriptExecutionPython(self.httpdef, self.property_util)
         self.script_execution.init_request_script()
         for key, value in self.script_execution.client.properties.updated.items():
             self.property_util.add_command_line_property(key, value)

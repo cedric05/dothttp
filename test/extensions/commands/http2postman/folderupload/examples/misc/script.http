@@ -1,15 +1,12 @@
 @name("text payload")
 GET http://httpbin.org/robots.txt
 > {%
-client.test("check status", function(){
-    // checking test and assert
-    client.assert(response.status ===200, "status is 200")
-})
-client.test("check json", function(){
-    // were able to check headers
-    client.assert(response.headers.valueOf('content-type') === "application/json", "content-type is json")
-})
-// were able to check json response
-client.global.set("outputval", response.body);
+class TestPayload(unittest.TestCase):
+    def test_status(self):
+        self.assertEqual(200, client.response.status_code)
 
-%} javascript
+    def test_content_type(self):
+        self.assertEqual("application/json", client.response.headers.get('content-type'))
+
+client.properties.set("outputval", client.response.text)
+%} python

@@ -1,36 +1,34 @@
 @name("text payload")
 GET http://localhost:8000/robots.txt
 > {%
-client.test("check status", function(){
-    // checking test and assert
-    client.assert(response.status ===200, "status is 200")
-})
-client.test("check json", function(){
-    // were able to check headers
-    client.assert(response.headers.valueOf('content-type') === "application/json", "content-type is json")
-})
-// were able to check json response
-client.global.set("outputval", response.body);
+class TestPayload(unittest.TestCase):
+    def test_status(self):
+        self.assertEqual(200, client.response.status_code)
+        client.properties.set("outputval", client.response.text)
 
-%} javascript
+    def test_content_type(self):
+        self.assertEqual("application/json", client.response.headers.get('content-type'))
+
+
+%} python
 
 @name("json_payload")
 POST http://localhost:8000/post
 
 json({"token": "secret_token"})
 > {%
-client.test("check status", function(){
-    // checking test and assert
-    client.assert(response.status ===200, "status is 200")
-})
-client.test("check headers", function(){
-    // were able to check headers
-    client.assert(response.headers.valueOf('content-type') === "application/json", "content-type is json")
-})
-// were able to check json response
-client.global.set("outputval", response.body.json.token);
-client.log("this is sample log");
-%} javascript
+class TestJsonPayload(unittest.TestCase):
+    def test_status(self):
+        self.assertEqual(200, client.response.status_code)
+        client.properties.set("outputval", client.response.json().get("json", {}).get("token"))
+        log("this is sample log")
+
+    def test_headers(self):
+        self.assertEqual("application/json", client.response.headers.get('content-type'))
+
+
+
+%} python
 
 
 
@@ -49,43 +47,40 @@ json(
 }
 )
 > {%
-
-client.test("checks payload output recursive",  function(){
-    client.assert(isEqual(response.body, {'simpleKey':'simpleValue',
-	"keyWithObjects": [
-		"hi",
-		"hi2",
-		{
-			"simpleKey2": "simpleValue2"
-		}
-	]
-}), "paylaod changed")
-
-});
-
-%} javascript
+class TestEquals(unittest.TestCase):
+    def test_payload_recursive(self):
+        expected = {'simpleKey':'simpleValue',
+            "keyWithObjects": [
+                "hi",
+                "hi2",
+                {
+                    "simpleKey2": "simpleValue2"
+                }
+            ]
+        }
+        self.assertEqual(expected, client.response.json()["json"])
+%} python
 
 
 @name("delete property")
 GET http://localhost:8000/robots.txt
 // {{setPropertyByfile=sample}}
 > {%
-
-const value = client.global.get("setPropertyByfile");
-console.log("value is `" + value+"`");
-client.global.clear("setPropertyByfile");
-
-%} javascript
+def test_1():
+    value = client.properties.get("setPropertyByfile")
+    log(f"value is `{value}`")
+    client.properties.set("setPropertyByfile", "")
+%} python
 
 
 @name("script error")
 GET http://localhost:8000/robots.txt
 // {{setPropertyByfile=sample}}
 > {%
-
-client.log(response.body.test.out);
-
-%} javascript
+# This will cause an error - intentional for testing
+def test_1():
+    client.log(client.response.json()["test"]["out"])
+%} python
 
 
 
@@ -93,11 +88,7 @@ client.log(response.body.test.out);
 GET http://localhost:8000/robots.txt
 // {{setPropertyByfile=sample}}
 > {%
-
-const atob = require('atob');
-var b64 = "SGVsbG8sIFdvcmxkIQ==";
-var bin = atob(b64);
-
-console.log("value is `" + bin+"`");
-
-%} javascript
+b64 = "SGVsbG8sIFdvcmxkIQ=="
+bin_data = base64.b64decode(b64).decode('utf-8')
+log(f"value is `{bin_data}`")
+%} python

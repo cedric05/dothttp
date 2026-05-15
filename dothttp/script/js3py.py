@@ -32,12 +32,6 @@ from ..parse import MIME_TYPE_JSON, HttpDef, request_logger
 from ..utils.common import get_real_file_path
 from ..utils.property_util import PropertyProvider
 
-try:
-    import js2py
-    from js2py.base import JsObjectWrapper
-    from js2py.internals.simplex import JsException
-except:
-    pass
 
 
 def write_guard(x):
@@ -79,11 +73,6 @@ allowed_global = {
 }
 allowed_global.update(safe_globals)
 
-# disable python imports
-# js2py.disable_pyimport() # so that few libraries can be imported
-
-with open(get_real_file_path("../postScript.js", __file__)) as f:
-    js_template = f.read()
 
 
 @dataclass
@@ -226,49 +215,6 @@ class ScriptExecutionEnvironmentBase:
             script_result.error = str(exc)
             request_logger.error("unknown exception happened", exc_info=True)
             return script_result
-
-
-class ScriptExecutionJs(ScriptExecutionEnvironmentBase):
-    def _execute_test_script(self, resp) -> None:
-        # enable require will only be used for
-        # those who want to use require in dothttp scripts
-        # i will write up a document on how to do it
-        context = js2py.EvalJs(enable_require=True)
-        try:
-            context.execute(
-                js_template.replace("JS_CODE_REPLACE", self.client.request.test_script)
-            )
-        except JsException as exc:
-            raise ScriptException(payload=str(exc), function="''")
-        content_type = resp.headers.get("content-type", "text/plain")
-        # in some cases mimetype can have charset
-        # like text/plain; charset=utf-8
-        content_type = (
-            content_type.split(";")[0] if ";" in content_type else content_type
-        )
-        client = context.jsHandler(
-            content_type == MIME_TYPE_JSON,
-            self.client.properties,
-            resp.text,
-            resp.status_code,
-            dict(resp.headers),
-        )
-        script_result = ScriptResult(stdout="", error="", properties={}, tests=[])
-        for test_name in client.tests:
-            test_result = TestResult(test_name)
-            try:
-                test_result.result = client.tests[test_name]()
-                test_result.success = True
-            except Exception as exc:
-                test_result.error = str(exc)
-                test_result.success = False
-                request_logger.error(f"test execution failed {exc}")
-            script_result.tests.append(test_result)
-        for i in client.properties.updated:
-            if not isinstance(client.properties.vars[i], JsObjectWrapper):
-                script_result.properties[i] = client.properties.vars[i] or ""
-        script_result.stdout += "\n".join(client.stdout)
-        return script_result
 
 
 class ScriptExecutionPython(ScriptExecutionEnvironmentBase):

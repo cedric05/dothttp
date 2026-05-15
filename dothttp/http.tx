@@ -314,7 +314,7 @@ HTTP_TEST_SCRIPT:
 ;
 
 SCRIPT_LANGUAGE:
-    'python' | 'javascript'
+    'python'
 ;
 
 SLASH:
