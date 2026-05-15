@@ -1,9 +1,7 @@
 FROM python:3.11-slim
 
-# Install system dependencies (minimal set for faster builds)
+# Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    netcat-openbsd \
     libmagic1 \
     && rm -rf /var/lib/apt/lists/*
 
@@ -19,8 +17,9 @@ COPY pyproject.toml poetry.lock* ./
 # Configure poetry to not create virtual environments (we're in a container)
 RUN poetry config virtualenvs.create false
 
-# Install dependencies including dev dependencies (pytest, etc.)
+# Install dependencies including dev dependencies (pytest, gunicorn, httpbin, etc.)
 RUN poetry install --no-root
 
 # The actual code will be mounted as a volume at runtime
+# httpbin server is started automatically by pytest conftest.py fixture
 CMD ["poetry", "run", "pytest"]
