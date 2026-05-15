@@ -2,6 +2,7 @@ import pytest
 import subprocess
 import time
 import socket
+import sys
 
 def is_port_in_use(port):
     """Check if a port is already in use."""
@@ -9,26 +10,43 @@ def is_port_in_use(port):
         return s.connect_ex(('localhost', port)) == 0
 
 @pytest.fixture(scope='session', autouse=True)
-def start_httpbin_container():
+def start_httpbin_server():
+    """Start httpbin server using gunicorn for tests."""
     # Check if httpbin is already running on port 8000
     if is_port_in_use(8000):
-        print("httpbin is already running on port 8000, skipping container start")
+        print("httpbin is already running on port 8000, skipping server start")
         yield
         return
 
-    # Setup: Start the Docker container
-    container_id = None
+    # Setup: Start the gunicorn server with httpbin
+    process = None
     try:
-        container_id = subprocess.check_output(
-            ["docker", "run", "-d", "-p", "8000:80", "kennethreitz/httpbin"]
-        ).decode().strip()
-        # Wait for the container to be ready
-        time.sleep(5)  # Adjust the sleep time as needed
+        # Start gunicorn with httpbin app
+        process = subprocess.Popen(
+            [sys.executable, "-m", "gunicorn", "-b", "127.0.0.1:8000", "httpbin:app"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE
+        )
+
+        # Wait for the server to be ready
+        max_attempts = 30
+        for _ in range(max_attempts):
+            if is_port_in_use(8000):
+                print("httpbin server started successfully on port 8000")
+                break
+            time.sleep(0.5)
+        else:
+            raise RuntimeError("Failed to start httpbin server")
 
         yield
 
     finally:
-        # Teardown: Stop and remove the Docker container if we started it
-        if container_id:
-            subprocess.run(["docker", "stop", container_id], capture_output=True)
-            subprocess.run(["docker", "rm", container_id], capture_output=True)
+        # Teardown: Stop the gunicorn server if we started it
+        if process:
+            process.terminate()
+            try:
+                process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait()
+            print("httpbin server stopped")

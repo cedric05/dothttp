@@ -24,32 +24,6 @@ def test_hai():
 
 
 
-@name("javascript")
-GET https://postman-echo.com/get
-> {%
-
-client.test("check status", function(){
-    // checking test and assert
-    client.assert(response.status ===200, "status is 200")
-})
-
-%} javascript
-
-
-
-@name("default_javascript")
-GET https://postman-echo.com/get
-> {%
-
-
-client.test("check status", function(){
-    // checking test and assert
-    client.assert(response.status ===200, "status is 200")
-})
-
-%} javascript
-
-
 @name("python iter")
 GET https://postman-echo.com/get
 > {%

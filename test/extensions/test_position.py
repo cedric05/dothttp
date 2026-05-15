@@ -164,20 +164,18 @@ json({
                 },
             ),
             (
-                (1131, "script.http"),
+                (905, "script.http"),
                 {
-                    "type": "payload_json",
+                    "type": "url",
                     "target": "isEquals check",
                     "target_base": None,
                     "base_start": None,
                 },
             ),
             (
-                (1215, "script.http"),
+                (1033, "script.http"),
                 {
-                    "start": 1211,
-                    "end": 1469,
-                    "type": "script",
+                    "type": "payload_json",
                     "target": "isEquals check",
                     "target_base": None,
                     "base_start": None,
@@ -220,9 +218,9 @@ json({
                 },
             ),
         ]:
-            # print(({"position": params[0], "filename": params[1]},
-            #        self.execute_n_get(params={"position": params[0], "filename": str(
-            #            command_dir.joinpath(params[1]))})))
+            print(({"position": params[0], "filename": params[1]},
+                   self.execute_n_get(params={"position": params[0], "filename": str(
+                       command_dir.joinpath(params[1]))})))
             self.assertEqual(
                 result,
                 self.execute_n_get(

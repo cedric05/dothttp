@@ -86,7 +86,7 @@ class HttpDef:
     session_clear = False
     no_parent_script = False
     test_script: str = ""
-    test_script_lang: ScriptType = ScriptType.JAVA_SCRIPT
+    test_script_lang: ScriptType = ScriptType.PYTHON
     proxy: Optional[Dict[str, str]] = None
 
     def get_har(self):

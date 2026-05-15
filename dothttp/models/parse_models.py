@@ -179,7 +179,6 @@ class ToFile:
 
 @dataclass
 class LangOption:
-    javascript: Optional[str]
     python: Optional[str]
 
 
@@ -511,11 +510,7 @@ class HttpFileType(enum.Enum):
 
 class ScriptType(enum.Enum):
     PYTHON = "python"
-    JAVA_SCRIPT = "javascript"
 
     @staticmethod
     def get_script_type(script_type: LangOption):
-        if script_type == "javascript":
-            return ScriptType.JAVA_SCRIPT
-        else:
-            return ScriptType.PYTHON
+        return ScriptType.PYTHON

@@ -6,7 +6,7 @@ from requests import Response
 
 from dothttp.models.parse_models import ScriptType
 from dothttp.parse import HttpDef
-from dothttp.script import ScriptExecutionJs, ScriptExecutionPython
+from dothttp.script import ScriptExecutionPython
 from dothttp.utils.property_util import PropertyProvider
 
 file_name = f"{dir_path}/requests/script.http"
@@ -82,57 +82,11 @@ something
             result,
         )
 
-    def test_javascript(self):
-        req, result = self.load_comp("javascript")
-        self.assertEqual(ScriptType.JAVA_SCRIPT, req.httpdef.test_script_lang)
-        self.assertEqual(
-            {
-                "stdout": "",
-                "error": "",
-                "properties": {},
-                "tests": [
-                    {
-                        "name": "check status",
-                        "success": True,
-                        "result": None,
-                        "error": None,
-                    }
-                ],
-                "compiled": True,
-            },
-            result,
-        )
-
-    def test_javascript_default(self):
-        req, result = self.load_comp("default_javascript")
-        self.assertEqual(ScriptType.JAVA_SCRIPT, req.httpdef.test_script_lang)
-        self.assertEqual(
-            {
-                "stdout": "",
-                "error": "",
-                "properties": {},
-                "tests": [
-                    {
-                        "name": "check status",
-                        "success": True,
-                        "result": None,
-                        "error": None,
-                    }
-                ],
-                "compiled": True,
-            },
-            result,
-        )
 
     def load_comp(self, target):
         req = self.get_req_comp(file_name, target=target)
         req.load_def()
-        execution_cls = (
-            ScriptExecutionJs
-            if req.httpdef.test_script_lang == ScriptType.JAVA_SCRIPT
-            else ScriptExecutionPython
-        )
-        script_execution = execution_cls(req.httpdef, req.property_util)
+        script_execution = ScriptExecutionPython(req.httpdef, req.property_util)
         resp = req.get_response()
         return req, script_execution.execute_test_script(resp).as_json()
 
