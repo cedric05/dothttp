@@ -118,7 +118,7 @@ class ResovleTest(TestBase):
                 id=1,
             )
         )
-        self.assertEquals(
+        self.assertEqual(
             result.result["resolved"], "http://localhost:8000/get")
 
     def test_hover_url_content(self):
@@ -131,7 +131,7 @@ class ResovleTest(TestBase):
                     id=1,
                 )
             )
-            self.assertEquals(
+            self.assertEqual(
                 result.result["resolved"], "http://localhost:8000/get")
 
     def test_hover_json_content(self):
@@ -153,7 +153,7 @@ json({
             )
         )
         expected = {'totalSeconds': 10800}
-        self.assertEquals(expected, result.result["resolved"])
+        self.assertEqual(expected, result.result["resolved"])
 
         index2 = content.find("numOfHours * 60 * 60")
         result2 = resolve_handler.run(
@@ -163,7 +163,7 @@ json({
                 id=2,
             )
         )
-        self.assertEquals(10800, result2.result["resolved"])
+        self.assertEqual(10800, result2.result["resolved"])
 
     def test_hover_import_content(self):
         resolve_handler = GetHoveredResolvedParamContentHandler()
@@ -186,7 +186,7 @@ json({
             )
         )
         expected = "https://req.dothttp.dev/ram"
-        self.assertEquals(expected, result.result["resolved"])
+        self.assertEqual(expected, result.result["resolved"])
 
     def test_hover_context_content(self):
         resolve_handler = GetHoveredResolvedParamContentHandler()
@@ -212,7 +212,7 @@ GET "https://httpbin.org/get"
             )
         )
         expected = "https://httpbin.org/get/ram"
-        self.assertEquals(expected, result.result["resolved"])
+        self.assertEqual(expected, result.result["resolved"])
 
     def test_hover_context_with_no_target(self):
         resolve_handler = GetHoveredResolvedParamContentHandler()
@@ -245,7 +245,7 @@ GET "https://httpbin.org/get"
             )
         )
         expected = "https://httpbin.org/get/ranga"
-        self.assertEquals(expected, result.result["resolved"])
+        self.assertEqual(expected, result.result["resolved"])
 
         index = content.find("rama")
         result = resolve_handler.run(
@@ -257,7 +257,7 @@ GET "https://httpbin.org/get"
             )
         )
         expected = {"totalSeconds": 10800, "rama": "ranga"}
-        self.assertEquals(expected, result.result["resolved"])
+        self.assertEqual(expected, result.result["resolved"])
         
         # look for property name and resolve it
         
@@ -270,7 +270,7 @@ GET "https://httpbin.org/get"
                 id=1,
             )
         )
-        self.assertEquals({'name': 'numOfSeconds', 'value': 10800}, result.result["property_at_pos"])
+        self.assertEqual({'name': 'numOfSeconds', 'value': 10800}, result.result["property_at_pos"])
 
     def test_hover_import_relative_content(self):
         resolve_handler = GetHoveredResolvedParamContentHandler()
@@ -293,7 +293,7 @@ GET "https://httpbin.org/get"
             )
         )
         expected = "https://req.dothttp.dev/ram"
-        self.assertEquals(expected, result.result["resolved"])
+        self.assertEqual(expected, result.result["resolved"])
 
 
     def test_hover_query(self):
@@ -316,7 +316,7 @@ GET "https://httpbin.org/get"
             )
         )
         expected = "ram=ranga"
-        self.assertEquals(expected, result.result["resolved"])
+        self.assertEqual(expected, result.result["resolved"])
 
 
     def test_hover_headers(self):
@@ -339,7 +339,7 @@ GET "https://httpbin.org/get"
             )
         )
         expected = {'ram': 'ranga'}
-        self.assertEquals(expected, result.result["resolved"])
+        self.assertEqual(expected, result.result["resolved"])
 
 
 class FileExecute(TestBase):
