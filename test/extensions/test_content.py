@@ -242,7 +242,7 @@ class FileExecute(TestBase):
             curl=False,
         )
         result.load_def()
-        self.assertEquals(result.httpdef.payload.json["a"], 10)
+        self.assertEqual(result.httpdef.payload.json["a"], 10)
         
         
     def test_from_context_with_var(self):
@@ -265,4 +265,4 @@ class FileExecute(TestBase):
             curl=False,
         )
         result.load_def()
-        self.assertEquals(result.httpdef.payload.json["a"], 12)
+        self.assertEqual(result.httpdef.payload.json["a"], 12)

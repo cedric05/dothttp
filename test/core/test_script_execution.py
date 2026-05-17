@@ -97,7 +97,7 @@ class ScriptExecutionIntegration(TestCase):
             """
 class SampleTestCase(unittest.TestCase):
     def test_status_code(self):
-        self.assertEquals(200 , client.response.status_code)
+        self.assertEqual(200 , client.response.status_code)
 """
         )
 
@@ -140,18 +140,18 @@ def pre_request():
         props.add_command_line_property("ram", "raju")
         script_exe = ScriptExecutionPython(httpdef, props)
         script_exe.pre_request_script()
-        self.assertEquals({"ram": "ranga"}, httpdef.headers)
-        self.assertEquals({"new": "value", "ram": "raju"}, script_exe.client.properties)
+        self.assertEqual({"ram": "ranga"}, httpdef.headers)
+        self.assertEqual({"new": "value", "ram": "raju"}, script_exe.client.properties)
 
     def test_math_n_headers(self):
         resp = self.get_script_exe(
             """
 class SampleTestCase(unittest.TestCase):
     def test_math(self):
-        self.assertEquals(4 , math.pow(2,2))
+        self.assertEqual(4 , math.pow(2,2))
 
     def test_headers(self):
-        self.assertEquals("sample_value", client.response.headers.get("sample_header"))
+        self.assertEqual("sample_value", client.response.headers.get("sample_header"))
 
     def test_date(self):
         datetime.datetime.now()
@@ -159,7 +159,7 @@ class SampleTestCase(unittest.TestCase):
     def test_hash(self):
         hashobj = hashlib.sha512()
         hashobj.update(b'ram')
-        self.assertEquals("92f35115cca41c3270b11813164b0845108686761d73b3e6e4e95ae8380fbdd92c1b9d6ff0e6181214486e9eb7ccdd779ffe1b04b161e510c7d8e7da715eb0ae",
+        self.assertEqual("92f35115cca41c3270b11813164b0845108686761d73b3e6e4e95ae8380fbdd92c1b9d6ff0e6181214486e9eb7ccdd779ffe1b04b161e510c7d8e7da715eb0ae",
         hashobj.hexdigest())
 
 """
@@ -206,7 +206,7 @@ class SampleTestCase(unittest.TestCase):
             """
 class SampleTestCase(unittest.TestCase):
     def test_status_code(self):
-        self.assertEquals(401 , client.response.status_code)
+        self.assertEqual(401 , client.response.status_code)
 """
         )
         self.assertEqual(

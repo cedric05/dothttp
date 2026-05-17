@@ -197,7 +197,7 @@ class SubstitutionTest(TestBase):
             file=f"{base_dir}/system_command.http", target="2"
         )
         request_data = json.loads(system_command_request.body)
-        self.assertEquals(request_data, {"sub": "world\n"}, "insecure flag is set")
+        self.assertEqual(request_data, {"sub": "world\n"}, "insecure flag is set")
 
 
         # test system command substitution as insecure flag is base
@@ -205,7 +205,7 @@ class SubstitutionTest(TestBase):
             file=f"{base_dir}/system_command.http", target="parent"
         )
         request_data = json.loads(system_command_request.body)
-        self.assertEquals(request_data, {"sub": "hello\n"}, "parent has insecure flag is set")
+        self.assertEqual(request_data, {"sub": "hello\n"}, "parent has insecure flag is set")
 
 
 
@@ -214,7 +214,7 @@ class SubstitutionTest(TestBase):
             file=f"{base_dir}/system_command.http", target="child"
         )
         request_data = json.loads(system_command_request.body)
-        self.assertEquals(request_data, {"sub": "hello\n"}, "grand parent has insecure flag is set")
+        self.assertEqual(request_data, {"sub": "hello\n"}, "grand parent has insecure flag is set")
 
 
     def test_substitution_from_env_variable(self):

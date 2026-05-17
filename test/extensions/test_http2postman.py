@@ -100,7 +100,7 @@ class Testhttp2postman(TestBase):
             return result.result
 
     def test_negative(self):
-        self.assertEquals(
+        self.assertEqual(
             {"error": True, "error_message": "filename not existent or invalid link"},
             self.error_scenario("ram.http"),
         )

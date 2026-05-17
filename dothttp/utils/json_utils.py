@@ -79,6 +79,11 @@ class JSONEncoder(json.JSONEncoder):
 
             return text
 
+        # Convert indent to string if it's an integer (for Python 3.13+ compatibility)
+        indent = self.indent
+        if isinstance(indent, int):
+            indent = ' ' * indent
+
         if _one_shot and c_make_encoder is not None and self.indent is None:
             _iterencode = c_make_encoder(
                 markers,
@@ -96,7 +101,7 @@ class JSONEncoder(json.JSONEncoder):
                 markers,
                 self.default,
                 _encoder,
-                self.indent,
+                indent,
                 floatstr,
                 self.key_separator,
                 self.item_separator,
