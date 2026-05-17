@@ -1,4 +1,5 @@
 import argparse
+import atexit
 import logging
 import sys
 
@@ -12,9 +13,16 @@ from .parse.request_base import (
     RequestCompiler,
     eprint,
 )
+from .plugin_system import cleanup_plugins, ensure_integrated
 from .utils.log_utils import setup_logging
 
 logger = logging.getLogger("dothttp")
+
+# Ensure plugins are auto-integrated
+ensure_integrated()
+
+# Register cleanup handler
+atexit.register(cleanup_plugins)
 
 
 def apply(args: Config):
@@ -49,6 +57,40 @@ def main():
     parser = argparse.ArgumentParser(
         description="http requests for humans", prog="dothttp"
     )
+
+    # Add subparsers for plugin commands
+    subparsers = parser.add_subparsers(dest='command', help='commands')
+
+    # Plugin command
+    plugin_parser = subparsers.add_parser('plugin', help='Plugin management')
+    plugin_subparsers = plugin_parser.add_subparsers(dest='plugin_command', help='plugin commands')
+
+    # plugin list
+    list_parser = plugin_subparsers.add_parser('list', help='List all plugins')
+    list_parser.add_argument('-v', '--verbose', action='store_true', help='Show detailed information')
+
+    # plugin info
+    info_parser = plugin_subparsers.add_parser('info', help='Show plugin information')
+    info_parser.add_argument('plugin_name', help='Name of the plugin')
+
+    # plugin create
+    create_parser = plugin_subparsers.add_parser('create', help='Create a new plugin')
+    create_parser.add_argument('plugin_name', help='Name for the new plugin')
+    create_parser.add_argument('--template', choices=['basic', 'logger', 'auth'],
+                               default='basic', help='Template to use')
+
+    # plugin enable
+    enable_parser = plugin_subparsers.add_parser('enable', help='Enable a plugin')
+    enable_parser.add_argument('plugin_name', help='Name of the plugin to enable')
+
+    # plugin disable
+    disable_parser = plugin_subparsers.add_parser('disable', help='Disable a plugin')
+    disable_parser.add_argument('plugin_name', help='Name of the plugin to disable')
+
+    # plugin install
+    install_parser = plugin_subparsers.add_parser('install', help='Install plugin dependencies')
+    install_parser.add_argument('plugin_name', help='Name of the plugin')
+
     general_group = parser.add_argument_group("general")
     general_group.add_argument(
         "--curl", help="generates curl script", action="store_const", const=True
@@ -96,11 +138,26 @@ def main():
     property_group.add_argument(
         "--property", help="list of property's", nargs="+", default=[]
     )
-    general_group.add_argument("file", help="http file")
+    general_group.add_argument("file", nargs='?', help="http file")
     general_group.add_argument(
         "--target", "-t", help="targets a particular http definition", type=str
     )
     args = parser.parse_args()
+
+    # Handle plugin commands
+    if args.command == 'plugin':
+        if not args.plugin_command:
+            plugin_parser.print_help()
+            sys.exit(1)
+        from .plugin_system.cli import run_cli
+        run_cli(args)
+        return
+
+    # Require file for normal execution
+    if not args.file:
+        parser.print_help()
+        sys.exit(1)
+
     if args.debug and args.info:
         eprint("info and debug are conflicting options, use debug for more information")
         sys.exit(1)
