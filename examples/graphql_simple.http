@@ -1,0 +1,11 @@
+# GraphQL Example - No special syntax needed!
+# GraphQL is just a POST request with JSON payload
+
+@name("github-user-repos")
+POST https://api.github.com/graphql
+"Authorization": "Bearer {{GITHUB_TOKEN}}"
+
+json({
+  "query": "query { viewer { login name } }",
+  "variables": {}
+})

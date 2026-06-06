@@ -1,0 +1,3 @@
+@name("proxy with different url")
+GET https://httpbin.org/ip
+proxy("socks5://different-proxy.example.com:1080")

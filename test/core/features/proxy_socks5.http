@@ -1,0 +1,3 @@
+@name("socks5 proxy")
+GET https://httpbin.org/ip
+proxy("socks5://proxy.example.com:1080")

@@ -1,0 +1,3 @@
+@name("retry with backoff")
+GET https://httpbin.org/status/503
+retry(total=3, backoff_factor=1)

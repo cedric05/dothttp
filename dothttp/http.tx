@@ -29,6 +29,9 @@ HTTP:
         urlwrap=URL
         (authwrap=AUTHWRAP)?
         (certificate = CERTAUTH)?
+        (timeout=TIMEOUT)?
+        (retry=RETRY)?
+        (proxy=PROXY)?
         (lines *= LINE)?
         (payload=PAYLOAD)?
         (output=TOFILE)?
@@ -133,6 +136,23 @@ AZURECLIAUTH:
     'azurecli' '(' (('scope' '=')?  scope=DotString )?  ')'
 ;
 
+TIMEOUT:
+    'timeout' '(' timeout_seconds=DotString ')'
+;
+
+RETRY:
+    'retry' '(' retry_params*=RETRY_PARAM[','] ','? ')'
+;
+
+RETRY_PARAM:
+      ('total' '=' total=DotString)
+    | ('status_forcelist' '=' '[' status_forcelist*=DotString[','] ','? ']')
+    | ('backoff_factor' '=' backoff_factor=DotString)
+;
+
+PROXY:
+    'proxy' '(' proxy=DotString ')'
+;
 
 EXTRA_ARG:
     // there can be more

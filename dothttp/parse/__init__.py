@@ -467,6 +467,53 @@ class HttpDefBase(BaseModelProcessor):
                         else None
                     )
 
+    def load_timeout(self):
+        """Load timeout from current request or parent with inheritance"""
+        timeout_wrap = self.get_current_or_base("timeout")
+        if timeout_wrap:
+            timeout_str = self.get_updated_content(timeout_wrap.timeout_seconds)
+            try:
+                self.httpdef.timeout = float(timeout_str)
+                request_logger.debug(f"timeout set to {self.httpdef.timeout} seconds")
+            except ValueError:
+                base_logger.error(f"Invalid timeout value: {timeout_str}")
+
+    def load_retry(self):
+        """Load retry configuration - maps to commonly-used urllib3.Retry parameters"""
+        retry_wrap = self.get_current_or_base("retry")
+        if not retry_wrap or not retry_wrap.retry_params:
+            return
+
+        try:
+            # Process each retry parameter
+            for param in retry_wrap.retry_params:
+                if param.total:
+                    self.httpdef.retry_total = int(self.get_updated_content(param.total))
+
+                if param.status_forcelist:
+                    self.httpdef.retry_status_forcelist = [
+                        int(self.get_updated_content(code))
+                        for code in param.status_forcelist
+                    ]
+
+                if param.backoff_factor:
+                    self.httpdef.retry_backoff_factor = float(self.get_updated_content(param.backoff_factor))
+
+            request_logger.debug(
+                f"retry configured: total={self.httpdef.retry_total}, "
+                f"backoff_factor={self.httpdef.retry_backoff_factor}"
+            )
+        except (ValueError, TypeError) as e:
+            base_logger.error(f"Invalid retry configuration: {e}")
+
+    def load_custom_proxy(self):
+        """Load custom proxy from current request or parent with inheritance"""
+        proxy_wrap = self.get_current_or_base("proxy")
+        if proxy_wrap:
+            proxy_url = self.get_updated_content(proxy_wrap.proxy)
+            self.httpdef.custom_proxy = proxy_url
+            request_logger.debug(f"custom proxy set: {proxy_url}")
+
     def load_headers(self):
         """
             entrypoints
@@ -935,6 +982,9 @@ class HttpDefBase(BaseModelProcessor):
         self.load_payload()
         self.load_auth()
         self.load_proxy()
+        self.load_timeout()
+        self.load_retry()
+        self.load_custom_proxy()
         self.load_certificate()
         self.load_output()
         self._loaded = True

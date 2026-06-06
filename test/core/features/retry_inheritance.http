@@ -1,0 +1,6 @@
+@name("parent with retry")
+GET https://httpbin.org/status/500
+retry(total=3, backoff_factor=1)
+
+@name("child inherits retry") : "parent with retry"
+GET https://httpbin.org/status/503

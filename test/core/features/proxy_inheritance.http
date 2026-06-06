@@ -1,0 +1,6 @@
+@name("parent with proxy")
+GET https://httpbin.org/ip
+proxy("http://proxy.example.com:8080")
+
+@name("child inherits proxy") : "parent with proxy"
+GET https://httpbin.org/headers

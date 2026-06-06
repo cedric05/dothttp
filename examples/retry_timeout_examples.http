@@ -1,0 +1,108 @@
+# Examples demonstrating timeout, retry, and proxy_chain features
+
+# Example 1: Basic timeout
+@name("simple timeout")
+GET https://httpbin.org/delay/2
+timeout(5)
+
+# Example 2: Retry with backoff
+@name("retry on failure")
+POST https://httpbin.org/status/503
+timeout(10)
+retry(total=3, backoff_factor=1)
+json({"test": "data"})
+
+# Example 3: Retry on specific status codes
+@name("retry specific status")
+GET https://httpbin.org/status/429
+retry(total=5, status_forcelist=[429, 503, 504])
+
+# Example 4: HTTP proxy
+@name("http proxy")
+GET https://httpbin.org/ip
+proxy("http://proxy.example.com:8080")
+
+# Example 5: SOCKS5 proxy
+@name("socks5 proxy")
+GET https://httpbin.org/ip
+proxy("socks5://proxy.example.com:1080")
+
+# Example 6: Combined features
+@name("full feature set")
+POST https://httpbin.org/post
+timeout(30)
+retry(total=3, backoff_factor=2, status_forcelist=[500, 502, 503])
+proxy("http://proxy.example.com:8080")
+basicauth("user", "pass")
+json({
+    "message": "testing all features",
+    "timestamp": "{{$timestamp}}"
+})
+
+# Example 7: Parent-child inheritance (base request)
+@name("base api request")
+GET https://api.example.com/v1
+timeout(15)
+retry(total=2, backoff_factor=1)
+"Authorization": "Bearer {{token}}"
+
+# Example 8: Child inherits timeout and retry from parent
+@name("users endpoint") : "base api request"
+GET /users
+? page=1
+? limit=10
+
+# Example 9: Child overrides parent's timeout
+@name("slow endpoint") : "base api request"
+GET /slow-operation
+timeout(60)
+
+# Example 10: Retry with all parameters
+@name("comprehensive retry")
+GET https://httpbin.org/status/500
+retry(total=5, backoff_factor=2, status_forcelist=[408, 429, 500, 502, 503, 504])
+
+# Example 11: Using variables for configuration
+var retry_count = 3;
+var timeout_seconds = 20;
+
+@name("variable driven config")
+GET https://httpbin.org/get
+timeout({{timeout_seconds}})
+retry(total={{retry_count}}, backoff_factor=1)
+
+# Example 12: Testing flaky APIs
+@name("flaky api test")
+GET https://httpbin.org/unstable
+timeout(10)
+retry(total=5, backoff_factor=1)
+
+# Example 13: Production testing with retry
+@name("production health check")
+GET https://api.example.com/health
+timeout(5)
+retry(total=3, backoff_factor=2, status_forcelist=[500, 502, 503])
+
+# Example 14: Corporate proxy environment
+@name("behind corporate proxy")
+GET https://external-api.example.com/data
+proxy("http://corporate-proxy.internal:3128")
+timeout(30)
+"User-Agent": "DotHTTP/1.0"
+
+# Example 15: No backoff (immediate retry)
+@name("immediate retry")
+GET https://httpbin.org/status/503
+retry(total=3, status_forcelist=[503])
+
+# Example 16: Exponential backoff with backoff_factor=1
+@name("backoff factor 1")
+GET https://httpbin.org/status/500
+retry(total=4, backoff_factor=1, status_forcelist=[500])
+# Delays: 0s, 1s, 2s, 4s
+
+# Example 17: Faster exponential backoff with backoff_factor=2
+@name("backoff factor 2")
+GET https://httpbin.org/status/500
+retry(total=4, backoff_factor=2, status_forcelist=[500])
+# Delays: 0s, 2s, 4s, 8s
