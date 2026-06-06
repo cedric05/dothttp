@@ -26,7 +26,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Run tests in docker container
 # httpbin server is started automatically by pytest conftest.py
-echo -e "${YELLOW}Running tests in Python 3.11 container...${NC}"
+echo -e "${YELLOW}Running tests in Python 3.14 container ...${NC}"
 docker run --rm \
     --network host \
     -v "${SCRIPT_DIR}:/app" \
