@@ -1,0 +1,37 @@
+# GraphQL Examples with GitHub API
+# GraphQL works out of the box - it's just POST with JSON!
+
+# Simple query
+@name("viewer-info")
+POST https://api.github.com/graphql
+"Authorization": "Bearer {{GITHUB_TOKEN}}"
+
+json({
+  "query": "query { viewer { login name email bio } }"
+})
+
+
+# Query with variables
+@name("get-user-repos")
+POST https://api.github.com/graphql
+"Authorization": "Bearer {{GITHUB_TOKEN}}"
+
+json({
+  "query": "query GetUserRepos($login: String!) { user(login: $login) { name login bio avatarUrl repositories(first: 10, orderBy: {field: STARGAZERS, direction: DESC}) { totalCount nodes { name description stargazerCount forkCount url } } } }",
+  "variables": {
+    "login": "cedric05"
+  }
+})
+
+
+# Mutation example
+@name("add-star")
+POST https://api.github.com/graphql
+"Authorization": "Bearer {{GITHUB_TOKEN}}"
+
+json({
+  "query": "mutation AddStar($repositoryId: ID!) { addStar(input: {starrableId: $repositoryId}) { starrable { stargazerCount } } }",
+  "variables": {
+    "repositoryId": "{{repoId}}"
+  }
+})
