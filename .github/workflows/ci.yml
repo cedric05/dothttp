@@ -16,7 +16,7 @@ jobs:
       - name: Install Python 3
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11
+          python-version: 3.14
       - uses: Gr1N/setup-poetry@v8
       - name: Install dependencies
         run: |
