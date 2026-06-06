@@ -1,0 +1,6 @@
+@name("parent with timeout")
+GET https://httpbin.org/delay/1
+timeout(20)
+
+@name("child inherits timeout") : "parent with timeout"
+GET https://httpbin.org/delay/1

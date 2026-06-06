@@ -1,0 +1,6 @@
+@name("all features combined")
+POST https://httpbin.org/post
+timeout(30)
+retry(total=3, backoff_factor=1, status_forcelist=[429, 500])
+proxy("http://proxy.example.com:8080")
+json({"test": "data"})

@@ -1,0 +1,3 @@
+@name("retry all params")
+GET https://httpbin.org/status/500
+retry(total=5, backoff_factor=2, status_forcelist=[500, 502, 503])

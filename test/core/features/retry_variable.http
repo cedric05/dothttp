@@ -1,0 +1,3 @@
+@name("retry with different values")
+GET https://httpbin.org/status/500
+retry(total=5, backoff_factor=2)

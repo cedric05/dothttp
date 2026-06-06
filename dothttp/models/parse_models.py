@@ -127,6 +127,30 @@ class AuthWrap:
 
 
 @dataclass
+class Timeout:
+    timeout_seconds: str
+
+
+@dataclass
+class RetryParam:
+    """Most commonly used urllib3.Retry parameters"""
+    total: Optional[str] = None
+    status_forcelist: Optional[List[str]] = None
+    backoff_factor: Optional[str] = None
+
+
+@dataclass
+class Retry:
+    """Maps to commonly-used urllib3.Retry parameters"""
+    retry_params: Optional[List[RetryParam]] = None
+
+
+@dataclass
+class Proxy:
+    proxy: str
+
+
+@dataclass
 class Query:
     key: str
     value: str
@@ -225,6 +249,9 @@ class Http:
     lines: Optional[List[Line]]
     payload: Optional[Payload]
     output: Optional[ToFile]
+    timeout: Optional[Timeout] = None
+    retry: Optional[Retry] = None
+    proxy: Optional[Proxy] = None
     description: Optional[str] = None
     extra_args: Optional[List[ExtraArg]] = field(default_factory=lambda: [])
     named_args: Optional[List[NamedArg]] = field(default_factory=lambda: [])

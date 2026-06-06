@@ -8,6 +8,8 @@ from urllib.parse import unquote, urlparse, urlunparse
 
 import jstyleson as json
 from requests import PreparedRequest, Response, Session
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # this is bad, loading private stuff. find a better way
 from requests.exceptions import SSLError
@@ -123,7 +125,7 @@ class RequestBase(HttpDefBase):
 
     def get_session(self):
         if self.httpdef.session_clear:
-            # calle should close session
+            # caller should close session
             # TODO
             return get_new_session()
         session = self.global_session
@@ -346,6 +348,30 @@ class HttpFileFormatter(RequestBase):
                     output_str += f'{new_line}azurespcert("tenant_id={cert_auth.tenant_id}", client_id="{cert_auth.client_id}", client_secret="{cert_auth.certificate_path}", scope="{cert_auth.scope}")'
                 else:
                     output_str += f'{new_line}azurecli( scope = "{azure_auth.scope}")'
+
+        # Format timeout
+        if timeout := http.timeout:
+            output_str += f'{new_line}timeout({timeout.timeout_seconds})'
+
+        # Format retry
+        if retry := http.retry:
+            if retry.retry_params:
+                params = []
+                for param in retry.retry_params:
+                    if param.total:
+                        params.append(f'total={param.total}')
+                    if param.backoff_factor:
+                        params.append(f'backoff_factor={param.backoff_factor}')
+                    if param.status_forcelist:
+                        codes = ', '.join(param.status_forcelist)
+                        params.append(f'status_forcelist=[{codes}]')
+                if params:
+                    output_str += f'{new_line}retry({", ".join(params)})'
+
+        # Format proxy
+        if proxy := http.proxy:
+            output_str += f'{new_line}proxy({apply_quote_or_unquote(proxy.proxy)})'
+
         if lines := http.lines:
 
             def check_for_quotes(line):
@@ -555,10 +581,59 @@ class RequestCompiler(RequestBase):
             )
             eprint("output file close failed")
 
+    def _create_retry_adapter(self):
+        """
+        Create a retry adapter based on httpdef retry settings.
+
+        Returns HTTPAdapter with retry configuration, or None if no retry is configured.
+        This adapter can be used directly with adapter.send() without mounting on session.
+
+        Passes parameters directly to urllib3.Retry without additional processing.
+        """
+        # Check if any retry configuration exists
+        if self.httpdef.retry_total is None:
+            return None  # No retry configuration
+
+        # Build kwargs for Retry, passing only configured parameters
+        retry_kwargs = {}
+
+        if self.httpdef.retry_total is not None:
+            retry_kwargs['total'] = self.httpdef.retry_total
+
+        if self.httpdef.retry_status_forcelist is not None:
+            retry_kwargs['status_forcelist'] = self.httpdef.retry_status_forcelist
+
+        if self.httpdef.retry_backoff_factor is not None:
+            retry_kwargs['backoff_factor'] = self.httpdef.retry_backoff_factor
+
+        # Always set raise_on_status=False for API testing tools
+        # Users want to see the response regardless of status code
+        retry_kwargs['raise_on_status'] = False
+
+        # Create retry strategy with configured parameters
+        retry_strategy = Retry(**retry_kwargs)
+
+        # Create adapter with retry strategy
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+
+        request_logger.debug(f"Retry adapter created with: {retry_kwargs}")
+
+        return adapter
+
     def get_response(self):
+        """
+        Get HTTP response with optional retry support via urllib3.Retry.
+
+        Uses adapter.send() directly if retry is configured, avoiding session
+        state modification and ensuring thread-safety in concurrent environments.
+        """
         session = self.get_session()
         request = self.get_request()
         session.cookies = request._cookies
+
+        # Create retry adapter if configured (doesn't modify session)
+        retry_adapter = self._create_retry_adapter()
+
         if self.httpdef.p12:
             session.mount(
                 request.url,
@@ -572,13 +647,36 @@ class RequestCompiler(RequestBase):
                 cert = tuple(self.httpdef.certificate)
             else:
                 cert = None
-            resp: Response = session.send(
-                request,
-                cert=cert,
-                verify=not self.httpdef.allow_insecure,
-                proxies=self.httpdef.proxy,
-                # stream=True
-            )
+
+            # Prepare kwargs for session.send
+            send_kwargs = {
+                'cert': cert,
+                'verify': not self.httpdef.allow_insecure,
+            }
+
+            # Handle proxy configuration
+            # Priority: custom_proxy (from DSL) > proxy (from named_args)
+            if self.httpdef.custom_proxy:
+                send_kwargs['proxies'] = {
+                    'http': self.httpdef.custom_proxy,
+                    'https': self.httpdef.custom_proxy,
+                }
+                request_logger.debug(f"Using custom proxy: {self.httpdef.custom_proxy}")
+            elif self.httpdef.proxy:
+                send_kwargs['proxies'] = self.httpdef.proxy
+
+            # Add timeout if configured
+            if self.httpdef.timeout:
+                send_kwargs['timeout'] = self.httpdef.timeout
+
+            # Use retry adapter if configured, otherwise use session.send()
+            if retry_adapter:
+                # Call adapter.send() directly - no need to mount on session!
+                # This keeps session state clean and is thread-safe
+                resp: Response = retry_adapter.send(request, **send_kwargs)
+            else:
+                # Normal request without retry
+                resp: Response = session.send(request, **send_kwargs)
         except UnicodeEncodeError:
             # for Chinese, smiley all other default encode converts into latin-1
             # as latin-1 didn't consist of those characters it will fail
@@ -586,11 +684,19 @@ class RequestCompiler(RequestBase):
             # as a last resort, it may not be correct solution. may be it is.
             # for now proceeding with this
             request.prepare_body(request.body.encode("utf-8"), files=None)
-            resp: Response = session.send(
-                request,
-                cert=self.httpdef.certificate,
-                verify=not self.httpdef.allow_insecure,
-            )
+
+            send_kwargs = {
+                'cert': self.httpdef.certificate,
+                'verify': not self.httpdef.allow_insecure,
+            }
+            if self.httpdef.timeout:
+                send_kwargs['timeout'] = self.httpdef.timeout
+
+            # Use retry adapter if configured
+            if retry_adapter:
+                resp: Response = retry_adapter.send(request, **send_kwargs)
+            else:
+                resp: Response = session.send(request, **send_kwargs)
         # in case of ssl self signed error, try to catch it and add more info
         # to user
         except SSLError as e:

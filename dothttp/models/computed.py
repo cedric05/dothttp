@@ -88,6 +88,12 @@ class HttpDef:
     test_script: str = ""
     test_script_lang: ScriptType = ScriptType.PYTHON
     proxy: Optional[Dict[str, str]] = None
+    timeout: Optional[float] = None
+    # Retry fields - most commonly used urllib3.Retry parameters
+    retry_total: Optional[int] = None
+    retry_status_forcelist: Optional[List[int]] = None
+    retry_backoff_factor: Optional[float] = None
+    custom_proxy: Optional[str] = None
 
     def get_har(self):
         if self.auth:

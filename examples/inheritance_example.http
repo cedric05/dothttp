@@ -1,0 +1,53 @@
+# Demonstrating inheritance of timeout, retry, and proxy_chain
+
+# Base configuration with retry and timeout
+@name("api base")
+GET https://api.github.com
+timeout(20)
+retry(total=3, backoff_factor=1)
+"Authorization": "Bearer secret-token"
+
+# Child 1: Inherits timeout and retry from parent
+@name("get users") : "api base"
+GET /users
+
+# Child 2: Overrides timeout, keeps retry
+@name("long operation") : "api base"
+GET /reports/generate
+timeout(120)
+
+# Child 3: Adds proxy, keeps timeout and retry
+@name("proxied request") : "api base"
+GET /external-data
+proxy("http://proxy.example.com:8080")
+
+# Multi-level inheritance example
+@name("service base")
+GET https://service.example.com/api
+timeout(15)
+retry(total=2)
+
+@name("user service") : "service base"
+GET /v1/users
+timeout(25)
+"X-Service": "user"
+
+@name("user detail") : "user service"
+GET /123
+# Inherits:
+# - timeout(25) from "user service"
+# - retry(total=2) from "service base"
+# - header "X-Service": "user" from "user service"
+
+# Testing different backoff factors
+@name("backoff factor 1")
+GET https://httpbin.org/status/503
+retry(total=3, backoff_factor=1, status_forcelist=[503])
+
+@name("backoff factor 2") : "backoff factor 1"
+GET https://httpbin.org/status/502
+retry(total=4, backoff_factor=2, status_forcelist=[502])
+
+@name("no backoff") : "backoff factor 1"
+GET https://httpbin.org/status/500
+retry(total=5, status_forcelist=[500])
