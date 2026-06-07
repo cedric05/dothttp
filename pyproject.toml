@@ -38,7 +38,7 @@ toml = "0.10.2"
 requests = "2.33.0"
 cryptography = "46.0.7"
 urllib3 = "2.7.0"
-idna = "3.15"
+idna = "3.18"
 xmltodict = "^1.0.2"
 
 [tool.poetry.group.dev.dependencies]
