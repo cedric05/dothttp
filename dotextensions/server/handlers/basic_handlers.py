@@ -181,6 +181,7 @@ class RunHttpFileHandler(BaseHandler):
         data = {}
         data.update(response_data["response"])  # deprecated
         data.update(response_data)
+        data["request_headers"] = dict(resp.request.headers)
         if not comp.args.no_cookie and "cookie" in resp.request.headers:
             # redirects can add cookies
             comp.httpdef.headers["cookie"] = resp.request.headers["cookie"]
