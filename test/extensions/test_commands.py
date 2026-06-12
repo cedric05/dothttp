@@ -6,6 +6,7 @@ from test.core.test_certs import cert_base, http_base
 from unittest import skip
 
 from dotextensions.server.handlers.basic_handlers import (
+    ContentExecuteHandler,
     ContentNameReferencesHandler,
     GetHoveredResolvedParamContentHandler,
     GetHoveredResolvedParamFileHandler,
@@ -667,6 +668,77 @@ awsauth(access_id="dummy", secret_key="dummy", service="s3", region="eu-east-1")
         self.assertEqual(200, result.result["status"])
         body = json.loads(result.result["body"])
         self.assertEqual({'fullName': 'Mr. John Doe'}, body["json"])
+
+
+class RequestHeadersTest(TestBase):
+    """Tests that request_headers is included in the execute response."""
+
+    def setUp(self):
+        self.handler = RunHttpFileHandler()
+        self.content_handler = ContentExecuteHandler()
+
+    def _run_file(self, filename, **extra_params):
+        params = {"file": filename, **extra_params}
+        return self.handler.run(Command(method=RunHttpFileHandler.name, params=params, id=1))
+
+    def _run_content(self, content, **extra_params):
+        params = {"content": content, **extra_params}
+        return self.content_handler.run(Command(method=ContentExecuteHandler.name, params=params, id=1))
+
+    def test_request_headers_present_in_result(self):
+        """request_headers key must always be present in a successful execute result."""
+        result = self._run_file(f"{command_dir}/simple.http")
+        self.assertIn("request_headers", result.result)
+
+    def test_request_headers_is_dict(self):
+        """request_headers must be a dict of string keys and values."""
+        result = self._run_file(f"{command_dir}/simple.http")
+        req_headers = result.result["request_headers"]
+        self.assertIsInstance(req_headers, dict)
+        for k, v in req_headers.items():
+            self.assertIsInstance(k, str)
+            self.assertIsInstance(v, str)
+
+    def test_basicauth_sets_authorization_header(self):
+        """A basicauth request must produce an Authorization header in request_headers."""
+        result = self._run_file(f"{command_dir}/complexrun.http", target="basicauth")
+        self.assertEqual(200, result.result.get("status"))
+        req_headers = result.result["request_headers"]
+        auth_keys = [k for k in req_headers if k.lower() == "authorization"]
+        self.assertTrue(len(auth_keys) > 0, "Authorization missing from request_headers for basicauth request")
+        # Basic auth header starts with "Basic "
+        self.assertTrue(req_headers[auth_keys[0]].startswith("Basic "), "Authorization header is not Basic auth")
+
+    def test_custom_headers_appear_in_request_headers(self):
+        """Custom headers defined in the .http file must be present in request_headers."""
+        content = """
+GET "http://localhost:8000/get"
+"X-Custom-Header": "dothttp-test"
+"X-Another": "value123"
+"""
+        result = self._run_content(content)
+        self.assertEqual(200, result.result.get("status"))
+        req_headers = result.result["request_headers"]
+        # header names from requests are capitalised per HTTP convention
+        header_keys_lower = {k.lower(): v for k, v in req_headers.items()}
+        self.assertIn("x-custom-header", header_keys_lower)
+        self.assertEqual("dothttp-test", header_keys_lower["x-custom-header"])
+        self.assertIn("x-another", header_keys_lower)
+        self.assertEqual("value123", header_keys_lower["x-another"])
+
+    def test_request_headers_separate_from_response_headers(self):
+        """request_headers and response headers (result['headers']) must be independent dicts."""
+        result = self._run_file(f"{command_dir}/simple.http")
+        req_headers = result.result["request_headers"]
+        resp_headers = result.result["headers"]
+        self.assertIsNot(req_headers, resp_headers)
+
+    def test_request_headers_via_content_handler(self):
+        """ContentExecuteHandler must also include request_headers in the result."""
+        content = 'GET "http://localhost:8000/get"\n'
+        result = self._run_content(content)
+        self.assertIn("request_headers", result.result)
+        self.assertIsInstance(result.result["request_headers"], dict)
 
 
 if __name__ == "__main__":
