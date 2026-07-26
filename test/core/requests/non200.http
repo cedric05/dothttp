@@ -1,2 +1,2 @@
 GET "http://localhost:8000/redirect-to"
-? 'url', "https://dothttp.azurewebsites.net"
+? 'url', "https://github.com"

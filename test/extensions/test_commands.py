@@ -392,7 +392,7 @@ POST "http://localhost:8000/post"
                 params={
                     "file": f"{command_dir}/complexrun.http",
                     "target": "2",
-                    "properties": {"host": "req.dothttp.dev"},
+                    "properties": {"host": "localhost:8000"},
                 },
                 id=1,
             )
@@ -403,9 +403,9 @@ POST "http://localhost:8000/post"
         self.assertEqual(
             "http://localhost:8000/post?startusing=dothttp", body["url"])
         self.assertEqual(
-            """var host = 'req.dothttp.dev' ;
+            """var host = 'localhost:8000' ;
 @name("2")
-POST "http://req.dothttp.dev/post"
+POST "http://localhost:8000/post"
 ? "startusing"= "dothttp"
 
 

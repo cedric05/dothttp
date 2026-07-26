@@ -1,4 +1,4 @@
-POST 'https://dothttp.azurewebsites.net'
+POST 'https://github.com'
 json({
 "string": "simple",
 "list": ["dothttp", "azure"],
