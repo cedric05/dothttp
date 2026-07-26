@@ -23,18 +23,18 @@ sub_dir = f"{dir_path}/substitution"
 class RequestTest(TestBase):
     def test_get(self):
         req = self.get_request(f"{base_dir}/pass.http")
-        self.assertEqual("https://dothttp.azurewebsites.net/", req.url, "incorrect url")
+        self.assertEqual("https://github.com/", req.url, "incorrect url")
         self.assertEqual("GET", req.method, "incorrect url")
 
     def test_post(self):
         req = self.get_request(f"{base_dir}/pass2.http")
-        self.assertEqual("https://dothttp.azurewebsites.net/", req.url, "incorrect url")
+        self.assertEqual("https://github.com/", req.url, "incorrect url")
         self.assertEqual("POST", req.method, "incorrect url")
 
     def test_query(self):
         req = self.get_request(f"{base_dir}/query.http")
         self.assertEqual(
-            "https://dothttp.azurewebsites.net/?key3=value3&key1=value1&key2=value2",
+            "https://github.com/?key3=value3&key1=value1&key2=value2",
             req.url,
             "incorrect url computed",
         )
@@ -85,7 +85,7 @@ class RequestTest(TestBase):
         )
         output = req.get_curl_output()
         self.assertEqual(
-            """curl -X GET --url http://endeavour.today/ \\
+            """curl -X GET --url https://github.com/ \\
 """,
             output,
         )
@@ -94,7 +94,7 @@ class RequestTest(TestBase):
         req = self.get_req_comp(f"{base_dir}/redirect.http", format=True, stdout=True)
         req.load()
         output = req.format(req.model)
-        self.assertEqual('GET "http://endeavour.today/"\n\n\n', output)
+        self.assertEqual('GET "https://github.com/"\n\n\n', output)
         print(output)
 
     def test_format2_print(self):
@@ -118,7 +118,7 @@ json({
     def test_curl_query(self):
         req = self.get_req_comp(f"{sub_dir}/query.http", stdout=True, curl=True)
         self.assertEqual(
-            """curl -X POST --url https://dothttp.azurewebsites.net/ram?key1=value1&key2=value2 \\
+            """curl -X POST --url https://github.com/ram?key1=value1&key2=value2 \\
 -H 'content-type: application/json' \\
 -d '{
     "key1": "value2"
@@ -129,7 +129,7 @@ json({
     def test_curl_query2(self):
         req = self.get_req_comp(f"{base_dir}/query.http", stdout=True, curl=True)
         self.assertEqual(
-            """curl -X GET --url https://dothttp.azurewebsites.net/?key3=value3&key1=value1&key2=value2 \\
+            """curl -X GET --url https://github.com/?key3=value3&key1=value1&key2=value2 \\
 """,
             req.get_curl_output(),
         )

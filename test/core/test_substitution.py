@@ -13,7 +13,7 @@ class SubstitutionTest(TestBase):
     def test_substitution(self):
         req = self.get_request(f"{base_dir}/host.http")
         self.assertEqual(
-            "https://dothttp.azurewebsites.net/ram", req.url, "incorrect url"
+            "https://github.com/ram", req.url, "incorrect url"
         )
 
     def test_substitution_json_query_multiple(self):
@@ -47,9 +47,9 @@ class SubstitutionTest(TestBase):
     def test_substitution_commandline(self):
         req = self.get_request(
             f"{base_dir}/httpfileprop.http",
-            properties=["dontsubstitute=dothttp.azurewebsites.net"],
+            properties=["dontsubstitute=github.com"],
         )
-        self.assertEqual("https://dothttp.azurewebsites.net/", req.url)
+        self.assertEqual("https://github.com/", req.url)
         self.assertEqual("GET", req.method)
 
     def test_substitution_infile_with_quotes(self):

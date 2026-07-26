@@ -1,6 +1,6 @@
 {
   "*": {
-    "host": "dothttp.azurewebsites.net",
+    "host": "github.com",
     "queryname": "key1",
     "valuename": "value2"
   },

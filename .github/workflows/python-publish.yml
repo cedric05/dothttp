@@ -17,13 +17,13 @@ jobs:
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.11'
   
-    - uses: Gr1N/setup-poetry@v8
+    - uses: Gr1N/setup-poetry@v9
     - name: Install dependencies
       run: |
         poetry config virtualenvs.create false 
@@ -41,7 +41,7 @@ jobs:
     - name: Publish package distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
     - name: Trigger workflow in dotextensions-build
-      uses: actions/github-script@v7
+      uses: actions/github-script@v8
       continue-on-error: true
       with:
         script: |

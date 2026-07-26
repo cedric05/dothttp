@@ -15,7 +15,7 @@ class PayLoadTest(TestBase):
     def test_json_payload(self):
         req = self.get_request(f"{base_dir}/jsonpayload.http")
         self.assertEqual(
-            "https://dothttp.azurewebsites.net/", req.url, "incorrect url computed"
+            "https://github.com/", req.url, "incorrect url computed"
         )
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual(b'{"string": "simple"}', req.body, "incorrect method")
@@ -23,7 +23,7 @@ class PayLoadTest(TestBase):
     def test_json_payload2(self):
         req = self.get_request(f"{base_dir}/jsonpayload2.http")
         self.assertEqual(
-            "https://dothttp.azurewebsites.net/", req.url, "incorrect url computed"
+            "https://github.com/", req.url, "incorrect url computed"
         )
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual(
@@ -47,7 +47,7 @@ class PayLoadTest(TestBase):
     def test_json_payload3(self):
         req = self.get_request(f"{base_dir}/jsonpayload3.http")
         self.assertEqual(
-            "https://dothttp.azurewebsites.net/", req.url, "incorrect url computed"
+            "https://github.com/", req.url, "incorrect url computed"
         )
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual(
@@ -99,7 +99,7 @@ class PayLoadTest(TestBase):
     def test_json_payload_complex(self):
         req = self.get_request(f"{base_dir}/jsonpayload4.http")
         self.assertEqual(
-            "https://dothttp.azurewebsites.net/", req.url, "incorrect url computed"
+            "https://github.com/", req.url, "incorrect url computed"
         )
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual(
@@ -133,7 +133,7 @@ class PayLoadTest(TestBase):
     def test_payload(self):
         req = self.get_request(f"{base_dir}/payload.http")
         self.assertEqual(
-            "https://dothttp.azurewebsites.net/", req.url, "incorrect url computed"
+            "https://github.com/", req.url, "incorrect url computed"
         )
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual("{}", req.body, "incorrect body")
@@ -142,7 +142,7 @@ class PayLoadTest(TestBase):
         comp = self.get_req_comp(f"{base_dir}/payload.http", target=2)
         req = comp.get_request()
         self.assertEqual(
-            "https://dothttp.azurewebsites.net/", req.url, "incorrect url computed"
+            "https://github.com/", req.url, "incorrect url computed"
         )
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual("😻", req.body, "incorrect method")
@@ -152,7 +152,7 @@ class PayLoadTest(TestBase):
     def test_payload2(self):
         req = self.get_request(f"{base_dir}/payload2.http")
         self.assertEqual(
-            "https://dothttp.azurewebsites.net/?key3=value3&key1=value1&key2=value2",
+            "https://github.com/?key3=value3&key1=value1&key2=value2",
             req.url,
             "incorrect url computed",
         )
@@ -162,7 +162,7 @@ class PayLoadTest(TestBase):
     def test_payload3(self):
         req = self.get_request(f"{base_dir}/payload3.http")
         self.assertEqual(
-            "https://dothttp.azurewebsites.net/", req.url, "incorrect url computed"
+            "https://github.com/", req.url, "incorrect url computed"
         )
         self.assertEqual("POST", req.method, "incorrect method")
         self.assertEqual(b"{}", req.body, "incorrect method")
