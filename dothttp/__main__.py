@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 import sys
 
 from requests.exceptions import RequestException
@@ -96,7 +97,12 @@ def main():
     property_group.add_argument(
         "--property", help="list of property's", nargs="+", default=[]
     )
-    general_group.add_argument("file", help="http file")
+    general_group.add_argument(
+        "file",
+        help="http file. use `-` or omit to read http content from stdin",
+        nargs="?",
+        default=None,
+    )
     general_group.add_argument(
         "--target", "-t", help="targets a particular http definition", type=str
     )
@@ -110,6 +116,13 @@ def main():
             # this can be done better by adding validation in add_argument.
             eprint(f"command line property: `{one_prop}` is invalid, expected prop=val")
             sys.exit(1)
+    content = None
+    if args.file is None or args.file == "-":
+        if args.file is None and sys.stdin.isatty():
+            parser.error("file is required (or pipe .http content via stdin)")
+        content = sys.stdin.read()
+        # gives load_content a cwd-based dirname for property-file/import resolution
+        args.file = os.path.join(os.getcwd(), "-")
     config = Config(
         curl=args.curl,
         property_file=args.property_file,
@@ -123,6 +136,7 @@ def main():
         format=args.format,
         stdout=args.stdout,
         experimental=args.experimental,
+        content=content,
     )
     apply(config)
 
