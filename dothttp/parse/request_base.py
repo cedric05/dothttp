@@ -491,7 +491,7 @@ class HttpFileFormatter(RequestBase):
 
     def run(self):
         formatted = self.format(self.model, property_util=self.property_util)
-        if self.args.stdout:
+        if self.args.stdout or self.args.content is not None:
             print(formatted)
         else:
             with open(self.args.file, "w") as f:
@@ -534,6 +534,13 @@ class RequestCompiler(RequestBase):
         return resp
 
     def print_script_result(self, script_result: ScriptResult):
+        if not (
+            script_result.stdout
+            or script_result.error
+            or script_result.properties
+            or script_result.tests
+        ):
+            return
         print("\n------------")
         if script_result.stdout:
             print("\n##STDOUT:")

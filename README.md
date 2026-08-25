@@ -317,13 +317,15 @@ via [dothttp-code](https://marketplace.visualstudio.com/items?itemName=ShivaPras
 ### Command line options
 
 ```
-usage: dothttp [-h] [--curl] [--property-file PROPERTY_FILE] [--no-cookie] [--env ENV [ENV ...]] [--debug] [--info] [--format] [--stdout]
-               [--property PROPERTY [PROPERTY ...]]
-               file
+usage: dothttp [-h] [--curl] [--property-file PROPERTY_FILE] [--no-cookie]
+               [--env ENV [ENV ...]] [--debug] [--info] [--format]
+               [--experimental] [--stdout]
+               [--property PROPERTY [PROPERTY ...]] [--target TARGET]
+               [file]
 
 http requests for humans
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
 
 general:
@@ -331,22 +333,107 @@ general:
   --no-cookie, -nc      cookie storage is disabled
   --debug, -d           debug will enable logs and exceptions
   --info, -i            more information
-  file                  http file
+  file                  http file. use `-` or omit to read http content from
+                        stdin
+  --target, -t TARGET   targets a particular http definition
 
 property:
-  --property-file PROPERTY_FILE, -p PROPERTY_FILE
+  --property-file, -p PROPERTY_FILE
                         property file
-  --env ENV [ENV ...], -e ENV [ENV ...]
-                        environment to select in property file. properties will be enabled on FIFO
+  --env, -e ENV [ENV ...]
+                        environment to select in property file. properties
+                        will be enabled on FIFO
+  --experimental, --b   enable experimental
   --property PROPERTY [PROPERTY ...]
                         list of property's
 
 format:
-  --format, -fmt        formatter
+  --format, -fmt        format http file
   --stdout              print to commandline
 ```
 
 checkout [examples]('./examples/dothttpazure.http')
+
+-----------
+
+## Using dothttp with AI agents / coding assistants
+
+**dothttp** is stdin/stdout friendly, so an AI agent (Claude Code, Cursor, a
+custom LLM tool, a CI script, etc.) can fire a request without ever writing a
+`.http` file to disk or leaving temp files behind.
+
+Pipe the `.http` content on stdin using `-` as the file argument (or just
+omit the file argument altogether):
+
+```shell
+echo 'GET "https://httpbin.org/get"' | dothttp -
+# or, equivalently
+echo 'GET "https://httpbin.org/get"' | dothttp
+```
+
+The response body is written to stdout, exactly like the file-based flow —
+no extra banners or separators clutter the output unless a test script
+(see [Templating](#templating)) actually produces something to report.
+
+This composes with the regular flags, so an agent can still target a
+specific request, substitute properties, or ask for a curl script instead
+of executing the request:
+
+```shell
+# multiple requests in one payload, run the 2nd one
+# a heredoc is the easiest way to hand over multi-line content
+dothttp - --target 2 <<EOF
+GET "https://httpbin.org/get"
+
+POST "https://httpbin.org/post"
+EOF
+
+# substitute a property from the command line
+echo 'GET "https://httpbin.org/get?key={{myprop}}"' \
+  | dothttp - --property myprop=myvalue
+
+# get a shareable curl command instead of executing the request
+echo 'GET "https://httpbin.org/get"' | dothttp - --curl
+```
+
+Property-file auto-discovery (`.dothttp.json`/`.yaml`/`.yml`/`.toml` in the
+current directory) still works in stdin mode, since it's resolved relative
+to the working directory the command is run from — handy for agents that
+run from within a project checkout.
+
+An explicit `>> "path/to/file"` output directive inside the piped content
+still writes to that file instead of stdout, same as file-based input.
+
+#### Reusing existing request definitions (`import` + `@name(...) : base`)
+
+An agent working inside a project usually doesn't need to reinvent auth,
+headers, or retry/timeout settings for every new request — a project's
+existing `.http` files already define them. **dothttp** supports `import`
+and named request inheritance (`@name("child") : "base"`), so an agent's
+stdin snippet can just import the file with the shared setup and extend it,
+inheriting everything from the base and overriding only what's different
+(the path, method, payload, etc).
+
+For example, [`examples/inheritance_example.http`](./examples/inheritance_example.http)
+already defines an `"api base"` request with a host, `Authorization` header,
+`timeout`, and `retry` configured. An agent can reuse all of it with a
+two-line snippet:
+
+```shell
+dothttp - --target "get repo" <<'EOF'
+import "examples/inheritance_example.http";
+
+@name("get repo") : "api base"
+GET /repos/cedric05/dothttp
+EOF
+```
+
+This resolves to `GET https://api.github.com/repos/cedric05/dothttp` with
+the `Authorization`, `timeout`, and `retry` settings from `"api base"`
+applied automatically — the agent never had to know or copy those details.
+`import` paths (like `--property-file` auto-discovery above) are resolved
+relative to the working directory the command is run from, so this works
+best when the agent runs from the project root.
 
 -----------
 ### Vscode alternatives

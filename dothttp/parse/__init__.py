@@ -277,6 +277,9 @@ class BaseModelProcessor:
         return
 
     def load_content(self):
+        if self.args.content is not None:
+            self.original_content = self.content = self.args.content
+            return
         if not os.path.exists(self.file):
             raise HttpFileNotFoundException(file=self.file)
         with open(self.file, "r", encoding="utf-8") as f:

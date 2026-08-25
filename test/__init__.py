@@ -17,9 +17,11 @@ class TestBase(unittest.TestCase):
         ).get_request()
 
     @staticmethod
-    def get_request_comp(file, env=None, prop=None, properties=None, target=None):
+    def get_request_comp(
+        file, env=None, prop=None, properties=None, target=None, content=None
+    ):
         return TestBase.get_req_comp(
-            file, env, prop, properties, target=target
+            file, env, prop, properties, target=target, content=content
         )
 
     @staticmethod
@@ -34,6 +36,7 @@ class TestBase(unittest.TestCase):
         format=False,
         stdout=False,
         target=None,
+        content=None,
     ) -> Union[HttpFileFormatter, CurlCompiler, RequestCompiler]:
         if properties is None:
             properties = []
@@ -52,6 +55,7 @@ class TestBase(unittest.TestCase):
             experimental=True,
             info=info,
             target=target,
+            content=content,
         )
         if format:
             return HttpFileFormatter(config)
