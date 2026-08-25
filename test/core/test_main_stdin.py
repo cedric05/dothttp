@@ -11,12 +11,17 @@ repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__f
 
 
 def run_dothttp(args, http_content, cwd=repo_root):
+    # PYTHONPATH ensures the package resolves even when `cwd` isn't the repo
+    # root (e.g. testing property-file auto-discovery from another directory)
+    # and dothttp isn't pip-installed in the current environment.
+    env = {**os.environ, "PYTHONPATH": repo_root}
     return subprocess.run(
         [sys.executable, "-m", "dothttp", *args],
         input=http_content,
         capture_output=True,
         text=True,
         cwd=cwd,
+        env=env,
         timeout=30,
     )
 
@@ -27,13 +32,15 @@ class MainStdinIntegrationTest(TestCase):
     def test_explicit_dash_reads_stdin_and_prints_response_on_stdout(self):
         result = run_dothttp(["-"], 'GET "http://localhost:8000/get"')
         self.assertEqual(0, result.returncode, result.stderr)
-        self.assertIn('"url":"http://localhost:8000/get"', result.stdout)
+        response = json.loads(result.stdout)
+        self.assertEqual("http://localhost:8000/get", response["url"])
         self.assertNotIn("------------", result.stdout)
 
     def test_omitted_file_reads_stdin_and_prints_response_on_stdout(self):
         result = run_dothttp([], 'GET "http://localhost:8000/get"')
         self.assertEqual(0, result.returncode, result.stderr)
-        self.assertIn('"url":"http://localhost:8000/get"', result.stdout)
+        response = json.loads(result.stdout)
+        self.assertEqual("http://localhost:8000/get", response["url"])
 
     def test_curl_flag_with_stdin(self):
         result = run_dothttp(
