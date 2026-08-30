@@ -49,7 +49,7 @@ flask-cors = "^6.0.5"
 pytest = "9.0.3"
 pytest-html = "^4.2.0"
 pytest-xdist = "^3.6.1"
-gunicorn = "^23.0.0"
+gunicorn = ">=23,<27"
 httpbin = "^0.10.4"
 
 [build-system]
