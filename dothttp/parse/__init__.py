@@ -44,6 +44,7 @@ from ..models.parse_models import (
     P12Certificate,
     ScriptType,
     TestScript,
+    Trust,
 )
 from ..property_schema import property_schema
 from ..script import ScriptExecutionPython
@@ -556,7 +557,7 @@ class HttpDefBase(BaseModelProcessor):
             "certificate"
         )
         if certificate:
-            if certificate.cert:
+            if hasattr(certificate, "cert") and certificate.cert:
                 self.httpdef.certificate = [
                     self.get_updated_content(certificate.cert),
                     (
@@ -565,11 +566,15 @@ class HttpDefBase(BaseModelProcessor):
                         else None
                     ),
                 ]
-            elif certificate.p12_file:
+            elif hasattr(certificate, "p12_file") and certificate.p12_file:
                 self.httpdef.p12 = [
                     self.get_updated_content(certificate.p12_file),
                     self.get_updated_content(certificate.password),
                 ]
+
+        trust = self.get_current_or_base("trust")
+        if trust:
+            self.httpdef.trust_root = self.get_updated_content(trust.root)
 
     def load_extra_flags(self):
         # flags are extendable
@@ -586,6 +591,8 @@ class HttpDefBase(BaseModelProcessor):
                     self.httpdef.session_clear = True
                 elif flag.insecure:
                     self.httpdef.allow_insecure = True
+                elif flag.enable_trust_store:
+                    self.httpdef.enable_trust_store = True
 
         for current_flag in self.http.extra_args:
             if current_flag.no_parent_script:

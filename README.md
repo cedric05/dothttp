@@ -435,6 +435,35 @@ applied automatically — the agent never had to know or copy those details.
 relative to the working directory the command is run from, so this works
 best when the agent runs from the project root.
 
+#### Custom and system trusted CAs
+
+Client certificates and trusted server CAs are configured separately. Use
+`trust(...)` to provide one CA certificate bundle for server verification:
+
+```http
+@name("internal api")
+GET https://api.example.com
+trust("/path/to/internal-root-ca.pem")
+```
+
+Trusted CA settings are inherited by child requests, as shown in
+[`examples/trust_store.http`](./examples/trust_store.http). Requests fail
+normally when the server is not trusted; `@insecure` is still the explicit
+way to disable certificate verification.
+
+To use the operating system trust store, install the optional `truststore`
+package and add `@enable_trust_store` after the request name:
+
+```shell
+python -m pip install truststore
+```
+
+```http
+@name("system trust store")
+@enable_trust_store
+GET https://api.example.com
+```
+
 -----------
 ### Vscode alternatives
 

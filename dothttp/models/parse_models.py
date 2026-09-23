@@ -214,7 +214,7 @@ class TestScript:
 
 @dataclass
 class Certificate:
-    cert: str
+    cert: Optional[str]
     key: Optional[str]
 
 
@@ -225,6 +225,11 @@ class P12Certificate:
 
 
 @dataclass
+class Trust:
+    root: str
+
+
+@dataclass
 class ExtraArg:
     # clears session after each
     clear: Optional[str] = ""
@@ -232,6 +237,7 @@ class ExtraArg:
     insecure: Optional[str] = ""
     # ignore parent script
     no_parent_script: Optional[str] = ""
+    enable_trust_store: Optional[str] = ""
 
 
 @dataclass
@@ -246,6 +252,7 @@ class Http:
     urlwrap: UrlWrap
     authwrap: Optional[AuthWrap]
     certificate: Optional[Union[Certificate, P12Certificate]]
+    trust: Optional[Trust]
     lines: Optional[List[Line]]
     payload: Optional[Payload]
     output: Optional[ToFile]

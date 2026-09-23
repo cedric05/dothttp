@@ -29,6 +29,7 @@ HTTP:
         urlwrap=URL
         (authwrap=AUTHWRAP)?
         (certificate = CERTAUTH)?
+        (trust = TRUSTAUTH)?
         (timeout=TIMEOUT)?
         (retry=RETRY)?
         (proxy=PROXY)?
@@ -79,6 +80,10 @@ CERTAUTH:
     ) | (
         'p12' '(' 'file' '=' p12_file=DotString ',' 'password' '=' password=DotString ','? ')'
     )
+;
+
+TRUSTAUTH:
+    ('trust' | 'trustroot' | 'trustedca') '(' root=DotString ')'
 ;
 
 HAWKAUTH:
@@ -159,6 +164,7 @@ EXTRA_ARG:
     clear=CLEAR_SESSION 
     | insecure=INSECURE
     | no_parent_script=CLEAR_PARENT_SCRIPT
+    | enable_trust_store=ENABLE_TRUST_STORE
 ;
 
 NAMED_ARG:
@@ -176,6 +182,10 @@ CLEAR_PARENT_SCRIPT:
 
 INSECURE:
     "@insecure"
+;
+
+ENABLE_TRUST_STORE:
+    "@enable_trust_store"
 ;
 
 METHODTYPE: 
