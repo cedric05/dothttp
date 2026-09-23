@@ -252,10 +252,10 @@ class Http:
     urlwrap: UrlWrap
     authwrap: Optional[AuthWrap]
     certificate: Optional[Union[Certificate, P12Certificate]]
-    trust: Optional[Trust]
     lines: Optional[List[Line]]
     payload: Optional[Payload]
     output: Optional[ToFile]
+    trust: Optional[Trust] = None
     timeout: Optional[Timeout] = None
     retry: Optional[Retry] = None
     proxy: Optional[Proxy] = None

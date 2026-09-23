@@ -36,6 +36,7 @@ GET "https://example.com/child"
 '''
             compiler = self.get_req_comp("", content=content, target="child")
             compiler.load()
+            compiler.load_def()
             self.assertEqual(root_one, compiler.httpdef.trust_root)
 
             response = Response()

@@ -579,7 +579,9 @@ class RequestCompiler(RequestBase):
         else:
 
             def func(data):
-                return output.write(data.decode())
+                return output.write(
+                    data.decode(resp.encoding or "utf-8", errors="replace")
+                )
 
         for data in resp.iter_content(1024):
             func(data)
