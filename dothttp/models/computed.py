@@ -81,8 +81,10 @@ class HttpDef:
     payload: Optional[Payload] = None
     certificate: Optional[List[str]] = None
     p12: Optional[List[str]] = None
+    trust_root: Optional[str] = None
     output: str = None
     allow_insecure = False
+    enable_trust_store = False
     session_clear = False
     no_parent_script = False
     test_script: str = ""

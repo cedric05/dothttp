@@ -1,0 +1,14 @@
+# Server trust configuration examples
+# trust() is for one explicit CA certificate bundle.
+@name("internal api")
+GET https://api.example.com
+trust("/path/to/internal-root-ca.pem")
+
+# A child request inherits the trust() setting from its base request.
+@name("internal health") : "internal api"
+GET /health
+
+# Use the operating system trust store instead of a custom CA file.
+@name("system trust store")
+@enable_trust_store
+GET https://api.example.com

@@ -309,6 +309,8 @@ class HttpFileFormatter(RequestBase):
                     output_str += f"@clear{new_line}"
                 if extra_arg.insecure:
                     output_str += f"@insecure{new_line}"
+                if extra_arg.enable_trust_store:
+                    output_str += f"@enable_trust_store{new_line}"
         method = http.urlwrap.method if http.urlwrap.method else "GET"
         output_str += f'{method} "{http.urlwrap.url}"'
         if certificate := http.certificate:
@@ -322,6 +324,8 @@ class HttpFileFormatter(RequestBase):
                     output_str += f"{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)}, password={apply_quote_or_unquote(certificate.password)})"
                 else:
                     output_str += f"{new_line}p12(file={apply_quote_or_unquote(certificate.p12_file)})"
+        if trust := getattr(http, "trust", None):
+            output_str += f"{new_line}trust({apply_quote_or_unquote(trust.root)})"
         if auth_wrap := http.authwrap:
             if basic_auth := auth_wrap.basic_auth:
                 output_str += f'{new_line}basicauth("{basic_auth.username}", "{basic_auth.password}")'
@@ -575,7 +579,9 @@ class RequestCompiler(RequestBase):
         else:
 
             def func(data):
-                return output.write(data.decode())
+                return output.write(
+                    data.decode(resp.encoding or "utf-8", errors="replace")
+                )
 
         for data in resp.iter_content(1024):
             func(data)
@@ -638,6 +644,11 @@ class RequestCompiler(RequestBase):
         request = self.get_request()
         session.cookies = request._cookies
 
+        if self.httpdef.enable_trust_store:
+            import truststore
+
+            truststore.inject_into_ssl()
+
         # Create retry adapter if configured (doesn't modify session)
         retry_adapter = self._create_retry_adapter()
 
@@ -649,6 +660,11 @@ class RequestCompiler(RequestBase):
                     pkcs12_password=self.httpdef.p12[1],
                 ),
             )
+        verify = (
+            False
+            if self.httpdef.allow_insecure
+            else self.httpdef.trust_root or True
+        )
         try:
             if self.httpdef.certificate:
                 cert = tuple(self.httpdef.certificate)
@@ -658,7 +674,7 @@ class RequestCompiler(RequestBase):
             # Prepare kwargs for session.send
             send_kwargs = {
                 'cert': cert,
-                'verify': not self.httpdef.allow_insecure,
+                'verify': verify,
             }
 
             # Handle proxy configuration
@@ -694,7 +710,7 @@ class RequestCompiler(RequestBase):
 
             send_kwargs = {
                 'cert': self.httpdef.certificate,
-                'verify': not self.httpdef.allow_insecure,
+                'verify': verify,
             }
             if self.httpdef.timeout:
                 send_kwargs['timeout'] = self.httpdef.timeout

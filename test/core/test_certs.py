@@ -1,8 +1,13 @@
 import os
 import sys
+import tempfile
 import pytest
+from unittest.mock import Mock
 from test import TestBase
 from unittest import skip
+from unittest.mock import patch
+
+from requests import Response
 
 from dothttp.parse import PropertyNotFoundException
 from dothttp.parse.request_base import CurlCompiler
@@ -16,6 +21,63 @@ quote = "'" if is_windows else ""
 
 
 class CertUnitTest(TestBase):
+    def test_trust_roots_are_inherited_and_passed_to_requests(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root_one = os.path.join(directory, "root-one.pem")
+            with open(root_one, "wb") as root_file:
+                root_file.write(b"root-one")
+
+            content = f'''@name("base")
+GET "https://example.com"
+trust("{root_one}")
+
+@name("child") : "base"
+GET "https://example.com/child"
+'''
+            compiler = self.get_req_comp("", content=content, target="child")
+            compiler.load()
+            compiler.load_def()
+            self.assertEqual(root_one, compiler.httpdef.trust_root)
+
+            response = Response()
+            response.status_code = 200
+
+            def send(request, **kwargs):
+                self.assertEqual(root_one, kwargs["verify"])
+                return response
+
+            with patch.object(compiler.global_session, "send", side_effect=send):
+                compiler.get_response()
+
+    def test_enable_trust_store_injects_ssl_context(self):
+        content = '''@name("trust-store")
+@enable_trust_store
+GET "https://example.com"
+'''
+        compiler = self.get_req_comp("", content=content, target="trust-store")
+        response = Response()
+        response.status_code = 200
+        truststore = Mock()
+        with patch.dict("sys.modules", {"truststore": truststore}):
+            with patch.object(
+                compiler.global_session, "send", return_value=response
+            ):
+                compiler.get_response()
+        truststore.inject_into_ssl.assert_called_once_with()
+
+    def test_insecure_overrides_trust_roots(self):
+        with tempfile.NamedTemporaryFile(mode="w") as root_file:
+            content = f'''@insecure
+GET "https://example.com"
+trust("{root_file.name}")
+'''
+            compiler = self.get_req_comp("", content=content)
+            response = Response()
+            response.status_code = 200
+            with patch.object(compiler.global_session, "send", return_value=response) as send:
+                compiler.get_response()
+            self.assertIs(send.call_args.kwargs["verify"], False)
+
     def test_fail_no_property_certificate(self):
         with self.assertRaises(PropertyNotFoundException):
             filename = f"{http_base}/no-password.http"
