@@ -16,8 +16,22 @@ build_test_image() {
     docker build -t "${TEST_IMAGE}" -f Dockerfile.test .
 }
 
-# Build test image if it doesn't exist or if Dockerfile.test is newer
-if [ ! "$(docker images -q ${TEST_IMAGE} 2> /dev/null)" ] || [ Dockerfile.test -nt "$(docker inspect -f '{{.Created}}' ${TEST_IMAGE} 2>/dev/null || echo '1970-01-01')" ]; then
+# Build test image if it doesn't exist or if its inputs are newer.
+IMAGE_CREATED="$(docker inspect -f '{{.Created}}' "${TEST_IMAGE}" 2>/dev/null || true)"
+IMAGE_CREATED_EPOCH="$(date -d "${IMAGE_CREATED}" +%s 2>/dev/null || echo 0)"
+NEEDS_BUILD=false
+if [[ -z "$(docker images -q "${TEST_IMAGE}" 2>/dev/null)" ]]; then
+    NEEDS_BUILD=true
+else
+    for image_input in Dockerfile.test pyproject.toml poetry.lock; do
+        if [[ "$(stat -c %Y "${image_input}")" -gt "${IMAGE_CREATED_EPOCH}" ]]; then
+            NEEDS_BUILD=true
+            break
+        fi
+    done
+fi
+
+if [[ "${NEEDS_BUILD}" == true ]]; then
     build_test_image
 fi
 
@@ -32,7 +46,7 @@ docker run --rm \
     -v "${SCRIPT_DIR}:/app" \
     -w /app \
     "${TEST_IMAGE}" \
-    poetry run pytest "$@"
+    python -m pytest "$@"
 
 # Capture exit code
 TEST_EXIT_CODE=$?
