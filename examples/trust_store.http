@@ -9,7 +9,6 @@ trust("/path/to/internal-root-ca.pem")
 GET /health
 
 # Use the operating system trust store instead of a custom CA file.
-# Requires: python -m pip install truststore
 @name("system trust store")
 @enable_trust_store
 GET https://api.example.com
