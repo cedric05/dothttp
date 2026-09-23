@@ -451,13 +451,6 @@ Trusted CA settings are inherited by child requests, as shown in
 normally when the server is not trusted; `@insecure` is still the explicit
 way to disable certificate verification.
 
-To use the operating system trust store, install the optional `truststore`
-package and add `@enable_trust_store` after the request name:
-
-```shell
-python -m pip install truststore
-```
-
 ```http
 @name("system trust store")
 @enable_trust_store
