@@ -44,8 +44,8 @@ jobs:
       uses: actions/github-script@v8
       continue-on-error: true
       with:
+        github-token: ${{ secrets.PERSONAL_ACCESS_TOKEN_DOT }}
         script: |
-
           const version = "${{ github.ref }}";
           // remove prefix from the github.ref
           const dothttpversion = version.replace(/^refs\/tags\/v/, '');
@@ -59,9 +59,13 @@ jobs:
             inputs: {
               dothttpversion: dothttpversion,
               dotextensions_version: dothttpversion,
-              python_version: '3.12.4',
-              linux_python_version: '3.12.4'
+              python_version: '3.12.10',
+              // Note: All boolean parameters must be passed as strings via the API
+              build_windows: 'true',
+              build_windows_arm: 'true',
+              build_linux_amd64: 'true',
+              build_linux_arm64: 'true',
+              build_mac: 'true',
+              build_mac_intel: 'true'
             }
           });
-      env:
-        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN_DOT }}
