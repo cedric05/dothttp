@@ -11,9 +11,11 @@ from dothttp.__version__ import __version__ as version
 from .handlers.basic_handlers import (
     ContentExecuteHandler,
     ContentNameReferencesHandler,
+    ContentTestHandler,
     FormatHttpFileHandler,
     GetNameReferencesHandler,
     RunHttpFileHandler,
+    RunHttpFileTestHandler,
     VersionHandler,
     GetHoveredResolvedParamContentHandler,
     GetHoveredResolvedParamFileHandler
@@ -37,6 +39,8 @@ handlers: Dict[str, BaseHandler] = {
         GetNameReferencesHandler(),
         ImportPostmanCollection(),
         ContentExecuteHandler(),
+        RunHttpFileTestHandler(),
+        ContentTestHandler(),
         Http2Har(),
         ContentNameReferencesHandler(),
         TypeFromPos(),

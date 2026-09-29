@@ -21,6 +21,7 @@ from dothttp.parse.request_base import (
     RequestCompiler,
     dothttp_model,
 )
+from dothttp.script import DothttpResponse
 from ..models import BaseHandler, Command, DothttpTypes, Result
 from .gohandler import TypeFromPos
 from . import logger
@@ -203,6 +204,13 @@ class RunHttpFileHandler(BaseHandler):
             "status": resp.status_code,
             "method": resp.request.method,
             "url": resp.url,
+            # capture the request too so the response round-trips for a
+            # tests-only replay (redirect hops keep their own request)
+            "request": {
+                "method": resp.request.method,
+                "url": resp.request.url,
+                "headers": dict(resp.request.headers),
+            },
         }
 
     def get_request_comp(self, config):
@@ -323,6 +331,68 @@ class ContentExecuteHandler(RunHttpFileHandler):
         }
         result.update(response)
         return Result(id=command.id, result=result)
+
+
+class RunTestBase:
+    """
+    Runs only the test script of a dothttp definition against a
+    previously-captured response, without re-issuing the HTTP request.
+
+    The captured response is passed in ``command.params["response"]`` using
+    the same serialized shape that the execute handlers emit
+    (``{body, output_file, headers, status, method, url}``) and is adapted
+    into a ``requests.Response``-like object via ``DothttpResponse``.
+    """
+
+    def get_test_result(self, command, comp: RequestCompiler) -> Result:
+        # parse + resolve + compile the test script (and pre/init scripts);
+        # crucially this does NOT call comp.get_response(), so no request goes out
+        comp.load_def()
+        if comp.property_util.errors:
+            return Result(
+                id=command.id,
+                result={
+                    "errors": [
+                        {"var": list(error.kwargs["var"]), "message": str(error)}
+                        for error in comp.property_util.errors
+                    ],
+                    "error": True,
+                    "error_message": "errors found while resolving properties",
+                },
+            )
+        resp = DothttpResponse(command.params.get("response") or {})
+        script_result = comp.script_execution.execute_test_script(resp).as_json()
+        return Result(
+            id=command.id,
+            result={
+                "script_result": script_result,
+                **self._get_resp_data(resp),
+            },
+        )
+
+
+class RunHttpFileTestHandler(RunHttpFileHandler, RunTestBase):
+    name = "/file/test"
+
+    def get_method(self):
+        return RunHttpFileTestHandler.name
+
+    def execute(self, command):
+        config = self.get_config(command)
+        comp = self.get_request_comp(config)
+        return self.get_test_result(command, comp)
+
+
+class ContentTestHandler(ContentExecuteHandler, RunTestBase):
+    name = "/content/test"
+
+    def get_method(self):
+        return ContentTestHandler.name
+
+    def execute(self, command):
+        config = self.get_config(command)
+        comp = self.get_request_comp(config)
+        return self.get_test_result(command, comp)
 
 
 class FormatHttpFileHandler(BaseHandler):

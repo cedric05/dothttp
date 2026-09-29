@@ -22,6 +22,7 @@ import yaml
 from cryptography import *
 from faker import Faker
 from requests import Response
+from requests.structures import CaseInsensitiveDict
 from RestrictedPython import compile_restricted, safe_globals
 from RestrictedPython.Eval import default_guarded_getiter
 from RestrictedPython.Guards import guarded_iter_unpack_sequence
@@ -152,12 +153,114 @@ class Properties(dict):
 
 
 @dataclass
+class _RequestInfo:
+    method: typing.Union[None, str] = None
+    url: typing.Union[None, str] = None
+    headers: CaseInsensitiveDict = field(default_factory=CaseInsensitiveDict)
+
+
+class DothttpResponse:
+    """
+    A ``requests.Response``-like adapter built from dothttp's serialized
+    response format::
+
+        {
+            "body": <str | bytes>,           # or "body_base64": <str>
+            "output_file": <str>,
+            "headers": {<name>: <value>},
+            "status": <int>,
+            "method": <str>,
+            "url": <str>,
+            "request_headers": {<name>: <value>},   # optional
+            "history": [<response dict>, ...],       # optional, redirect hops
+        }
+
+    It exposes the subset of the ``requests.Response`` surface that test
+    scripts rely on (``status_code``, ``headers``, ``text``, ``content``,
+    ``json()``, ``url``, ``ok``, ``request.method``, ``history`` ...), so
+    tests can run against a previously captured response without re-issuing
+    the request. ``history`` entries (redirect hops) are themselves
+    ``DothttpResponse`` instances, mirroring ``requests``.
+    """
+
+    def __init__(self, data: dict):
+        body = data.get("body", "")
+        if isinstance(body, (bytes, bytearray)):
+            self._content = bytes(body)
+        elif data.get("body_base64"):
+            self._content = base64.b64decode(data["body_base64"])
+        else:
+            self._content = (body or "").encode("utf-8")
+        self.status_code = data.get("status", 0)
+        self.headers = CaseInsensitiveDict(data.get("headers") or {})
+        self.url = data.get("url", "")
+        self.reason = data.get("reason", "")
+        self.output_file = data.get("output_file", "")
+        self.encoding = data.get("encoding") or self._guess_encoding()
+        self.cookies = data.get("cookies", {})
+        self.elapsed = datetime.timedelta(0)
+        # redirect hops, each captured in the same serialized shape
+        self.history = [
+            DothttpResponse(hop) for hop in (data.get("history") or [])
+        ]
+        # the request that produced this response; a nested "request" dict
+        # takes precedence, else fall back to the top-level method/url and
+        # the "request_headers" emitted by the execute handlers
+        request = data.get("request") or {}
+        self.request = _RequestInfo(
+            method=request.get("method", data.get("method")),
+            url=request.get("url", data.get("url")),
+            headers=CaseInsensitiveDict(
+                request.get("headers") or data.get("request_headers") or {}
+            ),
+        )
+
+    def _guess_encoding(self):
+        content_type = (self.headers.get("content-type") or "").lower()
+        if "charset=" in content_type:
+            return content_type.split("charset=")[-1].split(";")[0].strip()
+        return "utf-8"
+
+    @property
+    def content(self) -> bytes:
+        return self._content
+
+    @property
+    def text(self) -> str:
+        try:
+            return self._content.decode(self.encoding or "utf-8", errors="replace")
+        except (LookupError, TypeError):
+            return self._content.decode("utf-8", errors="replace")
+
+    @property
+    def ok(self) -> bool:
+        return self.status_code < 400
+
+    def json(self, **kwargs):
+        return json.loads(self.text, **kwargs)
+
+    def iter_content(self, chunk_size=1, decode_unicode=False):
+        content = self.text if decode_unicode else self._content
+        for i in range(0, len(content), chunk_size):
+            yield content[i : i + chunk_size]
+
+    def raise_for_status(self):
+        if 400 <= self.status_code:
+            raise requests.HTTPError(
+                f"{self.status_code} Error for url: {self.url}", response=self
+            )
+
+    def __repr__(self):
+        return f"<DothttpResponse [{self.status_code}]>"
+
+
+@dataclass
 class Client:
     request: HttpDef
     properties: Properties
     env_properties: Properties
     infile_properties: Properties
-    response: Response = None
+    response: typing.Union[Response, "DothttpResponse"] = None
 
 
 class ScriptExecutionEnvironmentBase:
