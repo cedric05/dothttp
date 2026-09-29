@@ -3,7 +3,11 @@ from test import TestBase
 from typing import Dict
 from unittest import skip
 
-from dotextensions.server.handlers.basic_handlers import RunHttpFileHandler
+from dotextensions.server.handlers.basic_handlers import (
+    ContentTestHandler,
+    RunHttpFileHandler,
+    RunHttpFileTestHandler,
+)
 from dotextensions.server.models import Command
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -104,3 +108,143 @@ class ScriptExecutionTest(TestBase):
             )
         )
         return result
+
+
+class TestOnlyExecutionTest(TestBase):
+    """
+    Tests the tests-only handlers (`/file/test`, `/content/test`) that run the
+    test script against a previously-captured response, without issuing a new
+    HTTP request.
+    """
+
+    def setUp(self) -> None:
+        self.file_handler = RunHttpFileTestHandler()
+        self.content_handler = ContentTestHandler()
+
+    def test_file_tests_pass_against_captured_response(self):
+        # target "1" (text payload) asserts status==200 and
+        # content-type=="application/json", and stores response.text
+        result = self.run_file_target(
+            "1",
+            response={
+                "body": "hello world",
+                "output_file": "",
+                "headers": {"content-type": "application/json"},
+                "status": 200,
+                "method": "GET",
+                "url": "http://localhost:8000/robots.txt",
+            },
+        )
+        script_result = result.result["script_result"]
+        self.assertEqual(True, script_result["compiled"])
+        self.assertEqual({"outputval": "hello world"}, script_result["properties"])
+        self.assertEqual(2, len(script_result["tests"]))
+        for test in script_result["tests"]:
+            self.assertTrue(test["success"], test["error"])
+        # no request was made
+        self.assertEqual("GET", result.result["method"])
+
+    def test_file_tests_report_failure(self):
+        # a non-json content-type makes test_content_type fail while
+        # test_status still passes
+        result = self.run_file_target(
+            "1",
+            response={
+                "body": "hello world",
+                "output_file": "",
+                "headers": {"content-type": "text/plain"},
+                "status": 200,
+                "method": "GET",
+                "url": "http://localhost:8000/robots.txt",
+            },
+        )
+        script_result = result.result["script_result"]
+        self.assertEqual(True, script_result["compiled"])
+        success_count = sum(1 for t in script_result["tests"] if t["success"])
+        self.assertEqual(1, success_count)
+
+    def test_json_body_is_parsed(self):
+        # target "2" reads response.json()["json"]["token"] into a property
+        result = self.run_file_target(
+            "2",
+            response={
+                "body": '{"json": {"token": "secret_token"}}',
+                "output_file": "",
+                "headers": {"content-type": "application/json"},
+                "status": 200,
+                "method": "POST",
+                "url": "http://localhost:8000/post",
+            },
+        )
+        script_result = result.result["script_result"]
+        self.assertEqual({"outputval": "secret_token"}, script_result["properties"])
+        self.assertEqual("this is sample log\n", script_result["stdout"])
+        for test in script_result["tests"]:
+            self.assertTrue(test["success"], test["error"])
+
+    def test_content_handler_with_history_and_request(self):
+        content = """
+GET http://localhost:8000/get
+> {%
+def test_history():
+    assert len(client.response.history) == 1
+    assert client.response.history[0].status_code == 302
+
+def test_request():
+    assert client.response.request.method == "GET"
+
+def test_status():
+    assert client.response.status_code == 200
+%} python
+"""
+        result = self.content_handler.run(
+            Command(
+                method=ContentTestHandler.name,
+                params={
+                    "content": content,
+                    "response": {
+                        "body": "{}",
+                        "output_file": "",
+                        "headers": {"content-type": "application/json"},
+                        "status": 200,
+                        "method": "GET",
+                        "url": "http://localhost:8000/get",
+                        "request": {
+                            "method": "GET",
+                            "url": "http://localhost:8000/redirect",
+                            "headers": {},
+                        },
+                        "history": [
+                            {
+                                "status": 302,
+                                "headers": {"location": "http://localhost:8000/get"},
+                                "method": "GET",
+                                "url": "http://localhost:8000/redirect",
+                            }
+                        ],
+                    },
+                },
+                id=1,
+            )
+        )
+        script_result = result.result["script_result"]
+        self.assertEqual(True, script_result["compiled"])
+        self.assertEqual(3, len(script_result["tests"]))
+        for test in script_result["tests"]:
+            self.assertTrue(test["success"], test["error"])
+
+    def run_file_target(self, target, response, properties=None):
+        if properties is None:
+            properties = {}
+        return self.file_handler.run(
+            Command(
+                method=RunHttpFileTestHandler.name,
+                params={
+                    "file": f"{command_dir}/script.http",
+                    "target": target,
+                    "properties": properties,
+                    "response": response,
+                },
+                id=1,
+            )
+        )
