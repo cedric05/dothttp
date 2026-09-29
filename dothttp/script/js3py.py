@@ -19,6 +19,9 @@ import xmltodict
 import jsonschema
 import requests
 import yaml
+import collections
+import itertools
+import re
 from cryptography import *
 from faker import Faker
 from requests import Response
@@ -67,10 +70,58 @@ allowed_global = {
     "open": open,
     "json": json,
     "yaml": yaml,
+    "dict": dict,
+    "next": next,
+    "list": list,
+    "tuple": tuple,
+    "set": set,
+    "str": str,
+    "int": int,
+    "float": float,
+    "bool": bool,
+    "bytes": bytes,
+    "bytearray": bytearray,
+    "frozenset": frozenset,
+    "enumerate": enumerate,
+    "zip": zip,
+    "range": range,
+    "reversed": reversed,
+    "sorted": sorted,
+    "filter": filter,
+    "map": map,
+    "slice": slice,
+    "len": len,
+    "max": max,
+    "min": min,
+    "sum": sum,
+    "abs": abs,
+    "round": round,
+    "pow": pow,
+    "divmod": divmod,
+    "any": any,
+    "all": all,
+    "collections": collections,
+    "defaultdict": collections.defaultdict,
+    "Counter": collections.Counter,
+    "OrderedDict": collections.OrderedDict,
+    "deque": collections.deque,
+    "namedtuple": collections.namedtuple,
+    "itertools": itertools,
+    "re": re,
+    "isinstance": isinstance,
+    "issubclass": issubclass,
     "cryptography": cryptography,
     "jsonschema": jsonschema,
     "requests": requests,
     "xmltodict": xmltodict,
+    "Exception": Exception,
+    "ValueError": ValueError,
+    "KeyError": KeyError,
+    "IndexError": IndexError,
+    "TypeError": TypeError,
+    "AttributeError": AttributeError,
+    "AssertionError": AssertionError,
+    "ZeroDivisionError": ZeroDivisionError,
 }
 allowed_global.update(safe_globals)
 
