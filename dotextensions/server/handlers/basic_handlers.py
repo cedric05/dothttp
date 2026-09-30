@@ -1,4 +1,5 @@
 import mimetypes
+import platform
 from typing import List
 
 from urllib.parse import urlencode
@@ -38,7 +39,18 @@ class VersionHandler(BaseHandler):
         return VersionHandler.name
 
     def run(self, command: Command) -> Result:
-        return Result(id=command.id, result={"version": __version__})
+        os_name = platform.system().lower()
+        if os_name not in {"darwin", "linux", "windows"}:
+            os_name = "unknown"
+        arch = platform.machine() or platform.processor() or "unknown"
+        return Result(
+            id=command.id,
+            result={
+                "version": __version__,
+                "os": os_name,
+                "arch": arch,
+            },
+        )
 
 
 class RunHttpFileHandler(BaseHandler):
@@ -157,7 +169,6 @@ class RunHttpFileHandler(BaseHandler):
             )
         resp = comp.get_response()
         if output := comp.httpdef.output:
-            # body = f"Output stored in {output}"
             try:
                 comp.write_to_output(resp)
             except Exception as e:
@@ -167,7 +178,7 @@ class RunHttpFileHandler(BaseHandler):
         body = resp.text
         response_data = {
             "response": {
-                "body": body,  # for binary out, it will fail, check for alternatives
+                "body": body,
                 "output_file": output or "",
                 **self._get_resp_data(resp),
             },
@@ -178,13 +189,11 @@ class RunHttpFileHandler(BaseHandler):
             response_data["history"] = [
                 self._get_resp_data(hist_item) for hist_item in resp.history
             ]
-        # will be used for response
         data = {}
-        data.update(response_data["response"])  # deprecated
+        data.update(response_data["response"])
         data.update(response_data)
         data["request_headers"] = dict(resp.request.headers)
         if not comp.args.no_cookie and "cookie" in resp.request.headers:
-            # redirects can add cookies
             comp.httpdef.headers["cookie"] = resp.request.headers["cookie"]
         try:
             data.update(
@@ -204,8 +213,6 @@ class RunHttpFileHandler(BaseHandler):
             "status": resp.status_code,
             "method": resp.request.method,
             "url": resp.url,
-            # capture the request too so the response round-trips for a
-            # tests-only replay (redirect hops keep their own request)
             "request": {
                 "method": resp.request.method,
                 "url": resp.request.url,
@@ -233,24 +240,16 @@ class ContentBase(BaseModelProcessor):
         self.args = config
 
     def load_content(self):
-        # joining contexts to content is not correct approach
-        # as any error in one of context could bring down main usecase
         self.original_content = self.content = self.args.content
 
     def load_model(self):
-        # reqcomp will try to resolve properties right after model is generated
         super(ContentBase, self).load_model()
-        ##
-        # context has varibles defined
-        # for resolving purpose, including them into content
         self.content = self.content + CONTEXT_SEP + CONTEXT_SEP.join(self.args.contexts)
 
     def select_target(self):
         for context in self.args.contexts:
             try:
-                # if model is generated, try to figure out target
                 model: MultidefHttp = dothttp_model.model_from_str(context)
-                # by including targets in to model
                 self.load_properties_from_var(model, self.property_util, can_override=False)
                 self.model.allhttps = self.model.allhttps + model.allhttps
                 if model.import_list and model.import_list.filename:
@@ -261,10 +260,7 @@ class ContentBase(BaseModelProcessor):
                     self.load_imports()
                 self.content += context + "\n\n" + context
 
-            except Exception as e:
-                # contexts, can not always be correct syntax
-                # in such scenarios, don't complain, try to resolve with
-                # next contexts
+            except Exception:
                 logger.info("ignoring exception, context is not looking good")
         return super(ContentBase, self).select_target()
 
@@ -282,7 +278,6 @@ class ContentExecuteHandler(RunHttpFileHandler):
 
     def get_config(self, command):
         config = super().get_config(command)
-        # config.file = command.params.get('content')
         return config
 
     def get_method(self):
@@ -295,10 +290,6 @@ class ContentExecuteHandler(RunHttpFileHandler):
         return ContentCurlCompiler(config)
 
     def run(self, command: Command) -> Result:
-        """
-        When handling content, if an exception is raised, the response is not in the usual format.
-        Instead, it returns an error message. It is better to respond with a structured response.
-        """
         try:
             return self.execute(command)
         except DotHttpException as exc:
@@ -315,9 +306,7 @@ class ContentExecuteHandler(RunHttpFileHandler):
             "status": 0,
             "method": "REQUEST_EXECUTION_ERROR",
             "url": "REQUEST_EXECUTION_ERROR",
-            "headers": {
-                "Content-Type": "text/plain",
-            },
+            "headers": {"Content-Type": "text/plain"},
             "output_file": "",
             "error": True,
             "error_message": error_result,
@@ -337,16 +326,9 @@ class RunTestBase:
     """
     Runs only the test script of a dothttp definition against a
     previously-captured response, without re-issuing the HTTP request.
-
-    The captured response is passed in ``command.params["response"]`` using
-    the same serialized shape that the execute handlers emit
-    (``{body, output_file, headers, status, method, url}``) and is adapted
-    into a ``requests.Response``-like object via ``DothttpResponse``.
     """
 
     def get_test_result(self, command, comp: RequestCompiler) -> Result:
-        # parse + resolve + compile the test script (and pre/init scripts);
-        # crucially this does NOT call comp.get_response(), so no request goes out
         comp.load_def()
         if comp.property_util.errors:
             return Result(
@@ -446,15 +428,12 @@ class ResolveBase:
             resolved = comp.httpdef.url
         elif type_type == DothttpTypes.NAME.value:
             resolved = comp.httpdef.name
-        # header
-        # query is pending
         elif type_type == DothttpTypes.VARIABLE.value:
             variable_name = type_dict["name"]
             resolved = comp.property_util.resolve_property_string(variable_name)
         elif type_type == DothttpTypes.HEADER.value:
-            resolved =  dict(comp.httpdef.headers)
+            resolved = dict(comp.httpdef.headers)
         elif type_type == DothttpTypes.URL_PARAMS.value:
-            # generate url params
             resolved = urlencode(comp.httpdef.query, doseq=True)
         elif type_type == DothttpTypes.PAYLOAD_DATA.value:
             resolved = comp.httpdef.payload.data
@@ -470,9 +449,6 @@ class ResolveBase:
             resolved = ""
         type_dict["resolved"] = resolved
         return Result(id=command.id, result=type_dict)
-
-
-# return resolved string instead of model object
 
 
 class GetHoveredResolvedParamFileHandler(RunHttpFileHandler, ResolveBase):
@@ -592,7 +568,7 @@ class ContentNameReferencesHandler(GetNameReferencesHandler):
                 ) = self.parse_n_get(context_context, filename)
                 imported_names += _all_names + _imported_names
                 imported_urls += _all_urls + _imported_urls
-            except:
+            except Exception:
                 pass
         result = Result(
             id=command.id,
