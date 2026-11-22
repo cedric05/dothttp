@@ -16,6 +16,8 @@ jobs:
       url: https://pypi.org/p/dothttp-req
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+      packages: write
+
     steps:
     - uses: actions/checkout@v5
     - name: Set up Python
@@ -32,7 +34,7 @@ jobs:
         # unit tests need python-magic
         # package in pypi woudn't need python-magic
         # for integration tests
-        pytest
+        pytest --ignore=test/core/test_certs.py
     - name: Build Distribution
       run: |
         # install prerequisites

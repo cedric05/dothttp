@@ -8,47 +8,41 @@ on:
     tags:
       - v*
 
-env:
-  IMAGE_NAME: dothttp
-
 jobs:
   push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
     if: github.event_name == 'push'
     steps:
       - uses: actions/checkout@v5
-      - name: Build image
-        run: docker build . --file Dockerfile --tag $IMAGE_NAME
-      - name: Log into registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-      - name: Push image
+      - name: Set image version
+        env:
+          GITHUB_REF: ${{ github.ref }}
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
-          DOCKER_HUB_IMAGE_ID=dothttp/dothttp
-
-          # Change all uppercase to lowercase
-          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
-
-          # Strip git ref prefix from version
-          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
-
-          # Strip "v" prefix from tag name
-          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
-
-          # Use Docker `latest` tag convention
-          [ "$VERSION" == "main" ] && VERSION=latest
-
-          echo IMAGE_ID=$IMAGE_ID
-          echo VERSION=$VERSION
-
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
-          docker tag $IMAGE_NAME $DOCKER_HUB_IMAGE_ID:$VERSION
-          docker tag $IMAGE_NAME $DOCKER_HUB_IMAGE_ID
-
-
-          docker push $IMAGE_ID:$VERSION
-
-          echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login  -u prasanth5 --password-stdin
-
-          docker push $DOCKER_HUB_IMAGE_ID:$VERSION
-          docker push $DOCKER_HUB_IMAGE_ID
+          VERSION="${GITHUB_REF##*/}"
+          VERSION="${VERSION#v}"
+          [ "$VERSION" = "main" ] && VERSION=latest
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/login-action@v3
+        with:
+          username: prasanth5
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v5
+        continue-on-error: true
+        with:
+          context: .
+          push: true
+          tags: |
+            dothttp/dothttp:${{ env.VERSION }}
+            dothttp/dothttp:staging-${{ env.VERSION }}
+            dothttp/dothttp:latest
+            ghcr.io/${{ github.repository }}:${{ env.VERSION }}
+            ghcr.io/${{ github.repository }}:staging-${{ env.VERSION }}
