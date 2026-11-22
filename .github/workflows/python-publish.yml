@@ -16,6 +16,8 @@ jobs:
       url: https://pypi.org/p/dothttp-req
     permissions:
       id-token: write  # IMPORTANT: this permission is mandatory for trusted publishing
+      packages: write
+
     steps:
     - uses: actions/checkout@v5
     - name: Set up Python
